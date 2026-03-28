@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dubai RTA Theory Test - Prepared by Ajmal Thahir</title>
+<meta name="description" content="Dubai RTA Driving License Theory Test Practice - 1000 Questions with Voice & Timer">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="container">
+    <div class="hero">
+      <div class="flag-badge">🇦🇪 RTA Official Theory Test</div>
+      <h1>Dubai Driving License<br><span class="glow">Theory Test Practice</span></h1>
+      <p class="hero-sub">1000 Questions · Voice · Timed · Images</p>
+      <div class="credit-box">
+        <span>✨ Prepared by <b>Ajmal Thahir</b>, Kerala</span>
+        <a href="https://wa.me/919847131871" target="_blank">📱 +91 98471 31871</a>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat"><span class="sn">1000</span><span class="sl">Questions</span></div>
+      <div class="stat"><span class="sn">10</span><span class="sl">Categories</span></div>
+      <div class="stat"><span class="sn">🎙️</span><span class="sl">Voice TTS</span></div>
+      <div class="stat"><span class="sn">📸</span><span class="sl">Images</span></div>
+    </div>
+
+    <h2 class="sec-title">⏱️ Timer Per Question</h2>
+    <div class="timer-row">
+      <div class="t-btn active" data-t="15" onclick="setTimer(this,15)"><span class="tv">15s</span><span class="tl">Fast</span></div>
+      <div class="t-btn" data-t="20" onclick="setTimer(this,20)"><span class="tv">20s</span><span class="tl">Normal</span></div>
+      <div class="t-btn" data-t="30" onclick="setTimer(this,30)"><span class="tv">30s</span><span class="tl">Relaxed</span></div>
+      <div class="t-btn" data-t="0" onclick="setTimer(this,0)"><span class="tv">∞</span><span class="tl">No Limit</span></div>
+    </div>
+
+    <h2 class="sec-title">🎮 Mode</h2>
+    <div class="mode-row">
+      <div class="m-card" onclick="startQuiz('practice','all')"><div class="mi">📚</div><div class="mn">Practice</div><div class="ms">All 1000 questions – no pressure</div></div>
+      <div class="m-card featured" onclick="startQuiz('exam','all')"><div class="mi">🎯</div><div class="mn">RTA Exam</div><div class="ms">35 Qs · Pass=23 correct</div><span class="badge">REAL EXAM</span></div>
+      <div class="m-card" onclick="startQuiz('quick','all')"><div class="mi">⚡</div><div class="mn">Quick Quiz</div><div class="ms">20 random questions</div></div>
+    </div>
+
+    <h2 class="sec-title">📂 Category Practice</h2>
+    <div class="cat-grid" id="catGrid"></div>
+
+    <div class="settings-panel">
+      <label class="tog"><input type="checkbox" id="voiceOn" checked> 🔊 Voice Read</label>
+      <label class="tog"><input type="checkbox" id="shuffleOn" checked> 🔀 Shuffle</label>
+      <label class="tog"><input type="checkbox" id="imgOn" checked> 📸 Images</label>
+    </div>
+    <button class="big-btn" onclick="startQuiz('practice','all')">🚀 Start Practice Now</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="screen">
+  <div class="q-header">
+    <button class="back-btn" onclick="goHome()">← Home</button>
+    <div class="q-hc"><div class="mode-tag" id="modeTag">Practice</div><div class="cat-tag" id="catTag">All</div></div>
+    <div class="live-score"><span id="liveC" class="lc">0</span>/<span id="liveT" class="lt">0</span></div>
+  </div>
+
+  <div class="prog-bar-wrap">
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-labels"><span id="progTxt">Q 1 of 35</span><span id="progPct">0%</span></div>
+  </div>
+
+  <div class="timer-ring-wrap" id="timerWrap">
+    <svg viewBox="0 0 100 100" class="tring-svg">
+      <circle class="tr-bg" cx="50" cy="50" r="42"/>
+      <circle class="tr-fg" cx="50" cy="50" r="42" id="trFg"/>
+    </svg>
+    <div class="t-num" id="tNum">30</div>
+  </div>
+
+  <div class="q-card" id="qCard">
+    <div class="q-meta">
+      <span class="qn-badge" id="qnBadge">Q.1</span>
+      <span class="qc-badge" id="qcBadge">Signs</span>
+      <button class="voice-btn" id="voiceBtn" onclick="speakNow()" title="Listen">🔊</button>
+    </div>
+
+    <div class="q-img-box" id="qImgBox">
+      <div class="sign-canvas" id="signCanvas"></div>
+    </div>
+
+    <p class="q-text" id="qText">Loading...</p>
+
+    <div class="opts" id="opts">
+      <button class="opt" id="oA" onclick="pick('A')"><span class="ol">A</span><span class="ot" id="oAt"></span></button>
+      <button class="opt" id="oB" onclick="pick('B')"><span class="ol">B</span><span class="ot" id="oBt"></span></button>
+      <button class="opt" id="oC" onclick="pick('C')"><span class="ol">C</span><span class="ot" id="oCt"></span></button>
+      <button class="opt" id="oD" onclick="pick('D')"><span class="ol">D</span><span class="ot" id="oDt"></span></button>
+    </div>
+
+    <div class="expl-box" id="explBox">
+      <span class="expl-ico" id="explIco">✅</span>
+      <div><div class="expl-res" id="explRes">Correct!</div><div class="expl-txt" id="explTxt"></div></div>
+    </div>
+
+    <div class="q-nav">
+      <button class="nav-btn prev" onclick="prevQ()">← Prev</button>
+      <button class="nav-btn skip" onclick="skipQ()" id="skipBtn">Skip ⏭</button>
+      <button class="nav-btn next" onclick="nextQ()" id="nextBtn" style="display:none">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen">
+  <div class="res-wrap">
+    <div class="trophy" id="trophy">🏆</div>
+    <h2 class="res-title" id="resTitle">Great Job!</h2>
+    <div class="score-ring" id="scoreRing">
+      <div class="sr-pct" id="srPct">0%</div>
+      <div class="sr-lbl">Score</div>
+    </div>
+    <div class="res-stats">
+      <div class="rs correct"><span id="rsC">0</span><small>✅ Correct</small></div>
+      <div class="rs wrong"><span id="rsW">0</span><small>❌ Wrong</small></div>
+      <div class="rs skip"><span id="rsS">0</span><small>⏭ Skipped</small></div>
+      <div class="rs time"><span id="rsT">0:00</span><small>⏱ Time</small></div>
+    </div>
+    <div class="pf-box" id="pfBox">
+      <span class="pf-lbl" id="pfLbl">PASS</span>
+      <p id="pfMsg">Congratulations! You passed!</p>
+    </div>
+    <div class="res-btns">
+      <button onclick="reviewMode()">📋 Review</button>
+      <button class="primary" onclick="retryQ()">🔄 Retry</button>
+      <button onclick="goHome()">🏠 Home</button>
+    </div>
+    <p class="footer-credit">Prepared by <b>Ajmal Thahir</b>, Kerala · <a href="https://wa.me/919847131871">+91 98471 31871</a></p>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div id="review" class="screen">
+  <div class="rev-header">
+    <button class="back-btn" onclick="showScreen('results')">← Results</button>
+    <h2>Answer Review</h2>
+  </div>
+  <div id="revList" class="rev-list"></div>
+</div>
+
+<div class="voice-bar" id="voiceBar"><div class="vw"><span></span><span></span><span></span><span></span><span></span></div> Reading...</div>
+
+<script src="questions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
