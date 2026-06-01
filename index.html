@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Nexus — Global Tag Talk</title>
+<title>Reedbi— Global Tag Talk</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -355,7 +356,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 <div class="auth-screen" id="auth-screen">
   <div class="auth-box">
     <div class="auth-head">
-      <div class="auth-logo">⬡ Nexus</div>
+      <div class="auth-logo">⬡ Reedbi</div>
       <div class="auth-sub">Global Tag Talk · Jobs · Marketplace</div>
     </div>
     <div class="auth-body">
@@ -394,7 +395,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 <div class="shell" id="main-app" style="display:none">
 <div class="left" id="lp">
   <div class="lhead">
-    <span class="logo">⬡ Nexus</span>
+    <span class="logo">⬡ Reedbi</span>
     <div style="display:flex;align-items:center;gap:5px">
       <div class="uchip" onclick="showMyProfile()">
         <div class="uchip-av av0" id="uc-av">ME</div>
@@ -414,7 +415,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 <div class="right" id="rp">
   <div class="es" id="es">
     <div class="es-ic"><i class="ti ti-device-mobile"></i></div>
-    <h2>Nexus on Your Phone</h2>
+    <h2>Reedbi on Your Phone</h2>
     <p>All posts, comments & CVs saved to your phone's localStorage. Select a tag to get started.</p>
     <button class="btn btnok" onclick="openCreateModal()" style="border-radius:17px;margin-top:7px;display:flex;align-items:center;gap:5px;margin:8px auto 0"><i class="ti ti-plus"></i> Create a Tag</button>
   </div>
@@ -427,7 +428,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
         <span class="stor-badge stor-phone" id="stor-badge"><i class="ti ti-device-mobile" style="font-size:9px"></i> Phone</span>
         <button class="ib" id="ficbtn" onclick="toggleFollow()"><i class="ti ti-bookmark" id="ficon"></i></button>
         <button class="ib" onclick="toggleInnerSearch()"><i class="ti ti-search"></i></button>
-        <button class="ib"><i class="ti ti-info-circle"></i></button>
+        <button class="ib" onclick="showTagInfo()" title="Tag Info"><i class="ti ti-info-circle"></i></button>
       </div>
     </div>
     <div class="tag-inner-search" id="tag-inner-search" style="display:none">
@@ -472,7 +473,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 </div>
 
 <!-- PROFILE MODAL (shows own CVs + user info) -->
-<div class="pmb" id="pmb" onclick="if(event.target===this)closePM()">
+<div class="pmb" id="pmb">
   <div class="pm">
     <div class="pm-av" id="pm-av"></div>
     <h3 id="pm-name"></h3>
@@ -565,22 +566,67 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 
 <div class="tstack" id="tstack"></div>
 
+<!-- ══ BOOST / ADVERTISE MODAL ══ -->
+<div class="overlay" id="boost-ovl">
+  <div class="modal">
+    <div class="mhd">
+      <h3><i class="ti ti-rocket" style="font-size:13px;color:var(--gold)"></i> Boost Post as Ad</h3>
+      <button class="ib" onclick="closeBoost()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbd">
+      <div style="font-size:12px;color:var(--muted2);margin-bottom:12px;line-height:1.6">Boosted posts appear <strong>at the top of the feed</strong> with a gold crown badge. Reach thousands of users worldwide.</div>
+      <div id="boost-plans"></div>
+    </div>
+    <div class="mft">
+      <button class="btn btnc" onclick="closeBoost()">Cancel</button>
+      <button class="btn btnok" style="background:var(--gold);color:#000" onclick="proceedToPayment()"><i class="ti ti-credit-card"></i> Pay & Boost</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAYMENT MODAL ══ -->
+<div class="overlay" id="pay-ovl">
+  <div class="modal">
+    <div class="mhd">
+      <h3><i class="ti ti-credit-card" style="font-size:13px;color:var(--green)"></i> Complete Payment</h3>
+      <button class="ib" onclick="closePay()"><i class="ti ti-arrow-left"></i></button>
+    </div>
+    <div class="mbd">
+      <div class="pay-total-box">
+        <div class="total-label">Total Amount</div>
+        <div class="total-amount" id="pay-amount">$4.99</div>
+        <div class="total-desc" id="pay-desc">Daily Boost · 24 hours</div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--muted2);margin-bottom:9px;text-transform:uppercase;letter-spacing:.05em">Choose Payment Method</div>
+      <div id="pay-methods"></div>
+      <div id="pay-detail-area"></div>
+      <div style="font-size:10px;color:var(--muted2);margin-top:10px;text-align:center;line-height:1.6">
+        <i class="ti ti-shield-check" style="font-size:11px;color:var(--green)"></i> Secure · Worldwide · Instant activation after payment confirmation
+      </div>
+    </div>
+    <div class="mft">
+      <button class="btn btnc" onclick="closePay();document.getElementById('boost-ovl').classList.add('open')">← Back</button>
+      <button class="btn btnok" style="background:var(--green)" onclick="confirmPayment()"><i class="ti ti-check"></i> Confirm &amp; Activate</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAYMENT SUCCESS ══ -->
+<div class="overlay" id="pay-success-ovl">
+  <div class="modal" style="border-radius:16px 16px 0 0">
+    <div class="mbd" style="text-align:center;padding:28px 20px">
+      <div style="font-size:52px;margin-bottom:12px">🎉</div>
+      <h3 style="font-size:18px;margin-bottom:8px;color:var(--green)">Boost Activated!</h3>
+      <div style="font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:18px" id="success-msg">Your post is now boosted and will appear at the top of the feed with a gold crown badge.</div>
+      <button class="btn btnok" style="width:100%;border-radius:10px" onclick="document.getElementById('pay-success-ovl').classList.remove('open')">Done</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ============================================================
    PHONE STORAGE ENGINE
    All data stored in localStorage under namespaced keys.
-   Keys:
-     nx_user          — current user profile
-     nx_accounts      — all registered accounts
-     nx_posts_{tagId} — posts array per tag
-     nx_cmts_{tagId}_{postId} — comments per post
-     nx_apps          — job applications
-     nx_cvs_{uid}     — CV metadata list per user
-     nx_cv_data_{uid}_{cvId} — base64 CV file data
-     nx_followed_tags — followed tag ids
-     nx_followed_users — followed usernames
-     nx_tags_custom   — user-created tags
-     nx_live_{tagId}  — live activity ring buffer (last 50 entries)
 ============================================================ */
 const LS = {
   get(k,def=null){try{const v=localStorage.getItem(k);return v===null?def:JSON.parse(v);}catch(e){return def;}},
@@ -590,16 +636,24 @@ const LS = {
   size(){try{let b=0;for(const k of Object.keys(localStorage)){if(k.startsWith('nx_'))b+=((localStorage.getItem(k)||'').length*2);}return b;}catch(e){return 0;}},
 };
 
-/* ── Real-time simulation using localStorage polling ──
-   We poll localStorage every 2s to pick up changes from
-   other tabs/windows on same device. Combined with
-   setInterval-based live injection, this gives instant
-   cross-tab real-time without any server.
-   On a real server, replace polling with BroadcastChannel
-   or WebSocket that writes to localStorage on each client.
-*/
+/* ── Global State Variables ── */
 let lsPollIntervals = {};
+let currentUser = null;
+let activeTagId=null,actRegion=null,actUser=null,actAutoTag=null,sortMode='latest';
+let showFolOnly=false,pidCtr=Date.now();
+let isAtBot=true,pendingPosts=[],liveIvl=null,liveTimeout=null,refreshIvl=null;
+let followedTags=new Set(),followedUsers=new Set();
+let curApplyPid=null,curProfileUser=null,addedSuggestTags=[];
+let innerSearchQ='',showInnerSearch=false;
+let selectedCVId=null; 
 
+/* ── Ad Boost State Variables ── */
+let curBoostPostId = null;
+let curBoostTagId  = null;
+let selBoostPlan   = null;
+let selPayMethod   = null;
+
+/* ── Real-time simulation using localStorage polling ── */
 function startLSPolling(tagId){
   if(lsPollIntervals[tagId]) clearInterval(lsPollIntervals[tagId]);
   let lastPostCount = (LS.get('nx_posts_'+tagId,[])).length;
@@ -617,7 +671,7 @@ function startLSPolling(tagId){
           t.posts.push(sp);
           if(isAtBot){appendPostDOM(t,sp);renderSbar(t);renderSlideRows(t);updateTagItem(t);}
           else{pendingPosts.push(sp);showBanner();}
-          document.getElementById('ttxt').innerHTML='<i class="ti ti-device-mobile" style="font-size:10px"></i> New post from <b>'+esc(sp.user)+'</b> <span class="rc">'+sp.region+'</span>';
+          document.getElementById('ttxt').innerHTML='<i class="ti ti-device-mobile" style="font-size:10px"></i> New post from <b>'+esc(sp.user)+'</b> <span class="rc">'+esc(sp.region)+'</span>';
         }
       });
       lastPostCount = stored.length;
@@ -637,7 +691,7 @@ function startLSPolling(tagId){
         });
         lastCommentCounts[p.id]=storedC.length;
         renderSbar(t); updateTagItem(t);
-        document.getElementById('ttxt').innerHTML='<i class="ti ti-device-mobile" style="font-size:10px"></i> <b>'+esc(newCs[0].user)+'</b> commented <span class="rc">'+newCs[0].region+'</span>';
+        document.getElementById('ttxt').innerHTML='<i class="ti ti-device-mobile" style="font-size:10px"></i> <b>'+esc(newCs[0].user)+'</b> commented <span class="rc">'+esc(newCs[0].region)+'</span>';
       }
     });
   }, 2000);
@@ -679,8 +733,6 @@ function downloadCV(uid,cvId,name){
 /* ============================================================
    AUTH (phone storage only)
 ============================================================ */
-let currentUser = null;
-
 function switchAuthTab(tab){
   document.getElementById('tab-login').className='auth-tab'+(tab==='login'?' on':'');
   document.getElementById('tab-signup').className='auth-tab'+(tab==='signup'?' on':'');
@@ -731,7 +783,6 @@ function doSignOut(){
   stopLive();stopLSPolling();activeTagId=null;
 }
 function enterApp(){
-  // restore session
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('main-app').style.display='flex';
   document.getElementById('uc-nm').textContent=currentUser.name;
@@ -807,19 +858,12 @@ function loadPhonePostsIntoTag(tagId){
   });
 }
 
-let activeTagId=null,actRegion=null,actUser=null,actAutoTag=null,sortMode='latest';
-let showFolOnly=false,pidCtr=Date.now();
-let isAtBot=true,pendingPosts=[],liveIvl=null;
-let followedTags=new Set(),followedUsers=new Set();
-let curApplyPid=null,curProfileUser=null,addedSuggestTags=[];
-let innerSearchQ='',showInnerSearch=false;
-let selectedCVId=null; // CV selected for current application
-
 /* ============================================================
-   UTILS
+   UTILS & ESCAPING
 ============================================================ */
 const cs=cat=>CST[cat]||CST.general;
-const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const escJS=s=>String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
 const avC=i=>AVS[i%AVS.length];
 const ini=n=>String(n).substring(0,2).toUpperCase();
 function fmtT(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<10)return'just now';if(s<60)return s+'s ago';const m=Math.floor(s/60);if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
@@ -842,10 +886,10 @@ function renderTagList(filter){
   filter=filter||'';
   const list=document.getElementById('tlist');
   let filtered=tags.filter(t=>{const ms=!filter||t.name.includes(filter.toLowerCase())||t.desc.toLowerCase().includes(filter.toLowerCase());return ms&&(!showFolOnly||t.followed);});
-  if(!filtered.length){list.innerHTML='<div class="nores"><div class="nores-ic"><i class="ti ti-tag-off"></i></div>'+(filter?'<p>No tags for "<strong>'+esc(filter)+'</strong>"</p><button onclick="openCreateModalWithName(\''+esc(filter)+'\')">+ Create #'+esc(filter)+'</button>':'<p>No followed tags yet.</p>')+'</div>';return;}
+  if(!filtered.length){list.innerHTML='<div class="nores"><div class="nores-ic"><i class="ti ti-tag-off"></i></div>'+(filter?'<p>No tags for "<strong>'+esc(filter)+'</strong>"</p><button onclick="openCreateModalWithName(\''+escJS(filter)+'\')">+ Create #'+esc(filter)+'</button>':'<p>No followed tags yet.</p>')+'</div>';return;}
   filtered.sort((a,b)=>{const aT=a.posts.length?Math.max(...a.posts.map(p=>p.ts)):0,bT=b.posts.length?Math.max(...b.posts.map(p=>p.ts)):0;return bT-aT;});
   list.innerHTML=filtered.map(t=>{const s=cs(t.cat),last=[...t.posts].sort((a,b)=>b.ts-a.ts)[0],u=t._unread||0;
-    return '<div class="ti'+(activeTagId===t.id?' act':'')+'" onclick="openTag(\''+t.id+'\')">'
+    return '<div class="ti'+(activeTagId===t.id?' act':'')+'" onclick="openTag(\''+escJS(t.id)+'\')">'
       +'<div class="tav" style="background:'+s.bg+';color:'+s.fg+'">'+s.emoji+'</div>'
       +'<div class="tinf"><div class="tnr1"><span class="tnm">#'+t.name+'</span>'+(t.followed?'<span class="tbadge">Following</span>':'')+'</div>'
       +'<div class="tprev">'+(last?esc((last.title||last.body).substring(0,38)):t.desc)+'</div></div>'
@@ -856,7 +900,7 @@ function filterTags(v){renderTagList(v);}
 function toggleFol(){showFolOnly=!showFolOnly;document.getElementById('folbtn').classList.toggle('on',showFolOnly);renderTagList(document.getElementById('tsr').value);}
 
 /* ============================================================
-   OPEN TAG
+   OPEN & VIEW TAG
 ============================================================ */
 function openTag(id){
   stopLive();stopLSPolling();
@@ -865,6 +909,14 @@ function openTag(id){
   const t=tags.find(x=>x.id===id);if(!t)return;
   // Load posts & comments from phone storage
   loadPhonePostsIntoTag(id);
+
+  // Restore boosts
+  const boosts=LS.get('nx_boosts',[]);
+  t.posts.forEach(p=>{
+    const b=boosts.find(x=>x.tagId===id&&x.postId==p.id&&Date.now()<x.expiry);
+    if(b){p.boosted=b.plan;p.boostExpiry=b.expiry;}
+  });
+
   t._unread=0;
   document.getElementById('es').style.display='none';
   const cv=document.getElementById('cv-view');cv.style.display='flex';
@@ -882,10 +934,18 @@ function openTag(id){
   if(window.innerWidth<=700)document.getElementById('lp').classList.add('hidden');
   startLive(id);         // simulated live posts
   startLSPolling(id);    // real-time LS polling (cross-tab)
-  setInterval(()=>{if(activeTagId===id)refreshTimes();},30000);
+
+  if(refreshIvl) clearInterval(refreshIvl);
+  refreshIvl = setInterval(()=>{if(activeTagId===id)refreshTimes();},30000);
 }
 function updateSub(t){const on=Math.floor(t.members*0.03+10+Math.random()*12);document.getElementById('chs').innerHTML=t.members.toLocaleString()+' members · <span class="online">'+on+' online</span>';}
 function updateFBtn(t){const ic=document.getElementById('ficon');ic.className=t.followed?'ti ti-bookmark-filled':'ti ti-bookmark';ic.style.color=t.followed?'var(--green)':'';}
+function showTagInfo(){
+  if(!activeTagId) return;
+  const t=tags.find(x=>x.id===activeTagId);
+  if(!t) return;
+  toast('🏷️ #' + t.name + ': ' + t.desc + ' (' + t.cat.toUpperCase() + ')', 'info');
+}
 
 /* ============================================================
    SLIDE ROWS
@@ -895,15 +955,15 @@ function renderSlideRows(t){
   const r1=document.getElementById('srow-tags');
   let h1='<span class="srow-label"><i class="ti ti-hash" style="font-size:9px"></i> Auto-Tags</span>';
   h1+='<button class="chip atg'+(actAutoTag===null&&actRegion===null&&actUser===null?' sel':'')+'" onclick="clearFilters()">All</button>';
-  [...allAT].slice(0,14).forEach(at=>{const fol=followedTags.has('at_'+at);h1+='<button class="chip atg'+(actAutoTag===at?' sel':'')+(fol?' fat':'')+'" onclick="clickATag(\''+esc(at)+'\')">'+(fol?'<i class="ti ti-check" style="font-size:9px"></i>':'')+'#'+esc(at)+'</button>';});
+  [...allAT].slice(0,14).forEach(at=>{const fol=followedTags.has('at_'+at);h1+='<button class="chip atg'+(actAutoTag===at?' sel':'')+(fol?' fat':'')+'" onclick="clickATag(\''+escJS(at)+'\')">'+(fol?'<i class="ti ti-check" style="font-size:9px"></i>':'')+'#'+esc(at)+'</button>';});
   r1.innerHTML=h1;
   const allReg=[...new Set(t.posts.map(p=>p.region).filter(Boolean))].sort();
   const allUsers=[...new Set(t.posts.map(p=>p.user))].slice(0,10);
   const r2=document.getElementById('srow-ru');
   let h2='<span class="srow-label"><i class="ti ti-map-pin" style="font-size:9px"></i></span>';
-  allReg.forEach(r=>{h2+='<button class="chip reg'+(actRegion===r?' sel':'')+'" onclick="setRegion(\''+r.replace(/'/g,"\\'")+'\')">'+r+'</button>';});
+  allReg.forEach(r=>{h2+='<button class="chip reg'+(actRegion===r?' sel':'')+'" onclick="setRegion(\''+escJS(r)+'\')">'+esc(r)+'</button>';});
   h2+='<div class="srow-sep"></div><span class="srow-label"><i class="ti ti-users" style="font-size:9px"></i></span>';
-  allUsers.forEach(u=>{const p=t.posts.find(x=>x.user===u);const ai=p?p.avIdx:0;h2+='<button class="chip usr'+(actUser===u?' sel':'')+'" onclick="setUser(\''+esc(u)+'\')">'+'<span class="'+avC(ai)+'" style="width:13px;height:13px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;flex-shrink:0">'+ini(u)+'</span> '+esc(u.length>9?u.substring(0,9)+'…':u)+'</button>';});
+  allUsers.forEach(u=>{const p=t.posts.find(x=>x.user===u);const ai=p?p.avIdx:0;h2+='<button class="chip usr'+(actUser===u?' sel':'')+'" onclick="setUser(\''+escJS(u)+'\')">'+'<span class="'+avC(ai)+'" style="width:13px;height:13px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;flex-shrink:0">'+ini(u)+'</span> '+esc(u.length>9?u.substring(0,9)+'…':u)+'</button>';});
   h2+='<div class="srow-sep"></div>';
   h2+='<button class="srt'+(sortMode==='latest'?' on':'')+'" onclick="setSort(\'latest\')"><i class="ti ti-clock"></i> Latest</button>';
   h2+='<button class="srt'+(sortMode==='top'?' on':'')+'" onclick="setSort(\'top\')"><i class="ti ti-trending-up"></i> Top</button>';
@@ -914,7 +974,7 @@ function setRegion(r){actRegion=(actRegion===r)?null:r;if(actRegion){actAutoTag=
 function setUser(u){actUser=(actUser===u)?null:u;if(actUser){actAutoTag=null;actRegion=null;}const t=tags.find(x=>x.id===activeTagId);if(!t)return;renderSlideRows(t);renderMsgs(t);updateFHd(t);}
 function setSort(m){sortMode=m;const t=tags.find(x=>x.id===activeTagId);if(!t)return;renderSlideRows(t);renderMsgs(t);}
 function clearFilters(){actRegion=null;actUser=null;actAutoTag=null;innerSearchQ='';document.getElementById('inner-srch').value='';const t=tags.find(x=>x.id===activeTagId);if(!t)return;renderSlideRows(t);renderMsgs(t);updateFHd(t);}
-function updateFHd(t){const h=document.getElementById('fhd'),txt=document.getElementById('fhdtxt');if(actRegion){const c=t.posts.filter(p=>p.region===actRegion).length;txt.innerHTML='<i class="ti ti-map-pin" style="font-size:10px"></i> '+actRegion+' — '+c+' posts';h.style.display='flex';}else if(actUser){const c=t.posts.filter(p=>p.user===actUser).length;txt.innerHTML='<i class="ti ti-user" style="font-size:10px"></i> '+esc(actUser)+' ('+c+')';h.style.display='flex';}else if(actAutoTag){txt.innerHTML='<i class="ti ti-hash" style="font-size:10px"></i> #'+esc(actAutoTag);h.style.display='flex';}else if(innerSearchQ){txt.innerHTML='<i class="ti ti-search" style="font-size:10px"></i> "'+esc(innerSearchQ)+'"';h.style.display='flex';}else{h.style.display='none';}}
+function updateFHd(t){const h=document.getElementById('fhd'),txt=document.getElementById('fhdtxt');if(actRegion){const c=t.posts.filter(p=>p.region===actRegion).length;txt.innerHTML='<i class="ti ti-map-pin" style="font-size:10px"></i> '+esc(actRegion)+' — '+c+' posts';h.style.display='flex';}else if(actUser){const c=t.posts.filter(p=>p.user===actUser).length;txt.innerHTML='<i class="ti ti-user" style="font-size:10px"></i> '+esc(actUser)+' ('+c+')';h.style.display='flex';}else if(actAutoTag){txt.innerHTML='<i class="ti ti-hash" style="font-size:10px"></i> #'+esc(actAutoTag);h.style.display='flex';}else if(innerSearchQ){txt.innerHTML='<i class="ti ti-search" style="font-size:10px"></i> "'+esc(innerSearchQ)+'"';h.style.display='flex';}else{h.style.display='none';}}
 
 function toggleInnerSearch(){showInnerSearch=!showInnerSearch;const el=document.getElementById('tag-inner-search');el.style.display=showInnerSearch?'flex':'none';if(showInnerSearch)setTimeout(()=>document.getElementById('inner-srch').focus(),80);else clearInnerSearch();}
 function doInnerSearch(q){innerSearchQ=q.trim().toLowerCase();const t=tags.find(x=>x.id===activeTagId);if(!t)return;renderMsgs(t);updateFHd(t);}
@@ -924,38 +984,107 @@ function renderSbar(t){const tl=t.posts.reduce((s,p)=>s+p.likes,0),tc=t.posts.re
 /* ============================================================
    BUILD BUBBLE
 ============================================================ */
-function buildBubble(t,p,isMine){
-  const ats=extractAutoTags(p.title,p.body);
-  const isJob=t.cat==='jobs';
-  const commHtml=p.comments.map((c,ci)=>'<div class="ci"><div class="cav '+avC(c.avIdx)+'">'+ini(c.user)+'</div><div class="ccon"><span class="cau" onclick="openProfile(\''+esc(c.user)+'\',\'\',\''+esc(t.name)+'\','+c.avIdx+')">'+esc(c.user)+'</span><div class="ctxt">'+esc(c.text)+'</div><div class="cmeta"><span class="clk" onclick="likeC(\''+t.id+'\','+p.id+','+ci+')"><i class="ti ti-heart" style="'+(c.liked?'color:#f43f5e':'')+'"></i> '+c.likes+'</span>'+(c.ts?'<span>'+fmtT(c.ts)+'</span>':'')+'<span style="color:var(--gold)"><i class="ti ti-device-mobile" style="font-size:8px"></i></span></div></div></div>').join('');
-  const atsHtml=ats.length?'<div class="atrow">'+ats.map(at=>'<button class="at'+(followedTags.has('at_'+at)?' fat':'')+'" onclick="clickATag(\''+esc(at)+'\')"><i class="ti ti-hash" style="font-size:8px"></i>'+esc(at)+'</button>').join('')+'</div>':'';
-  const applyHtml=isJob?'<button class="abtn" id="ab-'+t.id+'-'+p.id+'" onclick="openApply(\''+t.id+'\','+p.id+')" style="'+(p.applied?'display:none':'')+'"><i class="ti ti-send"></i> Apply Now</button><div class="applbl" id="al-'+t.id+'-'+p.id+'" style="'+(p.applied?'display:block':'')+'">✓ Applied! Good luck 🎉</div>':'';
-  return (!isMine?'<div class="snm" onclick="openProfile(\''+esc(p.user)+'\',\''+esc(p.co||'')+'\',\''+esc(t.name)+'\','+p.avIdx+')"><span class="pav '+avC(p.avIdx)+'">'+ini(p.user)+'</span>'+esc(p.user)+'</div>':'')
-    +'<div class="bub '+(isMine?'out':'in')+'">'
-    +(p.title?'<div class="ptrow"><i class="ti ti-pencil"></i><span class="pttxt">'+esc(p.title)+'</span></div>':'')
-    +'<div class="prow"><span class="pnm" onclick="setUser(\''+esc(p.user)+'\')">'+esc(p.user)+'</span>'+(p.co&&p.co!=='Self'?'<span class="psep">·</span><span class="pco" onclick="openProfile(\''+esc(p.co)+'\',\'\',\''+esc(t.name)+'\','+Math.floor(Math.random()*7)+')">'+esc(p.co)+'</span>':'')+'</div>'
-    +'<div class="pbody">'+esc(p.body)+'</div>'
-    +(p.region?'<div class="rchip'+(actRegion===p.region?' selr':'')+'" onclick="setRegion(\''+p.region.replace(/'/g,"\\'")+'\')"><i class="ti ti-map-pin" style="font-size:8px"></i>'+p.region+'</div>':'')
-    +atsHtml
-    +'<div class="pts"><i class="ti ti-clock" style="font-size:8px"></i>'+fmtT(p.ts)+' · '+fmtC(p.ts)+' <span class="ph-dot"><i class="ti ti-device-mobile" style="font-size:8px"></i></span></div>'
-    +'<div class="bftr"><div class="bacts"><button class="ba'+(p.liked?' lkd':'')+'" onclick="likePost(\''+t.id+'\','+p.id+')"><i class="ti ti-heart"></i> '+p.likes+'</button><button class="ba" onclick="toggleC(\''+t.id+'\','+p.id+')"><i class="ti ti-message-2"></i> '+p.comments.length+'</button><button class="ba" onclick="sharePost('+p.id+')"><i class="ti ti-share"></i></button></div><div class="btime">'+(isMine?' ✓✓':'')+'</div></div>'
-    +applyHtml
-    +'<div class="cs'+(p.showComments?' open':'')+'" id="cs-'+t.id+'-'+p.id+'">'+commHtml+'<div class="acmt"><div class="cav '+avC(currentUser?.avIdx||0)+'">'+ini(currentUser?.name||'ME')+'</div><input type="text" placeholder="Comment…" id="cin-'+t.id+'-'+p.id+'" onkeydown="if(event.key===\'Enter\')submitC(\''+t.id+'\','+p.id+')"><button class="csnd" onclick="submitC(\''+t.id+'\','+p.id+')"><i class="ti ti-send"></i></button></div></div>'
-    +'</div>';
+function buildBubble(t, p, isMine) {
+  const ats = extractAutoTags(p.title, p.body);
+  const isJob = t.cat === 'jobs';
+  const isBoosted = p.boosted && p.boostExpiry && Date.now() < p.boostExpiry;
+
+  const commHtml = p.comments.map((c, ci) => {
+    return '<div class="ci">' +
+      '<div class="cav ' + avC(c.avIdx) + '">' + ini(c.user) + '</div>' +
+      '<div class="ccon">' +
+        '<span class="cau" onclick="openProfile(\'' + escJS(c.user) + '\',\'\',\'' + escJS(t.name) + '\',' + c.avIdx + ')">' + esc(c.user) + '</span>' +
+        '<div class="ctxt">' + esc(c.text) + '</div>' +
+        '<div class="cmeta">' +
+          '<span class="clk" onclick="likeC(\'' + escJS(t.id) + '\',' + p.id + ',' + ci + ')">' +
+            '<i class="ti ti-heart" style="' + (c.liked ? 'color:#f43f5e' : '') + '"></i> ' + c.likes +
+          '</span>' +
+          (c.ts ? '<span>' + fmtT(c.ts) + '</span>' : '') +
+          '<span style="color:var(--gold)"><i class="ti ti-device-mobile" style="font-size:8px"></i></span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  const atsHtml = ats.length ? '<div class="atrow">' + ats.map(at => '<button class="at' + (followedTags.has('at_' + at) ? ' fat' : '') + '" onclick="clickATag(\'' + escJS(at) + '\')"><i class="ti ti-hash" style="font-size:8px"></i>' + esc(at) + '</button>').join('') + '</div>' : '';
+  
+  const applyHtml = isJob ? '<button class="abtn" id="ab-' + t.id + '-' + p.id + '" onclick="openApply(\'' + escJS(t.id) + '\',' + p.id + ')" style="' + (p.applied ? 'display:none' : '') + '"><i class="ti ti-send"></i> Apply Now</button><div class="applbl" id="al-' + t.id + '-' + p.id + '" style="' + (p.applied ? 'display:block' : '') + '">✓ Applied! Good luck 🎉</div>' : '';
+
+  // Header crown for boosted posts
+  const crownHtml = isBoosted ? '<div style="margin-bottom:5px"><span class="ad-crown"><i class="ti ti-crown"></i> ' + getBoostedLabel(p.boosted) + '</span></div>' : '';
+
+  // WhatsApp Share and Boost buttons
+  const titleForWA = (p.title || p.body || '').substring(0, 40);
+  const bodyForWA = (p.body || '').substring(0, 80);
+  const waBtn = '<button class="wa-share-btn" onclick="waShare(' + p.id + ',\'' + escJS(titleForWA) + '\',\'' + escJS(bodyForWA) + '\',\'' + escJS(p.region || '') + '\')"><i class="ti ti-brand-whatsapp"></i></button>';
+  
+  const boostBtn = !isBoosted ? 
+    '<button class="ba" onclick="openBoost(\'' + escJS(t.id) + '\',' + p.id + ')" style="color:var(--gold)"><i class="ti ti-rocket"></i></button>' : 
+    '<span style="font-size:9px;color:var(--gold);padding:2px 4px"><i class="ti ti-crown"></i></span>';
+
+  const isMineClass = isMine ? 'out' : 'in';
+  const adBoostClass = isBoosted ? ' ad-boost' : '';
+
+  return (!isMine ? '<div class="snm" onclick="openProfile(\'' + escJS(p.user) + '\',\'' + escJS(p.co || '') + '\',\'' + escJS(t.name) + '\',' + p.avIdx + ')"><span class="pav ' + avC(p.avIdx) + '">' + ini(p.user) + '</span>' + esc(p.user) + '</div>' : '') +
+    '<div class="bub ' + isMineClass + adBoostClass + '">' +
+    crownHtml +
+    (p.title ? '<div class="ptrow"><i class="ti ti-pencil"></i><span class="pttxt">' + esc(p.title) + '</span></div>' : '') +
+    '<div class="prow"><span class="pnm" onclick="setUser(\'' + escJS(p.user) + '\')">' + esc(p.user) + '</span>' + (p.co && p.co !== 'Self' ? '<span class="psep">·</span><span class="pco" onclick="openProfile(\'' + escJS(p.co) + '\',\'\',\'' + escJS(t.name) + '\',' + Math.floor(Math.random() * 7) + ')">' + esc(p.co) + '</span>' : '') + '</div>' +
+    '<div class="pbody">' + esc(p.body) + '</div>' +
+    (p.region ? '<div class="rchip' + (actRegion === p.region ? ' selr' : '') + '" onclick="setRegion(\'' + escJS(p.region) + '\')"><i class="ti ti-map-pin" style="font-size:8px"></i>' + esc(p.region) + '</div>' : '') +
+    atsHtml +
+    '<div class="pts"><i class="ti ti-clock" style="font-size:8px"></i>' + fmtT(p.ts) + ' · ' + fmtC(p.ts) + ' <span class="ph-dot"><i class="ti ti-device-mobile" style="font-size:8px"></i></span></div>' +
+    '<div class="bftr">' +
+      '<div class="bacts">' +
+        '<button class="ba' + (p.liked ? ' lkd' : '') + '" onclick="likePost(\'' + escJS(t.id) + '\',' + p.id + ')"><i class="ti ti-heart"></i> ' + p.likes + '</button>' +
+        '<button class="ba" onclick="toggleC(\'' + escJS(t.id) + '\',' + p.id + ')"><i class="ti ti-message-2"></i> ' + p.comments.length + '</button>' +
+        '<button class="ba" onclick="sharePost(' + p.id + ')"><i class="ti ti-share"></i></button>' +
+        waBtn +
+        boostBtn +
+      '</div>' +
+      '<div class="btime">' + (isMine ? ' ✓✓' : '') + '</div>' +
+    '</div>' +
+    applyHtml +
+    '<div class="cs' + (p.showComments ? ' open' : '') + '" id="cs-' + t.id + '-' + p.id + '">' +
+      commHtml +
+      '<div class="acmt">' +
+        '<div class="cav ' + avC(currentUser?.avIdx || 0) + '">' + ini(currentUser?.name || 'ME') + '</div>' +
+        '<input type="text" placeholder="Comment…" id="cin-' + t.id + '-' + p.id + '" onkeydown="if(event.key===\'Enter\')submitC(\'' + escJS(t.id) + '\',' + p.id + ')">' +
+        '<button class="csnd" onclick="submitC(\'' + escJS(t.id) + '\',' + p.id + ')"><i class="ti ti-send"></i></button>' +
+      '</div>' +
+    '</div>' +
+    '</div>';
 }
 
 function renderMsgs(t){
   const box=document.getElementById('msgs');if(!box)return;
   let posts=[...t.posts];
+  // filter
   if(actRegion)posts=posts.filter(p=>p.region===actRegion);
   if(actUser)posts=posts.filter(p=>p.user===actUser);
   if(actAutoTag){const kw=actAutoTag;posts=posts.filter(p=>extractAutoTags(p.title,p.body).includes(kw));}
   if(innerSearchQ){const q=innerSearchQ;posts=posts.filter(p=>(p.title||'').toLowerCase().includes(q)||(p.body||'').toLowerCase().includes(q)||(p.user||'').toLowerCase().includes(q)||(p.co||'').toLowerCase().includes(q));}
-  if(sortMode==='top')posts.sort((a,b)=>b.likes-a.likes);else posts.sort((a,b)=>b.ts-a.ts);
+  
+  // sort: boosted first, then by mode
+  const now=Date.now();
+  const isBoosted=p=>p.boosted&&p.boostExpiry&&now<p.boostExpiry;
+  if(sortMode==='top') posts.sort((a,b)=>{if(isBoosted(a)&&!isBoosted(b))return -1;if(!isBoosted(a)&&isBoosted(b))return 1;return b.likes-a.likes;});
+  else posts.sort((a,b)=>{if(isBoosted(a)&&!isBoosted(b))return -1;if(!isBoosted(a)&&isBoosted(b))return 1;return b.ts-a.ts;});
+
   if(!posts.length){box.innerHTML='<div class="nbanner" id="nbanner" onclick="scrollLatest()"><i class="ti ti-arrow-down"></i><span id="nbtxt">New</span></div><div style="text-align:center;padding:30px 12px;color:var(--muted2)"><i class="ti ti-mood-empty" style="font-size:30px;display:block;margin-bottom:7px"></i>No posts. <span style="color:var(--green);cursor:pointer" onclick="clearFilters()">Clear filter</span></div>';return;}
   let html='<div class="nbanner" id="nbanner" onclick="scrollLatest()"><i class="ti ti-arrow-down"></i><span id="nbtxt">New posts</span></div>';
+  let shownBoostStrip=false;
   let lastDay='';
-  posts.forEach(p=>{const isMine=p.mine===true||p.uid===currentUser?.uid;const d=new Date(p.ts);const dl=d.toDateString()===new Date().toDateString()?'Today':d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});if(dl!==lastDay){html+='<div class="ddiv">'+dl+'</div>';lastDay=dl;}html+='<div class="bwrap '+(isMine?'mine':'theirs')+'" id="bw-'+t.id+'-'+p.id+'">'+buildBubble(t,p,isMine)+'</div>';});
+  posts.forEach(p=>{
+    const mine=p.mine===true||p.uid===currentUser?.uid;
+    const d=new Date(p.ts);const dl=d.toDateString()===new Date().toDateString()?'Today':d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    if(dl!==lastDay){html+='<div class="ddiv">'+dl+'</div>';lastDay=dl;}
+    if(isBoosted(p) && !shownBoostStrip){
+      html+='<div class="ad-boost-strip"><i class="ti ti-crown" style="font-size:10px"></i> Sponsored posts · <span style="color:var(--muted2)">Reach more people — boost your post</span></div>';
+      shownBoostStrip=true;
+    }
+    html+='<div class="bwrap '+(mine?'mine':'theirs')+'" id="bw-'+t.id+'-'+p.id+'">'+buildBubble(t,p,mine)+'</div>';
+  });
   box.innerHTML=html;box.scrollTop=0;
 }
 
@@ -963,7 +1092,7 @@ function renderMsgs(t){
 function appendPostDOM(t,p){const box=document.getElementById('msgs');if(!box)return;const isMine=p.mine===true||p.uid===currentUser?.uid;const banner=document.getElementById('nbanner');const div=document.createElement('div');div.id='bw-'+t.id+'-'+p.id;div.className='bwrap '+(isMine?'mine':'theirs')+' nf';div.innerHTML=buildBubble(t,p,isMine);if(banner&&banner.parentNode===box)box.insertBefore(div,banner.nextSibling);else box.insertBefore(div,box.firstChild);if(isAtBot)box.scrollTop=0;}
 function appendCommentDOM(tagId,postId,c,ci){const cs=document.getElementById('cs-'+tagId+'-'+postId);if(!cs)return;const addRow=cs.querySelector('.acmt');const div=document.createElement('div');div.className='ci nca';div.innerHTML='<div class="cav '+avC(c.avIdx)+'">'+ini(c.user)+'</div><div class="ccon"><span class="cau">'+esc(c.user)+'</span><div class="ctxt">'+esc(c.text)+'</div><div class="cmeta"><span>'+fmtT(c.ts)+'</span><span style="color:var(--gold)"><i class="ti ti-device-mobile" style="font-size:8px"></i> phone</span></div></div>';cs.insertBefore(div,addRow);}
 function updateFooter(tagId,postId,p){const bw=document.getElementById('bw-'+tagId+'-'+postId);if(!bw)return;const btns=bw.querySelectorAll('.ba');if(btns[1])btns[1].innerHTML='<i class="ti ti-message-2"></i> '+p.comments.length;}
-function updateTagItem(t){const item=document.querySelector('.ti[onclick="openTag(\''+t.id+'\')"]');if(!item)return;const sorted=[...t.posts].sort((a,b)=>b.ts-a.ts);const last=sorted[0];const u=t._unread||0;const prev=item.querySelector('.tprev');const time=item.querySelector('.ttime');if(prev&&last)prev.textContent=(last.title||last.body).substring(0,38);if(time&&last)time.textContent=fmtT(last.ts);let badge=item.querySelector('.ubadge');if(u>0){if(badge)badge.textContent=u;else{const mc=item.querySelector('.tmeta');if(mc){const b=document.createElement('div');b.className='ubadge';b.textContent=u;mc.appendChild(b);}}}}
+function updateTagItem(t){const item=document.querySelector('.ti[onclick="openTag(\''+escJS(t.id)+'\')"]');if(!item)return;const sorted=[...t.posts].sort((a,b)=>b.ts-a.ts);const last=sorted[0];const u=t._unread||0;const prev=item.querySelector('.tprev');const time=item.querySelector('.ttime');if(prev&&last)prev.textContent=(last.title||last.body).substring(0,38);if(time&&last)time.textContent=fmtT(last.ts);let badge=item.querySelector('.ubadge');if(u>0){if(badge)badge.textContent=u;else{const mc=item.querySelector('.tmeta');if(mc){const b=document.createElement('div');b.className='ubadge';b.textContent=u;mc.appendChild(b);}}}}
 function refreshTimes(){const t=tags.find(x=>x.id===activeTagId);if(!t)return;t.posts.forEach(p=>{const bw=document.getElementById('bw-'+t.id+'-'+p.id);if(!bw)return;const pts=bw.querySelector('.pts');if(pts)pts.innerHTML='<i class="ti ti-clock" style="font-size:8px"></i>'+fmtT(p.ts)+' · '+fmtC(p.ts)+' <span class="ph-dot"><i class="ti ti-device-mobile" style="font-size:8px"></i></span>';});}
 
 /* scroll */
@@ -974,34 +1103,68 @@ function flushPending(){if(!pendingPosts.length)return;const t=tags.find(x=>x.id
 function scrollLatest(){flushPending();const box=document.getElementById('msgs');if(box)box.scrollTop=0;}
 
 /* ============================================================
-   LIVE ENGINE
+   LIVE SIMULATED ENGINE
 ============================================================ */
-function startLive(tagId){stopLive();liveIvl=setInterval(()=>injectLive(tagId),6000+Math.random()*8000);setTimeout(()=>injectLive(tagId),2500);}
-function stopLive(){if(liveIvl){clearInterval(liveIvl);liveIvl=null;}}
+function startLive(tagId){
+  stopLive();
+  liveIvl=setInterval(()=>injectLive(tagId),6000+Math.random()*8000);
+  liveTimeout=setTimeout(()=>injectLive(tagId),2500);
+}
+function stopLive(){
+  if(liveIvl){clearInterval(liveIvl);liveIvl=null;}
+  if(liveTimeout){clearTimeout(liveTimeout);liveTimeout=null;}
+}
 function injectLive(tagId){
   const t=tags.find(x=>x.id===tagId);if(!t)return;
   const user=WN[Math.floor(Math.random()*WN.length)],avIdx=Math.floor(Math.random()*7),region=WR[Math.floor(Math.random()*WR.length)];
   if(Math.random()<0.55&&t.posts.length){
     const p=t.posts[Math.floor(Math.random()*t.posts.length)];
-    document.getElementById('ctyp').innerHTML='<i class="ti ti-pencil" style="font-size:10px"></i> '+user+' is typing…';
+    if(activeTagId===tagId){
+      document.getElementById('ctyp').innerHTML='<i class="ti ti-pencil" style="font-size:10px"></i> '+esc(user)+' is typing…';
+    }
     setTimeout(()=>{
-      document.getElementById('ctyp').innerHTML='';
+      if(activeTagId===tagId){
+        const ctypeEl = document.getElementById('ctyp');
+        if (ctypeEl) ctypeEl.innerHTML='';
+      }
       const c={user,avIdx,text:LC[Math.floor(Math.random()*LC.length)],likes:0,liked:false,ts:Date.now(),region};
       p.comments.push(c);
       // Save to phone storage
       const key='nx_cmts_'+tagId+'_'+p.id;
       const storedC=LS.get(key,[]);storedC.push(c);LS.set(key,storedC);
-      if(activeTagId===tagId){if(p.showComments)appendCommentDOM(tagId,p.id,c,p.comments.length-1);updateFooter(tagId,p.id,p);renderSbar(t);updateTagItem(t);}else{t._unread=(t._unread||0)+1;updateTagItem(t);}
-      document.getElementById('ttxt').innerHTML='<i class="ti ti-device-mobile" style="font-size:9px"></i> <b>'+user+'</b> commented <span class="rc">'+region+'</span>';
+      
+      // Sync via BroadcastChannel
+      bcBroadcast({type:'new_comment', tagId, postId: p.id, comment: c});
+
+      if(activeTagId===tagId){
+        if(p.showComments)appendCommentDOM(tagId,p.id,c,p.comments.length-1);
+        updateFooter(tagId,p.id,p);
+        renderSbar(t);
+        updateTagItem(t);
+        document.getElementById('ttxt').innerHTML='<i class="ti ti-device-mobile" style="font-size:9px"></i> <b>'+esc(user)+'</b> commented <span class="rc">'+esc(region)+'</span>';
+      }else{
+        t._unread=(t._unread||0)+1;
+        updateTagItem(t);
+      }
     },1600+Math.random()*1200);
   }else{
     const titles=LP[tagId]||LP.tech;pidCtr++;
-    const np={id:pidCtr,user,co:LCO[Math.floor(Math.random()*LCO.length)],avIdx,title:titles[Math.floor(Math.random()*titles.length)],body:LBD[Math.floor(Math.random()*LBD.length)],region,ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false};
+    const np={id:pidCtr,user,co:LCO[Math.floor(Math.random()*LCO.length)],avIdx,title:titles[Math.floor(Math.random()*titles.length)],body:LBD[Math.floor(Math.random()*LBD.length)],region,ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false,boosted:null};
     t.posts.push(np);
     // Save to phone storage
     const stored=LS.get('nx_posts_'+tagId,[]);stored.push({...np,comments:[]});LS.set('nx_posts_'+tagId,stored.slice(-100));
-    if(activeTagId===tagId){if(isAtBot){appendPostDOM(t,np);renderSbar(t);renderSlideRows(t);updateTagItem(t);}else{pendingPosts.push(np);showBanner();}}else{t._unread=(t._unread||0)+1;updateTagItem(t);}
-    document.getElementById('ttxt').innerHTML='<i class="ti ti-device-mobile" style="font-size:9px"></i> <b>'+user+'</b> posted "<span style="color:var(--muted2)">'+np.title.substring(0,28)+'</span>" <span class="rc">'+region+'</span>';
+    
+    // Sync via BroadcastChannel
+    bcBroadcast({type:'new_post', tagId, post: {...np, comments: []}});
+
+    if(activeTagId===tagId){
+      if(isAtBot){appendPostDOM(t,np);renderSbar(t);renderSlideRows(t);updateTagItem(t);}
+      else{pendingPosts.push(np);showBanner();}
+      document.getElementById('ttxt').innerHTML='<i class="ti ti-device-mobile" style="font-size:9px"></i> <b>'+esc(user)+'</b> posted "<span style="color:var(--muted2)">'+esc(np.title.substring(0,28))+'</span>" <span class="rc">'+esc(np.region)+'</span>';
+    }else{
+      t._unread=(t._unread||0)+1;
+      updateTagItem(t);
+    }
   }
 }
 
@@ -1012,8 +1175,11 @@ function likePost(tagId,postId){const t=tags.find(x=>x.id===tagId),p=t.posts.fin
 const stored=LS.get('nx_posts_'+tagId,[]);const sp=stored.find(x=>x.id==postId);if(sp){sp.likes=p.likes;LS.set('nx_posts_'+tagId,stored);}}
 function likeC(tagId,postId,ci){const t=tags.find(x=>x.id===tagId),p=t.posts.find(x=>x.id==postId);if(!p||!p.comments[ci])return;const c=p.comments[ci];c.liked=!c.liked;c.likes+=c.liked?1:-1;const cs=document.getElementById('cs-'+tagId+'-'+postId);if(!cs)return;const items=cs.querySelectorAll('.ci');if(items[ci]){const cl=items[ci].querySelector('.clk');if(cl)cl.innerHTML='<i class="ti ti-heart" style="'+(c.liked?'color:#f43f5e':'')+'"></i> '+c.likes;}}
 function toggleC(tagId,postId){const t=tags.find(x=>x.id===tagId),p=t.posts.find(x=>x.id==postId);if(!p)return;p.showComments=!p.showComments;const cs=document.getElementById('cs-'+tagId+'-'+postId);if(cs){cs.classList.toggle('open',p.showComments);if(p.showComments)setTimeout(()=>document.getElementById('cin-'+tagId+'-'+postId)?.focus(),80);}}
+function sharePost(id){navigator.clipboard.writeText(location.href.split('?')[0]+'?post='+id).catch(()=>{});toast('Link copied!','info');}
+
 function submitC(tagId,postId){
   const inp=document.getElementById('cin-'+tagId+'-'+postId);
+  if(!inp) return;
   const text=inp.value.trim();if(!text)return;
   const t=tags.find(x=>x.id===tagId),p=t.posts.find(x=>x.id==postId);if(!p)return;
   const c={user:currentUser?.name||'Me',avIdx:currentUser?.avIdx||0,text,likes:0,liked:false,ts:Date.now(),region:document.getElementById('cregion')?.value||'',uid:currentUser?.uid||'guest'};
@@ -1021,19 +1187,23 @@ function submitC(tagId,postId){
   // Save to phone storage
   const key='nx_cmts_'+tagId+'_'+postId;
   const storedC=LS.get(key,[]);storedC.push(c);LS.set(key,storedC);
+  
+  // Broadcast instantly
+  bcBroadcast({type:'new_comment', tagId, postId, comment:c});
+
   appendCommentDOM(tagId,postId,c,p.comments.length-1);
   updateFooter(tagId,postId,p);renderSbar(t);updateTagItem(t);
-  toast('Comment saved to phone 📱','live');
+  toast('💬 Synced to all open tabs','live');
 }
+
 function toggleFollow(){const t=tags.find(x=>x.id===activeTagId);if(!t)return;t.followed=!t.followed;t.members+=t.followed?1:-1;updateFBtn(t);updateSub(t);renderSbar(t);if(t.followed)followedTags.add(t.id);else followedTags.delete(t.id);LS.set('nx_followed_tags',[...followedTags]);renderTagList(document.getElementById('tsr').value);toast(t.followed?'Following #'+t.name:'Unfollowed #'+t.name,t.followed?'ok':'info');}
-function sharePost(id){navigator.clipboard.writeText(location.href.split('?')[0]+'?post='+id).catch(()=>{});toast('Link copied!','info');}
 
 /* ============================================================
    COMPOSER
 ============================================================ */
 function onTI(v){updateSuggests(v,document.getElementById('cbody').value);}
 function onBI(ta){autoResize(ta);updateSuggests(document.getElementById('ctitle').value,ta.value);}
-function updateSuggests(title,body){const found=extractAutoTags(title,body).filter(t=>!addedSuggestTags.includes(t));const row=document.getElementById('sgrow');if(!found.length&&!addedSuggestTags.length){row.innerHTML='';row.className='sgrow';return;}row.className='sgrow has';let h='<span style="font-size:9px;color:var(--muted2);flex-shrink:0">Auto-tags:</span>';addedSuggestTags.forEach(t=>{h+='<button class="stag added" onclick="remSuggest(\''+t+'\')">#'+t+' ✕</button>';});found.forEach(t=>{h+='<button class="stag" onclick="addSuggest(\''+t+'\')">#'+t+' +</button>';});row.innerHTML=h;}
+function updateSuggests(title,body){const found=extractAutoTags(title,body).filter(t=>!addedSuggestTags.includes(t));const row=document.getElementById('sgrow');if(!found.length&&!addedSuggestTags.length){row.innerHTML='';row.className='sgrow';return;}row.className='sgrow has';let h='<span style="font-size:9px;color:var(--muted2);flex-shrink:0">Auto-tags:</span>';addedSuggestTags.forEach(t=>{h+='<button class="stag added" onclick="remSuggest(\''+escJS(t)+'\')">#'+esc(t)+' ✕</button>';});found.forEach(t=>{h+='<button class="stag" onclick="addSuggest(\''+escJS(t)+'\')">#'+esc(t)+' +</button>';});row.innerHTML=h;}
 function addSuggest(tag){if(!addedSuggestTags.includes(tag))addedSuggestTags.push(tag);updateSuggests(document.getElementById('ctitle').value,document.getElementById('cbody').value);}
 function remSuggest(tag){addedSuggestTags=addedSuggestTags.filter(t=>t!==tag);updateSuggests(document.getElementById('ctitle').value,document.getElementById('cbody').value);}
 
@@ -1045,15 +1215,19 @@ function sendPost(){
   if(!body&&!title){toast('Write something first!','err');return;}
   const t=tags.find(x=>x.id===activeTagId);
   pidCtr++;
-  const np={id:pidCtr,user:currentUser?.name||'Me',co:currentUser?.co||'',avIdx:currentUser?.avIdx||0,mine:true,uid:currentUser?.uid,title,body:body||title,region,ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false};
+  const np={id:pidCtr,user:currentUser?.name||'Me',co:currentUser?.co||'',avIdx:currentUser?.avIdx||0,mine:true,uid:currentUser?.uid,title,body:body||title,region,ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false,boosted:null};
   t.posts.push(np);
   // Save to phone storage
   const stored=LS.get('nx_posts_'+activeTagId,[]);stored.push({...np,comments:[]});LS.set('nx_posts_'+activeTagId,stored.slice(-100));
+  
+  // Broadcast via WhatsApp-style channel
+  bcBroadcast({type:'new_post', tagId:activeTagId, post:{...np,comments:[]}});
+
   document.getElementById('ctitle').value='';document.getElementById('cbody').value='';document.getElementById('cregion').value='';document.getElementById('cbody').style.height='auto';document.getElementById('sgrow').innerHTML='';document.getElementById('sgrow').className='sgrow';addedSuggestTags=[];
   if(actRegion&&region!==actRegion){actRegion=null;actUser=null;actAutoTag=null;}actAutoTag=null;
   appendPostDOM(t,np);renderSlideRows(t);updateFHd(t);renderSbar(t);updateTagItem(t);
   const box=document.getElementById('msgs');if(box)setTimeout(()=>{box.scrollTop=0;},40);
-  toast('Saved to phone 📱','ok');
+  toast('Posted & synced 📱','ok');
 }
 
 /* ============================================================
@@ -1129,7 +1303,7 @@ async function submitApply(){
   const apps=LS.get('nx_apps',[]);apps.push(rec);LS.set('nx_apps',apps);
   if(p){p.applied=true;const stored=LS.get('nx_posts_'+curApplyPid.tagId,[]);const sp=stored.find(x=>x.id==curApplyPid.postId);if(sp){sp.applied=true;LS.set('nx_posts_'+curApplyPid.tagId,stored);}const ab=document.getElementById('ab-'+curApplyPid.tagId+'-'+curApplyPid.postId);const al=document.getElementById('al-'+curApplyPid.tagId+'-'+curApplyPid.postId);if(ab)ab.style.display='none';if(al)al.style.display='block';}
   closeApply();
-  toast('Application saved to phone 📱'+' Good luck '+name.split(' ')[0]+' 🚀','gold');
+  toast('Application saved to phone 📱 Good luck '+name.split(' ')[0]+' 🚀','gold');
 }
 
 function showMyApps(){
@@ -1138,19 +1312,18 @@ function showMyApps(){
   const cvs=getCVs(uid);
   const body=document.getElementById('myapps-body');
   if(!apps.length){body.innerHTML='<p style="color:var(--muted);font-size:12px;text-align:center;padding:20px">No applications yet.</p>';document.getElementById('myapps-ovl').classList.add('open');return;}
-  body.innerHTML=apps.map(a=>{const cv=cvs.find(c=>c.id===a.cvId);return '<div style="background:var(--card);border-radius:8px;padding:10px 11px;margin-bottom:8px"><div style="font-size:12px;font-weight:600;margin-bottom:2px">'+esc(a.postTitle||'Job Application')+'</div><div style="font-size:10px;color:var(--muted2);margin-bottom:4px">#'+esc(a.tagId)+' · '+new Date(a.ts).toLocaleDateString()+(cv?'<span style="color:var(--gold);margin-left:6px"><i class="ti ti-device-mobile" style="font-size:9px"></i> '+esc(cv.name)+'</span>':'')+'</div>'+(a.note?'<div style="font-size:11px;color:var(--muted)">'+esc(a.note.substring(0,80))+'…</div>':'')+(cv?'<button onclick="downloadCV(\''+uid+'\',\''+cv.id+'\',\''+esc(cv.name)+'\')" style="margin-top:6px;font-size:10px;color:var(--green);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:3px 8px;cursor:pointer;font-family:var(--font)"><i class="ti ti-download"></i> Download CV</button>':'')+'</div>';}).join('');
+  body.innerHTML=apps.map(a=>{const cv=cvs.find(c=>c.id===a.cvId);return '<div style="background:var(--card);border-radius:8px;padding:10px 11px;margin-bottom:8px"><div style="font-size:12px;font-weight:600;margin-bottom:2px">'+esc(a.postTitle||'Job Application')+'</div><div style="font-size:10px;color:var(--muted2);margin-bottom:4px">#'+esc(a.tagId)+' · '+new Date(a.ts).toLocaleDateString()+(cv?'<span style="color:var(--gold);margin-left:6px"><i class="ti ti-device-mobile" style="font-size:9px"></i> '+esc(cv.name)+'</span>':'')+'</div>'+(a.note?'<div style="font-size:11px;color:var(--muted)">'+esc(a.note.substring(0,80))+'…</div>':'')+(cv?'<button onclick="downloadCV(\''+uid+'\',\''+cv.id+'\',\''+escJS(cv.name)+'\')" style="margin-top:6px;font-size:10px;color:var(--green);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:3px 8px;cursor:pointer;font-family:var(--font)"><i class="ti ti-download"></i> Download CV</button>':'')+'</div>';}).join('');
   document.getElementById('myapps-ovl').classList.add('open');
 }
 
 /* ============================================================
    PROFILE + CV VIEW
 ============================================================ */
-let curProfileUser=null;
 function openProfile(user,co,tagName,avIdx){
   curProfileUser={user,co,avIdx};
   const av=document.getElementById('pm-av');av.className='pm-av '+avC(avIdx);av.textContent=ini(user);
   document.getElementById('pm-name').textContent=user;
-  document.getElementById('pm-meta').textContent=(co&&co!=='Self'?co+' · ':'')+(tagName?'Active in #'+tagName:'Nexus member');
+  document.getElementById('pm-meta').textContent=(co&&co!=='Self'?co+' · ':'')+(tagName?'Active in #'+tagName:'Reedbi member');
   const t=tags.find(x=>x.id===activeTagId);
   const up=t?t.posts.filter(p=>p.user===user):[];
   const int=new Set();up.forEach(p=>extractAutoTags(p.title,p.body).forEach(at=>int.add(at)));
@@ -1163,16 +1336,26 @@ function openProfile(user,co,tagName,avIdx){
     const cvs=getCVs(uid);
     const info=getCVStorageInfo(uid);
     pmCVs.innerHTML='<div class="pm-cvs-title"><i class="ti ti-device-mobile" style="color:var(--gold)"></i> My CVs on Phone ('+cvs.length+') · '+info.kbUsed+' KB</div>'
-      +(cvs.length?cvs.map(cv=>'<div class="pm-cv-card" onclick="downloadCV(\''+uid+'\',\''+cv.id+'\',\''+esc(cv.name)+'\')">'
+      +(cvs.length?cvs.map(cv=>'<div class="pm-cv-card" onclick="downloadCV(\''+uid+'\',\''+cv.id+'\',\''+escJS(cv.name)+'\')">'
         +'<i class="ti ti-file-text"></i>'
         +'<div class="pm-cv-card-info"><div class="pm-cv-card-name">'+esc(cv.name)+'</div>'
         +'<div class="pm-cv-card-meta">'+cv.type.toUpperCase()+' · '+fmtBytes(cv.size||0)+' · '+fmtT(cv.ts)+'</div></div>'
         +'<span class="pm-cv-card-dl"><i class="ti ti-download"></i></span></div>').join('')
         :'<p style="font-size:11px;color:var(--muted2);margin-bottom:6px">No CVs saved yet. Apply to a job to upload your first CV.</p>');
   }else{pmCVs.innerHTML='';}
-  const isFol=followedUsers.has(user);
-  const fbtn=document.getElementById('pm-follow-btn');
-  if(fbtn)fbtn.innerHTML=(isFol?'<i class="ti ti-user-check"></i> Following':'<i class="ti ti-user-plus"></i> Follow');
+
+  const pmActs=document.querySelector('.pm-acts');
+  if(ownProfile){
+    pmActs.innerHTML='<button class="pmb2 pmb2-f" onclick="closePM();showMyApps()"><i class="ti ti-briefcase"></i> My Applications</button>'
+      +'<button class="pmb2 pmb2-m" onclick="closePM();doSignOut()"><i class="ti ti-logout"></i> Sign Out</button>';
+  }else{
+    const isFol=followedUsers.has(user);
+    pmActs.innerHTML='<button class="pmb2 pmb2-f" id="pm-follow-btn" onclick="followUser()"><i class="ti ti-user-plus"></i> Follow</button>'
+      +'<button class="pmb2 pmb2-m" onclick="closePM();toast(\'DM coming soon!\',\'info\')"><i class="ti ti-message"></i> Message</button>';
+    const fbtn=document.getElementById('pm-follow-btn');
+    if(fbtn)fbtn.innerHTML=(isFol?'<i class="ti ti-user-check"></i> Following':'<i class="ti ti-user-plus"></i> Follow');
+  }
+
   document.getElementById('pmb').classList.add('open');
 }
 function showMyProfile(){openProfile(currentUser?.name||'Guest',currentUser?.co||'','',currentUser?.avIdx||0);}
@@ -1214,14 +1397,10 @@ if(currentUser){enterApp();}
 
 /* ============================================================
    WHATSAPP-STYLE REAL-TIME via BroadcastChannel
-   BroadcastChannel sends messages instantly across ALL open
-   tabs/windows of the same origin — same phone, same browser.
-   Combined with localStorage persistence, this gives true
-   real-time sync without any server.
 ============================================================ */
 let bc = null;
 try{
-  bc = new BroadcastChannel('nexus_realtime');
+  bc = new BroadcastChannel('Reedbi_realtime');
   bc.onmessage = (e) => {
     const msg = e.data;
     if(!msg || !msg.type) return;
@@ -1243,7 +1422,7 @@ function handleBCMessage(msg){
     if(activeTagId === msg.tagId){
       if(isAtBot){ appendPostDOM(t,p); renderSbar(t); renderSlideRows(t); updateTagItem(t); }
       else{ pendingPosts.push(p); showBanner(); }
-      document.getElementById('ttxt').innerHTML='<i class="ti ti-brand-whatsapp" style="font-size:10px;color:var(--green)"></i> <b>'+esc(p.user)+'</b> posted <span class="rc">'+p.region+'</span>';
+      document.getElementById('ttxt').innerHTML='<i class="ti ti-brand-whatsapp" style="font-size:10px;color:var(--green)"></i> <b>'+esc(p.user)+'</b> posted <span class="rc">'+esc(p.region)+'</span>';
     } else { t._unread=(t._unread||0)+1; updateTagItem(t); }
   }
   else if(msg.type === 'new_comment'){
@@ -1256,7 +1435,7 @@ function handleBCMessage(msg){
       if(p.showComments) appendCommentDOM(msg.tagId, msg.postId, c, p.comments.length-1);
       updateFooter(msg.tagId, msg.postId, p);
       renderSbar(t); updateTagItem(t);
-      document.getElementById('ttxt').innerHTML='<i class="ti ti-brand-whatsapp" style="font-size:10px;color:var(--green)"></i> <b>'+esc(c.user)+'</b> commented <span class="rc">'+c.region+'</span>';
+      document.getElementById('ttxt').innerHTML='<i class="ti ti-brand-whatsapp" style="font-size:10px;color:var(--green)"></i> <b>'+esc(c.user)+'</b> commented <span class="rc">'+esc(c.region)+'</span>';
     } else { t._unread=(t._unread||0)+1; updateTagItem(t); }
   }
   else if(msg.type === 'boost_activated'){
@@ -1268,51 +1447,9 @@ function handleBCMessage(msg){
   }
 }
 
-/* Patch sendPost to also broadcast */
-const _origSendPost = sendPost;
-// Override sendPost to broadcast after saving
-const _sendPostOrig = window.sendPost;
-window.sendPost = function(){
-  // call original inline — we re-implement broadcast here
-  if(!activeTagId){toast('Select a tag first','err');return;}
-  const title=document.getElementById('ctitle').value.trim();
-  const body=document.getElementById('cbody').value.trim();
-  const region=document.getElementById('cregion').value;
-  if(!body&&!title){toast('Write something first!','err');return;}
-  const t=tags.find(x=>x.id===activeTagId);
-  pidCtr++;
-  const np={id:pidCtr,user:currentUser?.name||'Me',co:currentUser?.co||'',avIdx:currentUser?.avIdx||0,mine:true,uid:currentUser?.uid,title,body:body||title,region,ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false,boosted:null};
-  t.posts.push(np);
-  const stored=LS.get('nx_posts_'+activeTagId,[]);stored.push({...np,comments:[]});LS.set('nx_posts_'+activeTagId,stored.slice(-100));
-  // Broadcast via WhatsApp-style channel
-  bcBroadcast({type:'new_post', tagId:activeTagId, post:{...np,comments:[]}});
-  document.getElementById('ctitle').value='';document.getElementById('cbody').value='';document.getElementById('cregion').value='';document.getElementById('cbody').style.height='auto';document.getElementById('sgrow').innerHTML='';document.getElementById('sgrow').className='sgrow';addedSuggestTags=[];
-  if(actRegion&&region!==actRegion){actRegion=null;actUser=null;actAutoTag=null;}actAutoTag=null;
-  appendPostDOM(t,np);renderSlideRows(t);updateFHd(t);renderSbar(t);updateTagItem(t);
-  const box=document.getElementById('msgs');if(box)setTimeout(()=>{box.scrollTop=0;},40);
-  toast('Posted & synced 📱','ok');
-};
-
-/* Patch submitC to also broadcast */
-const _origSubmitC = window.submitC;
-window.submitC = function(tagId, postId){
-  const inp=document.getElementById('cin-'+tagId+'-'+postId);
-  const text=inp.value.trim();if(!text)return;
-  const t=tags.find(x=>x.id===tagId),p=t.posts.find(x=>x.id==postId);if(!p)return;
-  const c={user:currentUser?.name||'Me',avIdx:currentUser?.avIdx||0,text,likes:0,liked:false,ts:Date.now(),region:document.getElementById('cregion')?.value||'',uid:currentUser?.uid||'guest'};
-  p.comments.push(c);inp.value='';
-  const key='nx_cmts_'+tagId+'_'+postId;
-  const storedC=LS.get(key,[]);storedC.push(c);LS.set(key,storedC);
-  // Broadcast instantly
-  bcBroadcast({type:'new_comment', tagId, postId, comment:c});
-  appendCommentDOM(tagId,postId,c,p.comments.length-1);
-  updateFooter(tagId,postId,p);renderSbar(t);updateTagItem(t);
-  toast('💬 Synced to all open tabs','live');
-};
-
 /* WhatsApp share button */
 function waShare(postId, title, body, region){
-  const text=encodeURIComponent((title?title+'\n':'')+body+'\n\n'+region+'\n🔗 '+window.location.href.split('?')[0]+'?post='+postId+'\n\n— via Nexus Global Tag Talk');
+  const text=encodeURIComponent((title?title+'\n':'')+body+'\n\n'+region+'\n🔗 '+window.location.href.split('?')[0]+'?post='+postId+'\n\n— via Reedbi Global Tag Talk');
   window.open('https://wa.me/?text='+text,'_blank');
 }
 
@@ -1326,26 +1463,26 @@ const BOOST_PLANS = [
   {id:'monthly', name:'Monthly Boost', duration:'30 days',  days:30, price:59.99, usd:'$59.99', emoji:'👑', best:true},
 ];
 
-// Payment account details — update with your real accounts
+// Payment accounts
 const PAY_ACCOUNTS = {
   card:{
     name:'Credit / Debit Card',
     icon:'💳',
     sub:'Visa, Mastercard, Amex — worldwide',
-    detail:'stripe', // triggers Stripe-like UI
+    detail:'stripe', 
   },
   paypal:{
     name:'PayPal',
     icon:'🅿️',
     sub:'Send to your PayPal account',
-    link:'https://paypal.me/YOURNEXUSID', // ← replace
-    detail:'Send payment to: <strong>paypal.me/YOURNEXUSID</strong><br>Include post title in notes.',
+    link:'https://paypal.me/YOURREEDBIID', 
+    detail:'Send payment to: <strong>paypal.me/YOURREEDBIID</strong><br>Include post title in notes.',
   },
   wise:{
     name:'Wise (Transferwise)',
     icon:'🌍',
     sub:'Best rate worldwide — USD/EUR/GBP/AED',
-    detail:'Account name: <strong>Nexus Global Ltd</strong><br>Email: <strong>pay@nexusglobal.app</strong><br>Currency: USD / EUR / GBP',
+    detail:'Account name: <strong>Reedbi Global Ltd</strong><br>Email: <strong>pay@reedbiglobal.app</strong><br>Currency: USD / EUR / GBP',
   },
   crypto:{
     name:'Crypto (USDT / BTC)',
@@ -1363,14 +1500,9 @@ const PAY_ACCOUNTS = {
     name:'UPI / Google Pay',
     icon:'📲',
     sub:'India — instant UPI transfer',
-    detail:'UPI ID: <strong>nexusglobal@okaxis</strong><br>GPay / PhonePe / Paytm accepted.',
+    detail:'UPI ID: <strong>reedbiglobal@okaxis</strong><br>GPay / PhonePe / Paytm accepted.',
   },
 };
-
-let curBoostPostId = null;
-let curBoostTagId  = null;
-let selBoostPlan   = null;
-let selPayMethod   = null;
 
 function openBoost(tagId, postId){
   curBoostTagId  = tagId;
@@ -1492,75 +1624,10 @@ function confirmPayment(){
   toast('🚀 Boost activated! '+plan.name,'gold');
 }
 
-/* ── Inject Boost & WA Share buttons into buildBubble ──
-   We monkey-patch buildBubble to insert boost button into footer */
-const _origBuildBubble = window.buildBubble;
-window.buildBubble = function(t, p, isMine){
-  let html = _origBuildBubble(t, p, isMine);
-  // Check boost expiry
-  const isBoosted = p.boosted && p.boostExpiry && Date.now() < p.boostExpiry;
-  // Inject boost badge after title row
-  if(isBoosted){
-    const crownHtml='<span class="ad-crown"><i class="ti ti-crown"></i> '+getBoostedLabel(p.boosted)+'</span>';
-    html=html.replace('class="bub '+(isMine?'out':'in')+'"','class="bub '+(isMine?'out':'in')+' ad-boost"');
-    // insert crown after ptrow or at top of bub
-    html=html.replace('<div class="prow">','<div style="margin-bottom:5px">'+crownHtml+'</div><div class="prow">');
-  }
-  // Insert WA share + Boost buttons into footer
-  const pid=p.id;
-  const title=(p.title||p.body||'').substring(0,40).replace(/'/g,"\\'");
-  const waBtn='<button class="wa-share-btn" onclick="waShare('+pid+',\''+title+'\',\''+esc(p.body||'').replace(/'/g,"\\'").substring(0,80)+'\',\''+esc(p.region||'')+'\')"><i class="ti ti-brand-whatsapp"></i></button>';
-  const boostBtn=!isBoosted?'<button class="ba" onclick="openBoost(\''+t.id+'\','+pid+')" style="color:var(--gold)"><i class="ti ti-rocket"></i></button>':'<span style="font-size:9px;color:var(--gold);padding:2px 4px"><i class="ti ti-crown"></i></span>';
-  html=html.replace('</div><div class="btime">',waBtn+boostBtn+'</div><div class="btime">');
-  return html;
-};
-
 function getBoostedLabel(tier){
   const labels={daily:'Ad · 24h',weekly:'Ad · 7d',biweekly:'Ad · 14d',monthly:'Ad · 30d'};
   return labels[tier]||'Sponsored';
 }
-
-/* ── Override renderMsgs to put boosted posts first ── */
-const _origRenderMsgs = window.renderMsgs;
-window.renderMsgs = function(t){
-  const box=document.getElementById('msgs');if(!box)return;
-  let posts=[...t.posts];
-  // filter
-  if(actRegion)posts=posts.filter(p=>p.region===actRegion);
-  if(actUser)posts=posts.filter(p=>p.user===actUser);
-  if(actAutoTag){const kw=actAutoTag;posts=posts.filter(p=>extractAutoTags(p.title,p.body).includes(kw));}
-  if(innerSearchQ){const q=innerSearchQ;posts=posts.filter(p=>(p.title||'').toLowerCase().includes(q)||(p.body||'').toLowerCase().includes(q)||(p.user||'').toLowerCase().includes(q)||(p.co||'').toLowerCase().includes(q));}
-  // sort: boosted first, then by mode
-  const now=Date.now();
-  const isBoosted=p=>p.boosted&&p.boostExpiry&&now<p.boostExpiry;
-  if(sortMode==='top') posts.sort((a,b)=>{if(isBoosted(a)&&!isBoosted(b))return -1;if(!isBoosted(a)&&isBoosted(b))return 1;return b.likes-a.likes;});
-  else posts.sort((a,b)=>{if(isBoosted(a)&&!isBoosted(b))return -1;if(!isBoosted(a)&&isBoosted(b))return 1;return b.ts-a.ts;});
-  if(!posts.length){box.innerHTML='<div class="nbanner" id="nbanner" onclick="scrollLatest()"><i class="ti ti-arrow-down"></i><span id="nbtxt">New</span></div><div style="text-align:center;padding:30px 12px;color:var(--muted2)"><i class="ti ti-mood-empty" style="font-size:30px;display:block;margin-bottom:7px"></i>No posts. <span style="color:var(--green);cursor:pointer" onclick="clearFilters()">Clear filter</span></div>';return;}
-  let html='<div class="nbanner" id="nbanner" onclick="scrollLatest()"><i class="ti ti-arrow-down"></i><span id="nbtxt">New posts</span></div>';
-  let shownBoostStrip=false;
-  let lastDay='';
-  posts.forEach(p=>{
-    const mine=p.mine===true||p.uid===currentUser?.uid;
-    const d=new Date(p.ts);const dl=d.toDateString()===new Date().toDateString()?'Today':d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-    if(dl!==lastDay){html+='<div class="ddiv">'+dl+'</div>';lastDay=dl;}
-    if(isBoosted(p)&&!shownBoostStrip){
-      html+='<div class="ad-boost-strip"><i class="ti ti-crown" style="font-size:10px"></i> Sponsored posts · <span style="color:var(--muted2)">Reach more people — boost your post</span></div>';
-      shownBoostStrip=true;
-    }
-    html+='<div class="bwrap '+(mine?'mine':'theirs')+'" id="bw-'+t.id+'-'+p.id+'">'+buildBubble(t,p,mine)+'</div>';
-  });
-  box.innerHTML=html;box.scrollTop=0;
-};
-
-/* ── Restore boosts from phone storage when opening a tag ── */
-const _origOpenTag = window.openTag;
-window.openTag = function(id){
-  // restore boosts
-  const boosts=LS.get('nx_boosts',[]);
-  const t=tags.find(x=>x.id===id);
-  if(t){t.posts.forEach(p=>{const b=boosts.find(x=>x.tagId===id&&x.postId==p.id&&Date.now()<x.expiry);if(b){p.boosted=b.plan;p.boostExpiry=b.expiry;}});}
-  _origOpenTag(id);
-};
 
 /* ── Add sync dot to ticker when BroadcastChannel active ── */
 if(bc){
@@ -1571,70 +1638,12 @@ if(bc){
   }
 }
 
-/* ── Close boost/pay overlays on outside click ── */
+/* ── Close overlays on outside click ── */
 ['boost-ovl','pay-ovl','pay-success-ovl'].forEach(id=>{
   const el=document.getElementById(id);
   if(el) el.addEventListener('click',e=>{if(e.target===el){el.classList.remove('open');}});
 });
 
 </script>
-
-<!-- ══ BOOST / ADVERTISE MODAL ══ -->
-<div class="overlay" id="boost-ovl">
-  <div class="modal">
-    <div class="mhd">
-      <h3><i class="ti ti-rocket" style="font-size:13px;color:var(--gold)"></i> Boost Post as Ad</h3>
-      <button class="ib" onclick="closeBoost()"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="mbd">
-      <div style="font-size:12px;color:var(--muted2);margin-bottom:12px;line-height:1.6">Boosted posts appear <strong>at the top of the feed</strong> with a gold crown badge. Reach thousands of users worldwide.</div>
-      <div id="boost-plans"></div>
-    </div>
-    <div class="mft">
-      <button class="btn btnc" onclick="closeBoost()">Cancel</button>
-      <button class="btn btnok" style="background:var(--gold);color:#000" onclick="proceedToPayment()"><i class="ti ti-credit-card"></i> Pay & Boost</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ PAYMENT MODAL ══ -->
-<div class="overlay" id="pay-ovl">
-  <div class="modal">
-    <div class="mhd">
-      <h3><i class="ti ti-credit-card" style="font-size:13px;color:var(--green)"></i> Complete Payment</h3>
-      <button class="ib" onclick="closePay()"><i class="ti ti-arrow-left"></i></button>
-    </div>
-    <div class="mbd">
-      <div class="pay-total-box">
-        <div class="total-label">Total Amount</div>
-        <div class="total-amount" id="pay-amount">$4.99</div>
-        <div class="total-desc" id="pay-desc">Daily Boost · 24 hours</div>
-      </div>
-      <div style="font-size:11px;font-weight:600;color:var(--muted2);margin-bottom:9px;text-transform:uppercase;letter-spacing:.05em">Choose Payment Method</div>
-      <div id="pay-methods"></div>
-      <div id="pay-detail-area"></div>
-      <div style="font-size:10px;color:var(--muted2);margin-top:10px;text-align:center;line-height:1.6">
-        <i class="ti ti-shield-check" style="font-size:11px;color:var(--green)"></i> Secure · Worldwide · Instant activation after payment confirmation
-      </div>
-    </div>
-    <div class="mft">
-      <button class="btn btnc" onclick="closePay();document.getElementById('boost-ovl').classList.add('open')">← Back</button>
-      <button class="btn btnok" style="background:var(--green)" onclick="confirmPayment()"><i class="ti ti-check"></i> Confirm &amp; Activate</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ PAYMENT SUCCESS ══ -->
-<div class="overlay" id="pay-success-ovl">
-  <div class="modal" style="border-radius:16px 16px 0 0">
-    <div class="mbd" style="text-align:center;padding:28px 20px">
-      <div style="font-size:52px;margin-bottom:12px">🎉</div>
-      <h3 style="font-size:18px;margin-bottom:8px;color:var(--green)">Boost Activated!</h3>
-      <div style="font-size:13px;color:var(--muted2);line-height:1.7;margin-bottom:18px" id="success-msg">Your post is now boosted and will appear at the top of the feed with a gold crown badge.</div>
-      <button class="btn btnok" style="width:100%;border-radius:10px" onclick="document.getElementById('pay-success-ovl').classList.remove('open')">Done</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
