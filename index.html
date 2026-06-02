@@ -311,6 +311,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .st-passed{background:rgba(6,182,212,.18);color:var(--cyan)}
 /* applicant card (page owner view) */
 .appl-card{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:11px;margin-bottom:9px}
+.ats-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;border:1px solid;border-radius:7px;padding:1px 6px;margin-left:4px}
+.bulk-sched-btn{width:100%;font-size:11px;font-weight:700;color:#000;background:linear-gradient(135deg,var(--gold),#fbbf24);border:none;border-radius:8px;padding:8px;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:5px}
 .appl-section{margin-bottom:10px;border:1px solid var(--b);border-radius:10px;overflow:hidden}
 .appl-sec-head{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer;user-select:none}
 .appl-sec-chev{transition:transform .2s;font-size:14px}
@@ -516,6 +518,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       </div>
     </div>
     <div class="fg"><label>Cover Note</label><textarea id="ano" rows="2" placeholder="Brief intro and why you are a great fit..."></textarea></div>
+    <div class="fg"><label>Skills &amp; Keywords (for ATS matching)</label><textarea id="askills" rows="2" placeholder="e.g. React, Node.js, AWS, 5 years experience, PMP certified..."></textarea></div>
     <div class="fg">
       <label>CV / Resume <span style="color:var(--gold);font-weight:400;text-transform:none"><i class="ti ti-device-mobile" style="font-size:10px"></i> Stored on your phone</span></label>
       <div id="cv-list"></div>
@@ -563,6 +566,16 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <label style="font-size:11px;color:var(--mt);display:block;margin-bottom:6px">Document name (what to attach)</label>
     <input type="text" id="docreq-name" placeholder="e.g. Passport copy, Degree certificate" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:10px;color:var(--tx);font-family:var(--fn)">
     <button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveDocReq()"><i class="ti ti-send"></i> Request from Applicant</button>
+  </div>
+</div></div>
+<!-- BULK SCHEDULE -->
+<div class="overlay" id="bsched-ovl"><div class="modal" style="max-width:340px">
+  <div class="mhd"><h3><i class="ti ti-calendar-stats" style="font-size:13px"></i> Bulk Schedule</h3><button class="ib" onclick="closeOvl('bsched-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <div id="bsched-title" style="font-size:12px;color:var(--mt);margin-bottom:8px"></div>
+    <label style="font-size:11px;color:var(--mt);display:block;margin-bottom:6px">Date &amp; time for everyone</label>
+    <input type="datetime-local" id="bsched-dt" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:10px;color:var(--tx);font-family:var(--fn)">
+    <button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveBulkSchedule()"><i class="ti ti-check"></i> Schedule All in One</button>
   </div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
@@ -1487,7 +1500,7 @@ function submitApply(){
   if(!name||!email){toast('Fill name and email','err');return;}
   var uid=CU.uid;var cvs=getCVs(uid);var selCV2=selCVId?cvs.find(function(c){return c.id===selCVId;}):null;
   var t=tags.find(function(x){return x.id===curApplyPid.tagId;}),p=t&&t.posts.find(function(x){return x.id==curApplyPid.postId;});
-  var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',companyLower:(curApplyPid.company||(p?p.co:'')||'').toLowerCase(),tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),postBody:(p?p.body||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
+  var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,skills:(document.getElementById('askills')?document.getElementById('askills').value:''),cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',companyLower:(curApplyPid.company||(p?p.co:'')||'').toLowerCase(),tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),postBody:(p?p.body||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
   var apps=getAllApps();apps.push(rec);saveAllApps(apps);
   if(FB.ready){FB.db.collection('applications').doc(rec.id).set(rec).catch(function(){});}
   // Upload the CV file itself to the cloud so the page owner can view/open it
@@ -1522,6 +1535,63 @@ function uploadReqDoc(appId,drId){
   };
   inp.click();
 }
+/* ===== ATS matching engine =====
+   Scores each applicant's skills+note against employer-defined keywords. */
+var atsKeywords='';
+function atsScore(a,keywords){
+  var kws=keywords.split(/[,\n]/).map(function(k){return k.trim().toLowerCase();}).filter(Boolean);
+  if(!kws.length)return null;
+  var hay=((a.skills||'')+' '+(a.note||'')+' '+(a.postTitle||'')).toLowerCase();
+  var hits=0,matched=[];
+  kws.forEach(function(k){if(hay.indexOf(k)>=0){hits++;matched.push(k);}});
+  return {pct:Math.round(hits/kws.length*100),hits:hits,total:kws.length,matched:matched};
+}
+function runATS(company){
+  var kw=document.getElementById('ats-kw')?document.getElementById('ats-kw').value:'';
+  atsKeywords=kw;
+  if(!kw.trim()){toast('Enter required skills/keywords first','err');return;}
+  openCompanyPage(company);
+  toast('ATS scored all applicants by match %','ok');
+}
+function atsAutoSort(company,threshold){
+  if(!atsKeywords.trim()){toast('Run ATS scoring first','err');return;}
+  var apps=getAppsForCompany(company);
+  var sel=0,con=0;
+  apps.forEach(function(a){
+    var sc=atsScore(a,atsKeywords);if(!sc)return;
+    if(sc.pct>=threshold){setAppStatus(a.id,'selected');sel++;}
+    else if(sc.pct>=Math.max(40,threshold-30)){setAppStatus(a.id,'considered');con++;}
+  });
+  openCompanyPage(company);
+  toast('ATS auto-sort: '+sel+' selected, '+con+' considered (threshold '+threshold+'%)','gold');
+}
+/* ===== Bulk scheduling ===== */
+var bulkSchedCompany=null,bulkSchedStatus=null,bulkSchedKind=null;
+function openBulkSchedule(company,status,kind){
+  bulkSchedCompany=company;bulkSchedStatus=status;bulkSchedKind=kind;
+  var apps=getAppsForCompany(company).filter(function(a){return a.status===status&&(!ownerJobFilter||(a.postTitle||'(untitled)')===ownerJobFilter);});
+  document.getElementById('bsched-title').textContent=(kind==='mobilization'?'Mobilization':'Interview')+' for '+apps.length+' '+(kind==='mobilization'?'passed':'selected')+' candidate'+(apps.length!==1?'s':'');
+  var d=document.getElementById('bsched-dt');if(d)d.value='';
+  document.getElementById('bsched-ovl').classList.add('open');
+}
+function saveBulkSchedule(){
+  var dt=document.getElementById('bsched-dt').value;
+  if(!dt){toast('Pick a date & time','err');return;}
+  var apps=getAllApps();
+  var nice=new Date(dt).toLocaleString([], {weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  var n=0;
+  apps.forEach(function(a){
+    if((a.company||'').toLowerCase()===String(bulkSchedCompany).toLowerCase()&&a.status===bulkSchedStatus&&(!ownerJobFilter||(a.postTitle||'(untitled)')===ownerJobFilter)){
+      if(bulkSchedKind==='mobilization'){a.mobilizationAt=nice;a.mobilizationISO=dt;}
+      else{a.interviewAt=nice;a.interviewISO=dt;}
+      a.statusTs=Date.now();n++;
+      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){FB.db.collection('applications').doc(a.id).set(a,{merge:true}).catch(function(){});}
+    }
+  });
+  saveAllApps(apps);
+  closeOvl('bsched-ovl');openCompanyPage(bulkSchedCompany);
+  toast(n+' candidate'+(n!==1?'s':'')+' scheduled for '+(bulkSchedKind==='mobilization'?'mobilization':'interview')+' — all notified','gold');
+}
 function showMyApps(){
   if(!requireAuth('view applications'))return;
   var apps=getMyApps().reverse();var cvs=getCVs(CU.uid);
@@ -1539,6 +1609,7 @@ function showMyApps(){
       +(a.status==='rejected'?'<div style="font-size:11px;color:var(--red);margin-top:4px"><i class="ti ti-x"></i> Not selected this time. Keep applying!</div>':'')
       +(a.status==='selected'?'<div style="font-size:11px;color:var(--g);margin-top:4px"><i class="ti ti-circle-check"></i> Congratulations — you have been selected! 🎉</div>':'')
       +(a.interviewAt?'<div style="font-size:11px;color:var(--purple);margin-top:4px"><i class="ti ti-calendar-event"></i> Interview scheduled: <b>'+esc(a.interviewAt)+'</b></div>':'')
+      +(a.mobilizationAt?'<div style="font-size:11px;color:var(--cyan);margin-top:4px"><i class="ti ti-plane-departure"></i> Mobilization: <b>'+esc(a.mobilizationAt)+'</b></div>':'')
       +((a.docRequests&&a.docRequests.length)?'<div style="font-size:10px;color:var(--gold);margin-top:6px;font-weight:600"><i class="ti ti-paperclip"></i> Documents requested:</div>'+a.docRequests.map(function(dr){return '<div style="font-size:11px;margin-top:3px">• '+esc(dr.name)+': '+(dr.fileData?'<span style="color:var(--g)">✓ uploaded</span>':'<button onclick="uploadReqDoc(\''+a.id+'\',\''+dr.id+'\')" style="font-size:10px;color:var(--gold);background:transparent;border:1px solid rgba(245,166,35,.4);border-radius:6px;padding:2px 8px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-upload"></i> Upload</button>')+'</div>';}).join(''):'')
       +(cv?'<button onclick="dlCV(\''+CU.uid+'\',\''+cv.id+'\',\''+escJS(cv.name)+'\')" style="margin-top:6px;font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:3px 8px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-download"></i> My CV</button>':'')
       +'</div>';
@@ -1582,23 +1653,37 @@ function openCompanyPage(company){
   }
   head+='<div style="font-size:9px;color:var(--mt2);margin-top:8px;text-transform:uppercase;letter-spacing:.05em">Set status for ALL '+(ownerJobFilter?'in this job':'')+' ('+apps.length+'):</div><div class="appl-stat-row" style="margin-top:4px">'
     +STATUSES.filter(function(s){return s.id!=='received';}).map(function(s){return '<button class="stat-set-btn" onclick="ownerSetAllFiltered(\''+escJS(company)+'\',\''+s.id+'\')">'+s.label+'</button>';}).join('')
+    +'</div>';
+  // ATS matching panel
+  head+='<div style="margin-top:10px;padding-top:9px;border-top:1px solid var(--b)">'
+    +'<div style="font-size:9px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;font-weight:700"><i class="ti ti-robot"></i> ATS Auto-Match</div>'
+    +'<textarea id="ats-kw" rows="2" placeholder="Required skills/keywords (comma-separated): React, AWS, 5 years, PMP" style="width:100%;margin-top:5px;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:7px;color:var(--tx);font-size:11px;font-family:var(--fn)">'+esc(atsKeywords)+'</textarea>'
+    +'<div class="appl-stat-row" style="margin-top:5px">'
+    +'<button class="stat-set-btn" onclick="runATS(\''+escJS(company)+'\')"><i class="ti ti-scan"></i> Score CVs</button>'
+    +'<button class="stat-set-btn" onclick="atsAutoSort(\''+escJS(company)+'\',70)"><i class="ti ti-wand"></i> Auto-sort (≥70% select)</button>'
     +'</div></div>';
+  head+='</div>';
   if(!apps.length){body.innerHTML=head+'<p style="color:var(--mt);font-size:12px;text-align:center;padding:14px">No applications yet.</p>';document.getElementById('pg-ovl').classList.add('open');return;}
   var sectionsHtml=STATUSES.map(function(s){
     var group=apps.filter(function(a){return a.status===s.id;});
     if(!group.length)return '';
     var cards=group.map(function(a){return applicantCard(a,company);}).join('');
+    var bulkBtn='';
+    if(s.id==='interview')bulkBtn='<button class="bulk-sched-btn" onclick="event.stopPropagation();openBulkSchedule(\''+escJS(company)+'\',\'interview\',\'interview\')"><i class="ti ti-calendar-plus"></i> Schedule ALL for interview</button>';
+    if(s.id==='passed')bulkBtn='<button class="bulk-sched-btn" onclick="event.stopPropagation();openBulkSchedule(\''+escJS(company)+'\',\'passed\',\'mobilization\')"><i class="ti ti-plane-departure"></i> Mobilization schedule for ALL</button>';
     return '<div class="appl-section">'
       +'<div class="appl-sec-head '+s.cls+'" onclick="this.parentNode.classList.toggle(\'collapsed\')">'
       +'<span><i class="ti ti-'+s.icon+'"></i> '+s.label+' <b>('+group.length+')</b></span>'
       +'<i class="ti ti-chevron-down appl-sec-chev"></i></div>'
-      +'<div class="appl-sec-body">'+cards+'</div></div>';
+      +'<div class="appl-sec-body">'+(bulkBtn?'<div style="margin-bottom:8px">'+bulkBtn+'</div>':'')+cards+'</div></div>';
   }).join('');
   body.innerHTML=head+sectionsHtml;
   document.getElementById('pg-ovl').classList.add('open');
 }
 function applicantCard(a,company){
   var so=statusObj(a.status);
+  var atsBadge='';
+  if(atsKeywords.trim()){var sc=atsScore(a,atsKeywords);if(sc){var col=sc.pct>=70?'var(--g)':sc.pct>=40?'var(--gold)':'var(--red)';atsBadge='<span class="ats-badge" style="color:'+col+';border-color:'+col+'" title="Matched: '+esc(sc.matched.join(', '))+'"><i class="ti ti-robot" style="font-size:9px"></i> ATS '+sc.pct+'%</span>';}}
   var statBtns=STATUSES.filter(function(s){return s.id!=='received';}).map(function(s){return '<button class="stat-set-btn '+(a.status===s.id?'on '+s.cls:'')+'" onclick="ownerSetStatus(\''+a.id+'\',\''+s.id+'\',\''+escJS(company)+'\')">'+s.label+'</button>';}).join('');
   var cvBtn=a.cvId&&a.cvOwnerUid?'<button onclick="dlCV(\''+a.cvOwnerUid+'\',\''+a.cvId+'\',\''+escJS(a.cvName||'cv')+'\')" style="font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:var(--fn);margin-top:6px"><i class="ti ti-eye"></i> View CV: '+esc(a.cvName||'CV')+'</button>':'<div style="font-size:10px;color:var(--mt2);margin-top:6px">No CV attached</div>';
   var schedHtml='';
@@ -1607,6 +1692,9 @@ function applicantCard(a,company){
       +(a.interviewAt?'<div style="font-size:11px;color:var(--purple)"><i class="ti ti-calendar-event"></i> Interview: <b>'+esc(a.interviewAt)+'</b></div>':'')
       +'<button class="sched-btn" onclick="openSchedule(\''+a.id+'\',\''+escJS(company)+'\')"><i class="ti ti-calendar-plus"></i> '+(a.interviewAt?'Reschedule':'Schedule interview')+'</button>'
       +'</div>';
+  }
+  if(a.status==='passed'&&a.mobilizationAt){
+    schedHtml+='<div class="appl-sched"><div style="font-size:11px;color:var(--cyan)"><i class="ti ti-plane-departure"></i> Mobilization: <b>'+esc(a.mobilizationAt)+'</b></div></div>';
   }
   var docHtml='<div class="appl-docs">';
   if(a.docRequests&&a.docRequests.length){
@@ -1619,7 +1707,7 @@ function applicantCard(a,company){
   docHtml+='<button class="doc-add" onclick="openDocReq(\''+a.id+'\',\''+escJS(company)+'\')"><i class="ti ti-file-plus"></i> Request document</button></div>';
   return '<div class="appl-card">'
     +'<div class="appl-top"><div class="appl-av '+avC((a.name||'A').charCodeAt(0)%7)+'">'+ini(a.name)+'</div>'
-    +'<div style="flex:1"><div class="appl-nm">'+esc(a.name)+' <span class="stat-badge '+so.cls+'" style="margin-left:4px"><i class="ti ti-'+so.icon+'" style="font-size:9px"></i> '+so.label+'</span></div>'
+    +'<div style="flex:1"><div class="appl-nm">'+esc(a.name)+' <span class="stat-badge '+so.cls+'" style="margin-left:4px"><i class="ti ti-'+so.icon+'" style="font-size:9px"></i> '+so.label+'</span>'+atsBadge+'</div>'
     +'<div class="appl-mt">'+esc(a.email)+(a.phone?' · '+esc(a.phone):'')+(a.loc?' · '+esc(a.loc):'')+'</div></div></div>'
     +'<div style="font-size:11px;color:var(--mt2)">Applied for: <strong style="color:var(--tx)">'+esc(a.postTitle||'-')+'</strong> · '+new Date(a.ts).toLocaleDateString()+'</div>'
     +(a.note?'<div style="font-size:11px;color:var(--mt);margin-top:4px;line-height:1.5">"'+esc(a.note)+'"</div>':'')
@@ -1803,7 +1891,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v19 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v20 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
