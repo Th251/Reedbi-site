@@ -663,12 +663,13 @@ function initFirebase(){
     try{FB.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){});}catch(e){}
     // Offline cache for the compat SDK. Use single-tab persistence to avoid the
     // deprecated multi-tab warning. Wrapped so any failure is silent and harmless.
-    try{FB.db.enablePersistence().catch(function(){});}catch(e){}
+    // (Offline IndexedDB cache intentionally not enabled — it's optional and
+    //  the deprecated compat API logs a warning. Realtime sync works without it.)
   }catch(e){console.warn('FB init failed, using phone storage',e);FB.ready=false;setDbPill(false);}
 }
 /* Realtime listener: posts in a tag (live/instant store) */
 function fbListenTag(tagId){
-  if(!FB.ready||FB_CLOUD_DISABLED)return;
+  if(!FB.ready||FB_CLOUD_DISABLED||!FB.db)return;
   try{
     if(FB_LISTENERS['posts_'+tagId])return; // already listening
     FB_LISTENERS['posts_'+tagId]=FB.db.collection('tags').doc(tagId).collection('posts').orderBy('ts','desc').limit(200)
@@ -693,7 +694,7 @@ function fbListenTag(tagId){
   }catch(e){console.warn(e);}
 }
 function fbListenComments(tagId,postId){
-  if(!FB.ready||FB_CLOUD_DISABLED)return;
+  if(!FB.ready||FB_CLOUD_DISABLED||!FB.db)return;
   try{
     var key='cmts_'+tagId+'_'+postId;
     if(FB_LISTENERS[key])return;
@@ -704,12 +705,12 @@ function fbListenComments(tagId,postId){
         snap.docChanges().forEach(function(ch){
           if(ch.type==='added'){var c=ch.doc.data();if(!p.comments.find(function(x){return x.ts===c.ts&&x.user===c.user;})){c.liked=false;p.comments.push(c);if(activeTagId===tagId){if(p.showComments)appendCommentDOM(tagId,postId,c,p.comments.length-1);updateFooter(tagId,postId,p);renderSbar(t);}}}
         });
-      },function(err){if(fbIsPermErr(err))fbDisableCloud('listen cmts');else console.warn('listen cmts',err);});
+      },function(err){if(fbIsPermErr(err))fbStopListener('cmts_'+tagId+'_'+postId,'perm');else console.warn('listen cmts',err);});
   }catch(e){console.warn(e);}
 }
 /* Realtime listener: applications for a company (page owner sees instantly) */
 function fbListenCompanyApps(company){
-  if(!FB.ready||FB_CLOUD_DISABLED)return;
+  if(!FB.ready||FB_CLOUD_DISABLED||!FB.db)return;
   try{
     var key='apps_'+company.toLowerCase();
     if(FB_LISTENERS[key])return;
@@ -1122,6 +1123,15 @@ function toggleFol(){showFolOnly=!showFolOnly;document.getElementById('folbtn').
 ============================================================ */
 function loadPhonePosts(tagId){
   var t=tags.find(function(x){return x.id===tagId;});if(!t)return;
+  // FIRESTORE-FIRST: when cloud is live, the realtime listener (fbListenTag)
+  // is the single source of truth. Don't merge local posts — that avoids
+  // showing stale device-only copies and guarantees every user sees the
+  // same cloud feed. Local cache is only used when cloud is unavailable.
+  var cloudLive=FB.ready&&!FB_CLOUD_DISABLED;
+  if(cloudLive){
+    // start fresh; onSnapshot will fill t.posts from the cloud
+    return;
+  }
   var stored=LS.get('rb_posts_'+tagId,[])||[];
   stored.forEach(function(sp){if(!t.posts.find(function(p){return p.id===sp.id;})){sp.showComments=false;sp.liked=false;sp.applied=!!sp.applied;sp.boosted=sp.boosted||null;sp.boostExpiry=sp.boostExpiry||0;t.posts.push(sp);}});
   t.posts.forEach(function(p){var sc=LS.get('rb_cmts_'+tagId+'_'+p.id,[])||[];sc.forEach(function(c){if(!p.comments.find(function(x){return x.ts===c.ts&&x.user===c.user;})){c.liked=false;p.comments.push(c);}});});
@@ -1133,6 +1143,9 @@ function openTag(id){
   activeTagId=id;actRegion=null;actUser=null;actAutoTag=null;sortMode='latest';
   pendingPosts=[];isAtBot=true;addedSuggestTags=[];innerQ='';showIS=false;
   var t=tags.find(function(x){return x.id===id;});if(!t)return;
+  // Firestore-first: clear any demo/seed posts so the feed shows only real
+  // cloud data once the realtime listener attaches.
+  if(FB.ready&&!FB_CLOUD_DISABLED){t.posts=[];}
   loadPhonePosts(id);t._unread=0;
   document.getElementById('es').style.display='none';
   document.getElementById('cv-view').style.display='flex';
@@ -1628,7 +1641,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v12 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v14-firestore-first loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
