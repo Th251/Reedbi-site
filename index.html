@@ -399,7 +399,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
         <div class="chav" id="chav"></div>
         <div class="chin"><div class="chn" id="chn"></div><div class="chs" id="chs"></div></div>
         <div class="chacts">
-          <span class="sync-badge sync-local" id="sync-badge"><span class="sync-dot"></span> <span id="sync-txt">Phone</span></span>
+          <span class="sync-badge sync-local" id="sync-badge" onclick="fbConnTest()" style="cursor:pointer" title="Tap to test cloud connection"><span class="sync-dot"></span> <span id="sync-txt">Phone</span></span>
           <button class="ib" id="ficbtn" onclick="toggleFollow()"><i class="ti ti-bookmark" id="ficon"></i></button>
           <button class="ib" onclick="toggleIS()"><i class="ti ti-search"></i></button>
         </div>
@@ -655,18 +655,14 @@ function initFirebase(){
   try{
     if(typeof firebase==='undefined'||!firebase.initializeApp){setDbPill(false);return;}
     firebase.initializeApp(firebaseConfig);
-    // Modern offline cache (replaces deprecated enableMultiTabIndexedDbPersistence)
-    try{
-      FB.db=firebase.firestore();
-      FB.db.settings({cache:{kind:'persistent',tabManager:{kind:'persistentMultipleTab'}}});
-    }catch(e){
-      // fallback for older SDK builds
-      try{FB.db=firebase.firestore();FB.db.enablePersistence({synchronizeTabs:true}).catch(function(){});}catch(e2){FB.db=firebase.firestore();}
-    }
+    FB.db=firebase.firestore();
     FB.auth=firebase.auth();
     FB.ready=true;
     setDbPill(true);
     try{FB.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){});}catch(e){}
+    // Offline cache for the compat SDK. Use single-tab persistence to avoid the
+    // deprecated multi-tab warning. Wrapped so any failure is silent and harmless.
+    try{FB.db.enablePersistence().catch(function(){});}catch(e){}
   }catch(e){console.warn('FB init failed, using phone storage',e);FB.ready=false;setDbPill(false);}
 }
 /* Realtime listener: posts in a tag (live/instant store) */
@@ -744,6 +740,28 @@ function setDbPill(live){
   t.textContent=live?'Cloud Live':'Phone Mode';
   var sb=document.getElementById('sync-badge'),st=document.getElementById('sync-txt');
   if(sb){sb.className='sync-badge '+(live?'sync-live':'sync-local');if(st)st.textContent=live?'Cloud':'Phone';}
+}
+/* Connection self-test: writes & reads a probe doc to confirm cross-user sync
+   actually works. Tells the user precisely what to fix if it doesn't. */
+function fbConnTest(){
+  if(!FB.ready||!FB.db){toast('Firebase SDK not loaded (check your network/CDN).','err');return;}
+  toast('Testing cloud connection…','info');
+  var ref=FB.db.collection('_conn_test').doc('probe');
+  ref.set({t:Date.now()}).then(function(){
+    return ref.get();
+  }).then(function(){
+    FB_CLOUD_DISABLED=false;setDbPill(true);
+    toast('✅ Cloud is LIVE — posts will sync between users.','ok');
+  }).catch(function(err){
+    var c=(err&&(err.code||err.message))||'';
+    if(String(c).indexOf('permission')>=0||String(c).indexOf('insufficient')>=0){
+      toast('❌ Firestore RULES are blocking access. Set rules to allow authenticated read/write.','err');
+    }else if(String(c).indexOf('not-found')>=0||String(c).indexOf('database')>=0){
+      toast('❌ No Firestore database. Create one in Firebase Console → Firestore Database.','err');
+    }else{
+      toast('❌ Cloud error: '+String(c).slice(0,60),'err');
+    }
+  });
 }
 
 function handleBC(msg){
