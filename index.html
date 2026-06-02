@@ -578,16 +578,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveBulkSchedule()"><i class="ti ti-check"></i> Schedule All in One</button>
   </div>
 </div></div>
-<!-- EDIT APPLICATION -->
-<div class="overlay" id="edit-app-ovl"><div class="modal" style="max-width:360px">
-  <div class="mhd"><h3><i class="ti ti-edit" style="font-size:13px"></i> Edit Application</h3><button class="ib" onclick="closeOvl('edit-app-ovl')"><i class="ti ti-x"></i></button></div>
-  <div class="mbd">
-    <div class="fg"><label>Phone / WhatsApp</label><input type="text" id="ea-phone" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-family:var(--fn)"></div>
-    <div class="fg" style="margin-top:8px"><label>Cover Note</label><textarea id="ea-note" rows="2" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-family:var(--fn)"></textarea></div>
-    <div class="fg" style="margin-top:8px"><label>Skills &amp; Keywords</label><textarea id="ea-skills" rows="2" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-family:var(--fn)"></textarea></div>
-    <button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveEditApp()"><i class="ti ti-check"></i> Save Changes</button>
-  </div>
-</div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
 <!-- CREATE PAGE -->
@@ -1606,36 +1596,6 @@ function saveBulkSchedule(){
   closeOvl('bsched-ovl');openCompanyPage(bulkSchedCompany);
   toast(n+' candidate'+(n!==1?'s':'')+' scheduled for '+(bulkSchedKind==='mobilization'?'mobilization':'interview')+' — all notified','gold');
 }
-var editAppId=null;
-function openEditApp(appId){
-  var a=getMyApps().find(function(x){return x.id===appId;});if(!a)return;
-  editAppId=appId;
-  document.getElementById('ea-phone').value=a.phone||'';
-  document.getElementById('ea-note').value=a.note||'';
-  document.getElementById('ea-skills').value=a.skills||'';
-  document.getElementById('edit-app-ovl').classList.add('open');
-}
-function saveEditApp(){
-  var apps=getAllApps();var a=apps.find(function(x){return x.id===editAppId;});
-  if(a){
-    a.phone=document.getElementById('ea-phone').value;
-    a.note=document.getElementById('ea-note').value;
-    a.skills=document.getElementById('ea-skills').value;
-    saveAllApps(apps);
-    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){FB.db.collection('applications').doc(a.id).set(a,{merge:true}).catch(function(){});}
-    bcSend({type:'app_status',appId:a.id,status:a.status});
-  }
-  closeOvl('edit-app-ovl');showMyApps();
-  toast('Application updated','ok');
-}
-function withdrawApp(appId){
-  if(!confirm('Withdraw this application? This cannot be undone.'))return;
-  var apps=getAllApps().filter(function(x){return x.id!==appId;});
-  saveAllApps(apps);
-  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){FB.db.collection('applications').doc(appId).delete().catch(function(){});}
-  showMyApps();
-  toast('Application withdrawn','info');
-}
 function showMyApps(){
   if(!requireAuth('view applications'))return;
   var apps=getMyApps().reverse();var cvs=getCVs(CU.uid);
@@ -1656,10 +1616,6 @@ function showMyApps(){
       +(a.mobilizationAt?'<div style="font-size:11px;color:var(--cyan);margin-top:4px"><i class="ti ti-plane-departure"></i> Mobilization: <b>'+esc(a.mobilizationAt)+'</b></div>':'')
       +((a.docRequests&&a.docRequests.length)?'<div style="font-size:10px;color:var(--gold);margin-top:6px;font-weight:600"><i class="ti ti-paperclip"></i> Documents requested:</div>'+a.docRequests.map(function(dr){return '<div style="font-size:11px;margin-top:3px">• '+esc(dr.name)+': '+(dr.fileData?'<span style="color:var(--g)">✓ uploaded</span>':'<button onclick="uploadReqDoc(\''+a.id+'\',\''+dr.id+'\')" style="font-size:10px;color:var(--gold);background:transparent;border:1px solid rgba(245,166,35,.4);border-radius:6px;padding:2px 8px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-upload"></i> Upload</button>')+'</div>';}).join(''):'')
       +(cv?'<button onclick="dlCV(\''+CU.uid+'\',\''+cv.id+'\',\''+escJS(cv.name)+'\')" style="margin-top:6px;font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:3px 8px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-download"></i> My CV</button>':'')
-      +'<div style="display:flex;gap:6px;margin-top:8px;border-top:1px solid var(--b);padding-top:8px">'
-      +'<button onclick="openEditApp(\''+a.id+'\')" style="flex:1;font-size:10px;color:var(--blue);background:transparent;border:1px solid rgba(59,130,246,.4);border-radius:7px;padding:5px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-edit"></i> Edit</button>'
-      +'<button onclick="withdrawApp(\''+a.id+'\')" style="flex:1;font-size:10px;color:var(--red);background:transparent;border:1px solid rgba(244,63,94,.4);border-radius:7px;padding:5px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-trash"></i> Withdraw</button>'
-      +'</div>'
       +'</div>';
   }).join('');
   document.getElementById('ma-ovl').classList.add('open');
@@ -1939,7 +1895,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v22 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v21 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
