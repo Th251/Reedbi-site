@@ -297,6 +297,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .st-rejected{background:rgba(244,63,94,.15);color:var(--red)}
 .st-selected{background:rgba(37,211,102,.15);color:var(--g)}
 .st-interview{background:rgba(167,139,250,.18);color:var(--purple)}
+.st-passed{background:rgba(6,182,212,.18);color:var(--cyan)}
 /* applicant card (page owner view) */
 .appl-card{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:11px;margin-bottom:9px}
 .appl-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -591,15 +592,85 @@ var BC=null;
 try{BC=new BroadcastChannel('reedbi_v1');BC.onmessage=function(e){handleBC(e.data);};}catch(e){}
 function bcSend(msg){try{if(BC)BC.postMessage(msg);}catch(e){}}
 
+var FB_LISTENERS={};
 function initFirebase(){
   try{
-    if(typeof firebase==='undefined'){setDbPill(false);return;}
+    if(typeof firebase==='undefined'||!firebase.initializeApp){setDbPill(false);return;}
     firebase.initializeApp(firebaseConfig);
     FB.db=firebase.firestore();
     FB.auth=firebase.auth();
     FB.ready=true;
     setDbPill(true);
-  }catch(e){console.warn('FB init',e);setDbPill(false);}
+    try{FB.db.enablePersistence({synchronizeTabs:true}).catch(function(){});}catch(e){}
+  }catch(e){console.warn('FB init failed, using phone storage',e);FB.ready=false;setDbPill(false);}
+}
+/* Realtime listener: posts in a tag (live/instant store) */
+function fbListenTag(tagId){
+  if(!FB.ready)return;
+  try{
+    if(FB_LISTENERS['posts_'+tagId])return; // already listening
+    FB_LISTENERS['posts_'+tagId]=FB.db.collection('tags').doc(tagId).collection('posts').orderBy('ts','desc').limit(200)
+      .onSnapshot(function(snap){
+        var t=tags.find(function(x){return x.id===tagId;});if(!t)return;
+        snap.docChanges().forEach(function(ch){
+          var d=ch.doc.data();d.id=d.id||ch.doc.id;
+          if(ch.type==='added'){
+            if(!t.posts.find(function(p){return String(p.id)===String(d.id);})){
+              d.showComments=false;d.liked=false;d.comments=d.comments||[];
+              t.posts.push(d);
+              if(activeTagId===tagId){if(isAtBot){appendPostDOM(t,d);renderSbar(t);renderSlideRows(t);updateTagItem(t);}else{pendingPosts.push(d);showBanner();}}
+              else{t._unread=(t._unread||0)+1;updateTagItem(t);}
+              fbListenComments(tagId,d.id);
+            }
+          }else if(ch.type==='modified'){
+            var ex=t.posts.find(function(p){return String(p.id)===String(d.id);});
+            if(ex){ex.likes=d.likes;ex.boosted=d.boosted;ex.boostExpiry=d.boostExpiry;if(activeTagId===tagId)renderMsgs(t);}
+          }
+        });
+      },function(err){console.warn('listen posts',err);});
+  }catch(e){console.warn(e);}
+}
+function fbListenComments(tagId,postId){
+  if(!FB.ready)return;
+  try{
+    var key='cmts_'+tagId+'_'+postId;
+    if(FB_LISTENERS[key])return;
+    FB_LISTENERS[key]=FB.db.collection('tags').doc(tagId).collection('posts').doc(String(postId)).collection('comments').orderBy('ts','asc')
+      .onSnapshot(function(snap){
+        var t=tags.find(function(x){return x.id===tagId;});if(!t)return;
+        var p=t.posts.find(function(x){return String(x.id)===String(postId);});if(!p)return;
+        snap.docChanges().forEach(function(ch){
+          if(ch.type==='added'){var c=ch.doc.data();if(!p.comments.find(function(x){return x.ts===c.ts&&x.user===c.user;})){c.liked=false;p.comments.push(c);if(activeTagId===tagId){if(p.showComments)appendCommentDOM(tagId,postId,c,p.comments.length-1);updateFooter(tagId,postId,p);renderSbar(t);}}}
+        });
+      },function(err){console.warn('listen cmts',err);});
+  }catch(e){console.warn(e);}
+}
+/* Realtime listener: applications for a company (page owner sees instantly) */
+function fbListenCompanyApps(company){
+  if(!FB.ready)return;
+  try{
+    var key='apps_'+company.toLowerCase();
+    if(FB_LISTENERS[key])return;
+    FB_LISTENERS[key]=FB.db.collection('applications').where('companyLower','==',company.toLowerCase())
+      .onSnapshot(function(snap){
+        var apps=getAllApps();var changed=false;
+        snap.forEach(function(doc){var d=doc.data();d.id=doc.id;var ex=apps.find(function(a){return a.id===d.id;});if(ex){Object.assign(ex,d);}else{apps.push(d);}changed=true;});
+        if(changed){saveAllApps(apps);if(document.getElementById('pg-ovl').classList.contains('open'))openCompanyPage(company);}
+      },function(err){console.warn('listen apps',err);});
+  }catch(e){console.warn(e);}
+}
+/* Realtime listener: my own applications (applicant sees status change instantly) */
+function fbListenMyApps(){
+  if(!FB.ready||!CU)return;
+  try{
+    if(FB_LISTENERS['myapps'])FB_LISTENERS['myapps']();
+    FB_LISTENERS['myapps']=FB.db.collection('applications').where('uid','==',CU.uid)
+      .onSnapshot(function(snap){
+        var apps=getAllApps();var changed=false;
+        snap.forEach(function(doc){var d=doc.data();d.id=doc.id;var ex=apps.find(function(a){return a.id===d.id;});if(ex){if(ex.status!==d.status){toast('Status update: '+statusObj(d.status).label,d.status==='selected'||d.status==='interview'?'gold':'info');}Object.assign(ex,d);}else{apps.push(d);}changed=true;});
+        if(changed){saveAllApps(apps);if(activeTagId){var t=tags.find(function(x){return x.id===activeTagId;});if(t)renderMsgs(t);}if(document.getElementById('ma-ovl').classList.contains('open'))showMyApps();}
+      },function(err){console.warn('listen myapps',err);});
+  }catch(e){console.warn(e);}
 }
 function setDbPill(live){
   var p=document.getElementById('db-pill'),t=document.getElementById('db-pill-txt');
@@ -702,6 +773,7 @@ function enterApp(){
   followedTags=new Set(LS.get('rb_ftags',[])||[]);followedUsers=new Set(LS.get('rb_fusers',[])||[]);
   tags.forEach(function(t){t.followed=followedTags.has(t.id);});
   renderTagList();
+  if(FB.ready&&CU&&!CU.guest){fbListenMyApps();}
 }
 function requireAuth(action){
   if(CU&&!CU.guest)return true;
@@ -773,9 +845,10 @@ var STATUSES=[
   {id:'received',label:'Received',cls:'st-received',icon:'inbox'},
   {id:'review',label:'Under Review',cls:'st-review',icon:'eye'},
   {id:'considered',label:'Considered',cls:'st-considered',icon:'thumb-up'},
-  {id:'rejected',label:'Rejected',cls:'st-rejected',icon:'x'},
+  {id:'interview',label:'Call for Interview',cls:'st-interview',icon:'calendar'},
+  {id:'passed',label:'Passed Interview',cls:'st-passed',icon:'award'},
   {id:'selected',label:'Selected',cls:'st-selected',icon:'circle-check'},
-  {id:'interview',label:'Ready for Interview',cls:'st-interview',icon:'calendar'}
+  {id:'rejected',label:'Rejected',cls:'st-rejected',icon:'x'}
 ];
 function statusObj(id){return STATUSES.find(function(s){return s.id===id;})||STATUSES[0];}
 
@@ -882,6 +955,8 @@ function openTag(id){
   renderMsgs(t);renderTagList(document.getElementById('tsr').value);trackScroll();
   if(window.innerWidth<=700)document.getElementById('lp').classList.add('hidden');
   startLive(id);startPoll(id);
+  fbListenTag(id);
+  t.posts.forEach(function(p){fbListenComments(id,p.id);});
   setInterval(function(){if(activeTagId===id)refreshTimes();},30000);
 }
 function renderComposerState(){
@@ -1131,7 +1206,7 @@ function submitApply(){
   if(!name||!email){toast('Fill name and email','err');return;}
   var uid=CU.uid;var cvs=getCVs(uid);var selCV2=selCVId?cvs.find(function(c){return c.id===selCVId;}):null;
   var t=tags.find(function(x){return x.id===curApplyPid.tagId;}),p=t&&t.posts.find(function(x){return x.id==curApplyPid.postId;});
-  var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
+  var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',companyLower:(curApplyPid.company||(p?p.co:'')||'').toLowerCase(),tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
   var apps=getAllApps();apps.push(rec);saveAllApps(apps);
   if(FB.ready){FB.db.collection('applications').doc(rec.id).set(rec).catch(function(){});}
   if(p){p.applied=true;}
@@ -1149,8 +1224,11 @@ function showMyApps(){
     return '<div style="background:var(--card);border-radius:8px;padding:11px;margin-bottom:8px">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="font-size:12px;font-weight:600">'+esc(a.postTitle||'Job Application')+'</div><span class="stat-badge '+so.cls+'"><i class="ti ti-'+so.icon+'" style="font-size:9px"></i> '+so.label+'</span></div>'
       +'<div style="font-size:10px;color:var(--mt2);margin:4px 0">'+esc(a.company||'#'+a.tagId)+' · '+new Date(a.ts).toLocaleDateString()+(cv?' · '+esc(cv.name):'')+'</div>'
-      +(a.status==='interview'?'<div style="font-size:11px;color:var(--purple);margin-top:4px"><i class="ti ti-calendar"></i> The employer wants to interview you! Check your email.</div>':'')
-      +(a.status==='selected'?'<div style="font-size:11px;color:var(--g);margin-top:4px"><i class="ti ti-circle-check"></i> You have been selected!</div>':'')
+      +(a.status==='interview'?'<div style="font-size:11px;color:var(--purple);margin-top:4px"><i class="ti ti-calendar"></i> You are called for an interview! Check your email.</div>':'')
+      +(a.status==='passed'?'<div style="font-size:11px;color:var(--cyan);margin-top:4px"><i class="ti ti-award"></i> You passed the interview! 🎉</div>':'')
+      +(a.status==='considered'?'<div style="font-size:11px;color:var(--blue);margin-top:4px"><i class="ti ti-thumb-up"></i> Your application is being considered.</div>':'')
+      +(a.status==='rejected'?'<div style="font-size:11px;color:var(--red);margin-top:4px"><i class="ti ti-x"></i> Not selected this time. Keep applying!</div>':'')
+      +(a.status==='selected'?'<div style="font-size:11px;color:var(--g);margin-top:4px"><i class="ti ti-circle-check"></i> Congratulations — you have been selected! 🎉</div>':'')
       +(cv?'<button onclick="dlCV(\''+CU.uid+'\',\''+cv.id+'\',\''+escJS(cv.name)+'\')" style="margin-top:6px;font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:3px 8px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-download"></i> My CV</button>':'')
       +'</div>';
   }).join('');
@@ -1177,8 +1255,13 @@ function openCompanyPage(company){
     document.getElementById('pg-ovl').classList.add('open');return;
   }
   // owner view: list applicants with status controls
+  fbListenCompanyApps(company);
   var apps=getAppsForCompany(company).reverse();
-  var head='<div style="background:var(--card2);border-radius:9px;padding:11px;margin-bottom:11px"><div style="font-size:13px;font-weight:700">'+esc(page.name)+' · Owner</div><div style="font-size:11px;color:var(--mt2);margin-top:2px">'+apps.length+' application'+(apps.length!==1?'s':'')+' received</div></div>';
+  var head='<div style="background:var(--card2);border-radius:9px;padding:11px;margin-bottom:11px"><div style="font-size:13px;font-weight:700">'+esc(page.name)+' · Owner</div><div style="font-size:11px;color:var(--mt2);margin-top:2px">'+apps.length+' application'+(apps.length!==1?'s':'')+' received</div>'
+    +(apps.length?'<div style="font-size:9px;color:var(--mt2);margin-top:8px;text-transform:uppercase;letter-spacing:.05em">Set status for ALL applicants:</div><div class="appl-stat-row" style="margin-top:5px">'
+      +STATUSES.filter(function(s){return s.id!=='received';}).map(function(s){return '<button class="stat-set-btn" onclick="ownerSetAll(\''+escJS(company)+'\',\''+s.id+'\')" style="border-color:currentColor">'+s.label+'</button>';}).join('')
+      +'</div>':'')
+    +'</div>';
   if(!apps.length){body.innerHTML=head+'<p style="color:var(--mt);font-size:12px;text-align:center;padding:14px">No applications yet. Share your job posts to receive CVs.</p>';document.getElementById('pg-ovl').classList.add('open');return;}
   body.innerHTML=head+apps.map(function(a){
     var so=statusObj(a.status);
@@ -1201,6 +1284,12 @@ function ownerSetStatus(appId,status,company){
   setAppStatus(appId,status);
   openCompanyPage(company);
   toast('Status updated: '+statusObj(status).label,'ok');
+}
+function ownerSetAll(company,status){
+  var apps=getAppsForCompany(company);
+  apps.forEach(function(a){setAppStatus(a.id,status);});
+  openCompanyPage(company);
+  toast('All '+apps.length+' applicants set to: '+statusObj(status).label,'ok');
 }
 /* ============================================================
    BOOST + PAYMENT
@@ -1328,7 +1417,12 @@ function goBack(){stopLive();stopPoll();document.getElementById('lp').classList.
 document.getElementById('pmb').addEventListener('click',function(e){if(e.target===document.getElementById('pmb'))closePM();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('open');});closePM();}});
 
-/* INIT */
-initFirebase();
-(function(){var u=LS.get('rb_user');if(u){CU=u;enterApp();}})();
+/* INIT - bulletproof: UI must always boot even if Firebase/CDN fails */
+try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
+(function(){
+  try{
+    var u=LS.get('rb_user');
+    if(u){CU=u;enterApp();}
+  }catch(e){console.warn('session restore failed',e);}
+})();
 </script></body></html>
