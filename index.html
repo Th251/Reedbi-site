@@ -176,6 +176,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .bub.out .btime{color:rgba(220,248,198,.5)}
 .bub.out .ba{color:rgba(220,248,198,.55)}
 .abtn{margin-top:6px;width:100%;border:none;border-radius:8px;padding:7px 0;font-size:12px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--g),var(--cyan));color:#000;display:flex;align-items:center;justify-content:center;gap:4px;font-family:var(--fn)}
+.appl-count{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--cyan);background:rgba(6,182,212,.12);border-radius:8px;padding:2px 8px;margin-top:6px;margin-bottom:2px}
 .applbl{margin-top:5px;text-align:center;font-size:11px;color:var(--g);font-weight:600;display:none}
 .mgbtn{margin-top:6px;width:100%;border:none;border-radius:8px;padding:7px 0;font-size:12px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--gold),#ff6b35);color:#000;display:flex;align-items:center;justify-content:center;gap:4px;font-family:var(--fn)}
 .cs{margin-top:6px;padding:8px 10px;background:rgba(0,0,0,.2);border-radius:9px;display:none}
@@ -796,7 +797,38 @@ function delCV(uid,id){LS.del('rb_cvd_'+uid+'_'+id);LS.set('rb_cvs_'+uid,getCVs(
 function saveCVData(uid,id,b){LS.set('rb_cvd_'+uid+'_'+id,b);}
 function getCVData(uid,id){return LS.get('rb_cvd_'+uid+'_'+id,null);}
 function cvStorInfo(uid){var c=getCVs(uid),b=0;c.forEach(function(x){var d=getCVData(uid,x.id);if(d)b+=d.length*0.75;});return{count:c.length,kb:(b/1024).toFixed(1),pct:Math.min(100,(b/1048576*100)).toFixed(0)};}
-function dlCV(uid,id,name){var d=getCVData(uid,id);if(!d){toast('CV not found','err');return;}var a=document.createElement('a');a.href=d;a.download=name;a.click();}
+function dlCV(uid,id,name){
+  var d=getCVData(uid,id);
+  if(d){openCVData(d,name);return;}
+  // Not on this device — fetch from Firestore (e.g. owner viewing applicant's CV)
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
+    toast('Loading CV from cloud…','info');
+    FB.db.collection('cvs').doc(uid+'_'+id).get().then(function(doc){
+      if(doc&&doc.exists&&doc.data().data){openCVData(doc.data().data,name);}
+      else{toast('CV not available (applicant may need cloud sync on)','err');}
+    }).catch(function(){toast('Could not load CV from cloud','err');});
+    return;
+  }
+  toast('CV is stored on the applicant\u2019s device. Enable cloud sync to view it.','err');
+}
+function openCVData(d,name){
+  try{
+    // PDFs and images open in a viewer tab; other types download.
+    var isViewable=/^data:(application\/pdf|image\/)/.test(d);
+    if(isViewable){
+      var w=window.open();
+      if(w){
+        if(d.indexOf('application/pdf')>=0){w.document.write('<iframe src="'+d+'" style="width:100%;height:100%;border:0"></iframe>');}
+        else{w.document.write('<img src="'+d+'" style="max-width:100%">');}
+        w.document.title=name||'CV';
+      }else{ // popup blocked -> download
+        var a=document.createElement('a');a.href=d;a.download=name||'cv';a.click();
+      }
+    }else{
+      var a2=document.createElement('a');a2.href=d;a2.download=name||'cv';a2.click();
+    }
+  }catch(e){var a3=document.createElement('a');a3.href=d;a3.download=name||'cv';a3.click();}
+}
 function readB64(f){return new Promise(function(r,j){var fr=new FileReader();fr.onload=function(e){r(e.target.result);};fr.onerror=j;fr.readAsDataURL(f);});}
 
 /* ============================================================
@@ -1061,6 +1093,8 @@ function createPage(){
 function getAllApps(){return LS.get('rb_apps',[])||[];}
 function saveAllApps(a){LS.set('rb_apps',a);}
 function getAppsForCompany(co){return getAllApps().filter(function(a){return (a.company||'').toLowerCase()===String(co).toLowerCase();});}
+function getAppsForPost(tagId,postId){return getAllApps().filter(function(a){return a.tagId===tagId&&String(a.postId)===String(postId);});}
+function countAppsForPost(tagId,postId){return getAppsForPost(tagId,postId).length;}
 function getMyApps(){var uid=CU?CU.uid:'';return getAllApps().filter(function(a){return a.uid===uid;});}
 function setAppStatus(appId,status){
   var apps=getAllApps();var a=apps.find(function(x){return x.id===appId;});
@@ -1248,6 +1282,8 @@ function buildBubble(t,p,isMine){
   }
   var applyHtml='';
   if(isJob){
+    var nApplied=countAppsForPost(t.id,pid);
+    var countChip=nApplied>0?'<span class="appl-count" title="'+nApplied+' applicant'+(nApplied!==1?'s':'')+'"><i class="ti ti-users" style="font-size:10px"></i> '+nApplied+' applied</span>':'';
     if(userOwnsPage(p.co)){
       applyHtml='<button class="mgbtn" onclick="openCompanyPage(\''+escJS(p.co)+'\')"><i class="ti ti-users"></i> Manage Applicants ('+getAppsForCompany(p.co).length+')</button>';
     }else{
@@ -1255,6 +1291,7 @@ function buildBubble(t,p,isMine){
       if(myApp){var so=statusObj(myApp.status);applyHtml='<div class="applbl" style="display:block">Applied · <span class="stat-badge '+so.cls+'"><i class="ti ti-'+so.icon+'" style="font-size:9px"></i> '+so.label+'</span></div>';}
       else applyHtml='<button class="abtn" onclick="openApply(\''+escJS(t.id)+'\','+pid+',\''+escJS(p.co||'')+'\')"><i class="ti ti-send"></i> Apply Now</button>';
     }
+    if(countChip)applyHtml=countChip+applyHtml;
   }
   var crown=isAd?'<div class="ad-crown"><i class="ti ti-crown" style="font-size:9px"></i> '+adLabel+'</div>':'';
   var waT=esc((p.title||p.body||'').substring(0,40)).replace(/'/g,"\\'");
@@ -1420,6 +1457,14 @@ function submitApply(){
   var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',companyLower:(curApplyPid.company||(p?p.co:'')||'').toLowerCase(),tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),postBody:(p?p.body||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
   var apps=getAllApps();apps.push(rec);saveAllApps(apps);
   if(FB.ready){FB.db.collection('applications').doc(rec.id).set(rec).catch(function(){});}
+  // Upload the CV file itself to the cloud so the page owner can view/open it
+  // from another device (PDF/Word/photo). Stored under cvs/{uid}_{cvId}.
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&selCVId){
+    var cvData=getCVData(uid,selCVId);
+    if(cvData){
+      try{FB.db.collection('cvs').doc(uid+'_'+selCVId).set({data:cvData,name:selCV2?selCV2.name:'cv',uid:uid,ts:Date.now()}).catch(function(){});}catch(e){}
+    }
+  }
   if(p){p.applied=true;}
   closeOvl('ap-ovl');
   if(activeTagId)renderMsgs(tags.find(function(x){return x.id===activeTagId;}));
@@ -1478,7 +1523,7 @@ function openCompanyPage(company){
   body.innerHTML=head+apps.map(function(a){
     var so=statusObj(a.status);
     var statBtns=STATUSES.filter(function(s){return s.id!=='received';}).map(function(s){return '<button class="stat-set-btn '+(a.status===s.id?'on '+s.cls:'')+'" onclick="ownerSetStatus(\''+a.id+'\',\''+s.id+'\',\''+escJS(company)+'\')">'+s.label+'</button>';}).join('');
-    var cvBtn=a.cvId&&a.cvOwnerUid?'<button onclick="dlCV(\''+a.cvOwnerUid+'\',\''+a.cvId+'\',\''+escJS(a.cvName||'cv')+'\')" style="font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:var(--fn);margin-top:6px"><i class="ti ti-download"></i> Selected CV: '+esc(a.cvName||'CV')+'</button>':'<div style="font-size:10px;color:var(--mt2);margin-top:6px">No CV attached</div>';
+    var cvBtn=a.cvId&&a.cvOwnerUid?'<button onclick="dlCV(\''+a.cvOwnerUid+'\',\''+a.cvId+'\',\''+escJS(a.cvName||'cv')+'\')" style="font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:var(--fn);margin-top:6px"><i class="ti ti-eye"></i> View CV: '+esc(a.cvName||'CV')+'</button>':'<div style="font-size:10px;color:var(--mt2);margin-top:6px">No CV attached</div>';
     return '<div class="appl-card">'
       +'<div class="appl-top"><div class="appl-av '+avC((a.name||'A').charCodeAt(0)%7)+'">'+ini(a.name)+'</div>'
       +'<div style="flex:1"><div class="appl-nm">'+esc(a.name)+' <span class="stat-badge '+so.cls+'" style="margin-left:4px"><i class="ti ti-'+so.icon+'" style="font-size:9px"></i> '+so.label+'</span></div>'
@@ -1633,7 +1678,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v15 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v18 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
