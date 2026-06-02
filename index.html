@@ -68,6 +68,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .ttime{font-size:10px;color:var(--mt2)}
 .ubadge{background:var(--g);color:#000;border-radius:10px;font-size:9px;font-weight:700;padding:1px 5px;min-width:16px;text-align:center}
 .fdot{width:6px;height:6px;background:var(--g);border-radius:50%}
+.fol-btn{width:24px;height:24px;border-radius:50%;border:1px solid var(--b2);background:transparent;color:var(--mt);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .15s}
+.fol-btn:hover{border-color:var(--g);color:var(--g)}
+.fol-btn.on{background:var(--g);border-color:var(--g);color:#000}
 .nores{padding:24px 12px;text-align:center;color:var(--mt)}
 .nores i{font-size:30px;display:block;margin-bottom:7px;color:var(--mt2)}
 .nores button{margin-top:10px;background:var(--g);color:#000;border:none;border-radius:17px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fn)}
@@ -459,7 +462,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
           <option value="tech">💻 Tech</option><option value="sell">🛒 Sell</option>
           <option value="ai">🤖 AI</option><option value="insurance">🛡️ Insurance</option>
           <option value="news">📰 News</option><option value="health">🏥 Health</option>
-          <option value="edu">🎓 Education</option><option value="finance">💰 Finance</option><option value="travel">✈️ Travel</option>
+          <option value="edu">🎓 Education</option><option value="finance">💰 Finance</option><option value="travel">✈️ Travel</option><option value="remote">🌐 Remote</option>
         </select>
       </div>
     </div>
@@ -842,7 +845,7 @@ function dismissAuth(){hideAuthScreen();if(!CU){CU={uid:'guest_'+Date.now(),name
 /* ============================================================
    DATA
 ============================================================ */
-var CST={jobs:{emoji:'💼',bg:'#162a1c',fg:'#4ade80'},tech:{emoji:'💻',bg:'#162033',fg:'#60a5fa'},ai:{emoji:'🤖',bg:'#1e1533',fg:'#c084fc'},insurance:{emoji:'🛡️',bg:'#15212a',fg:'#38bdf8'},sell:{emoji:'🛒',bg:'#2a1f10',fg:'#fb923c'},general:{emoji:'💬',bg:'#1a1a2e',fg:'#94a3b8'},news:{emoji:'📰',bg:'#1a1f10',fg:'#a3e635'},health:{emoji:'🏥',bg:'#101f1a',fg:'#34d399'},edu:{emoji:'🎓',bg:'#1a1020',fg:'#e879f9'},finance:{emoji:'💰',bg:'#1f1a10',fg:'#fbbf24'},travel:{emoji:'✈️',bg:'#101a2a',fg:'#38bdf8'}};
+var CST={jobs:{emoji:'💼',bg:'#162a1c',fg:'#4ade80'},tech:{emoji:'💻',bg:'#162033',fg:'#60a5fa'},ai:{emoji:'🤖',bg:'#1e1533',fg:'#c084fc'},insurance:{emoji:'🛡️',bg:'#15212a',fg:'#38bdf8'},cyber:{emoji:'🛡️',bg:'#2a1520',fg:'#f472b6'},sell:{emoji:'🛒',bg:'#2a1f10',fg:'#fb923c'},general:{emoji:'💬',bg:'#1a1a2e',fg:'#94a3b8'},news:{emoji:'📰',bg:'#1a1f10',fg:'#a3e635'},health:{emoji:'🏥',bg:'#101f1a',fg:'#34d399'},edu:{emoji:'🎓',bg:'#1a1020',fg:'#e879f9'},finance:{emoji:'💰',bg:'#1f1a10',fg:'#fbbf24'},travel:{emoji:'✈️',bg:'#101a2a',fg:'#38bdf8'},remote:{emoji:'🌐',bg:'#101a20',fg:'#2dd4bf'}};
 var AVS=['av0','av1','av2','av3','av4','av5','av6'];
 var WN=['Alex','Jordan','Priya','Omar','Yuki','Lena','Dev','Sara','Mohammed','Chen','Fatima','Lucas','Ananya','Ivan','Aisha','Marco'];
 var WR=['🌍 Global','🇦🇪 UAE','🇮🇳 India','🇺🇸 USA','🇬🇧 UK','🇩🇪 Germany','🇸🇬 Singapore','🇨🇦 Canada','🇦🇺 Australia','🇧🇷 Brazil','🇵🇰 Pakistan','🇵🇭 Philippines'];
@@ -979,8 +982,19 @@ function renderTagList(filter){
       +'<div class="tav" style="background:'+s.bg+';color:'+s.fg+'">'+s.emoji+'</div>'
       +'<div class="tinf"><div class="tnr1"><span class="tnm">#'+esc(t.name)+'</span>'+(t.followed?'<span class="tbadge">Following</span>':'')+'</div>'
       +'<div class="tprev">'+(last?esc((last.title||last.body||'').substring(0,38)):esc(t.desc))+'</div></div>'
-      +'<div class="tmeta"><div class="ttime">'+(last?fmtT(last.ts):'')+'</div>'+(u?'<div class="ubadge">'+u+'</div>':(t.followed?'<div class="fdot"></div>':''))+'</div>'
+      +'<div class="tmeta">'
+      +'<button class="fol-btn'+(t.followed?' on':'')+'" onclick="event.stopPropagation();toggleTagFollow(\''+escJS(t.id)+'\')" title="'+(t.followed?'Following — tap to unfollow':'Follow')+'">'+(t.followed?'<i class="ti ti-check"></i>':'<i class="ti ti-plus"></i>')+'</button>'
+      +'<div class="ttime">'+(last?fmtT(last.ts):'')+'</div>'+(u?'<div class="ubadge">'+u+'</div>':'')+'</div>'
       +'</div>';}).join('');
+}
+function toggleTagFollow(id){
+  var t=tags.find(function(x){return x.id===id;});if(!t)return;
+  t.followed=!t.followed;t.members+=t.followed?1:-1;
+  if(t.followed)followedTags.add(t.id);else followedTags.delete(t.id);
+  LS.set('rb_ftags',Array.from(followedTags));
+  if(activeTagId===t.id){updateFBtn(t);updateSub(t);renderSbar(t);}
+  renderTagList(document.getElementById('tsr').value);
+  toast(t.followed?'Following #'+t.name:'Unfollowed #'+t.name,t.followed?'ok':'info');
 }
 function filterTags(v){renderTagList(v);}
 function toggleFol(){showFolOnly=!showFolOnly;document.getElementById('folbtn').classList.toggle('on',showFolOnly);renderTagList(document.getElementById('tsr').value);}
