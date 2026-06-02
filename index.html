@@ -311,6 +311,18 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .st-passed{background:rgba(6,182,212,.18);color:var(--cyan)}
 /* applicant card (page owner view) */
 .appl-card{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:11px;margin-bottom:9px}
+.appl-section{margin-bottom:10px;border:1px solid var(--b);border-radius:10px;overflow:hidden}
+.appl-sec-head{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer;user-select:none}
+.appl-sec-chev{transition:transform .2s;font-size:14px}
+.appl-section.collapsed .appl-sec-body{display:none}
+.appl-section.collapsed .appl-sec-chev{transform:rotate(-90deg)}
+.appl-sec-body{padding:9px;background:rgba(0,0,0,.12)}
+.appl-sched{margin-top:8px;padding:8px;background:rgba(167,139,250,.08);border-radius:8px;display:flex;flex-direction:column;gap:6px}
+.sched-btn{font-size:11px;font-weight:600;color:var(--purple);background:transparent;border:1px solid rgba(167,139,250,.4);border-radius:7px;padding:5px 10px;cursor:pointer;font-family:var(--fn);display:inline-flex;align-items:center;gap:4px;align-self:flex-start}
+.appl-docs{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.doc-req{font-size:11px;color:var(--mt);display:flex;align-items:center;gap:5px}
+.doc-view{font-size:10px;color:var(--cyan);background:transparent;border:1px solid rgba(6,182,212,.4);border-radius:6px;padding:1px 7px;cursor:pointer;font-family:var(--fn)}
+.doc-add{font-size:10px;color:var(--gold);background:transparent;border:1px dashed rgba(245,166,35,.4);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:var(--fn);align-self:flex-start;display:inline-flex;align-items:center;gap:4px;margin-top:2px}
 .appl-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .appl-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
 .appl-nm{font-size:13px;font-weight:600}
@@ -533,6 +545,27 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   <div class="mhd"><h3 id="pg-title"><i class="ti ti-building" style="font-size:12px"></i> Page</h3><button class="ib" onclick="closeOvl('pg-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="pg-body"></div>
 </div></div>
+
+<!-- SCHEDULE INTERVIEW -->
+<div class="overlay" id="sched-ovl"><div class="modal" style="max-width:340px">
+  <div class="mhd"><h3><i class="ti ti-calendar-plus" style="font-size:13px"></i> Schedule Interview</h3><button class="ib" onclick="closeOvl('sched-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <label style="font-size:11px;color:var(--mt);display:block;margin-bottom:6px">Pick date &amp; time</label>
+    <input type="datetime-local" id="sched-dt" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:10px;color:var(--tx);font-family:var(--fn)">
+    <button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveSchedule()"><i class="ti ti-check"></i> Set Interview Time</button>
+  </div>
+</div></div>
+
+<!-- REQUEST DOCUMENT -->
+<div class="overlay" id="docreq-ovl"><div class="modal" style="max-width:340px">
+  <div class="mhd"><h3><i class="ti ti-file-plus" style="font-size:13px"></i> Request Document</h3><button class="ib" onclick="closeOvl('docreq-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <label style="font-size:11px;color:var(--mt);display:block;margin-bottom:6px">Document name (what to attach)</label>
+    <input type="text" id="docreq-name" placeholder="e.g. Passport copy, Degree certificate" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:10px;color:var(--tx);font-family:var(--fn)">
+    <button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveDocReq()"><i class="ti ti-send"></i> Request from Applicant</button>
+  </div>
+</div></div>
+<input type="file" id="req-doc-file" style="display:none">
 
 <!-- CREATE PAGE -->
 <div class="overlay" id="mkpg-ovl"><div class="modal">
@@ -1470,6 +1503,25 @@ function submitApply(){
   if(activeTagId)renderMsgs(tags.find(function(x){return x.id===activeTagId;}));
   toast('Application sent to '+(rec.company||'employer')+'! Track status in My Applications','gold');
 }
+function uploadReqDoc(appId,drId){
+  var inp=document.getElementById('req-doc-file');
+  if(!inp)return;
+  inp.onchange=function(){
+    var f=inp.files[0];if(!f){return;}
+    if(f.size>1024*1024){toast('File too large (max 1MB for cloud)','err');inp.value='';return;}
+    readB64(f).then(function(b64){
+      var apps=getAllApps();var a=apps.find(function(x){return x.id===appId;});
+      if(a&&a.docRequests){var dr=a.docRequests.find(function(x){return x.id===drId;});if(dr){dr.fileData=b64;dr.fileName=f.name;}}
+      saveAllApps(apps);
+      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){FB.db.collection('applications').doc(appId).set(a,{merge:true}).catch(function(){});}
+      bcSend({type:'app_status',appId:appId,status:a?a.status:''});
+      toast('Document uploaded — employer can now view it','ok');
+      showMyApps();
+    }).catch(function(){toast('Could not read file','err');});
+    inp.value='';
+  };
+  inp.click();
+}
 function showMyApps(){
   if(!requireAuth('view applications'))return;
   var apps=getMyApps().reverse();var cvs=getCVs(CU.uid);
@@ -1486,6 +1538,8 @@ function showMyApps(){
       +(a.status==='considered'?'<div style="font-size:11px;color:var(--blue);margin-top:4px"><i class="ti ti-thumb-up"></i> Your application is being considered.</div>':'')
       +(a.status==='rejected'?'<div style="font-size:11px;color:var(--red);margin-top:4px"><i class="ti ti-x"></i> Not selected this time. Keep applying!</div>':'')
       +(a.status==='selected'?'<div style="font-size:11px;color:var(--g);margin-top:4px"><i class="ti ti-circle-check"></i> Congratulations — you have been selected! 🎉</div>':'')
+      +(a.interviewAt?'<div style="font-size:11px;color:var(--purple);margin-top:4px"><i class="ti ti-calendar-event"></i> Interview scheduled: <b>'+esc(a.interviewAt)+'</b></div>':'')
+      +((a.docRequests&&a.docRequests.length)?'<div style="font-size:10px;color:var(--gold);margin-top:6px;font-weight:600"><i class="ti ti-paperclip"></i> Documents requested:</div>'+a.docRequests.map(function(dr){return '<div style="font-size:11px;margin-top:3px">• '+esc(dr.name)+': '+(dr.fileData?'<span style="color:var(--g)">✓ uploaded</span>':'<button onclick="uploadReqDoc(\''+a.id+'\',\''+dr.id+'\')" style="font-size:10px;color:var(--gold);background:transparent;border:1px solid rgba(245,166,35,.4);border-radius:6px;padding:2px 8px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-upload"></i> Upload</button>')+'</div>';}).join(''):'')
       +(cv?'<button onclick="dlCV(\''+CU.uid+'\',\''+cv.id+'\',\''+escJS(cv.name)+'\')" style="margin-top:6px;font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:3px 8px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-download"></i> My CV</button>':'')
       +'</div>';
   }).join('');
@@ -1495,6 +1549,7 @@ function showMyApps(){
 /* ============================================================
    COMPANY PAGE (owner manages applicants)
 ============================================================ */
+var ownerJobFilter='';
 function openCompanyPage(company){
   var page=getPageByName(company);
   var isOwner=page&&CU&&page.ownerUid===CU.uid;
@@ -1511,42 +1566,112 @@ function openCompanyPage(company){
     body.innerHTML='<div style="text-align:center;margin-bottom:12px"><div class="pm-av av1" style="margin:0 auto 8px">'+ini(page.name)+'</div><div style="font-size:15px;font-weight:700">'+esc(page.name)+'</div><div style="font-size:11px;color:var(--mt2)">Company page · owned by '+esc(page.ownerName)+'</div></div>'+aboutHtml+'<p style="font-size:11px;color:var(--mt2);text-align:center">Only the page owner can view applicants.</p>';
     document.getElementById('pg-ovl').classList.add('open');return;
   }
-  // owner view: list applicants with status controls
   fbListenCompanyApps(company);
-  var apps=getAppsForCompany(company).reverse();
-  var head='<div style="background:var(--card2);border-radius:9px;padding:11px;margin-bottom:11px"><div style="font-size:13px;font-weight:700">'+esc(page.name)+' · Owner</div><div style="font-size:11px;color:var(--mt2);margin-top:2px">'+apps.length+' application'+(apps.length!==1?'s':'')+' received</div>'
-    +(apps.length?'<div style="font-size:9px;color:var(--mt2);margin-top:8px;text-transform:uppercase;letter-spacing:.05em">Set status for ALL applicants:</div><div class="appl-stat-row" style="margin-top:5px">'
-      +STATUSES.filter(function(s){return s.id!=='received';}).map(function(s){return '<button class="stat-set-btn" onclick="ownerSetAll(\''+escJS(company)+'\',\''+s.id+'\')" style="border-color:currentColor">'+s.label+'</button>';}).join('')
-      +'</div>':'')
-    +'</div>';
-  if(!apps.length){body.innerHTML=head+'<p style="color:var(--mt);font-size:12px;text-align:center;padding:14px">No applications yet. Share your job posts to receive CVs.</p>';document.getElementById('pg-ovl').classList.add('open');return;}
-  body.innerHTML=head+apps.map(function(a){
-    var so=statusObj(a.status);
-    var statBtns=STATUSES.filter(function(s){return s.id!=='received';}).map(function(s){return '<button class="stat-set-btn '+(a.status===s.id?'on '+s.cls:'')+'" onclick="ownerSetStatus(\''+a.id+'\',\''+s.id+'\',\''+escJS(company)+'\')">'+s.label+'</button>';}).join('');
-    var cvBtn=a.cvId&&a.cvOwnerUid?'<button onclick="dlCV(\''+a.cvOwnerUid+'\',\''+a.cvId+'\',\''+escJS(a.cvName||'cv')+'\')" style="font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:var(--fn);margin-top:6px"><i class="ti ti-eye"></i> View CV: '+esc(a.cvName||'CV')+'</button>':'<div style="font-size:10px;color:var(--mt2);margin-top:6px">No CV attached</div>';
-    return '<div class="appl-card">'
-      +'<div class="appl-top"><div class="appl-av '+avC((a.name||'A').charCodeAt(0)%7)+'">'+ini(a.name)+'</div>'
-      +'<div style="flex:1"><div class="appl-nm">'+esc(a.name)+' <span class="stat-badge '+so.cls+'" style="margin-left:4px"><i class="ti ti-'+so.icon+'" style="font-size:9px"></i> '+so.label+'</span></div>'
-      +'<div class="appl-mt">'+esc(a.email)+(a.phone?' · '+esc(a.phone):'')+(a.loc?' · '+esc(a.loc):'')+'</div></div></div>'
-      +'<div style="font-size:11px;color:var(--mt2)">Applied for: <strong style="color:var(--tx)">'+esc(a.postTitle||'-')+'</strong> · '+new Date(a.ts).toLocaleDateString()+'</div>'
-      +(a.note?'<div style="font-size:11px;color:var(--mt);margin-top:4px;line-height:1.5">"'+esc(a.note)+'"</div>':'')
-      +cvBtn
-      +'<div style="font-size:9px;color:var(--mt2);margin-top:8px;text-transform:uppercase;letter-spacing:.05em">Set status:</div>'
-      +'<div class="appl-stat-row">'+statBtns+'</div>'
+  var allApps=getAppsForCompany(company);
+  var titles={};allApps.forEach(function(a){titles[a.postTitle||'(untitled)']=1;});
+  var titleList=Object.keys(titles);
+  var apps=ownerJobFilter?allApps.filter(function(a){return (a.postTitle||'(untitled)')===ownerJobFilter;}):allApps;
+  var head='<div style="background:var(--card2);border-radius:9px;padding:11px;margin-bottom:10px">'
+    +'<div style="font-size:13px;font-weight:700">'+esc(page.name)+' · HR Dashboard</div>'
+    +'<div style="font-size:11px;color:var(--mt2);margin-top:2px">'+allApps.length+' total application'+(allApps.length!==1?'s':'')+' across '+titleList.length+' job'+(titleList.length!==1?'s':'')+'</div>';
+  if(titleList.length>1){
+    head+='<div style="font-size:9px;color:var(--mt2);margin-top:8px;text-transform:uppercase;letter-spacing:.05em">Filter by job:</div><div class="appl-stat-row" style="margin-top:4px">'
+      +'<button class="stat-set-btn'+(!ownerJobFilter?' on':'')+'" onclick="setOwnerJobFilter(\''+escJS(company)+'\',\'\')">All ('+allApps.length+')</button>'
+      +titleList.map(function(tt){return '<button class="stat-set-btn'+(ownerJobFilter===tt?' on':'')+'" onclick="setOwnerJobFilter(\''+escJS(company)+'\',\''+escJS(tt)+'\')">'+esc(tt)+' ('+allApps.filter(function(a){return (a.postTitle||'(untitled)')===tt;}).length+')</button>';}).join('')
       +'</div>';
+  }
+  head+='<div style="font-size:9px;color:var(--mt2);margin-top:8px;text-transform:uppercase;letter-spacing:.05em">Set status for ALL '+(ownerJobFilter?'in this job':'')+' ('+apps.length+'):</div><div class="appl-stat-row" style="margin-top:4px">'
+    +STATUSES.filter(function(s){return s.id!=='received';}).map(function(s){return '<button class="stat-set-btn" onclick="ownerSetAllFiltered(\''+escJS(company)+'\',\''+s.id+'\')">'+s.label+'</button>';}).join('')
+    +'</div></div>';
+  if(!apps.length){body.innerHTML=head+'<p style="color:var(--mt);font-size:12px;text-align:center;padding:14px">No applications yet.</p>';document.getElementById('pg-ovl').classList.add('open');return;}
+  var sectionsHtml=STATUSES.map(function(s){
+    var group=apps.filter(function(a){return a.status===s.id;});
+    if(!group.length)return '';
+    var cards=group.map(function(a){return applicantCard(a,company);}).join('');
+    return '<div class="appl-section">'
+      +'<div class="appl-sec-head '+s.cls+'" onclick="this.parentNode.classList.toggle(\'collapsed\')">'
+      +'<span><i class="ti ti-'+s.icon+'"></i> '+s.label+' <b>('+group.length+')</b></span>'
+      +'<i class="ti ti-chevron-down appl-sec-chev"></i></div>'
+      +'<div class="appl-sec-body">'+cards+'</div></div>';
   }).join('');
+  body.innerHTML=head+sectionsHtml;
   document.getElementById('pg-ovl').classList.add('open');
 }
-function ownerSetStatus(appId,status,company){
-  setAppStatus(appId,status);
-  openCompanyPage(company);
-  toast('Status updated: '+statusObj(status).label,'ok');
+function applicantCard(a,company){
+  var so=statusObj(a.status);
+  var statBtns=STATUSES.filter(function(s){return s.id!=='received';}).map(function(s){return '<button class="stat-set-btn '+(a.status===s.id?'on '+s.cls:'')+'" onclick="ownerSetStatus(\''+a.id+'\',\''+s.id+'\',\''+escJS(company)+'\')">'+s.label+'</button>';}).join('');
+  var cvBtn=a.cvId&&a.cvOwnerUid?'<button onclick="dlCV(\''+a.cvOwnerUid+'\',\''+a.cvId+'\',\''+escJS(a.cvName||'cv')+'\')" style="font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:var(--fn);margin-top:6px"><i class="ti ti-eye"></i> View CV: '+esc(a.cvName||'CV')+'</button>':'<div style="font-size:10px;color:var(--mt2);margin-top:6px">No CV attached</div>';
+  var schedHtml='';
+  if(a.status==='interview'){
+    schedHtml='<div class="appl-sched">'
+      +(a.interviewAt?'<div style="font-size:11px;color:var(--purple)"><i class="ti ti-calendar-event"></i> Interview: <b>'+esc(a.interviewAt)+'</b></div>':'')
+      +'<button class="sched-btn" onclick="openSchedule(\''+a.id+'\',\''+escJS(company)+'\')"><i class="ti ti-calendar-plus"></i> '+(a.interviewAt?'Reschedule':'Schedule interview')+'</button>'
+      +'</div>';
+  }
+  var docHtml='<div class="appl-docs">';
+  if(a.docRequests&&a.docRequests.length){
+    docHtml+=a.docRequests.map(function(dr){
+      return '<div class="doc-req"><i class="ti ti-paperclip" style="font-size:10px"></i> '+esc(dr.name)+': '
+        +(dr.fileData?'<button class="doc-view" onclick="viewReqDoc(\''+a.id+'\',\''+dr.id+'\')"><i class="ti ti-eye"></i> view</button>':'<span style="color:var(--mt2)">awaiting upload</span>')
+        +'</div>';
+    }).join('');
+  }
+  docHtml+='<button class="doc-add" onclick="openDocReq(\''+a.id+'\',\''+escJS(company)+'\')"><i class="ti ti-file-plus"></i> Request document</button></div>';
+  return '<div class="appl-card">'
+    +'<div class="appl-top"><div class="appl-av '+avC((a.name||'A').charCodeAt(0)%7)+'">'+ini(a.name)+'</div>'
+    +'<div style="flex:1"><div class="appl-nm">'+esc(a.name)+' <span class="stat-badge '+so.cls+'" style="margin-left:4px"><i class="ti ti-'+so.icon+'" style="font-size:9px"></i> '+so.label+'</span></div>'
+    +'<div class="appl-mt">'+esc(a.email)+(a.phone?' · '+esc(a.phone):'')+(a.loc?' · '+esc(a.loc):'')+'</div></div></div>'
+    +'<div style="font-size:11px;color:var(--mt2)">Applied for: <strong style="color:var(--tx)">'+esc(a.postTitle||'-')+'</strong> · '+new Date(a.ts).toLocaleDateString()+'</div>'
+    +(a.note?'<div style="font-size:11px;color:var(--mt);margin-top:4px;line-height:1.5">"'+esc(a.note)+'"</div>':'')
+    +cvBtn+schedHtml+docHtml
+    +'<div style="font-size:9px;color:var(--mt2);margin-top:8px;text-transform:uppercase;letter-spacing:.05em">Set status:</div>'
+    +'<div class="appl-stat-row">'+statBtns+'</div>'
+    +'</div>';
 }
-function ownerSetAll(company,status){
-  var apps=getAppsForCompany(company);
+function setOwnerJobFilter(company,title){ownerJobFilter=title;openCompanyPage(company);}
+function ownerSetStatus(appId,status,company){setAppStatus(appId,status);openCompanyPage(company);toast('Status updated: '+statusObj(status).label,'ok');}
+function ownerSetAllFiltered(company,status){
+  var allApps=getAppsForCompany(company);
+  var apps=ownerJobFilter?allApps.filter(function(a){return (a.postTitle||'(untitled)')===ownerJobFilter;}):allApps;
   apps.forEach(function(a){setAppStatus(a.id,status);});
   openCompanyPage(company);
-  toast('All '+apps.length+' applicants set to: '+statusObj(status).label,'ok');
+  toast(apps.length+' applicant'+(apps.length!==1?'s':'')+' set to: '+statusObj(status).label,'ok');
+}
+function ownerSetAll(company,status){ownerSetAllFiltered(company,status);}
+var schedAppId=null,schedCompany=null;
+function openSchedule(appId,company){schedAppId=appId;schedCompany=company;var d=document.getElementById('sched-dt');if(d)d.value='';document.getElementById('sched-ovl').classList.add('open');}
+function saveSchedule(){
+  var dt=document.getElementById('sched-dt').value;
+  if(!dt){toast('Pick a date & time','err');return;}
+  var apps=getAllApps();var a=apps.find(function(x){return x.id===schedAppId;});
+  if(a){
+    var nice=new Date(dt).toLocaleString([], {weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    a.interviewAt=nice;a.interviewISO=dt;a.statusTs=Date.now();
+    saveAllApps(apps);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){FB.db.collection('applications').doc(a.id).set(a,{merge:true}).catch(function(){});}
+    bcSend({type:'app_status',appId:a.id,status:a.status});
+  }
+  closeOvl('sched-ovl');openCompanyPage(schedCompany);toast('Interview scheduled — applicant notified','gold');
+}
+var docReqAppId=null,docReqCompany=null;
+function openDocReq(appId,company){docReqAppId=appId;docReqCompany=company;var n=document.getElementById('docreq-name');if(n)n.value='';document.getElementById('docreq-ovl').classList.add('open');}
+function saveDocReq(){
+  var name=document.getElementById('docreq-name').value.trim();
+  if(!name){toast('Enter document name (e.g. Passport copy)','err');return;}
+  var apps=getAllApps();var a=apps.find(function(x){return x.id===docReqAppId;});
+  if(a){
+    if(!a.docRequests)a.docRequests=[];
+    a.docRequests.push({id:'dr'+Date.now(),name:name,fileData:null,fileName:''});
+    saveAllApps(apps);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){FB.db.collection('applications').doc(a.id).set(a,{merge:true}).catch(function(){});}
+    bcSend({type:'app_status',appId:a.id,status:a.status});
+  }
+  closeOvl('docreq-ovl');openCompanyPage(docReqCompany);toast('Document requested from applicant','ok');
+}
+function viewReqDoc(appId,drId){
+  var a=getAllApps().find(function(x){return x.id===appId;});if(!a||!a.docRequests)return;
+  var dr=a.docRequests.find(function(x){return x.id===drId;});
+  if(dr&&dr.fileData){openCVData(dr.fileData,dr.fileName||dr.name);}else{toast('Document not uploaded yet','info');}
 }
 /* ============================================================
    BOOST + PAYMENT
@@ -1678,7 +1803,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v18 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v19 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
