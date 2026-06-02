@@ -189,6 +189,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .acmt input:focus{border-color:var(--g)}
 .csnd{width:26px;height:26px;border-radius:50%;background:var(--g);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#000;font-size:12px;flex-shrink:0}
 .composer{border-top:1px solid var(--b);background:var(--sf);padding:7px 11px;padding-bottom:calc(7px + var(--sab));flex-shrink:0}
+.cextra{display:flex;gap:5px;margin-bottom:6px}
+.cextra .cf{flex:1}
+.cbar{display:flex;align-items:flex-end;gap:6px}
+.img-preview{position:relative;margin-bottom:6px;display:inline-block}
+.img-preview img{max-height:90px;border-radius:10px;border:1px solid var(--b)}
+.img-preview .img-x{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
 .signin-prompt{padding:9px;text-align:center;font-size:12px;color:var(--mt)}
 .signin-prompt button{background:var(--g);color:#000;border:none;border-radius:14px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fn);margin-left:5px}
 .ctyp{min-height:13px;font-size:10px;color:var(--g);padding:0 2px 2px;display:flex;align-items:center;gap:3px}
@@ -401,9 +407,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       <div class="composer" id="composer">
         <div class="ctyp" id="ctyp"></div>
         <div class="sgrow" id="sgrow"></div>
-        <div class="cr1">
-          <div class="cf" style="flex:2"><i class="ti ti-pencil"></i><input type="text" id="ctitle" placeholder="Post title (optional)" oninput="onTI(this.value)"></div>
-          <div class="cf" style="flex:1;min-width:105px"><i class="ti ti-map-pin"></i>
+        <div class="cextra" id="cextra" style="display:none">
+          <div class="cf"><i class="ti ti-pencil"></i><input type="text" id="ctitle" placeholder="Title (optional)" oninput="onTI(this.value)"></div>
+          <div class="cf"><i class="ti ti-map-pin"></i>
             <select id="cregion">
               <option value="">Region...</option>
               <option>🌍 Global</option><option>🇦🇪 UAE</option><option>🇮🇳 India</option>
@@ -414,11 +420,13 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
             </select>
           </div>
         </div>
-        <div class="cr2">
+        <div class="img-preview" id="img-preview" style="display:none"></div>
+        <div class="cbar">
+          <button class="att" onclick="toggleExtra()" title="Add title & region"><i class="ti ti-plus" id="extra-ic"></i></button>
+          <button class="att" onclick="document.getElementById('img-file').click()" title="Add photo"><i class="ti ti-photo"></i></button>
+          <input type="file" id="img-file" accept="image/*" style="display:none" onchange="imgSel(this)">
           <div class="mw">
-            <button class="att"><i class="ti ti-paperclip"></i></button>
-            <textarea id="cbody" rows="1" placeholder="Write your message... (Enter to send)" oninput="onBI(this)" onkeydown="onKey(event)"></textarea>
-            <button class="att"><i class="ti ti-mood-smile"></i></button>
+            <textarea id="cbody" rows="1" placeholder="Message" oninput="onBI(this)" onkeydown="onKey(event)"></textarea>
           </div>
           <button class="sndbtn" onclick="sendPost()"><i class="ti ti-send"></i></button>
         </div>
@@ -984,13 +992,26 @@ function openTag(id){
   setInterval(function(){if(activeTagId===id)refreshTimes();},30000);
 }
 function renderComposerState(){
-  var comp=document.getElementById('composer');
-  if(CU&&!CU.guest){comp.querySelectorAll('.cr1,.cr2,.sgrow,.ctyp').forEach(function(e){e.style.display='';});var sp=comp.querySelector('.signin-prompt');if(sp)sp.remove();}
-  else{
-    comp.querySelectorAll('.cr1,.cr2,.sgrow,.ctyp').forEach(function(e){e.style.display='none';});
-    if(!comp.querySelector('.signin-prompt')){var d=document.createElement('div');d.className='signin-prompt';d.innerHTML='Sign in to post and comment<button onclick="doSignOut()">Sign In</button>';comp.appendChild(d);}
-  }
+  // Composer bar is always visible (WhatsApp-style). Posting as a guest
+  // triggers the sign-in screen via requireAuth() inside sendPost().
+  var cb=document.getElementById('cbody');
+  if(cb)cb.placeholder=(CU&&!CU.guest)?'Message':'Message (sign in to post)';
 }
+function toggleExtra(){var e=document.getElementById('cextra');var ic=document.getElementById('extra-ic');var show=e.style.display==='none';e.style.display=show?'flex':'none';if(ic)ic.className=show?'ti ti-minus':'ti ti-plus';}
+/* Image attach with phone localStorage */
+var pendingImg=null;
+function imgSel(inp){
+  var f=inp.files[0];if(!f)return;
+  if(f.size>3*1024*1024){toast('Image too large (max 3MB)','err');inp.value='';return;}
+  readB64(f).then(function(b64){
+    pendingImg=b64;
+    var pv=document.getElementById('img-preview');
+    pv.style.display='inline-block';
+    pv.innerHTML='<img src="'+b64+'"><button class="img-x" onclick="clearImg()"><i class="ti ti-x"></i></button>';
+  }).catch(function(){toast('Could not read image','err');});
+  inp.value='';
+}
+function clearImg(){pendingImg=null;var pv=document.getElementById('img-preview');pv.style.display='none';pv.innerHTML='';}
 function updateSub(t){var on=Math.floor(t.members*0.03+10+Math.random()*12);document.getElementById('chs').innerHTML=t.members.toLocaleString()+' members · <span class="online">'+on+' online</span>';}
 function updateFBtn(t){var ic=document.getElementById('ficon');ic.className=t.followed?'ti ti-bookmark-filled':'ti ti-bookmark';ic.style.color=t.followed?'var(--g)':'';}
 function startPoll(tagId){
@@ -1077,7 +1098,8 @@ function buildBubble(t,p,isMine){
     +'<div class="bub '+(isMine?'out':'in')+(isAd?' ad-bub':'')+'"> '+crown
     +(p.title?'<div class="ptrow"><i class="ti ti-pencil"></i><span class="pttxt">'+esc(p.title)+'</span></div>':'')
     +'<div class="prow"><span class="pnm" onclick="openProfile(\''+escJS(p.user)+'\',\''+escJS(p.co||'')+'\',\''+escJS(t.name)+'\','+p.avIdx+')">'+esc(p.user)+'</span>'+coLink+'</div>'
-    +'<div class="pbody">'+esc(p.body)+'</div>'
+    +(p.body?'<div class="pbody">'+esc(p.body)+'</div>':'')
+    +(p.img?'<img src="'+p.img+'" style="max-width:100%;border-radius:10px;margin-top:5px;cursor:pointer" onclick="window.open(this.src)">':'')
     +(p.region?'<div class="rchip'+(actRegion===p.region?' selr':'')+'" onclick="setRegion(\''+escJS(p.region)+'\')"><i class="ti ti-map-pin" style="font-size:8px"></i>'+esc(p.region)+'</div>':'')
     +atsHtml
     +'<div class="pts"><i class="ti ti-clock" style="font-size:8px"></i>'+fmtT(p.ts)+' '+fmtC(p.ts)+'</div>'
@@ -1182,19 +1204,19 @@ function sendPost(){
   var title=document.getElementById('ctitle').value.trim();
   var body=document.getElementById('cbody').value.trim();
   var region=document.getElementById('cregion').value;
-  if(!body&&!title){toast('Write something first!','err');return;}
+  if(!body&&!title&&!pendingImg){toast('Write a message or add a photo','err');return;}
   var t=tags.find(function(x){return x.id===activeTagId;});
   pidCtr++;
-  var np={id:pidCtr,user:CU.name,co:CU.co||'',avIdx:CU.avIdx,mine:true,uid:CU.uid,title:title,body:body||title,region:region,ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false,boosted:null,boostExpiry:0};
+  var np={id:pidCtr,user:CU.name,co:CU.co||'',avIdx:CU.avIdx,mine:true,uid:CU.uid,title:title,body:body||title||'',img:pendingImg||null,region:region,ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false,boosted:null,boostExpiry:0};
   t.posts.push(np);
   var stored=LS.get('rb_posts_'+activeTagId,[])||[];stored.push(Object.assign({},np,{comments:[]}));LS.set('rb_posts_'+activeTagId,stored.slice(-100));
   bcSend({type:'new_post',tagId:activeTagId,post:Object.assign({},np,{comments:[]})});
   if(FB.ready){FB.db.collection('tags').doc(activeTagId).collection('posts').doc(String(np.id)).set(Object.assign({},np,{comments:[]})).catch(function(){});}
-  document.getElementById('ctitle').value='';document.getElementById('cbody').value='';document.getElementById('cregion').value='';document.getElementById('cbody').style.height='auto';document.getElementById('sgrow').innerHTML='';document.getElementById('sgrow').className='sgrow';addedSuggestTags=[];
+  document.getElementById('ctitle').value='';document.getElementById('cbody').value='';document.getElementById('cregion').value='';document.getElementById('cbody').style.height='auto';document.getElementById('sgrow').innerHTML='';document.getElementById('sgrow').className='sgrow';addedSuggestTags=[];clearImg();
   if(actRegion&&region!==actRegion){actRegion=null;actUser=null;actAutoTag=null;}actAutoTag=null;
   appendPostDOM(t,np);renderSlideRows(t);updateFHd(t);renderSbar(t);updateTagItem(t);
   var box=document.getElementById('msgs');if(box)setTimeout(function(){box.scrollTop=0;},40);
-  toast(FB.ready?'Posted to cloud':'Posted & synced','ok');
+  toast(FB.ready?'Posted to cloud':'Posted','ok');
 }
 
 /* ============================================================
@@ -1414,7 +1436,7 @@ function showMyProfile(){
   openProfile(CU?CU.name:'Guest',CU?CU.co:'','',CU?CU.avIdx:0);
 }
 function closePM(){document.getElementById('pmb').classList.remove('open');}
-function followUser(){if(!requireAuth('follow'))return;if(!curProfileUser)return;var n=curProfileUser.user;if(followedUsers.has(n)){followedUsers.delete(n);toast('Unfollowed '+n,'info');}else{followedUsers.add(n);toast('Following '+n,'ok');}LS.set('rb_fusers',Array.from(followedUsers));closePM();}
+function followUser(){if(!curProfileUser)return;var n=curProfileUser.user;if(followedUsers.has(n)){followedUsers.delete(n);toast('Unfollowed '+n,'info');}else{followedUsers.add(n);toast('Following '+n,'ok');}LS.set('rb_fusers',Array.from(followedUsers));var fb=document.getElementById('pm-fol-btn');if(fb)fb.innerHTML=followedUsers.has(n)?'<i class="ti ti-user-check"></i> Following':'<i class="ti ti-user-plus"></i> Follow';}
 
 /* ============================================================
    CREATE TAG
