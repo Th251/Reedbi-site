@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>REEDBI01 — Global Tag Talk</title>
+<title>Reedbi — Global Tag Talk</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -61,7 +61,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .tav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:1px solid var(--b)}
 .tinf{flex:1;min-width:0}
 .tnr1{display:flex;align-items:center;gap:4px;margin-bottom:2px}
-.tnm{font-size:13px;font-weight:600}
+.tnm{font-size:14px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tbadge{font-size:9px;font-weight:600;padding:1px 5px;border-radius:7px;background:rgba(37,211,102,.15);color:var(--g)}
 .tprev{font-size:11px;color:var(--mt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tmeta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
@@ -321,7 +321,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .tok{background:var(--g);color:#000}.terr{background:#f43f5e;color:#fff}.t-inf{background:var(--blue);color:#fff}.tlv{background:#1a2535;color:var(--g);border:1px solid rgba(37,211,102,.3)}.tgld{background:var(--gold);color:#000}
 @keyframes tIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
 ::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:var(--b);border-radius:3px}
-@media(max-width:700px){.left{width:100%;position:absolute;z-index:10;height:100%}.left.hidden{display:none}.backbtn{display:flex!important}}
+@media(max-width:700px){
+  .shell{height:100dvh}
+  .left{width:100%;position:absolute;z-index:10;height:100%}
+  .left.hidden{display:none}
+  .right{width:100%;height:100dvh}
+  .backbtn{display:flex!important}
+  #cv-view{height:100dvh!important}
+  .composer{position:sticky;bottom:0;z-index:5}
+  .mw textarea{font-size:16px} /* prevents iOS zoom-on-focus */
+  .bub{max-width:85%}
+}
 .backbtn{display:none;width:30px;height:30px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:var(--mt);align-items:center;justify-content:center;font-size:17px}
 .av0{background:#1a3a2a;color:#4ade80}.av1{background:#1a2a4a;color:#60a5fa}.av2{background:#3a1a3a;color:#e879f9}.av3{background:#3a2a1a;color:#fb923c}.av4{background:#2a1a3a;color:#a78bfa}.av5{background:#1a3a3a;color:#34d399}.av6{background:#3a1a1a;color:#fb7185}
 </style>
@@ -330,7 +340,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <!-- AUTH -->
 <div class="auth-scr" id="auth-scr">
   <div class="auth-box">
-    <div class="auth-hd" style="position:relative"><button class="ib" onclick="dismissAuth()" style="position:absolute;top:10px;right:10px"><i class="ti ti-x"></i></button><div class="auth-logo">⬡ REEDBI01</div><div class="auth-sub">Global Tag Talk · Jobs · Ads · Pay Worldwide</div>
+    <div class="auth-hd" style="position:relative"><button class="ib" onclick="dismissAuth()" style="position:absolute;top:10px;right:10px"><i class="ti ti-x"></i></button><div class="auth-logo">⬡ Reedbi</div><div class="auth-sub">Global Tag Talk · Jobs · Ads · Pay Worldwide</div>
       <span class="db-pill" id="db-pill"><span class="sync-dot"></span><span id="db-pill-txt">Connecting…</span></span>
     </div>
     <div class="auth-bd">
@@ -362,7 +372,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:none">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ REEDBI01</span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi</span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -373,13 +383,13 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
         </div>
       </div>
     </div>
-    <div class="tsrch"><div class="sw"><i class="ti ti-search"></i><input type="text" id="tsr" placeholder="Search tags..." oninput="filterTags(this.value)" autocomplete="off"></div></div>
+    <div class="tsrch"><div class="sw"><i class="ti ti-search"></i><input type="text" id="tsr" placeholder="Search tags..." oninput="filterTags(this.value)" autocomplete="off"></div><button class="ib" onclick="cleanupTags()" title="Remove broken/old tags"><i class="ti ti-trash"></i></button></div>
     <div class="tlist" id="tlist"></div>
   </div>
   <div class="right">
     <div class="es" id="es">
       <i class="ti ti-brand-whatsapp"></i>
-      <h2>REEDBI01 Tag Talk</h2>
+      <h2>Reedbi Tag Talk</h2>
       <p>Real-time posts worldwide · Boost as ads · Apply to jobs · Pay anywhere</p>
       <button class="btn btnok" onclick="openCreateModal()" style="border-radius:17px;margin-top:7px;display:flex;align-items:center;gap:5px"><i class="ti ti-plus"></i> Create a Tag</button>
     </div>
@@ -603,6 +613,17 @@ try{BC=new BroadcastChannel('reedbi_v1');BC.onmessage=function(e){handleBC(e.dat
 function bcSend(msg){try{if(BC)BC.postMessage(msg);}catch(e){}}
 
 var FB_LISTENERS={};
+var FB_CLOUD_DISABLED=false; // set true after a permissions error to stop retry spam
+function fbDisableCloud(reason){
+  if(FB_CLOUD_DISABLED)return;
+  FB_CLOUD_DISABLED=true;
+  console.warn('Cloud sync disabled, using phone storage. Reason:',reason);
+  // detach all active listeners
+  for(var k in FB_LISTENERS){try{if(typeof FB_LISTENERS[k]==='function')FB_LISTENERS[k]();}catch(e){}}
+  FB_LISTENERS={};
+  setDbPill(false);
+}
+function fbIsPermErr(err){var c=(err&&(err.code||err.message))||'';return String(c).indexOf('permission')>=0||String(c).indexOf('insufficient')>=0;}
 function initFirebase(){
   try{
     if(typeof firebase==='undefined'||!firebase.initializeApp){setDbPill(false);return;}
@@ -618,7 +639,7 @@ function initFirebase(){
 }
 /* Realtime listener: posts in a tag (live/instant store) */
 function fbListenTag(tagId){
-  if(!FB.ready)return;
+  if(!FB.ready||FB_CLOUD_DISABLED)return;
   try{
     if(FB_LISTENERS['posts_'+tagId])return; // already listening
     FB_LISTENERS['posts_'+tagId]=FB.db.collection('tags').doc(tagId).collection('posts').orderBy('ts','desc').limit(200)
@@ -639,11 +660,11 @@ function fbListenTag(tagId){
             if(ex){ex.likes=d.likes;ex.boosted=d.boosted;ex.boostExpiry=d.boostExpiry;if(activeTagId===tagId)renderMsgs(t);}
           }
         });
-      },function(err){console.warn('listen posts',err);});
+      },function(err){if(fbIsPermErr(err))fbDisableCloud('listen posts');else console.warn('listen posts',err);});
   }catch(e){console.warn(e);}
 }
 function fbListenComments(tagId,postId){
-  if(!FB.ready)return;
+  if(!FB.ready||FB_CLOUD_DISABLED)return;
   try{
     var key='cmts_'+tagId+'_'+postId;
     if(FB_LISTENERS[key])return;
@@ -654,12 +675,12 @@ function fbListenComments(tagId,postId){
         snap.docChanges().forEach(function(ch){
           if(ch.type==='added'){var c=ch.doc.data();if(!p.comments.find(function(x){return x.ts===c.ts&&x.user===c.user;})){c.liked=false;p.comments.push(c);if(activeTagId===tagId){if(p.showComments)appendCommentDOM(tagId,postId,c,p.comments.length-1);updateFooter(tagId,postId,p);renderSbar(t);}}}
         });
-      },function(err){console.warn('listen cmts',err);});
+      },function(err){if(fbIsPermErr(err))fbDisableCloud('listen cmts');else console.warn('listen cmts',err);});
   }catch(e){console.warn(e);}
 }
 /* Realtime listener: applications for a company (page owner sees instantly) */
 function fbListenCompanyApps(company){
-  if(!FB.ready)return;
+  if(!FB.ready||FB_CLOUD_DISABLED)return;
   try{
     var key='apps_'+company.toLowerCase();
     if(FB_LISTENERS[key])return;
@@ -668,12 +689,12 @@ function fbListenCompanyApps(company){
         var apps=getAllApps();var changed=false;
         snap.forEach(function(doc){var d=doc.data();d.id=doc.id;var ex=apps.find(function(a){return a.id===d.id;});if(ex){Object.assign(ex,d);}else{apps.push(d);}changed=true;});
         if(changed){saveAllApps(apps);if(document.getElementById('pg-ovl').classList.contains('open'))openCompanyPage(company);}
-      },function(err){console.warn('listen apps',err);});
+      },function(err){if(fbIsPermErr(err))fbDisableCloud('listen apps');else console.warn('listen apps',err);});
   }catch(e){console.warn(e);}
 }
 /* Realtime listener: my own applications (applicant sees status change instantly) */
 function fbListenMyApps(){
-  if(!FB.ready||!CU)return;
+  if(!FB.ready||FB_CLOUD_DISABLED||!CU)return;
   try{
     if(FB_LISTENERS['myapps'])FB_LISTENERS['myapps']();
     FB_LISTENERS['myapps']=FB.db.collection('applications').where('uid','==',CU.uid)
@@ -681,7 +702,7 @@ function fbListenMyApps(){
         var apps=getAllApps();var changed=false;
         snap.forEach(function(doc){var d=doc.data();d.id=doc.id;var ex=apps.find(function(a){return a.id===d.id;});if(ex){if(ex.status!==d.status){toast('Status update: '+statusObj(d.status).label,d.status==='selected'||d.status==='interview'?'gold':'info');}Object.assign(ex,d);}else{apps.push(d);}changed=true;});
         if(changed){saveAllApps(apps);if(activeTagId){var t=tags.find(function(x){return x.id===activeTagId;});if(t)renderMsgs(t);}if(document.getElementById('ma-ovl').classList.contains('open'))showMyApps();}
-      },function(err){console.warn('listen myapps',err);});
+      },function(err){if(fbIsPermErr(err))fbDisableCloud('listen myapps');else console.warn('listen myapps',err);});
   }catch(e){console.warn(e);}
 }
 function setDbPill(live){
@@ -822,14 +843,20 @@ function enterApp(){
   document.getElementById('ae').value=CU.email;
   if(CU.email)document.getElementById('ap-pre').style.display='block';
   var custom=LS.get('rb_custom_tags',[])||[];
+  var SEED_IDS=['jobs','tech','ai','insurance','sell','remote'];
+  var cleaned=[];
   custom.forEach(function(ct){
-    if(!ct||!ct.id)return; // skip junk
-    // repair missing fields so renderTagList never crashes
-    ct.name=ct.name||ct.id;ct.cat=ct.cat||'general';ct.desc=ct.desc||'Community tag';
+    if(!ct||!ct.id||!ct.name)return;            // drop junk with no id/name
+    if(SEED_IDS.indexOf(ct.id)>=0)return;        // don't duplicate seed tags
+    if(!/^[a-z0-9\-_]{2,26}$/i.test(ct.name))return; // drop garbled names like "C GPT-P V"
+    ct.cat=ct.cat||'general';ct.desc=ct.desc||'Community tag';
     if(!Array.isArray(ct.posts))ct.posts=[];
     if(typeof ct.members!=='number')ct.members=1;
+    cleaned.push(ct);
     if(!tags.find(function(t){return t.id===ct.id;}))tags.push(ct);
   });
+  // persist the cleaned list so junk doesn't come back next load
+  if(cleaned.length!==custom.length)LS.set('rb_custom_tags',cleaned);
   followedTags=new Set(LS.get('rb_ftags',[])||[]);followedUsers=new Set(LS.get('rb_fusers',[])||[]);
   tags.forEach(function(t){t.followed=followedTags.has(t.id);});
   renderTagList();
@@ -903,7 +930,7 @@ var PAY_METHODS=[
 ];
 var PAY_DETAILS={
   paypal:'Send to: <strong>paypal.me/YOURREEDBIID</strong><br>Include post title in notes.',
-  wise:'Account name: <strong>REEDBI01 Global Ltd</strong><br>Email: <strong>pay@reedbi.app</strong>',
+  wise:'Account name: <strong>Reedbi Global Ltd</strong><br>Email: <strong>pay@reedbi.app</strong>',
   crypto:'USDT TRC20: <strong>TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</strong><br>BTC: <strong>bc1qxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</strong>',
   bank:'Bank: <strong>Emirates NBD</strong><br>IBAN: <strong>AE070260001234567890123</strong><br>Swift: <strong>EBILAEAD</strong>',
   upi:'UPI ID: <strong>reedbi@okaxis</strong><br>GPay / PhonePe / Paytm accepted.'
@@ -996,6 +1023,23 @@ function renderTagList(filter){
       +'<button class="fol-btn'+(t.followed?' on':'')+'" onclick="event.stopPropagation();toggleTagFollow(\''+escJS(t.id)+'\')" title="'+(t.followed?'Following — tap to unfollow':'Follow')+'">'+(t.followed?'<i class="ti ti-check"></i>':'<i class="ti ti-plus"></i>')+'</button>'
       +'<div class="ttime">'+(last?fmtT(last.ts):'')+'</div>'+(u?'<div class="ubadge">'+u+'</div>':'')+'</div>'
       +'</div>';}).join('');
+}
+function cleanupTags(){
+  // Remove old/corrupted custom tags with malformed names; keep clean ones.
+  var custom=LS.get('rb_custom_tags',[])||[];
+  var SEED=['jobs','tech','ai','insurance','sell','remote'];
+  var kept=custom.filter(function(ct){
+    if(!ct||!ct.id||!ct.name)return false;
+    // a "good" name is short, lowercase-ish, no weird spacing/symbols
+    return /^[a-z0-9\-_]{2,26}$/i.test(ct.name)&&SEED.indexOf(ct.id)<0;
+  });
+  LS.set('rb_custom_tags',kept);
+  // rebuild tags list from seed + kept
+  tags=tags.filter(function(t){return SEED.indexOf(t.id)>=0;});
+  kept.forEach(function(ct){if(!tags.find(function(t){return t.id===ct.id;})){if(!Array.isArray(ct.posts))ct.posts=[];ct.cat=ct.cat||'general';ct.desc=ct.desc||'Community tag';ct.members=ct.members||1;tags.push(ct);}});
+  var removed=custom.length-kept.length;
+  renderTagList();
+  toast(removed>0?('Removed '+removed+' old/broken tag'+(removed!==1?'s':'')):'No broken tags found','ok');
 }
 function toggleTagFollow(id){
   var t=tags.find(function(x){return x.id===id;});if(!t)return;
@@ -1168,7 +1212,7 @@ function buildBubble(t,p,isMine){
     +'<div class="acmt"><div class="cav '+avC(CU?CU.avIdx:0)+'">'+ini(CU?CU.name:'ME')+'</div><input type="text" placeholder="Comment..." id="cin-'+t.id+'-'+pid+'" onkeydown="if(event.key===\'Enter\')submitC(\''+escJS(t.id)+'\','+pid+')"><button class="csnd" onclick="submitC(\''+escJS(t.id)+'\','+pid+')"><i class="ti ti-send"></i></button></div></div>'
     +'</div>';
 }
-function waShare(pid,title,body,region){var text=encodeURIComponent(title+'\n'+body+'\n\n'+region+'\n via REEDBI01 Global Tag Talk');window.open('https://wa.me/?text='+text,'_blank');}
+function waShare(pid,title,body,region){var text=encodeURIComponent(title+'\n'+body+'\n\n'+region+'\n via Reedbi Global Tag Talk');window.open('https://wa.me/?text='+text,'_blank');}
 
 function renderMsgs(t){
   var box=document.getElementById('msgs');if(!box)return;
@@ -1450,7 +1494,7 @@ function openProfile(user,co,tagName,avIdx){
   curProfileUser={user:user,co:co,avIdx:avIdx};
   var av=document.getElementById('pm-av');av.className='pm-av '+avC(avIdx);av.textContent=ini(user);
   document.getElementById('pm-nm').textContent=user;
-  document.getElementById('pm-meta').textContent=(co&&co!=='Self'?co+' · ':'')+(tagName?'Active in #'+tagName:'REEDBI01 member');
+  document.getElementById('pm-meta').textContent=(co&&co!=='Self'?co+' · ':'')+(tagName?'Active in #'+tagName:'Reedbi member');
   var t=tags.find(function(x){return x.id===activeTagId;});
   var up=t?t.posts.filter(function(p){return p.user===user;}):[];
   var int=new Set();up.forEach(function(p){extractAT(p.title,p.body).forEach(function(a){int.add(a);});});
@@ -1510,7 +1554,7 @@ function createTag(){
 
 /* MISC */
 function autoResize(ta){if(!ta)return;ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,80)+'px';}
-function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendPost();}}
+function onKey(e){if(e.key==='Enter'&&!e.shiftKey&&window.innerWidth>700){e.preventDefault();sendPost();}}
 function goBack(){stopLive();stopPoll();document.getElementById('lp').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';activeTagId=null;pendingPosts=[];renderTagList(document.getElementById('tsr').value);}
 function goHome(){stopLive();stopPoll();activeTagId=null;pendingPosts=[];document.getElementById('lp').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;}
 ['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('open');});});
