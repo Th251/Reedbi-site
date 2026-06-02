@@ -97,7 +97,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .tis-w input{border:none;background:transparent;outline:none;font-size:12px;color:var(--tx);flex:1;font-family:var(--fn)}
 .tis-clr{font-size:11px;color:var(--g);cursor:pointer;border:none;background:transparent;font-family:var(--fn);white-space:nowrap}
 .slide-sec{background:var(--sf);border-bottom:1px solid var(--b);flex-shrink:0}
-.srow{display:flex;align-items:center;gap:4px;padding:5px 10px;overflow-x:auto;scrollbar-width:none;min-height:32px}
+.srow{display:flex;align-items:center;gap:4px;padding:5px 10px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;min-height:32px;-webkit-overflow-scrolling:touch;touch-action:pan-x;white-space:nowrap}
 .srow::-webkit-scrollbar{display:none}
 .srow+.srow{border-top:1px solid rgba(30,45,69,.5)}
 .sl{font-size:9px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:2px}
@@ -600,11 +600,26 @@ var firebaseConfig={
 };
 
 /* PHONE STORAGE */
+/* Storage with automatic in-memory fallback.
+   Some browsers (tracking prevention / private mode) BLOCK localStorage,
+   which would otherwise break tags, login and posting. We detect that
+   and transparently fall back to an in-memory store so the app still works. */
+var _memStore={};
+var _lsOK=(function(){try{var t='__rb_test__';localStorage.setItem(t,'1');localStorage.removeItem(t);return true;}catch(e){return false;}})();
 var LS={
-  get:function(k,d){try{var v=localStorage.getItem(k);return v===null?(d===undefined?null:d):JSON.parse(v);}catch(e){return d===undefined?null:d;}},
-  set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){toast('Phone storage full!','err');}},
-  del:function(k){try{localStorage.removeItem(k);}catch(e){}},
-  size:function(){try{var b=0;for(var k in localStorage){if(k.indexOf('rb_')===0)b+=(localStorage.getItem(k)||'').length*2;}return b;}catch(e){return 0;}}
+  get:function(k,d){
+    try{
+      var v=_lsOK?localStorage.getItem(k):(_memStore.hasOwnProperty(k)?_memStore[k]:null);
+      return v===null||v===undefined?(d===undefined?null:d):JSON.parse(v);
+    }catch(e){return d===undefined?null:d;}
+  },
+  set:function(k,v){
+    var s=JSON.stringify(v);
+    if(_lsOK){try{localStorage.setItem(k,s);return;}catch(e){_lsOK=false;/* fall through to memory */}}
+    _memStore[k]=s;
+  },
+  del:function(k){if(_lsOK){try{localStorage.removeItem(k);}catch(e){}}delete _memStore[k];},
+  size:function(){try{var b=0,src=_lsOK?localStorage:_memStore;for(var k in src){if(k.indexOf('rb_')===0)b+=((_lsOK?localStorage.getItem(k):_memStore[k])||'').length*2;}return b;}catch(e){return 0;}}
 };
 
 /* BROADCASTCHANNEL */
@@ -772,11 +787,15 @@ function fbErr(err){
 function doLogin(){
   var e=document.getElementById('le').value.trim().toLowerCase(),p=document.getElementById('lp').value;
   if(!e||!p){setErr('Fill both fields');return;}
+  setErr('Signing in…');
   if(FB.ready){
-    FB.auth.signInWithEmailAndPassword(e,p).then(function(cred){fbLoadProfile(cred.user.uid,e);})
+    var done=false;
+    // If Firebase is slow/blocked, fall back to local login after 4s so it never hangs
+    var timer=setTimeout(function(){if(!done){done=true;console.warn('Auth slow — using local login');localLogin(e,p);}},4000);
+    FB.auth.signInWithEmailAndPassword(e,p).then(function(cred){if(done)return;done=true;clearTimeout(timer);fbLoadProfile(cred.user.uid,e);})
       .catch(function(err){
+        if(done)return;done=true;clearTimeout(timer);
         var c=(err&&err.code)||'';
-        // If Firebase Auth isn't usable (config/domain/network), fall back to local accounts
         if(c.indexOf('configuration-not-found')>=0||c.indexOf('operation-not-allowed')>=0||c.indexOf('unauthorized-domain')>=0||c.indexOf('network-request-failed')>=0||c.indexOf('api-key')>=0){
           localLogin(e,p);
         }else{setErr(fbErr(err));}
@@ -969,7 +988,16 @@ function toast(msg,type){var s=document.getElementById('tstack');var d=document.
 function setTick(h){var e=document.getElementById('ttxt');if(e)e.innerHTML=h;}
 function closeOvl(id){var el=document.getElementById(id);if(el)el.classList.remove('open');}
 function isAdActive(p){return p&&p.boosted&&p.boostExpiry&&Date.now()<p.boostExpiry;}
-function extractAT(title,body){var text=((title||'')+' '+(body||'')).toLowerCase();var f=new Set();Object.keys(KW).forEach(function(k){if(text.indexOf(k)>=0)f.add(KW[k]);});var w=((title||'')+' '+(body||'')).match(/\b[A-Z][a-zA-Z]{2,}\b/g)||[];w.forEach(function(x){var l=x.toLowerCase();if(l.length>3&&['This','That','With','From','Have','Been','Will','Your','They','When','What'].indexOf(x)<0)f.add(l);});return Array.from(f).slice(0,8);}
+function extractAT(title,body){
+  var text=((title||'')+' '+(body||'')).toLowerCase();
+  var f=new Set();
+  Object.keys(KW).forEach(function(k){if(text.indexOf(k)>=0)f.add(KW[k]);});
+  var w=((title||'')+' '+(body||'')).match(/\b[A-Z][a-zA-Z]{2,}\b/g)||[];
+  w.forEach(function(x){var l=x.toLowerCase();if(l.length>3&&['This','That','With','From','Have','Been','Will','Your','They','When','What'].indexOf(x)<0)f.add(l);});
+  // Don't let auto sub-tags duplicate the main tag names (avoids contradiction)
+  var mainNames={};try{tags.forEach(function(t){if(t&&t.name)mainNames[t.name.toLowerCase()]=1;});}catch(e){}
+  return Array.from(f).filter(function(a){return !mainNames[a];}).slice(0,8);
+}
 
 /* ============================================================
    PAGES (company pages owned by users)
