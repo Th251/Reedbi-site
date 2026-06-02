@@ -636,25 +636,37 @@ function fbDisableCloud(reason){
   for(var k in FB_LISTENERS){try{if(typeof FB_LISTENERS[k]==='function')FB_LISTENERS[k]();}catch(e){}}
   FB_LISTENERS={};
   setDbPill(false);
-  // One-time, friendly heads-up that cross-device sync needs Firestore rules
   if(String(reason).indexOf('permission')>=0||/listen/.test(String(reason))){
     if(!fbDisableCloud._warned){fbDisableCloud._warned=true;
       toast('Cloud sync off — posts stay on this device. Enable Firestore to sync between users.','info');
     }
   }
 }
+/* Stop a single listener (its query was blocked) WITHOUT killing all sync.
+   Used for user-specific queries (myapps/company apps) that may be blocked
+   even when post sync works fine. */
+function fbStopListener(key,reason){
+  try{if(typeof FB_LISTENERS[key]==='function')FB_LISTENERS[key]();}catch(e){}
+  delete FB_LISTENERS[key];
+  console.warn('Stopped listener',key,'-',reason,'(other sync continues)');
+}
 function fbIsPermErr(err){var c=(err&&(err.code||err.message))||'';return String(c).indexOf('permission')>=0||String(c).indexOf('insufficient')>=0;}
 function initFirebase(){
   try{
     if(typeof firebase==='undefined'||!firebase.initializeApp){setDbPill(false);return;}
     firebase.initializeApp(firebaseConfig);
-    FB.db=firebase.firestore();
+    // Modern offline cache (replaces deprecated enableMultiTabIndexedDbPersistence)
+    try{
+      FB.db=firebase.firestore();
+      FB.db.settings({cache:{kind:'persistent',tabManager:{kind:'persistentMultipleTab'}}});
+    }catch(e){
+      // fallback for older SDK builds
+      try{FB.db=firebase.firestore();FB.db.enablePersistence({synchronizeTabs:true}).catch(function(){});}catch(e2){FB.db=firebase.firestore();}
+    }
     FB.auth=firebase.auth();
     FB.ready=true;
     setDbPill(true);
-    // Keep the user signed in across reloads / app restarts (fixes auto-logout)
     try{FB.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){});}catch(e){}
-    try{FB.db.enablePersistence({synchronizeTabs:true}).catch(function(){});}catch(e){}
   }catch(e){console.warn('FB init failed, using phone storage',e);FB.ready=false;setDbPill(false);}
 }
 /* Realtime listener: posts in a tag (live/instant store) */
@@ -709,7 +721,7 @@ function fbListenCompanyApps(company){
         var apps=getAllApps();var changed=false;
         snap.forEach(function(doc){var d=doc.data();d.id=doc.id;var ex=apps.find(function(a){return a.id===d.id;});if(ex){Object.assign(ex,d);}else{apps.push(d);}changed=true;});
         if(changed){saveAllApps(apps);if(document.getElementById('pg-ovl').classList.contains('open'))openCompanyPage(company);}
-      },function(err){if(fbIsPermErr(err))fbDisableCloud('listen apps');else console.warn('listen apps',err);});
+      },function(err){if(fbIsPermErr(err))fbStopListener('apps_'+company.toLowerCase(),'perm');else console.warn('listen apps',err);});
   }catch(e){console.warn(e);}
 }
 /* Realtime listener: my own applications (applicant sees status change instantly) */
@@ -722,7 +734,7 @@ function fbListenMyApps(){
         var apps=getAllApps();var changed=false;
         snap.forEach(function(doc){var d=doc.data();d.id=doc.id;var ex=apps.find(function(a){return a.id===d.id;});if(ex){if(ex.status!==d.status){toast('Status update: '+statusObj(d.status).label,d.status==='selected'||d.status==='interview'?'gold':'info');}Object.assign(ex,d);}else{apps.push(d);}changed=true;});
         if(changed){saveAllApps(apps);if(activeTagId){var t=tags.find(function(x){return x.id===activeTagId;});if(t)renderMsgs(t);}if(document.getElementById('ma-ovl').classList.contains('open'))showMyApps();}
-      },function(err){if(fbIsPermErr(err))fbDisableCloud('listen myapps');else console.warn('listen myapps',err);});
+      },function(err){if(fbIsPermErr(err))fbStopListener('myapps','perm');else console.warn('listen myapps',err);});
   }catch(e){console.warn(e);}
 }
 function setDbPill(live){
