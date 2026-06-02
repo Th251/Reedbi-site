@@ -976,10 +976,6 @@ function enterApp(){
   document.getElementById('an').value=CU.name;
   document.getElementById('ae').value=CU.email;
   if(CU.email)document.getElementById('ap-pre').style.display='block';
-  // Force seed tag names to their correct values every boot, so they can
-  // never appear corrupted regardless of cached/old data.
-  var SEED_NAMES={jobs:'jobs',tech:'tech',ai:'ai',insurance:'insurance',sell:'sell',remote:'remote'};
-  tags.forEach(function(t){if(SEED_NAMES[t.id]){t.name=SEED_NAMES[t.id];}});
   var custom=LS.get('rb_custom_tags',[])||[];
   var SEED_IDS=['jobs','tech','ai','insurance','sell','remote'];
   var cleaned=[];
@@ -1895,7 +1891,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v21 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v20 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -1918,23 +1914,5 @@ try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setD
       });
     }
   }catch(e){console.warn('auth-state',e);}
-})();
-
-/* Source-protection deterrents (client-side only — cannot fully hide source) */
-(function(){
-  try{
-    document.addEventListener('contextmenu',function(e){e.preventDefault();return false;});
-    document.addEventListener('keydown',function(e){
-      var k=e.key||'';
-      // F12
-      if(k==='F12'){e.preventDefault();return false;}
-      // Ctrl+Shift+I / J / C  (devtools, console, inspector)
-      if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(k==='I'||k==='i'||k==='J'||k==='j'||k==='C'||k==='c')){e.preventDefault();return false;}
-      // Ctrl+U (view source)
-      if((e.ctrlKey||e.metaKey)&&(k==='U'||k==='u')){e.preventDefault();return false;}
-      // Ctrl+S (save page)
-      if((e.ctrlKey||e.metaKey)&&(k==='S'||k==='s')){e.preventDefault();return false;}
-    });
-  }catch(e){}
 })();
 </script></body></html>
