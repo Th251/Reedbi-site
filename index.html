@@ -1123,15 +1123,9 @@ function toggleFol(){showFolOnly=!showFolOnly;document.getElementById('folbtn').
 ============================================================ */
 function loadPhonePosts(tagId){
   var t=tags.find(function(x){return x.id===tagId;});if(!t)return;
-  // FIRESTORE-FIRST: when cloud is live, the realtime listener (fbListenTag)
-  // is the single source of truth. Don't merge local posts — that avoids
-  // showing stale device-only copies and guarantees every user sees the
-  // same cloud feed. Local cache is only used when cloud is unavailable.
-  var cloudLive=FB.ready&&!FB_CLOUD_DISABLED;
-  if(cloudLive){
-    // start fresh; onSnapshot will fill t.posts from the cloud
-    return;
-  }
+  // Load any cached posts so the tag always has content and is responsive.
+  // The Firestore realtime listener (fbListenTag) merges in live cloud posts
+  // on top, so users still see each other's posts when cloud is connected.
   var stored=LS.get('rb_posts_'+tagId,[])||[];
   stored.forEach(function(sp){if(!t.posts.find(function(p){return p.id===sp.id;})){sp.showComments=false;sp.liked=false;sp.applied=!!sp.applied;sp.boosted=sp.boosted||null;sp.boostExpiry=sp.boostExpiry||0;t.posts.push(sp);}});
   t.posts.forEach(function(p){var sc=LS.get('rb_cmts_'+tagId+'_'+p.id,[])||[];sc.forEach(function(c){if(!p.comments.find(function(x){return x.ts===c.ts&&x.user===c.user;})){c.liked=false;p.comments.push(c);}});});
@@ -1143,9 +1137,6 @@ function openTag(id){
   activeTagId=id;actRegion=null;actUser=null;actAutoTag=null;sortMode='latest';
   pendingPosts=[];isAtBot=true;addedSuggestTags=[];innerQ='';showIS=false;
   var t=tags.find(function(x){return x.id===id;});if(!t)return;
-  // Firestore-first: clear any demo/seed posts so the feed shows only real
-  // cloud data once the realtime listener attaches.
-  if(FB.ready&&!FB_CLOUD_DISABLED){t.posts=[];}
   loadPhonePosts(id);t._unread=0;
   document.getElementById('es').style.display='none';
   document.getElementById('cv-view').style.display='flex';
@@ -1426,7 +1417,7 @@ function submitApply(){
   if(!name||!email){toast('Fill name and email','err');return;}
   var uid=CU.uid;var cvs=getCVs(uid);var selCV2=selCVId?cvs.find(function(c){return c.id===selCVId;}):null;
   var t=tags.find(function(x){return x.id===curApplyPid.tagId;}),p=t&&t.posts.find(function(x){return x.id==curApplyPid.postId;});
-  var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',companyLower:(curApplyPid.company||(p?p.co:'')||'').toLowerCase(),tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
+  var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',companyLower:(curApplyPid.company||(p?p.co:'')||'').toLowerCase(),tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),postBody:(p?p.body||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
   var apps=getAllApps();apps.push(rec);saveAllApps(apps);
   if(FB.ready){FB.db.collection('applications').doc(rec.id).set(rec).catch(function(){});}
   if(p){p.applied=true;}
@@ -1444,6 +1435,7 @@ function showMyApps(){
     return '<div style="background:var(--card);border-radius:8px;padding:11px;margin-bottom:8px">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="font-size:12px;font-weight:600">'+esc(a.postTitle||'Job Application')+'</div><span class="stat-badge '+so.cls+'"><i class="ti ti-'+so.icon+'" style="font-size:9px"></i> '+so.label+'</span></div>'
       +'<div style="font-size:10px;color:var(--mt2);margin:4px 0">'+esc(a.company||'#'+a.tagId)+' · '+new Date(a.ts).toLocaleDateString()+(cv?' · '+esc(cv.name):'')+'</div>'
+      +(a.postBody?'<div style="font-size:11px;color:var(--mt);margin:4px 0;padding:6px 8px;background:var(--card2);border-radius:6px">'+esc(a.postBody)+'</div>':'')
       +(a.status==='interview'?'<div style="font-size:11px;color:var(--purple);margin-top:4px"><i class="ti ti-calendar"></i> You are called for an interview! Check your email.</div>':'')
       +(a.status==='passed'?'<div style="font-size:11px;color:var(--cyan);margin-top:4px"><i class="ti ti-award"></i> You passed the interview! 🎉</div>':'')
       +(a.status==='considered'?'<div style="font-size:11px;color:var(--blue);margin-top:4px"><i class="ti ti-thumb-up"></i> Your application is being considered.</div>':'')
@@ -1641,7 +1633,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v14-firestore-first loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v15 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
