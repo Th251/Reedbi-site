@@ -325,7 +325,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       <span class="db-pill" id="db-pill"><span class="sync-dot"></span><span id="db-pill-txt">Connecting…</span></span>
     </div>
     <div class="auth-bd">
-      <div class="auth-note"><i class="ti ti-brand-whatsapp"></i> <strong>Real-time sync</strong> · Cloud + phone storage · Sign in to post, browse freely</div>
       <div class="auth-tabs">
         <button class="atab on" id="tab-l" onclick="switchTab('l')">Sign In</button>
         <button class="atab" id="tab-s" onclick="switchTab('s')">Sign Up</button>
@@ -720,11 +719,27 @@ function readB64(f){return new Promise(function(r,j){var fr=new FileReader();fr.
 var CU=null;
 function switchTab(t){['l','s'].forEach(function(x){document.getElementById('tab-'+x).className='atab'+(x===t?' on':'');});document.getElementById('lform').style.display=t==='l'?'block':'none';document.getElementById('sform').style.display=t==='s'?'block':'none';document.getElementById('aerr').textContent='';}
 function setErr(m){document.getElementById('aerr').textContent=m;}
+function fbErr(err){
+  var c=(err&&err.code)||'';
+  if(c.indexOf('unauthorized-domain')>=0||(err&&err.message&&err.message.indexOf('domain')>=0))
+    return 'This domain is not authorized. In Firebase Console → Authentication → Settings → Authorized domains, add the site you hosted on (e.g. your-site.web.app or your custom domain).';
+  if(c.indexOf('operation-not-allowed')>=0)
+    return 'Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method, enable Email/Password.';
+  if(c.indexOf('configuration-not-found')>=0)
+    return 'Authentication is not set up. In Firebase Console, open Authentication and click Get Started, then enable Email/Password.';
+  if(c.indexOf('email-already-in-use')>=0)return 'Email already registered. Please sign in instead.';
+  if(c.indexOf('invalid-email')>=0)return 'That email address is not valid.';
+  if(c.indexOf('weak-password')>=0)return 'Password is too weak (use 6+ characters).';
+  if(c.indexOf('wrong-password')>=0||c.indexOf('invalid-credential')>=0)return 'Incorrect email or password.';
+  if(c.indexOf('user-not-found')>=0)return 'No account with that email. Please sign up.';
+  if(c.indexOf('network-request-failed')>=0)return 'Network error — check your connection and that the Firebase scripts loaded.';
+  return (err&&err.message?err.message.replace('Firebase:','').trim():'Sign-in failed. Please try again.');
+}
 function doLogin(){
   var e=document.getElementById('le').value.trim().toLowerCase(),p=document.getElementById('lp').value;
   if(!e||!p){setErr('Fill both fields');return;}
   if(FB.ready){
-    FB.auth.signInWithEmailAndPassword(e,p).then(function(cred){fbLoadProfile(cred.user.uid,e);}).catch(function(err){setErr(err.message.replace('Firebase:','').replace(/\(auth.*\)/,''));});
+    FB.auth.signInWithEmailAndPassword(e,p).then(function(cred){fbLoadProfile(cred.user.uid,e);}).catch(function(err){setErr(fbErr(err));});
     return;
   }
   var accs=LS.get('rb_accs',[])||[],a=accs.find(function(x){return x.email===e;});
@@ -742,7 +757,7 @@ function doSignup(){
       var prof={uid:cred.user.uid,name:n,email:e,co:co||'',avIdx:avIdx};
       FB.db.collection('users').doc(cred.user.uid).set({name:n,co:co||'',email:e,avIdx:avIdx,createdAt:Date.now()});
       CU=prof;LS.set('rb_user',CU);enterApp();
-    }).catch(function(err){setErr(err.message.replace('Firebase:','').replace(/\(auth.*\)/,''));});
+    }).catch(function(err){setErr(fbErr(err));});
     return;
   }
   var accs=LS.get('rb_accs',[])||[];
