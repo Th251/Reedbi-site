@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Reedbi — Global Tag Talk</title>
+<title>REEDBI01 — Global Tag Talk</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -330,7 +330,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <!-- AUTH -->
 <div class="auth-scr" id="auth-scr">
   <div class="auth-box">
-    <div class="auth-hd" style="position:relative"><button class="ib" onclick="dismissAuth()" style="position:absolute;top:10px;right:10px"><i class="ti ti-x"></i></button><div class="auth-logo">⬡ Reedbi</div><div class="auth-sub">Global Tag Talk · Jobs · Ads · Pay Worldwide</div>
+    <div class="auth-hd" style="position:relative"><button class="ib" onclick="dismissAuth()" style="position:absolute;top:10px;right:10px"><i class="ti ti-x"></i></button><div class="auth-logo">⬡ REEDBI01</div><div class="auth-sub">Global Tag Talk · Jobs · Ads · Pay Worldwide</div>
       <span class="db-pill" id="db-pill"><span class="sync-dot"></span><span id="db-pill-txt">Connecting…</span></span>
     </div>
     <div class="auth-bd">
@@ -362,7 +362,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:none">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi</span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ REEDBI01</span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -379,7 +379,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   <div class="right">
     <div class="es" id="es">
       <i class="ti ti-brand-whatsapp"></i>
-      <h2>Reedbi Tag Talk</h2>
+      <h2>REEDBI01 Tag Talk</h2>
       <p>Real-time posts worldwide · Boost as ads · Apply to jobs · Pay anywhere</p>
       <button class="btn btnok" onclick="openCreateModal()" style="border-radius:17px;margin-top:7px;display:flex;align-items:center;gap:5px"><i class="ti ti-plus"></i> Create a Tag</button>
     </div>
@@ -821,7 +821,15 @@ function enterApp(){
   document.getElementById('an').value=CU.name;
   document.getElementById('ae').value=CU.email;
   if(CU.email)document.getElementById('ap-pre').style.display='block';
-  var custom=LS.get('rb_custom_tags',[])||[];custom.forEach(function(ct){if(!tags.find(function(t){return t.id===ct.id;}))tags.push(ct);});
+  var custom=LS.get('rb_custom_tags',[])||[];
+  custom.forEach(function(ct){
+    if(!ct||!ct.id)return; // skip junk
+    // repair missing fields so renderTagList never crashes
+    ct.name=ct.name||ct.id;ct.cat=ct.cat||'general';ct.desc=ct.desc||'Community tag';
+    if(!Array.isArray(ct.posts))ct.posts=[];
+    if(typeof ct.members!=='number')ct.members=1;
+    if(!tags.find(function(t){return t.id===ct.id;}))tags.push(ct);
+  });
   followedTags=new Set(LS.get('rb_ftags',[])||[]);followedUsers=new Set(LS.get('rb_fusers',[])||[]);
   tags.forEach(function(t){t.followed=followedTags.has(t.id);});
   renderTagList();
@@ -895,7 +903,7 @@ var PAY_METHODS=[
 ];
 var PAY_DETAILS={
   paypal:'Send to: <strong>paypal.me/YOURREEDBIID</strong><br>Include post title in notes.',
-  wise:'Account name: <strong>Reedbi Global Ltd</strong><br>Email: <strong>pay@reedbi.app</strong>',
+  wise:'Account name: <strong>REEDBI01 Global Ltd</strong><br>Email: <strong>pay@reedbi.app</strong>',
   crypto:'USDT TRC20: <strong>TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</strong><br>BTC: <strong>bc1qxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</strong>',
   bank:'Bank: <strong>Emirates NBD</strong><br>IBAN: <strong>AE070260001234567890123</strong><br>Swift: <strong>EBILAEAD</strong>',
   upi:'UPI ID: <strong>reedbi@okaxis</strong><br>GPay / PhonePe / Paytm accepted.'
@@ -974,7 +982,9 @@ function setAppStatus(appId,status){
 function renderTagList(filter){
   filter=filter||'';
   var list=document.getElementById('tlist');
-  var filtered=tags.filter(function(t){var ms=!filter||t.name.indexOf(filter.toLowerCase())>=0||t.desc.toLowerCase().indexOf(filter.toLowerCase())>=0;return ms&&(!showFolOnly||t.followed);});
+  // defensive: ensure every tag has the fields the renderer needs
+  tags.forEach(function(t){if(t){t.name=t.name||t.id||'tag';t.desc=t.desc||'';t.cat=t.cat||'general';if(!Array.isArray(t.posts))t.posts=[];if(typeof t.members!=='number')t.members=1;}});
+  var filtered=tags.filter(function(t){if(!t||!t.id)return false;var ms=!filter||t.name.indexOf(filter.toLowerCase())>=0||t.desc.toLowerCase().indexOf(filter.toLowerCase())>=0;return ms&&(!showFolOnly||t.followed);});
   if(!filtered.length){list.innerHTML='<div class="nores"><i class="ti ti-tag-off"></i>'+(filter?'<p>No tags for "'+esc(filter)+'"</p><button onclick="openCreateModalWithName(\''+escJS(filter)+'\')">+ Create #'+esc(filter)+'</button>':'<p>No followed tags yet.</p>')+'</div>';return;}
   filtered.sort(function(a,b){var aT=a.posts.length?Math.max.apply(null,a.posts.map(function(p){return p.ts;})):0,bT=b.posts.length?Math.max.apply(null,b.posts.map(function(p){return p.ts;})):0;return bT-aT;});
   list.innerHTML=filtered.map(function(t){var s=cs(t.cat),posts=t.posts.slice().sort(function(a,b){return b.ts-a.ts;}),last=posts[0],u=t._unread||0;
@@ -1158,7 +1168,7 @@ function buildBubble(t,p,isMine){
     +'<div class="acmt"><div class="cav '+avC(CU?CU.avIdx:0)+'">'+ini(CU?CU.name:'ME')+'</div><input type="text" placeholder="Comment..." id="cin-'+t.id+'-'+pid+'" onkeydown="if(event.key===\'Enter\')submitC(\''+escJS(t.id)+'\','+pid+')"><button class="csnd" onclick="submitC(\''+escJS(t.id)+'\','+pid+')"><i class="ti ti-send"></i></button></div></div>'
     +'</div>';
 }
-function waShare(pid,title,body,region){var text=encodeURIComponent(title+'\n'+body+'\n\n'+region+'\n via Reedbi Global Tag Talk');window.open('https://wa.me/?text='+text,'_blank');}
+function waShare(pid,title,body,region){var text=encodeURIComponent(title+'\n'+body+'\n\n'+region+'\n via REEDBI01 Global Tag Talk');window.open('https://wa.me/?text='+text,'_blank');}
 
 function renderMsgs(t){
   var box=document.getElementById('msgs');if(!box)return;
@@ -1440,7 +1450,7 @@ function openProfile(user,co,tagName,avIdx){
   curProfileUser={user:user,co:co,avIdx:avIdx};
   var av=document.getElementById('pm-av');av.className='pm-av '+avC(avIdx);av.textContent=ini(user);
   document.getElementById('pm-nm').textContent=user;
-  document.getElementById('pm-meta').textContent=(co&&co!=='Self'?co+' · ':'')+(tagName?'Active in #'+tagName:'Reedbi member');
+  document.getElementById('pm-meta').textContent=(co&&co!=='Self'?co+' · ':'')+(tagName?'Active in #'+tagName:'REEDBI01 member');
   var t=tags.find(function(x){return x.id===activeTagId;});
   var up=t?t.posts.filter(function(p){return p.user===user;}):[];
   var int=new Set();up.forEach(function(p){extractAT(p.title,p.body).forEach(function(a){int.add(a);});});
