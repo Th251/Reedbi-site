@@ -633,10 +633,15 @@ function fbDisableCloud(reason){
   if(FB_CLOUD_DISABLED)return;
   FB_CLOUD_DISABLED=true;
   console.warn('Cloud sync disabled, using phone storage. Reason:',reason);
-  // detach all active listeners
   for(var k in FB_LISTENERS){try{if(typeof FB_LISTENERS[k]==='function')FB_LISTENERS[k]();}catch(e){}}
   FB_LISTENERS={};
   setDbPill(false);
+  // One-time, friendly heads-up that cross-device sync needs Firestore rules
+  if(String(reason).indexOf('permission')>=0||/listen/.test(String(reason))){
+    if(!fbDisableCloud._warned){fbDisableCloud._warned=true;
+      toast('Cloud sync off — posts stay on this device. Enable Firestore to sync between users.','info');
+    }
+  }
 }
 function fbIsPermErr(err){var c=(err&&(err.code||err.message))||'';return String(c).indexOf('permission')>=0||String(c).indexOf('insufficient')>=0;}
 function initFirebase(){
