@@ -321,7 +321,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <!-- AUTH -->
 <div class="auth-scr" id="auth-scr">
   <div class="auth-box">
-    <div class="auth-hd"><div class="auth-logo">⬡ Reedbi</div><div class="auth-sub">Global Tag Talk · Jobs · Ads · Pay Worldwide</div>
+    <div class="auth-hd" style="position:relative"><button class="ib" onclick="dismissAuth()" style="position:absolute;top:10px;right:10px"><i class="ti ti-x"></i></button><div class="auth-logo">⬡ Reedbi</div><div class="auth-sub">Global Tag Talk · Jobs · Ads · Pay Worldwide</div>
       <span class="db-pill" id="db-pill"><span class="sync-dot"></span><span id="db-pill-txt">Connecting…</span></span>
     </div>
     <div class="auth-bd">
@@ -345,7 +345,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
         <button class="auth-btn" onclick="doSignup()"><i class="ti ti-user-plus"></i> Create Account</button>
       </div>
       <div class="auth-or">or</div>
-      <button class="guest-btn" onclick="skipAuth()"><i class="ti ti-eye" style="font-size:15px;color:var(--g)"></i> Browse as Guest (sign in to post)</button>
+      <button class="guest-btn" onclick="dismissAuth()"><i class="ti ti-eye" style="font-size:15px;color:var(--g)"></i> Keep Browsing as Guest</button>
       <div class="auth-err" id="aerr"></div>
     </div>
   </div>
@@ -777,10 +777,19 @@ function enterApp(){
 }
 function requireAuth(action){
   if(CU&&!CU.guest)return true;
-  toast('Sign in to '+(action||'continue'),'err');
-  setTimeout(function(){doSignOut();},900);
+  toast('Sign in to '+(action||'continue'),'info');
+  showAuthScreen();
   return false;
 }
+function showAuthScreen(){
+  // show login over the app without wiping the current browsing session
+  switchTab('l');
+  document.getElementById('aerr').textContent='';
+  document.getElementById('auth-scr').style.display='flex';
+}
+function hideAuthScreen(){document.getElementById('auth-scr').style.display='none';}
+/* Let guests dismiss the auth screen and keep browsing */
+function dismissAuth(){hideAuthScreen();if(!CU){CU={uid:'guest_'+Date.now(),name:'Guest',email:'',co:'',avIdx:0,guest:true};enterApp();}}
 /* ============================================================
    DATA
 ============================================================ */
@@ -1417,12 +1426,17 @@ function goBack(){stopLive();stopPoll();document.getElementById('lp').classList.
 document.getElementById('pmb').addEventListener('click',function(e){if(e.target===document.getElementById('pmb'))closePM();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('open');});closePM();}});
 
-/* INIT - bulletproof: UI must always boot even if Firebase/CDN fails */
+/* INIT - bulletproof: UI must always boot even if Firebase/CDN fails.
+   Do NOT show login on startup. Enter as a saved user if one exists,
+   otherwise enter as a silent guest. Auth screen only appears when
+   the user tries to post/comment/like/apply/boost (via requireAuth). */
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
     var u=LS.get('rb_user');
-    if(u){CU=u;enterApp();}
-  }catch(e){console.warn('session restore failed',e);}
+    if(u){CU=u;}
+    else{CU={uid:'guest_'+Date.now(),name:'Guest',email:'',co:'',avIdx:0,guest:true};}
+    enterApp();
+  }catch(e){console.warn('boot failed',e);}
 })();
 </script></body></html>
