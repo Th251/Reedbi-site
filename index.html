@@ -10,17 +10,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#0a0e17;--sf:#111827;--card:#161f2e;--card2:#1a2535;
-  --b:#1e2d45;--b2:#263550;
-  --g:#25d366;--g2:#1ab358;
-  --gold:#f5a623;--blue:#3b82f6;--pink:#e879f9;--red:#f43f5e;--cyan:#06b6d4;--purple:#a78bfa;
-  --tx:#f1f5f9;--mt:#94a3b8;--mt2:#64748b;
-  --bi:#1e2d45;--bo:#1a4731;--bot:#dcf8c6;
+  --bg:#f4f2ee;--sf:#ffffff;--card:#ffffff;--card2:#f3f6f8;
+  --b:#e0dfdc;--b2:#d0cfcc;
+  --g:#0a66c2;--g2:#004182;
+  --gold:#c37d16;--blue:#0a66c2;--pink:#c8438f;--red:#cc1016;--cyan:#0073b1;--purple:#7a3e9d;
+  --tx:#1d2226;--mt:#666666;--mt2:#8a8a8a;
+  --bi:#eef3f8;--bo:#0a66c2;--bot:#ffffff;
   --fn:'Inter',sans-serif;--sab:env(safe-area-inset-bottom,0px);
 }
 html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg);color:var(--tx)}
 .shell{display:flex;height:100vh;overflow:hidden}
-.auth-scr{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.auth-scr{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.auth-scr.show{display:flex}
 .auth-box{background:var(--sf);border:1px solid var(--b2);border-radius:18px;width:100%;max-width:380px}
 .auth-hd{padding:22px 22px 14px;text-align:center;border-bottom:1px solid var(--b)}
 .auth-logo{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--g),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -28,12 +29,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .auth-bd{padding:18px 20px}
 .auth-tabs{display:flex;background:var(--card);border-radius:10px;padding:3px;margin-bottom:14px}
 .atab{flex:1;border:none;background:transparent;border-radius:8px;padding:7px;font-size:13px;font-weight:500;cursor:pointer;color:var(--mt);font-family:var(--fn)}
-.atab.on{background:var(--g);color:#000;font-weight:600}
+.atab.on{background:var(--g);color:#fff;font-weight:600}
 .afg{margin-bottom:10px}
 .afg label{display:block;font-size:10px;font-weight:600;color:var(--mt);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
 .afg input{width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:10px 12px;color:var(--tx);font-size:14px;font-family:var(--fn);outline:none}
 .afg input:focus{border-color:var(--g)}
-.auth-btn{width:100%;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;background:var(--g);color:#000;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
+.auth-btn{width:100%;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;background:var(--g);color:#fff;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
 .auth-or{text-align:center;font-size:11px;color:var(--mt2);margin:10px 0;position:relative}
 .auth-or::before,.auth-or::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--b)}
 .auth-or::before{left:0}.auth-or::after{right:0}
@@ -43,21 +44,26 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .db-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px;margin-top:6px}
 .db-live{background:rgba(37,211,102,.15);color:var(--g)}.db-local{background:rgba(245,166,35,.15);color:var(--gold)}
 .left{width:310px;flex-shrink:0;display:flex;flex-direction:column;background:var(--sf);border-right:1px solid var(--b)}
-.lhd{padding:10px 12px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:17px;font-weight:700;background:linear-gradient(135deg,var(--g),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.uchip{display:flex;align-items:center;gap:5px;cursor:pointer;padding:3px 7px;border-radius:10px;background:var(--card);border:1px solid var(--b)}
+.lhd{padding:10px 14px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;background:var(--sf);box-shadow:0 1px 0 rgba(0,0,0,.04)}
+.logo{font-size:19px;font-weight:800;color:var(--g);letter-spacing:-.5px}
+.uchip{display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 8px;border-radius:20px;background:var(--card2);border:1px solid var(--b);transition:background .15s}
+.uchip:hover{background:#e8eef3}
 .uchip-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
 .uchip-nm{font-size:11px;font-weight:500;color:var(--mt2);max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hacts{display:flex;gap:2px}
-.ib{width:30px;height:30px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:var(--mt);display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s}
+.ib{width:34px;height:34px;border-radius:8px;border:none;background:transparent;cursor:pointer;color:var(--mt);display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .15s;touch-action:manipulation}
+.ib:hover{background:var(--card2);color:var(--g)}
+.ib:active{background:#e8eef3}
 .ib:hover,.ib.on{background:var(--card);color:var(--tx)}.ib.on{color:var(--g)}
 .tsrch{padding:6px 10px 5px;border-bottom:1px solid var(--b)}
 .sw{display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--b);border-radius:18px;padding:6px 11px}
 .sw i{color:var(--mt2);font-size:13px}
 .sw input{border:none;background:transparent;outline:none;font-size:13px;color:var(--tx);flex:1;font-family:var(--fn)}
-.tlist{flex:1;overflow-y:auto}
+.tlist{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.ti{touch-action:manipulation}
 .ti{display:flex;align-items:center;gap:10px;padding:9px 11px;cursor:pointer;border-bottom:1px solid rgba(30,45,69,.4)}
-.ti:hover,.ti:active{background:var(--card)}
+.ti:hover{background:var(--card2)}
+.ti:active{background:#e8eef3;transform:scale(.995)}
 .ti.act{background:var(--card2);border-left:3px solid var(--g)}
 .tav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:1px solid var(--b)}
 .tinf{flex:1;min-width:0}
@@ -67,14 +73,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .tprev{font-size:11px;color:var(--mt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tmeta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
 .ttime{font-size:10px;color:var(--mt2)}
-.ubadge{background:var(--g);color:#000;border-radius:10px;font-size:9px;font-weight:700;padding:1px 5px;min-width:16px;text-align:center}
+.ubadge{background:var(--g);color:#fff;border-radius:10px;font-size:9px;font-weight:700;padding:1px 5px;min-width:16px;text-align:center}
 .fdot{width:6px;height:6px;background:var(--g);border-radius:50%}
 .fol-btn{width:24px;height:24px;border-radius:50%;border:1px solid var(--b2);background:transparent;color:var(--mt);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .15s}
 .fol-btn:hover{border-color:var(--g);color:var(--g)}
-.fol-btn.on{background:var(--g);border-color:var(--g);color:#000}
+.fol-btn.on{background:var(--g);border-color:var(--g);color:#fff}
 .nores{padding:24px 12px;text-align:center;color:var(--mt)}
 .nores i{font-size:30px;display:block;margin-bottom:7px;color:var(--mt2)}
-.nores button{margin-top:10px;background:var(--g);color:#000;border:none;border-radius:17px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fn)}
+.nores button{margin-top:10px;background:var(--g);color:#fff;border:none;border-radius:17px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fn)}
 .right{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
 .es{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:var(--mt);padding:20px;text-align:center}
 .es i{font-size:44px;color:var(--mt2)}
@@ -102,14 +108,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .srow::-webkit-scrollbar{display:none}
 .srow+.srow{border-top:1px solid rgba(30,45,69,.5)}
 .sl{font-size:9px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:2px}
-.chip{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:14px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;font-family:var(--fn);border:1px solid var(--b);background:transparent;color:var(--mt)}
-.chip.sel{background:var(--g);color:#000;border-color:var(--g);font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:14px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;font-family:var(--fn);border:1px solid var(--b);background:transparent;color:var(--mt);touch-action:manipulation}
+.chip.sel{background:var(--g);color:#fff;border-color:var(--g);font-weight:600}
 .chip.reg{border-color:rgba(59,130,246,.35);color:#60a5fa}
 .chip.reg.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
 .chip.usr{border-color:rgba(232,121,249,.3);color:#e879f9}
 .chip.usr.sel{background:var(--pink);color:#fff;border-color:var(--pink)}
 .chip.atg{border-color:rgba(37,211,102,.25);color:var(--g)}
-.chip.atg.sel{background:var(--g);color:#000}
+.chip.atg.sel{background:var(--g);color:#fff}
 .chip.atg.fat{border-color:rgba(37,211,102,.5);background:rgba(37,211,102,.08)}
 .srt{margin-left:auto;flex-shrink:0;display:flex;align-items:center;gap:3px;padding:3px 8px;border-radius:9px;font-size:10px;font-weight:500;cursor:pointer;border:1px solid var(--b);background:transparent;color:var(--mt);font-family:var(--fn);white-space:nowrap}
 .srt.on{background:var(--card2);color:var(--gold);border-color:var(--gold)}
@@ -126,9 +132,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .fhd{padding:4px 12px;background:var(--card2);border-bottom:1px solid var(--b);display:none;align-items:center;justify-content:space-between;flex-shrink:0}
 .fhd strong{font-size:10px;color:var(--tx)}
 .clr{font-size:10px;color:var(--g);cursor:pointer;border:none;background:transparent;font-family:var(--fn)}
-.msgs{flex:1;overflow-y:auto;padding:9px 12px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch}
+.msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:11px;-webkit-overflow-scrolling:touch}
 .ddiv{text-align:center;font-size:10px;color:var(--mt2);background:var(--card);border-radius:8px;padding:2px 8px;align-self:center;margin:2px 0}
-.nbanner{display:none;position:sticky;top:4px;align-self:center;z-index:10;background:var(--g);color:#000;font-size:11px;font-weight:700;padding:5px 12px;border-radius:17px;cursor:pointer;box-shadow:0 3px 10px rgba(37,211,102,.4);align-items:center;gap:4px;animation:bop .6s ease infinite alternate}
+.nbanner{display:none;position:sticky;top:4px;align-self:center;z-index:10;background:var(--g);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:17px;cursor:pointer;box-shadow:0 3px 10px rgba(37,211,102,.4);align-items:center;gap:4px;animation:bop .6s ease infinite alternate}
 .nbanner.show{display:flex}
 @keyframes bop{from{transform:translateY(0)}to{transform:translateY(-3px)}}
 .ad-strip{background:linear-gradient(90deg,rgba(245,166,35,.08),rgba(255,107,53,.04));border-bottom:1px solid rgba(245,166,35,.15);padding:3px 10px;font-size:9px;color:var(--gold);display:flex;align-items:center;gap:5px}
@@ -139,8 +145,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .snm{font-size:11px;font-weight:600;color:var(--g);margin-bottom:2px;padding:0 2px;cursor:pointer;display:inline-flex;align-items:center;gap:3px}
 .bub{max-width:78%;border-radius:13px;padding:8px 11px 5px;word-break:break-word}
-.bub.in{background:var(--bi);border-top-left-radius:3px}
-.bub.out{background:var(--bo);border-top-right-radius:3px}
+.bub.in{background:var(--bi);border-top-left-radius:3px;border:1px solid var(--b);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.bub.out{background:var(--bo);border-top-right-radius:3px;box-shadow:0 1px 3px rgba(10,102,194,.2)}
 .bub.ad-bub{border:1.5px solid rgba(245,166,35,.45)!important}
 .bub.in.ad-bub{background:linear-gradient(160deg,#1e1a0d,var(--bi))!important}
 .ad-crown{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:7px;background:linear-gradient(135deg,#f5a623,#ff6b35);color:#000;margin-bottom:4px}
@@ -173,8 +179,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .ba-wa{color:var(--g)!important}
 .ba-boost{color:var(--gold)!important}
 .btime{font-size:9px;color:var(--mt2);white-space:nowrap;margin-left:auto}
-.bub.out .btime{color:rgba(220,248,198,.5)}
-.bub.out .ba{color:rgba(220,248,198,.55)}
+.bub.out .btime{color:rgba(255,255,255,.6)}
+.bub.out .ba{color:rgba(255,255,255,.6)}
 .abtn{margin-top:6px;width:100%;border:none;border-radius:8px;padding:7px 0;font-size:12px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--g),var(--cyan));color:#000;display:flex;align-items:center;justify-content:center;gap:4px;font-family:var(--fn)}
 .appl-count{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--cyan);background:rgba(6,182,212,.12);border-radius:8px;padding:2px 8px;margin-top:6px;margin-bottom:2px}
 .applbl{margin-top:5px;text-align:center;font-size:11px;color:var(--g);font-weight:600;display:none}
@@ -201,13 +207,13 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .img-preview img{max-height:90px;border-radius:10px;border:1px solid var(--b)}
 .img-preview .img-x{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
 .signin-prompt{padding:9px;text-align:center;font-size:12px;color:var(--mt)}
-.signin-prompt button{background:var(--g);color:#000;border:none;border-radius:14px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fn);margin-left:5px}
+.signin-prompt button{background:var(--g);color:#fff;border:none;border-radius:14px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fn);margin-left:5px}
 .ctyp{min-height:13px;font-size:10px;color:var(--g);padding:0 2px 2px;display:flex;align-items:center;gap:3px}
 .sgrow{display:flex;align-items:center;gap:4px;padding:1px 0 4px;overflow-x:auto;scrollbar-width:none;min-height:0}
 .sgrow::-webkit-scrollbar{display:none}
 .sgrow.has{min-height:24px}
 .stag{display:inline-flex;align-items:center;gap:2px;font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;cursor:pointer;background:rgba(37,211,102,.1);color:var(--g);border:1px solid rgba(37,211,102,.25);white-space:nowrap;flex-shrink:0}
-.stag.added{background:var(--g);color:#000;border-color:var(--g)}
+.stag.added{background:var(--g);color:#fff;border-color:var(--g)}
 .cr1{display:flex;gap:5px;margin-bottom:6px}
 .cf{flex:1;display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--b);border-radius:18px;padding:6px 11px}
 .cf:focus-within{border-color:var(--g)}
@@ -237,7 +243,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .mft{padding:10px 16px;border-top:1px solid var(--b);display:flex;justify-content:flex-end;gap:7px;flex-shrink:0;padding-bottom:calc(10px + var(--sab))}
 .btn{border:none;border-radius:8px;padding:8px 15px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fn)}
 .btnc{background:transparent;border:1px solid var(--b);color:var(--mt)}
-.btnok{background:var(--g);color:#000}
+.btnok{background:var(--g);color:#fff}
 .cv-drop{border:1.5px dashed var(--b2);border-radius:9px;padding:12px;text-align:center;cursor:pointer;margin-top:4px}
 .cv-drop:hover,.cv-drop.over{border-color:var(--g);background:rgba(37,211,102,.04)}
 .cv-drop i{font-size:20px;color:var(--mt);margin-bottom:4px;display:block}
@@ -251,7 +257,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .cv-name{font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cv-meta{font-size:10px;color:var(--mt2);margin-top:1px}
 .cv-chk{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--g)}
-.cv-item.sel .cv-chk{background:var(--g);color:#000;border-color:var(--g)}
+.cv-item.sel .cv-chk{background:var(--g);color:#fff;border-color:var(--g)}
 .stor-bar{background:var(--card);border-radius:8px;padding:7px 10px;margin-bottom:9px;font-size:10px;color:var(--mt2)}
 .stor-fill{height:3px;background:var(--b);border-radius:2px;margin-top:4px;overflow:hidden}
 .stor-used{height:100%;background:var(--g);border-radius:2px}
@@ -297,7 +303,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .pm-cv-dl{font-size:10px;color:var(--g);margin-left:auto;white-space:nowrap}
 .pm-acts{display:flex;gap:6px;flex-wrap:wrap}
 .pm-btn{flex:1;min-width:120px;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:4px}
-.pm-btn-f{background:var(--g);color:#000}
+.pm-btn-f{background:var(--g);color:#fff}
 .pm-btn-m{background:var(--card);color:var(--tx);border:1px solid var(--b)}
 .pm-btn-pg{background:var(--cyan);color:#000}
 /* status badges */
@@ -333,22 +339,38 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .stat-set-btn{font-size:10px;font-weight:600;padding:4px 9px;border-radius:8px;border:1px solid var(--b);background:transparent;color:var(--mt);cursor:pointer;font-family:var(--fn)}
 .stat-set-btn.on{border-color:currentColor}
 .tstack{position:fixed;bottom:20px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.fab{position:fixed;bottom:22px;right:18px;z-index:120;background:var(--g);color:#fff;border:none;border-radius:26px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(10,102,194,.4);touch-action:manipulation;transition:transform .12s}
+.fab:active{transform:scale(.94)}
+.fab i{font-size:18px}
+.pc-grid{display:flex;flex-direction:column;gap:9px}
+.pc-opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:13px 14px;cursor:pointer;font-family:var(--fn);transition:all .15s;touch-action:manipulation}
+.pc-opt:hover{background:#e8eef3;border-color:var(--g)}
+.pc-opt:active{transform:scale(.98)}
+.pc-opt i{font-size:24px;flex-shrink:0}
+.pc-opt b{display:block;font-size:14px;color:var(--tx);font-weight:700}
+.pc-opt small{display:block;font-size:11px;color:var(--mt);margin-top:1px}
+@media(max-width:700px){.fab{bottom:78px;padding:12px 16px}.fab-txt{display:inline}}
 .toast{padding:8px 13px;border-radius:10px;font-size:12px;font-weight:500;animation:tIn .28s ease;display:flex;align-items:center;gap:5px;box-shadow:0 4px 14px rgba(0,0,0,.4);max-width:280px}
-.tok{background:var(--g);color:#000}.terr{background:#f43f5e;color:#fff}.t-inf{background:var(--blue);color:#fff}.tlv{background:#1a2535;color:var(--g);border:1px solid rgba(37,211,102,.3)}.tgld{background:var(--gold);color:#000}
+.tok{background:var(--g);color:#fff}.terr{background:#f43f5e;color:#fff}.t-inf{background:var(--blue);color:#fff}.tlv{background:#1a2535;color:var(--g);border:1px solid rgba(37,211,102,.3)}.tgld{background:var(--gold);color:#000}
 @keyframes tIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
 ::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:var(--b);border-radius:3px}
 @media(max-width:700px){
   .shell{height:100dvh}
-  .left{width:100%;position:absolute;z-index:10;height:100%}
+  .left{width:100%;position:absolute;inset:0;z-index:10;height:100dvh}
   .left.hidden{display:none}
   .right{width:100%;height:100dvh}
   .backbtn{display:flex!important}
   #cv-view{height:100dvh!important}
   .composer{position:sticky;bottom:0;z-index:5}
-  .mw textarea{font-size:16px} /* prevents iOS zoom-on-focus */
+  .mw textarea{font-size:16px}
   .bub{max-width:85%}
+  .tlist{flex:1;min-height:0;-webkit-overflow-scrolling:touch}
+  .ti{padding:13px 12px}
+  .fol-btn{width:30px;height:30px}
+  .srow{padding:7px 10px}
+  .chip{padding:6px 11px;font-size:12px}
 }
-.backbtn{display:none;width:30px;height:30px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:var(--mt);align-items:center;justify-content:center;font-size:17px}
+.backbtn{display:none;width:38px;height:38px;border-radius:50%;border:none;background:var(--card2);cursor:pointer;color:var(--g);align-items:center;justify-content:center;font-size:19px;touch-action:manipulation}
 .av0{background:#1a3a2a;color:#4ade80}.av1{background:#1a2a4a;color:#60a5fa}.av2{background:#3a1a3a;color:#e879f9}.av3{background:#3a2a1a;color:#fb923c}.av4{background:#2a1a3a;color:#a78bfa}.av5{background:#1a3a3a;color:#34d399}.av6{background:#3a1a1a;color:#fb7185}
 </style>
 </head>
@@ -385,7 +407,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   </div>
 </div>
 
-<div class="shell" id="app" style="display:none">
+<div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
       <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi</span>
@@ -404,10 +426,18 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   </div>
   <div class="right">
     <div class="es" id="es">
-      <i class="ti ti-brand-whatsapp"></i>
-      <h2>Reedbi Tag Talk</h2>
-      <p>Real-time posts worldwide · Boost as ads · Apply to jobs · Pay anywhere</p>
-      <button class="btn btnok" onclick="openCreateModal()" style="border-radius:17px;margin-top:7px;display:flex;align-items:center;gap:5px"><i class="ti ti-plus"></i> Create a Tag</button>
+      <i class="ti ti-messages" style="font-size:46px;color:var(--g)"></i>
+      <h2>Welcome to Reedbi</h2>
+      <p>Pick a tag on the left to join the conversation, or create your own. Share posts, apply to jobs, and connect worldwide.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px">
+        <button class="btn btnok" onclick="openCreateModal()" style="border-radius:20px;display:flex;align-items:center;gap:5px"><i class="ti ti-plus"></i> Create a Tag</button>
+        <button class="btn" onclick="openTag('jobs')" style="border-radius:20px;border:1px solid var(--b);background:var(--card2);color:var(--tx);display:flex;align-items:center;gap:5px"><i class="ti ti-briefcase"></i> Browse Jobs</button>
+      </div>
+      <div style="margin-top:16px;font-size:11px;color:var(--mt2);display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+        <span><i class="ti ti-bolt" style="color:var(--gold)"></i> Real-time</span>
+        <span><i class="ti ti-briefcase" style="color:var(--g)"></i> Jobs &amp; ATS</span>
+        <span><i class="ti ti-photo" style="color:var(--cyan)"></i> Photos &amp; videos</span>
+      </div>
     </div>
     <div id="cv-view" style="display:none;flex-direction:column;flex:1;min-height:0;height:100%">
       <div class="ch">
@@ -578,6 +608,28 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveBulkSchedule()"><i class="ti ti-check"></i> Schedule All in One</button>
   </div>
 </div></div>
+<!-- EDIT APPLICATION -->
+<div class="overlay" id="edit-app-ovl"><div class="modal" style="max-width:360px">
+  <div class="mhd"><h3><i class="ti ti-edit" style="font-size:13px"></i> Edit Application</h3><button class="ib" onclick="closeOvl('edit-app-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <div class="fg"><label>Phone / WhatsApp</label><input type="text" id="ea-phone" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-family:var(--fn)"></div>
+    <div class="fg" style="margin-top:8px"><label>Cover Note</label><textarea id="ea-note" rows="2" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-family:var(--fn)"></textarea></div>
+    <div class="fg" style="margin-top:8px"><label>Skills &amp; Keywords</label><textarea id="ea-skills" rows="2" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-family:var(--fn)"></textarea></div>
+    <button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveEditApp()"><i class="ti ti-check"></i> Save Changes</button>
+  </div>
+</div></div>
+<!-- WHAT DO YOU WANT TO DO -->
+<div class="overlay" id="post-chooser-ovl"><div class="modal" style="max-width:380px">
+  <div class="mhd"><h3><i class="ti ti-sparkles" style="font-size:13px"></i> What would you like to do?</h3><button class="ib" onclick="closeOvl('post-chooser-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <div class="pc-grid">
+      <button class="pc-opt" onclick="startPostType('job')"><i class="ti ti-briefcase" style="color:var(--g)"></i><div><b>Post a Job</b><small>Hire — receive CVs &amp; applications</small></div></button>
+      <button class="pc-opt" onclick="startPostType('sell')"><i class="ti ti-shopping-cart" style="color:var(--gold)"></i><div><b>Sell an Item</b><small>List something for sale</small></div></button>
+      <button class="pc-opt" onclick="startPostType('hire')"><i class="ti ti-user-search" style="color:var(--cyan)"></i><div><b>Find Work</b><small>Share your skills / CV</small></div></button>
+      <button class="pc-opt" onclick="startPostType('share')"><i class="ti ti-message-circle" style="color:var(--purple)"></i><div><b>Share / Ask</b><small>Post an update or question</small></div></button>
+    </div>
+  </div>
+</div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
 <!-- CREATE PAGE -->
@@ -628,10 +680,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   </div>
 </div></div>
 
+<button class="fab" id="fab" onclick="openPostChooser()"><i class="ti ti-plus"></i> <span class="fab-txt">Post</span></button>
 <div class="tstack" id="tstack"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script>
 /* ============================================================
    FIREBASE (real backend) + localStorage fallback
@@ -704,6 +758,7 @@ function initFirebase(){
     if(typeof firebase==='undefined'||!firebase.initializeApp){setDbPill(false);return;}
     firebase.initializeApp(firebaseConfig);
     FB.db=firebase.firestore();
+    try{if(firebase.storage)FB.storage=firebase.storage();}catch(e){FB.storage=null;}
     FB.auth=firebase.auth();
     FB.ready=true;
     setDbPill(true);
@@ -850,7 +905,11 @@ function dlCV(uid,id,name){
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
     toast('Loading CV from cloud…','info');
     FB.db.collection('cvs').doc(uid+'_'+id).get().then(function(doc){
-      if(doc&&doc.exists&&doc.data().data){openCVData(doc.data().data,name);}
+      if(doc&&doc.exists){var cd=doc.data();
+        if(cd.url){window.open(cd.url,'_blank');}        // Firebase Storage download URL
+        else if(cd.data){openCVData(cd.data,name);}       // Firestore base64
+        else{toast('CV not available','err');}
+      }
       else{toast('CV not available (applicant may need cloud sync on)','err');}
     }).catch(function(){toast('Could not load CV from cloud','err');});
     return;
@@ -966,9 +1025,9 @@ function fbLoadProfile(uid,email){
   }catch(e){}
 }
 function skipAuth(){CU={uid:'guest_'+Date.now(),name:'Guest',email:'',co:'',avIdx:0,guest:true};enterApp();}
-function doSignOut(){if(FB.ready&&FB.auth)FB.auth.signOut();LS.del('rb_user');CU=null;document.getElementById('app').style.display='none';document.getElementById('auth-scr').style.display='flex';stopLive();stopPoll();activeTagId=null;}
+function doSignOut(){if(FB.ready&&FB.auth)FB.auth.signOut();LS.del('rb_user');CU=null;document.getElementById('app').style.display='none';document.getElementById('auth-scr').classList.add('show');stopLive();stopPoll();activeTagId=null;}
 function enterApp(){
-  document.getElementById('auth-scr').style.display='none';
+  document.getElementById('auth-scr').classList.remove('show');
   document.getElementById('app').style.display='flex';
   document.getElementById('uc-nm').textContent=CU.name;
   document.getElementById('uc-av').textContent=ini(CU.name);
@@ -976,6 +1035,10 @@ function enterApp(){
   document.getElementById('an').value=CU.name;
   document.getElementById('ae').value=CU.email;
   if(CU.email)document.getElementById('ap-pre').style.display='block';
+  // Force seed tag names to their correct values every boot, so they can
+  // never appear corrupted regardless of cached/old data.
+  var SEED_NAMES={jobs:'jobs',tech:'tech',ai:'ai',insurance:'insurance',sell:'sell',remote:'remote'};
+  tags.forEach(function(t){if(SEED_NAMES[t.id]){t.name=SEED_NAMES[t.id];}});
   var custom=LS.get('rb_custom_tags',[])||[];
   var SEED_IDS=['jobs','tech','ai','insurance','sell','remote'];
   var cleaned=[];
@@ -995,6 +1058,8 @@ function enterApp(){
   tags.forEach(function(t){t.followed=followedTags.has(t.id);});
   renderTagList();
   if(FB.ready&&CU&&!CU.guest){fbListenMyApps();}
+  // Friendly one-time welcome for new users
+  if(!LS.get('rb_seen_welcome')){LS.set('rb_seen_welcome',1);setTimeout(function(){toast('👋 Welcome to Reedbi! Tap any tag to start, or create your own.','info');},700);}
 }
 function requireAuth(action){
   if(CU&&!CU.guest)return true;
@@ -1006,9 +1071,9 @@ function showAuthScreen(){
   // show login over the app without wiping the current browsing session
   switchTab('l');
   document.getElementById('aerr').textContent='';
-  document.getElementById('auth-scr').style.display='flex';
+  document.getElementById('auth-scr').classList.add('show');
 }
-function hideAuthScreen(){document.getElementById('auth-scr').style.display='none';}
+function hideAuthScreen(){document.getElementById('auth-scr').classList.remove('show');}
 /* Let guests dismiss the auth screen and keep browsing */
 function dismissAuth(){hideAuthScreen();if(!CU){CU={uid:'guest_'+Date.now(),name:'Guest',email:'',co:'',avIdx:0,guest:true};enterApp();}}
 /* ============================================================
@@ -1491,24 +1556,51 @@ function cvDrag(e,over){e.preventDefault();document.getElementById('cv-drop').cl
 function cvDrop(e){e.preventDefault();document.getElementById('cv-drop').classList.remove('over');var f=e.dataTransfer.files[0];if(f)handleCVFile(f);}
 function cvSel(inp){if(inp.files[0])handleCVFile(inp.files[0]);}
 function handleCVFile(f){
+  // Firestore documents are limited to ~1MB. Base64 inflates size by ~33%,
+  // so the raw file must stay under ~700KB to upload to the cloud.
   if(f.size>5*1024*1024){toast('File too large (max 5MB)','err');return;}
+  var tooBigForCloud=f.size>700*1024;
   var uid=CU?CU.uid:'guest';var id='cv'+Date.now();
-  readB64(f).then(function(b64){saveCVData(uid,id,b64);saveCVMeta(uid,{id:id,name:f.name,type:f.type||'doc',size:f.size,ts:Date.now()});selCVId=id;document.getElementById('cv-fname').textContent='';renderCVList();toast('CV saved to phone','ok');}).catch(function(){toast('Could not save CV','err');});
+  window._lastCVText='';
+  try{var rt=new FileReader();rt.onload=function(){var txt=String(rt.result||'');window._lastCVText=(txt.match(/[A-Za-z][A-Za-z0-9\+\#\.\-]{1,}/g)||[]).join(' ').slice(0,4000);};rt.readAsText(f);}catch(e){}
+  readB64(f).then(function(b64){
+    saveCVData(uid,id,b64);saveCVMeta(uid,{id:id,name:f.name,type:f.type||'doc',size:f.size,ts:Date.now(),cloudOk:!tooBigForCloud,text:window._lastCVText||''});selCVId=id;document.getElementById('cv-fname').textContent='';renderCVList();
+    if(tooBigForCloud)toast('CV saved on phone. Over 700KB — enable Firebase Storage for cloud sharing.','info');
+    else toast('CV saved','ok');
+  }).catch(function(){toast('Could not save CV','err');});
+}
+function cvToFirestore(uid,cvId,cvData,name){
+  if(cvData.length>1300000){toast('CV too large for cloud DB. Enable Firebase Storage for large files.','err');return;}
+  try{FB.db.collection('cvs').doc(uid+'_'+cvId).set({data:cvData,name:name,uid:uid,ts:Date.now()}).then(function(){console.log('CV in Firestore');}).catch(function(e){console.warn('CV upload failed',e);});}catch(e){}
 }
 function submitApply(){
   var name=document.getElementById('an').value.trim(),email=document.getElementById('ae').value.trim();
   if(!name||!email){toast('Fill name and email','err');return;}
   var uid=CU.uid;var cvs=getCVs(uid);var selCV2=selCVId?cvs.find(function(c){return c.id===selCVId;}):null;
   var t=tags.find(function(x){return x.id===curApplyPid.tagId;}),p=t&&t.posts.find(function(x){return x.id==curApplyPid.postId;});
-  var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,skills:(document.getElementById('askills')?document.getElementById('askills').value:''),cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',companyLower:(curApplyPid.company||(p?p.co:'')||'').toLowerCase(),tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),postBody:(p?p.body||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
+  var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,skills:(document.getElementById('askills')?document.getElementById('askills').value:''),cvText:(selCV2&&selCV2.text?selCV2.text:''),cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',companyLower:(curApplyPid.company||(p?p.co:'')||'').toLowerCase(),tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),postBody:(p?p.body||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
   var apps=getAllApps();apps.push(rec);saveAllApps(apps);
   if(FB.ready){FB.db.collection('applications').doc(rec.id).set(rec).catch(function(){});}
   // Upload the CV file itself to the cloud so the page owner can view/open it
   // from another device (PDF/Word/photo). Stored under cvs/{uid}_{cvId}.
-  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&selCVId){
+  if(FB.ready&&!FB_CLOUD_DISABLED&&selCVId){
     var cvData=getCVData(uid,selCVId);
     if(cvData){
-      try{FB.db.collection('cvs').doc(uid+'_'+selCVId).set({data:cvData,name:selCV2?selCV2.name:'cv',uid:uid,ts:Date.now()}).catch(function(){});}catch(e){}
+      var cvFileName=selCV2?selCV2.name:'cv';
+      // Prefer Firebase Storage (no size limit). Falls back to Firestore for small files.
+      if(FB.storage){
+        try{
+          var ref=FB.storage.ref('cvs/'+uid+'_'+selCVId);
+          ref.putString(cvData,'data_url').then(function(snap){
+            return snap.ref.getDownloadURL();
+          }).then(function(url){
+            FB.db.collection('cvs').doc(uid+'_'+selCVId).set({url:url,name:cvFileName,uid:uid,ts:Date.now()}).catch(function(){});
+            console.log('CV uploaded to Firebase Storage');
+          }).catch(function(e){console.warn('Storage upload failed, trying Firestore',e);cvToFirestore(uid,selCVId,cvData,cvFileName);});
+        }catch(e){cvToFirestore(uid,selCVId,cvData,cvFileName);}
+      }else{
+        cvToFirestore(uid,selCVId,cvData,cvFileName);
+      }
     }
   }
   if(p){p.applied=true;}
@@ -1541,7 +1633,8 @@ var atsKeywords='';
 function atsScore(a,keywords){
   var kws=keywords.split(/[,\n]/).map(function(k){return k.trim().toLowerCase();}).filter(Boolean);
   if(!kws.length)return null;
-  var hay=((a.skills||'')+' '+(a.note||'')+' '+(a.postTitle||'')).toLowerCase();
+  // Match against cover letter (note), skills, CV filename, and any CV text
+  var hay=((a.skills||'')+' '+(a.note||'')+' '+(a.cvName||'')+' '+(a.cvText||'')+' '+(a.postTitle||'')).toLowerCase();
   var hits=0,matched=[];
   kws.forEach(function(k){if(hay.indexOf(k)>=0){hits++;matched.push(k);}});
   return {pct:Math.round(hits/kws.length*100),hits:hits,total:kws.length,matched:matched};
@@ -1592,6 +1685,36 @@ function saveBulkSchedule(){
   closeOvl('bsched-ovl');openCompanyPage(bulkSchedCompany);
   toast(n+' candidate'+(n!==1?'s':'')+' scheduled for '+(bulkSchedKind==='mobilization'?'mobilization':'interview')+' — all notified','gold');
 }
+var editAppId=null;
+function openEditApp(appId){
+  var a=getMyApps().find(function(x){return x.id===appId;});if(!a)return;
+  editAppId=appId;
+  document.getElementById('ea-phone').value=a.phone||'';
+  document.getElementById('ea-note').value=a.note||'';
+  document.getElementById('ea-skills').value=a.skills||'';
+  document.getElementById('edit-app-ovl').classList.add('open');
+}
+function saveEditApp(){
+  var apps=getAllApps();var a=apps.find(function(x){return x.id===editAppId;});
+  if(a){
+    a.phone=document.getElementById('ea-phone').value;
+    a.note=document.getElementById('ea-note').value;
+    a.skills=document.getElementById('ea-skills').value;
+    saveAllApps(apps);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){FB.db.collection('applications').doc(a.id).set(a,{merge:true}).catch(function(){});}
+    bcSend({type:'app_status',appId:a.id,status:a.status});
+  }
+  closeOvl('edit-app-ovl');showMyApps();
+  toast('Application updated','ok');
+}
+function withdrawApp(appId){
+  if(!confirm('Withdraw this application? This cannot be undone.'))return;
+  var apps=getAllApps().filter(function(x){return x.id!==appId;});
+  saveAllApps(apps);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){FB.db.collection('applications').doc(appId).delete().catch(function(){});}
+  showMyApps();
+  toast('Application withdrawn','info');
+}
 function showMyApps(){
   if(!requireAuth('view applications'))return;
   var apps=getMyApps().reverse();var cvs=getCVs(CU.uid);
@@ -1612,6 +1735,10 @@ function showMyApps(){
       +(a.mobilizationAt?'<div style="font-size:11px;color:var(--cyan);margin-top:4px"><i class="ti ti-plane-departure"></i> Mobilization: <b>'+esc(a.mobilizationAt)+'</b></div>':'')
       +((a.docRequests&&a.docRequests.length)?'<div style="font-size:10px;color:var(--gold);margin-top:6px;font-weight:600"><i class="ti ti-paperclip"></i> Documents requested:</div>'+a.docRequests.map(function(dr){return '<div style="font-size:11px;margin-top:3px">• '+esc(dr.name)+': '+(dr.fileData?'<span style="color:var(--g)">✓ uploaded</span>':'<button onclick="uploadReqDoc(\''+a.id+'\',\''+dr.id+'\')" style="font-size:10px;color:var(--gold);background:transparent;border:1px solid rgba(245,166,35,.4);border-radius:6px;padding:2px 8px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-upload"></i> Upload</button>')+'</div>';}).join(''):'')
       +(cv?'<button onclick="dlCV(\''+CU.uid+'\',\''+cv.id+'\',\''+escJS(cv.name)+'\')" style="margin-top:6px;font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:3px 8px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-download"></i> My CV</button>':'')
+      +'<div style="display:flex;gap:6px;margin-top:8px;border-top:1px solid var(--b);padding-top:8px">'
+      +'<button onclick="openEditApp(\''+a.id+'\')" style="flex:1;font-size:10px;color:var(--blue);background:transparent;border:1px solid rgba(59,130,246,.4);border-radius:7px;padding:5px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-edit"></i> Edit</button>'
+      +'<button onclick="withdrawApp(\''+a.id+'\')" style="flex:1;font-size:10px;color:var(--red);background:transparent;border:1px solid rgba(244,63,94,.4);border-radius:7px;padding:5px;cursor:pointer;font-family:var(--fn)"><i class="ti ti-trash"></i> Withdraw</button>'
+      +'</div>'
       +'</div>';
   }).join('');
   document.getElementById('ma-ovl').classList.add('open');
@@ -1667,7 +1794,10 @@ function openCompanyPage(company){
   var sectionsHtml=STATUSES.map(function(s){
     var group=apps.filter(function(a){return a.status===s.id;});
     if(!group.length)return '';
-    var cards=group.map(function(a){return applicantCard(a,company);}).join('');
+    var SHOWN=50; // render first 50 per section for performance with huge volumes
+    var shown=group.slice(0,SHOWN);
+    var cards=shown.map(function(a){return applicantCard(a,company);}).join('');
+    if(group.length>SHOWN){cards+='<div style="font-size:11px;color:var(--mt2);text-align:center;padding:8px">Showing '+SHOWN+' of '+group.length+'. Use job filter or bulk actions to manage the rest.</div>';}
     var bulkBtn='';
     if(s.id==='interview')bulkBtn='<button class="bulk-sched-btn" onclick="event.stopPropagation();openBulkSchedule(\''+escJS(company)+'\',\'interview\',\'interview\')"><i class="ti ti-calendar-plus"></i> Schedule ALL for interview</button>';
     if(s.id==='passed')bulkBtn='<button class="bulk-sched-btn" onclick="event.stopPropagation();openBulkSchedule(\''+escJS(company)+'\',\'passed\',\'mobilization\')"><i class="ti ti-plane-departure"></i> Mobilization schedule for ALL</button>';
@@ -1865,6 +1995,24 @@ function followUser(){if(!curProfileUser)return;var n=curProfileUser.user;if(fol
 /* ============================================================
    CREATE TAG
 ============================================================ */
+function openPostChooser(){document.getElementById('post-chooser-ovl').classList.add('open');}
+function startPostType(kind){
+  closeOvl('post-chooser-ovl');
+  if(!requireAuth('post'))return;
+  var map={job:{tag:'jobs',title:'Job title (e.g. Senior Developer)',body:'Describe the role, requirements, salary, and how to apply...',hint:'Posting a job — applicants can send CVs'},
+           sell:{tag:'sell',title:'What are you selling?',body:'Describe the item, price, condition, and location...',hint:'Listing an item for sale'},
+           hire:{tag:'jobs',title:'Your role / headline (e.g. Accountant, 5 yrs)',body:'Share your skills, experience, and what you are looking for...',hint:'Sharing your profile to find work'},
+           share:{tag:'general',title:'Title (optional)',body:'What do you want to share or ask?',hint:'Sharing an update'}};
+  var cfg=map[kind]||map.share;
+  openTag(cfg.tag);
+  setTimeout(function(){
+    var ti=document.getElementById('ctitle'),bo=document.getElementById('cbody'),ce=document.getElementById('cextra');
+    if(ti)ti.placeholder=cfg.title;
+    if(bo){bo.placeholder=cfg.body;bo.focus();}
+    if(ce&&ce.style.display==='none'&&(kind==='job'||kind==='sell'||kind==='hire'))toggleExtra(); // show title/region fields
+    toast(cfg.hint,'info');
+  },200);
+}
 function openCreateModal(){if(!requireAuth('create a tag'))return;['mn','md'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('cr-ovl').classList.add('open');setTimeout(function(){document.getElementById('mn').focus();},130);}
 function openCreateModalWithName(name){openCreateModal();setTimeout(function(){document.getElementById('mn').value=name.replace(/[^a-z0-9\-_]/gi,'').toLowerCase();},180);}
 function createTag(){
@@ -1891,7 +2039,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v20 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v30 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -1914,5 +2062,21 @@ try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setD
       });
     }
   }catch(e){console.warn('auth-state',e);}
+})();
+
+/* Source-protection deterrents — DESKTOP ONLY so they never interfere with mobile taps */
+(function(){
+  try{
+    var isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0)||window.innerWidth<=700;
+    if(isTouch)return; // skip entirely on phones/tablets
+    document.addEventListener('contextmenu',function(e){e.preventDefault();return false;});
+    document.addEventListener('keydown',function(e){
+      var k=e.key||'';
+      if(k==='F12'){e.preventDefault();return false;}
+      if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(k==='I'||k==='i'||k==='J'||k==='j'||k==='C'||k==='c')){e.preventDefault();return false;}
+      if((e.ctrlKey||e.metaKey)&&(k==='U'||k==='u')){e.preventDefault();return false;}
+      if((e.ctrlKey||e.metaKey)&&(k==='S'||k==='s')){e.preventDefault();return false;}
+    });
+  }catch(e){}
 })();
 </script></body></html>
