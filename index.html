@@ -225,7 +225,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .mw:focus-within{border-color:var(--g)}
 .mw textarea{flex:1;border:none;background:transparent;outline:none;resize:none;font-size:13px;font-family:var(--fn);color:var(--tx);max-height:80px;min-height:20px;line-height:1.5}
 .att{width:25px;height:25px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:var(--mt);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.sndbtn{width:41px;height:41px;border-radius:50%;border:none;background:var(--g);cursor:pointer;color:#000;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sndbtn{width:44px;height:44px;border-radius:50%;border:none;background:var(--g);cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;touch-action:manipulation;box-shadow:0 2px 6px rgba(10,102,194,.35)}
+.sndbtn:active{transform:scale(.93)}
 .sndbtn:active{transform:scale(.93)}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
 .overlay.open{display:flex}
@@ -339,6 +340,20 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .stat-set-btn{font-size:10px;font-weight:600;padding:4px 9px;border-radius:8px;border:1px solid var(--b);background:transparent;color:var(--mt);cursor:pointer;font-family:var(--fn)}
 .stat-set-btn.on{border-color:currentColor}
 .tstack{position:fixed;bottom:20px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.lp-photos{display:flex;flex-wrap:wrap;gap:7px}
+.lp-thumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--b)}
+.lp-thumb img{width:100%;height:100%;object-fit:cover}
+.lp-thumb button{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
+.lp-add{width:64px;height:64px;border-radius:8px;border:2px dashed var(--b2);background:var(--card2);color:var(--g);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:18px;font-family:var(--fn)}
+.lp-add span{font-size:9px;color:var(--mt2)}
+.ord-steps{display:flex;flex-wrap:wrap;gap:5px}
+.ord-step{font-size:10px;border:1px solid var(--b);background:var(--card2);color:var(--mt);border-radius:7px;padding:5px 8px;cursor:pointer;font-family:var(--fn);display:inline-flex;align-items:center;gap:4px;touch-action:manipulation}
+.ord-step.done{background:rgba(10,102,194,.1);color:var(--g);border-color:var(--g)}
+.ord-step.cur{background:var(--g);color:#fff;font-weight:700}
+.trk{display:flex;flex-direction:column;gap:5px;margin-top:8px;border-left:2px solid var(--b);padding-left:10px}
+.trk-step{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--mt2)}
+.trk-step.done{color:var(--g);font-weight:600}
+.trk-step.done i{color:var(--g)}
 .fab{position:fixed;bottom:22px;right:18px;z-index:120;background:var(--g);color:#fff;border:none;border-radius:26px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(10,102,194,.4);touch-action:manipulation;transition:transform .12s}
 .fab:active{transform:scale(.94)}
 .fab i{font-size:18px}
@@ -355,10 +370,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 @keyframes tIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
 ::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:var(--b);border-radius:3px}
 @media(max-width:700px){
-  .shell{height:100dvh}
-  .left{width:100%;position:absolute;inset:0;z-index:10;height:100dvh}
+  .shell{height:100dvh;position:relative}
+  .left{width:100%;position:absolute;inset:0;z-index:10;height:100dvh;background:var(--sf)}
   .left.hidden{display:none}
-  .right{width:100%;height:100dvh}
+  .right{width:100%;height:100dvh;position:absolute;inset:0;z-index:5}
   .backbtn{display:flex!important}
   #cv-view{height:100dvh!important}
   .composer{position:sticky;bottom:0;z-index:5}
@@ -415,6 +430,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
           <button class="ib" onclick="openCreateModal()"><i class="ti ti-square-plus"></i></button>
+          <button class="ib" onclick="showMyProducts()" title="My Shop"><i class="ti ti-building-store"></i></button>
+          <button class="ib" onclick="showMyOrders()" title="My Orders"><i class="ti ti-package"></i></button>
           <button class="ib" id="folbtn" onclick="toggleFol()"><i class="ti ti-bookmarks"></i></button>
           <button class="ib" onclick="showMyApps()" title="My applications"><i class="ti ti-briefcase"></i></button>
           <button class="ib" onclick="doSignOut()"><i class="ti ti-logout"></i></button>
@@ -629,6 +646,53 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       <button class="pc-opt" onclick="startPostType('share')"><i class="ti ti-message-circle" style="color:var(--purple)"></i><div><b>Share / Ask</b><small>Post an update or question</small></div></button>
     </div>
   </div>
+</div></div>
+<!-- LIST PRODUCT -->
+<div class="overlay" id="list-prod-ovl"><div class="modal" style="max-width:420px">
+  <div class="mhd"><h3><i class="ti ti-shopping-bag" style="font-size:13px"></i> List a Product</h3><button class="ib" onclick="closeOvl('list-prod-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <div class="lp-photos" id="lp-photos"></div>
+    <div id="lp-photo-hint" style="font-size:10px;color:var(--mt2);margin:4px 0 10px">Add at least 5 photos (0/5)</div>
+    <input type="file" id="lp-photo-file" accept="image/*" multiple style="display:none" onchange="listPhotoSel(this)">
+    <div class="fg"><label>Product title</label><input type="text" id="lp-title" placeholder="e.g. iPhone 14 Pro 256GB"></div>
+    <div class="fg" style="margin-top:8px"><label>Description</label><textarea id="lp-desc" rows="2" placeholder="Condition, specs, details..."></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <div class="fg" style="flex:1"><label>Currency</label><select id="lp-cur"></select></div>
+      <div class="fg" style="flex:1"><label>Price</label><input type="text" id="lp-price" placeholder="0.00"></div>
+      <div class="fg" style="width:80px"><label>Quantity</label><input type="number" id="lp-qty" placeholder="1" value="1" min="1"></div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Pickup / seller address</label><input type="text" id="lp-addr" placeholder="Street, city, country"></div>
+    <div class="fg" style="margin-top:8px"><label>Phone / WhatsApp</label><input type="text" id="lp-phone" placeholder="+1 234 567 8900"></div>
+    <div class="fg" style="margin-top:8px"><label>Google Maps location</label>
+      <div style="display:flex;gap:6px"><input type="text" id="lp-map" placeholder="Paste Google Maps link" style="flex:1">
+      <button class="btn" onclick="detectMyLocation()" style="border:1px solid var(--b);background:var(--card2);color:var(--g);white-space:nowrap"><i class="ti ti-current-location"></i></button></div>
+    </div>
+    <button class="btn btnok" style="width:100%;margin-top:14px" onclick="submitProduct()"><i class="ti ti-check"></i> Publish Listing</button>
+  </div>
+</div></div>
+
+<!-- BUY / PLACE ORDER -->
+<div class="overlay" id="buy-ovl"><div class="modal" style="max-width:360px">
+  <div class="mhd"><h3><i class="ti ti-shopping-cart" style="font-size:13px"></i> Place Order</h3><button class="ib" onclick="closeOvl('buy-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <div id="buy-info" style="background:var(--card2);border-radius:9px;padding:10px;margin-bottom:10px"></div>
+    <div class="fg"><label>Quantity</label><input type="number" id="buy-qty" value="1" min="1"></div>
+    <div class="fg" style="margin-top:8px"><label>Delivery address</label><textarea id="buy-addr" rows="2" placeholder="Full delivery address"></textarea></div>
+    <div class="fg" style="margin-top:8px"><label>Your phone</label><input type="text" id="buy-phone" placeholder="+1 234 567 8900"></div>
+    <button class="btn btnok" style="width:100%;margin-top:12px" onclick="placeOrder()"><i class="ti ti-check"></i> Confirm Order</button>
+  </div>
+</div></div>
+
+<!-- SELLER DASHBOARD -->
+<div class="overlay" id="seller-ovl"><div class="modal" style="max-width:440px">
+  <div class="mhd"><h3><i class="ti ti-building-store" style="font-size:13px"></i> My Shop</h3><button class="ib" onclick="closeOvl('seller-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="seller-body"></div>
+</div></div>
+
+<!-- MY ORDERS (buyer tracking) -->
+<div class="overlay" id="myorders-ovl"><div class="modal" style="max-width:420px">
+  <div class="mhd"><h3><i class="ti ti-package" style="font-size:13px"></i> My Orders</h3><button class="ib" onclick="closeOvl('myorders-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="myorders-body"></div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -1146,6 +1210,30 @@ var STATUSES=[
   {id:'rejected',label:'Rejected',cls:'st-rejected',icon:'x'}
 ];
 function statusObj(id){return STATUSES.find(function(s){return s.id===id;})||STATUSES[0];}
+/* ===== Order/shipping status pipeline ===== */
+var ORDER_STATUS=[
+  {id:'placed',label:'Order Placed',icon:'shopping-cart'},
+  {id:'packed',label:'Packed',icon:'package'},
+  {id:'ready',label:'Ready to Ship',icon:'box'},
+  {id:'handed',label:'At Air/Cargo Handling',icon:'building-warehouse'},
+  {id:'shipped',label:'Shipped (Air/Cargo)',icon:'plane'},
+  {id:'origin_customs',label:'Under Customs (Origin)',icon:'shield-check'},
+  {id:'in_transit',label:'In Transit',icon:'truck-delivery'},
+  {id:'arrived',label:'Reached Destination Port',icon:'anchor'},
+  {id:'dest_customs',label:'Under Customs (Destination)',icon:'shield'},
+  {id:'out_delivery',label:'Out for Delivery',icon:'truck'},
+  {id:'delivered',label:'Delivered',icon:'circle-check'}
+];
+function orderStatusObj(id){return ORDER_STATUS.find(function(s){return s.id===id;})||ORDER_STATUS[0];}
+function orderStatusIndex(id){for(var i=0;i<ORDER_STATUS.length;i++){if(ORDER_STATUS[i].id===id)return i;}return 0;}
+/* ===== Currencies (common world currencies) ===== */
+var CURRENCIES=['USD $','EUR €','GBP £','AED د.إ','INR ₹','SAR ﷼','PKR ₨','PHP ₱','SGD S$','CAD C$','AUD A$','JPY ¥','CNY ¥','BRL R$','NGN ₦','ZAR R','MYR RM','IDR Rp','THB ฿','TRY ₺','RUB ₽','KRW ₩','HKD HK$','CHF Fr','SEK kr','MXN $','EGP £','BDT ৳','LKR Rs','KWD د.ك','QAR ﷼','OMR ﷼','BHD .د.ب'];
+/* ===== Products store ===== */
+function getProducts(){return LS.get('rb_products',[])||[];}
+function saveProducts(p){LS.set('rb_products',p);}
+function getMyProducts(){var uid=CU?CU.uid:'';return getProducts().filter(function(x){return x.sellerUid===uid;});}
+function getOrders(){return LS.get('rb_orders',[])||[];}
+function saveOrders(o){LS.set('rb_orders',o);}
 
 var activeTagId=null,actRegion=null,actUser=null,actAutoTag=null,sortMode='latest';
 var showFolOnly=false,pidCtr=Date.now();
@@ -1295,8 +1383,10 @@ function openTag(id){
   if(window.innerWidth<=700)document.getElementById('lp').classList.add('hidden');
   startLive(id);startPoll(id);
   fbListenTag(id);
+  var fab=document.getElementById('fab');if(fab)fab.style.display='none';
   t.posts.forEach(function(p){fbListenComments(id,p.id);});
-  setInterval(function(){if(activeTagId===id)refreshTimes();},30000);
+  if(window._timeIvl)clearInterval(window._timeIvl);
+  window._timeIvl=setInterval(function(){if(activeTagId===id)refreshTimes();},30000);
 }
 function renderComposerState(){
   // Composer bar is always visible (WhatsApp-style). Posting as a guest
@@ -1999,6 +2089,7 @@ function openPostChooser(){document.getElementById('post-chooser-ovl').classList
 function startPostType(kind){
   closeOvl('post-chooser-ovl');
   if(!requireAuth('post'))return;
+  if(kind==='sell'){openListProduct();return;} // full product listing flow
   var map={job:{tag:'jobs',title:'Job title (e.g. Senior Developer)',body:'Describe the role, requirements, salary, and how to apply...',hint:'Posting a job — applicants can send CVs'},
            sell:{tag:'sell',title:'What are you selling?',body:'Describe the item, price, condition, and location...',hint:'Listing an item for sale'},
            hire:{tag:'jobs',title:'Your role / headline (e.g. Accountant, 5 yrs)',body:'Share your skills, experience, and what you are looking for...',hint:'Sharing your profile to find work'},
@@ -2030,8 +2121,8 @@ function createTag(){
 /* MISC */
 function autoResize(ta){if(!ta)return;ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,80)+'px';}
 function onKey(e){if(e.key==='Enter'&&!e.shiftKey&&window.innerWidth>700){e.preventDefault();sendPost();}}
-function goBack(){stopLive();stopPoll();document.getElementById('lp').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';activeTagId=null;pendingPosts=[];renderTagList(document.getElementById('tsr').value);}
-function goHome(){stopLive();stopPoll();activeTagId=null;pendingPosts=[];document.getElementById('lp').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;}
+function goBack(){stopLive();stopPoll();var _f=document.getElementById('fab');if(_f)_f.style.display='';document.getElementById('lp').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';activeTagId=null;pendingPosts=[];renderTagList(document.getElementById('tsr').value);}
+function goHome(){stopLive();stopPoll();var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('lp').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;}
 ['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('open');});});
 document.getElementById('pmb').addEventListener('click',function(e){if(e.target===document.getElementById('pmb'))closePM();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('open');});closePM();}});
@@ -2039,7 +2130,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v30 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v33 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -2064,7 +2155,30 @@ try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setD
   }catch(e){console.warn('auth-state',e);}
 })();
 
-/* Source-protection deterrents — DESKTOP ONLY so they never interfere with mobile taps */
+/* Robust tag click/tap via event delegation — works on all mobile browsers
+   even if inline onclick handlers misbehave. */
+(function(){
+  function bindTagList(){
+    var list=document.getElementById('tlist');
+    if(!list){setTimeout(bindTagList,300);return;}
+    function handler(e){
+      var el=e.target;
+      // ignore taps on the follow button
+      while(el&&el!==list){
+        if(el.classList&&el.classList.contains('fol-btn'))return;
+        if(el.getAttribute&&el.getAttribute('data-tid')){
+          var id=el.getAttribute('data-tid');
+          if(id&&typeof openTag==='function'){openTag(id);}
+          return;
+        }
+        el=el.parentNode;
+      }
+    }
+    list.addEventListener('click',handler);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindTagList);
+  else bindTagList();
+})();
 (function(){
   try{
     var isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0)||window.innerWidth<=700;
@@ -2079,4 +2193,151 @@ try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setD
     });
   }catch(e){}
 })();
+/* ============================================================
+   MARKETPLACE — product listing, photos, orders, shipping status
+   ============================================================ */
+var listPhotos=[]; // base64 photos for the product being listed
+function openListProduct(){
+  if(!requireAuth('list a product'))return;
+  listPhotos=[];
+  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  var cs=document.getElementById('lp-cur');if(cs&&!cs.options.length){CURRENCIES.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o);});}
+  renderListPhotos();
+  document.getElementById('list-prod-ovl').classList.add('open');
+}
+function listPhotoSel(inp){
+  var files=inp.files;if(!files)return;
+  var remaining=10-listPhotos.length;
+  var arr=Array.prototype.slice.call(files,0,remaining);
+  var done=0;
+  arr.forEach(function(f){
+    if(f.size>2*1024*1024){toast('Each photo max 2MB','err');return;}
+    readB64(f).then(function(b64){listPhotos.push(b64);done++;renderListPhotos();}).catch(function(){});
+  });
+  inp.value='';
+}
+function removeListPhoto(i){listPhotos.splice(i,1);renderListPhotos();}
+function renderListPhotos(){
+  var box=document.getElementById('lp-photos');if(!box)return;
+  var html=listPhotos.map(function(p,i){return '<div class="lp-thumb"><img src="'+p+'"><button onclick="removeListPhoto('+i+')"><i class="ti ti-x"></i></button></div>';}).join('');
+  html+='<button class="lp-add" onclick="document.getElementById(\'lp-photo-file\').click()"><i class="ti ti-camera-plus"></i><span>'+listPhotos.length+'/10</span></button>';
+  box.innerHTML=html;
+  var hint=document.getElementById('lp-photo-hint');
+  if(hint)hint.textContent=listPhotos.length<5?('Add at least 5 photos ('+listPhotos.length+'/5)'):('✓ '+listPhotos.length+' photos added');
+}
+function detectMyLocation(){
+  if(!navigator.geolocation){toast('Location not supported','err');return;}
+  toast('Getting your location…','info');
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var lat=pos.coords.latitude.toFixed(6),lng=pos.coords.longitude.toFixed(6);
+    var url='https://maps.google.com/?q='+lat+','+lng;
+    document.getElementById('lp-map').value=url;
+    toast('Location captured','ok');
+  },function(){toast('Could not get location — paste your Google Maps link instead','err');});
+}
+function submitProduct(){
+  var title=document.getElementById('lp-title').value.trim();
+  var desc=document.getElementById('lp-desc').value.trim();
+  var price=document.getElementById('lp-price').value.trim();
+  var cur=document.getElementById('lp-cur').value;
+  var qty=parseInt(document.getElementById('lp-qty').value,10)||1;
+  var addr=document.getElementById('lp-addr').value.trim();
+  var phone=document.getElementById('lp-phone').value.trim();
+  var map=document.getElementById('lp-map').value.trim();
+  if(!title){toast('Enter a product title','err');return;}
+  if(listPhotos.length<5){toast('Add at least 5 photos of the product','err');return;}
+  if(!price){toast('Enter a price','err');return;}
+  if(!addr||!phone){toast('Add your address and phone number','err');return;}
+  var prod={id:'prd'+Date.now(),sellerUid:CU.uid,sellerName:CU.name,title:title,desc:desc,price:price,currency:cur,qty:qty,sold:0,
+    photos:listPhotos.slice(),addr:addr,phone:phone,map:map,ts:Date.now()};
+  var prods=getProducts();prods.unshift(prod);saveProducts(prods);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(prod.id).set(prod).catch(function(){});}catch(e){}}
+  closeOvl('list-prod-ovl');
+  toast('Product listed!','ok');
+  // also post into the sell tag feed as a card
+  activeTagId='sell';var t=tags.find(function(x){return x.id==='sell';});
+  if(t){pidCtr++;var np={id:pidCtr,user:CU.name,uid:CU.uid,mine:true,avIdx:CU.avIdx,title:title,body:desc+'\n\nPrice: '+cur+' '+price+' · Qty: '+qty,img:listPhotos[0],mediaType:'image',productId:prod.id,region:'',ts:Date.now(),likes:0,liked:false,comments:[],showComments:false};t.posts.push(np);
+    var stored=LS.get('rb_posts_sell',[])||[];stored.push(Object.assign({},np,{comments:[]}));LS.set('rb_posts_sell',stored.slice(-100));
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('tags').doc('sell').collection('posts').doc(String(np.id)).set(Object.assign({},np,{comments:[]})).catch(function(){});}catch(e){}}
+  }
+  showMyProducts();
+}
+/* Seller dashboard — my products + orders with shipping status */
+function showMyProducts(){
+  if(!requireAuth('view your products'))return;
+  var prods=getMyProducts();var orders=getOrders().filter(function(o){return o.sellerUid===CU.uid;});
+  var body=document.getElementById('seller-body');
+  var head='<div style="background:var(--card2);border-radius:9px;padding:11px;margin-bottom:10px"><div style="font-size:13px;font-weight:700">My Shop</div><div style="font-size:11px;color:var(--mt2);margin-top:2px">'+prods.length+' product'+(prods.length!==1?'s':'')+' · '+orders.length+' order'+(orders.length!==1?'s':'')+'</div>'
+    +'<button class="btn btnok" style="margin-top:9px;border-radius:18px" onclick="closeOvl(\'seller-ovl\');openListProduct()"><i class="ti ti-plus"></i> List a Product</button></div>';
+  var ordHtml='';
+  if(orders.length){
+    ordHtml='<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px">Orders to fulfil</div>'+orders.map(function(o){return orderCardSeller(o);}).join('');
+  }
+  var prodHtml=prods.length?('<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px">My Listings</div>'+prods.map(function(p){return productCardSeller(p);}).join('')):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No products yet. Tap “List a Product”.</p>';
+  body.innerHTML=head+ordHtml+prodHtml;
+  document.getElementById('seller-ovl').classList.add('open');
+}
+function productCardSeller(p){
+  return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+(p.photos[0]||'')+'" style="width:54px;height:54px;border-radius:8px;object-fit:cover">'
+    +'<div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
+    +'<div style="font-size:12px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div>'
+    +'<div style="font-size:10px;color:var(--mt2)">Qty: '+p.qty+' · '+(p.photos.length)+' photos · Sold: '+(p.sold||0)+'</div></div></div></div>';
+}
+function orderCardSeller(o){
+  var si=orderStatusIndex(o.status);
+  var steps=ORDER_STATUS.map(function(s,i){return '<button class="ord-step'+(i<=si?' done':'')+(i===si?' cur':'')+'" onclick="setOrderStatus(\''+o.id+'\','+i+')"><i class="ti ti-'+s.icon+'"></i> '+s.label+'</button>';}).join('');
+  return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="font-weight:400;color:var(--mt2);font-size:11px">×'+o.qty+'</span></div>'
+    +'<div style="font-size:11px;color:var(--mt)">Buyer: '+esc(o.buyerName)+(o.buyerPhone?' · '+esc(o.buyerPhone):'')+'</div>'
+    +(o.buyerAddr?'<div style="font-size:11px;color:var(--mt2)">Ship to: '+esc(o.buyerAddr)+'</div>':'')
+    +'<div style="font-size:10px;color:var(--mt2);margin:6px 0 4px;text-transform:uppercase">Update status (tap a stage):</div>'
+    +'<div class="ord-steps">'+steps+'</div></div>';
+}
+function setOrderStatus(orderId,idx){
+  var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});
+  if(o){o.status=ORDER_STATUS[idx].id;o.statusTs=Date.now();saveOrders(orders);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}
+    bcSend({type:'order_status',orderId:o.id});
+  }
+  showMyProducts();
+  toast('Status: '+orderStatusObj(ORDER_STATUS[idx].id).label,'ok');
+}
+/* Buyer — place order + track */
+function buyProduct(productId){
+  if(!requireAuth('place an order'))return;
+  var p=getProducts().find(function(x){return x.id===productId;});if(!p){toast('Product not found','err');return;}
+  curBuyProduct=p;
+  document.getElementById('buy-info').innerHTML='<div style="font-weight:700">'+esc(p.title)+'</div><div style="color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div>';
+  document.getElementById('buy-qty').value=1;document.getElementById('buy-addr').value='';document.getElementById('buy-phone').value='';
+  document.getElementById('buy-ovl').classList.add('open');
+}
+var curBuyProduct=null;
+function placeOrder(){
+  if(!curBuyProduct)return;
+  var qty=parseInt(document.getElementById('buy-qty').value,10)||1;
+  var addr=document.getElementById('buy-addr').value.trim();
+  var phone=document.getElementById('buy-phone').value.trim();
+  if(!addr||!phone){toast('Enter delivery address and phone','err');return;}
+  var o={id:'ord'+Date.now(),productId:curBuyProduct.id,productTitle:curBuyProduct.title,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
+    sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,buyerUid:CU.uid,buyerName:CU.name,buyerPhone:phone,buyerAddr:addr,
+    status:'placed',ts:Date.now()};
+  var orders=getOrders();orders.unshift(o);saveOrders(orders);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o).catch(function(){});}catch(e){}}
+  closeOvl('buy-ovl');
+  toast('Order placed! Track it in My Orders.','ok');
+}
+function showMyOrders(){
+  if(!requireAuth('view orders'))return;
+  var orders=getOrders().filter(function(o){return o.buyerUid===CU.uid;});
+  var body=document.getElementById('myorders-body');
+  if(!orders.length){body.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No orders yet.</p>';document.getElementById('myorders-ovl').classList.add('open');return;}
+  body.innerHTML=orders.map(function(o){
+    var si=orderStatusIndex(o.status);var so=orderStatusObj(o.status);
+    var track=ORDER_STATUS.map(function(s,i){return '<div class="trk-step'+(i<=si?' done':'')+'"><i class="ti ti-'+s.icon+'"></i><span>'+s.label+'</span></div>';}).join('');
+    return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="color:var(--mt2);font-weight:400;font-size:11px">×'+o.qty+'</span></div>'
+      +'<div style="font-size:11px;color:var(--mt)">Seller: '+esc(o.sellerName)+'</div>'
+      +'<div style="font-size:11px;color:var(--g);font-weight:700;margin-top:3px"><i class="ti ti-'+so.icon+'"></i> '+so.label+'</div>'
+      +'<div class="trk">'+track+'</div></div>';
+  }).join('');
+  document.getElementById('myorders-ovl').classList.add('open');
+}
 </script></body></html>
