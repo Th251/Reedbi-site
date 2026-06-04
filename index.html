@@ -346,6 +346,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .stat-set-btn.on{border-color:currentColor}
 .tstack{position:fixed;bottom:20px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
 .seller-tabs{display:flex;gap:6px;margin-bottom:11px}
+.exp-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;border-radius:6px;padding:2px 7px}
+.exp-ok{background:rgba(10,102,194,.1);color:var(--g)}
+.exp-soon{background:rgba(204,16,22,.12);color:var(--red)}
+.exp-gone{background:var(--red);color:#fff}
+.idle-warn{font-size:10px;color:var(--gold);background:rgba(195,125,22,.1);border-radius:7px;padding:6px 9px;margin-top:7px;display:flex;align-items:center;gap:5px}
+.ag-docs{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ag-doc{background:var(--card2);border-radius:9px;padding:9px;text-align:center}
+.ag-doc-img{width:100%;height:70px;object-fit:cover;border-radius:6px}
+.ag-doc-ph{width:100%;height:70px;border-radius:6px;background:var(--b);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--mt2)}
+.ag-doc-lbl{font-size:10px;color:var(--mt);margin:5px 0 4px}
+.ag-doc-btn{font-size:10px;background:var(--g);color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:var(--fn);touch-action:manipulation}
 .lbl-sec{font-size:11px;font-weight:700;color:var(--mt);margin:12px 0 7px;text-transform:uppercase;letter-spacing:.04em}
 .lbl-row{display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:8px;padding:9px 11px;margin-bottom:6px}
 .lbl-tag{font-size:10px;font-weight:600;border-radius:6px;padding:2px 7px;white-space:nowrap}
@@ -483,12 +494,13 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v47</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v51</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
           <button class="ib" onclick="openCreateModal()"><i class="ti ti-square-plus"></i></button>
           <button class="ib" onclick="openProductSearch()" title="Search products to buy"><i class="ti ti-search"></i></button>
+          <button class="ib" onclick="showAgentDashboard()" title="Delivery Agent"><i class="ti ti-moped"></i></button>
           <button class="ib" onclick="showMyActivity()" title="My Activity — all in one place"><i class="ti ti-layout-dashboard"></i></button>
           <button class="ib" onclick="showMyProducts()" title="My Shop"><i class="ti ti-building-store"></i></button>
           <button class="ib" onclick="showMyOrders()" title="My Orders"><i class="ti ti-package"></i></button>
@@ -719,8 +731,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <div class="fg" style="margin-top:8px"><label>Description</label><textarea id="lp-desc" rows="2" placeholder="Condition, specs, details..."></textarea></div>
     <div style="display:flex;gap:8px;margin-top:8px">
       <div class="fg" style="flex:1"><label>Currency</label><select id="lp-cur"></select></div>
-      <div class="fg" style="flex:1"><label>Price</label><input type="text" id="lp-price" placeholder="0.00"></div>
+      <div class="fg" style="flex:1"><label>Selling price</label><input type="text" id="lp-price" placeholder="0.00"></div>
       <div class="fg" style="width:80px"><label>Quantity</label><input type="number" id="lp-qty" placeholder="1" value="1" min="1"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <div class="fg" style="flex:1"><label>Cost price (your cost)</label><input type="text" id="lp-cost" placeholder="0.00"></div>
+      <div class="fg" style="flex:1"><label>Offer price (optional)</label><input type="text" id="lp-offer" placeholder="discounted"></div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Expiry date (optional, for perishable items)</label><input type="datetime-local" id="lp-expiry">
     </div>
     <div class="fg" style="margin-top:8px"><label>Pickup / seller address</label><input type="text" id="lp-addr" placeholder="Street, city, country"></div>
     <div class="fg" style="margin-top:8px"><label>Phone / WhatsApp</label><input type="text" id="lp-phone" placeholder="+1 234 567 8900"></div>
@@ -803,6 +821,46 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="overlay" id="labels-ovl"><div class="modal" style="max-width:440px">
   <div class="mhd"><h3><i class="ti ti-printer" style="font-size:13px"></i> Print Order Labels</h3><button class="ib" onclick="closeOvl('labels-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="labels-body"></div>
+</div></div>
+<!-- TEAM MANAGEMENT -->
+<div class="overlay" id="team-ovl"><div class="modal" style="max-width:380px">
+  <div class="mhd"><h3><i class="ti ti-users-plus" style="font-size:13px"></i> Manage Team</h3><button class="ib" onclick="closeOvl('team-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="team-body"></div>
+</div></div>
+<!-- AGENT PROFILE -->
+<div class="overlay" id="agent-ovl"><div class="modal" style="max-width:400px">
+  <div class="mhd"><h3><i class="ti ti-moped" style="font-size:13px"></i> Delivery Agent Profile</h3><button class="ib" onclick="closeOvl('agent-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <div class="fg"><label>Full name</label><input type="text" id="ag-name"></div>
+    <div class="fg" style="margin-top:8px"><label>Phone / WhatsApp</label><input type="text" id="ag-phone" placeholder="+971..."></div>
+    <div class="fg" style="margin-top:8px"><label>Vehicle number</label><input type="text" id="ag-vehicle-no" placeholder="e.g. DXB A 12345"></div>
+    <div style="font-size:11px;color:var(--mt);margin:10px 0 6px">Upload documents (stored securely)</div>
+    <div class="ag-docs" id="ag-docs"></div>
+    <button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveAgentProfile()"><i class="ti ti-check"></i> Save Profile</button>
+  </div>
+</div></div>
+
+<!-- ASSIGN AGENT -->
+<div class="overlay" id="assign-ovl"><div class="modal" style="max-width:380px">
+  <div class="mhd"><h3><i class="ti ti-user-check" style="font-size:13px"></i> Assign Delivery Agent</h3><button class="ib" onclick="closeOvl('assign-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="assign-body"></div>
+</div></div>
+
+<!-- AGENT DASHBOARD -->
+<div class="overlay" id="agentdash-ovl"><div class="modal" style="max-width:420px">
+  <div class="mhd"><h3><i class="ti ti-moped" style="font-size:13px"></i> Agent Dashboard</h3><button class="ib" onclick="closeOvl('agentdash-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="agentdash-body"></div>
+</div></div>
+
+<!-- RATE DELIVERY -->
+<div class="overlay" id="rate-ovl"><div class="modal" style="max-width:320px">
+  <div class="mhd"><h3><i class="ti ti-star" style="font-size:13px"></i> Rate Delivery</h3><button class="ib" onclick="closeOvl('rate-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" style="text-align:center">
+    <div id="rate-info" style="font-size:12px;color:var(--mt);margin-bottom:8px"></div>
+    <div id="rate-stars"></div>
+    <textarea id="rate-cmt" rows="2" placeholder="Comment (optional)" style="width:100%;margin-top:10px;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-family:var(--fn)"></textarea>
+    <button class="btn btnok" style="width:100%;margin-top:10px" onclick="submitRating()"><i class="ti ti-send"></i> Submit Rating</button>
+  </div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -3681,19 +3739,47 @@ function getPages(){return LS.get('rb_pages',[])||[];}
 function savePages(p){LS.set('rb_pages',p);}
 function getPageByName(name){return getPages().find(function(p){return p.name.toLowerCase()===String(name).toLowerCase();});}
 function getMyPages(){var uid=CU?CU.uid:'';return getPages().filter(function(p){return p.ownerUid===uid;});}
-function userOwnsPage(name){var p=getPageByName(name);return p&&CU&&p.ownerUid===CU.uid;}
+function userOwnsPage(name){var p=getPageByName(name);if(!p||!CU)return false;if(p.ownerUid===CU.uid)return true;var m=(p.members||[]).find(function(x){return x.uid===CU.uid;});return !!(m&&(m.role==='admin'||m.role==='editor'||m.role==='packer'));}
 function openCreatePage(prefill){if(!requireAuth('create a page'))return;document.getElementById('pg-name').value=prefill||'';document.getElementById('pg-about').value='';document.getElementById('mkpg-ovl').classList.add('open');}
 function createPage(){
   var name=document.getElementById('pg-name').value.trim();
   var about=document.getElementById('pg-about').value.trim();
   if(!name){toast('Enter a page name','err');return;}
   var pages=getPages();
-  if(getPageByName(name)){toast('Page already exists','err');return;}
-  pages.push({id:'pg'+Date.now(),name:name,about:about,ownerUid:CU.uid,ownerName:CU.name,ts:Date.now()});
+  if(getPageByName(name)){toast('“'+name+'” is already taken. Page names are unique worldwide — choose another.','err');return;}
+  var pg={id:'pg'+Date.now(),name:name,about:about,ownerUid:CU.uid,ownerName:CU.name,members:[],ts:Date.now()};
+  pages.push(pg);
   LS.set('rb_pages',pages);
-  if(FB.ready){FB.db.collection('pages').add({name:name,about:about,ownerUid:CU.uid,ownerName:CU.name,ts:Date.now()}).catch(function(){});}
+  if(FB.ready){FB.db.collection('pages').doc(name.toLowerCase()).set(pg,{merge:true}).catch(function(){});}
   closeOvl('mkpg-ovl');closePM();
   toast('Page "'+name+'" created! You will receive applications here.','ok');
+}
+/* ===== Team roles & access control ===== */
+function pageRole(pageName){
+  // returns the current user's role on a page: 'owner','admin','editor','viewer', or null
+  var p=getPageByName(pageName);if(!p||!CU)return null;
+  if(p.ownerUid===CU.uid)return 'owner';
+  var m=(p.members||[]).find(function(x){return x.uid===CU.uid;});
+  return m?m.role:null;
+}
+function canManagePage(pageName){var r=pageRole(pageName);return r==='owner'||r==='admin'||r==='editor';}
+function canEditPage(pageName){var r=pageRole(pageName);return r==='owner'||r==='admin';}
+function addPageMember(pageName,uid,name,role){
+  var pages=getPages();var p=pages.find(function(x){return x.name.toLowerCase()===String(pageName).toLowerCase();});
+  if(!p)return false;
+  if(p.ownerUid!==CU.uid&&!((p.members||[]).find(function(x){return x.uid===CU.uid&&x.role==='admin';})))return false;
+  if(!p.members)p.members=[];
+  if(p.members.find(function(x){return x.uid===uid;})){toast('Already a team member','info');return false;}
+  p.members.push({uid:uid,name:name,role:role||'viewer',ts:Date.now()});
+  savePages(pages);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(p.name.toLowerCase()).set(p,{merge:true}).catch(function(){});}catch(e){}}
+  return true;
+}
+function removePageMember(pageName,uid){
+  var pages=getPages();var p=pages.find(function(x){return x.name.toLowerCase()===String(pageName).toLowerCase();});
+  if(!p||!p.members)return;
+  p.members=p.members.filter(function(x){return x.uid!==uid;});savePages(pages);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(p.name.toLowerCase()).set(p,{merge:true}).catch(function(){});}catch(e){}}
 }
 
 /* APPLICATIONS storage */
@@ -4239,6 +4325,43 @@ function withdrawApp(appId){
   showMyApps();
   toast('Application withdrawn','info');
 }
+var teamPageName=null;
+function openTeam(pageName){
+  teamPageName=pageName;renderTeam();
+  document.getElementById('team-ovl').classList.add('open');
+}
+function renderTeam(){
+  var p=getPageByName(teamPageName);if(!p)return;
+  var body=document.getElementById('team-body');
+  var members=p.members||[];
+  var h='<div style="font-size:12px;color:var(--mt);margin-bottom:10px">Give team members access to <b>'+esc(p.name)+'</b>. Each can have a role.</div>';
+  h+='<div class="act-row" style="border:none"><div><b>'+esc(p.ownerName)+'</b><small>Owner · full control</small></div></div>';
+  h+=members.map(function(m){
+    return '<div class="act-row"><div><b>'+esc(m.name)+'</b><small>'+roleLabel(m.role)+'</small></div>'
+      +'<button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="teamRemove(\''+escJS(m.uid)+'\')">Remove</button></div>';
+  }).join('');
+  if(!members.length)h+='<div class="act-empty">No team members yet.</div>';
+  h+='<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px">'
+    +'<div style="font-size:11px;font-weight:700;margin-bottom:7px">Add team member</div>'
+    +'<input type="text" id="team-uid" placeholder="Member user ID or email" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
+    +'<input type="text" id="team-name" placeholder="Display name (e.g. HR1)" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
+    +'<select id="team-role" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:8px">'
+    +'<option value="viewer">Viewer (read only)</option>'
+    +'<option value="packer">Packer (update order status)</option>'
+    +'<option value="editor">Editor (read + write/manage applicants)</option>'
+    +'<option value="admin">Admin (full + manage team)</option></select>'
+    +'<button class="btn btnok" style="width:100%" onclick="teamAdd()"><i class="ti ti-user-plus"></i> Add Member</button></div>';
+  body.innerHTML=h;
+}
+function roleLabel(r){return r==='admin'?'Admin · full + team':r==='editor'?'Editor · read & write':r==='packer'?'Packer · update status':'Viewer · read only';}
+function teamAdd(){
+  var uid=document.getElementById('team-uid').value.trim();
+  var name=document.getElementById('team-name').value.trim()||uid;
+  var role=document.getElementById('team-role').value;
+  if(!uid){toast('Enter the member user ID or email','err');return;}
+  if(addPageMember(teamPageName,uid,name,role)){toast(name+' added as '+role,'ok');renderTeam();}
+}
+function teamRemove(uid){removePageMember(teamPageName,uid);renderTeam();toast('Member removed','info');}
 function showMyApps(){
   if(!requireAuth('view applications'))return;
   var apps=getMyApps().reverse();var cvs=getCVs(CU.uid);
@@ -4295,6 +4418,7 @@ function openCompanyPage(company){
   var apps=ownerJobFilter?allApps.filter(function(a){return (a.postTitle||'(untitled)')===ownerJobFilter;}):allApps;
   var head='<div style="background:var(--card2);border-radius:9px;padding:11px;margin-bottom:10px">'
     +'<div style="font-size:13px;font-weight:700">'+esc(page.name)+' · HR Dashboard</div>'
+    +((pageRole(company)==='owner'||pageRole(company)==='admin')?'<button class="act-mini" style="margin-top:6px" onclick="openTeam(\''+escJS(company)+'\')"><i class="ti ti-users-plus"></i> Manage Team (HR access)</button>':'')
     +'<div style="font-size:11px;color:var(--mt2);margin-top:2px">'+allApps.length+' total application'+(allApps.length!==1?'s':'')+' across '+titleList.length+' job'+(titleList.length!==1?'s':'')+'</div>';
   if(titleList.length>1){
     head+='<div style="font-size:9px;color:var(--mt2);margin-top:8px;text-transform:uppercase;letter-spacing:.05em">Filter by job:</div><div class="appl-stat-row" style="margin-top:4px">'
@@ -4568,7 +4692,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v47 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v51 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -4638,7 +4762,7 @@ var listPhotos=[]; // base64 photos for the product being listed
 function openListProduct(){
   if(!requireAuth('list a product'))return;
   listPhotos=[];
-  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   var cs=document.getElementById('lp-cur');if(cs&&!cs.options.length){CURRENCIES.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o);});}
   renderListPhotos();
   document.getElementById('list-prod-ovl').classList.add('open');
@@ -4687,7 +4811,10 @@ function submitProduct(){
   if(!price){toast('Enter a price','err');return;}
   if(!addr||!phone){toast('Add your address and phone number','err');return;}
   var serialNo='PRD-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
-  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:CU.name,title:title,desc:desc,price:price,currency:cur,qty:qty,sold:0,
+  var cost=(document.getElementById('lp-cost')||{}).value||'';
+  var offer=(document.getElementById('lp-offer')||{}).value||'';
+  var expiry=(document.getElementById('lp-expiry')||{}).value||'';
+  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:CU.name,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,
     photos:listPhotos.slice(),addr:addr,phone:phone,map:map,ts:Date.now()};
   var prods=getProducts();prods.unshift(prod);saveProducts(prods);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(prod.id).set(prod).catch(function(){});}catch(e){}}
@@ -4754,7 +4881,23 @@ function showMyProducts(tab){
     if(!ranked.length){content='<p style="font-size:12px;color:var(--mt);text-align:center;padding:18px"><i class="ti ti-chart-bar" style="font-size:30px;color:var(--b2);display:block;margin-bottom:6px"></i>No sales data yet. Stats appear once you receive orders.</p>';}
     else{
       var maxU=ranked[0].d.units||1;
-      content='<div style="font-size:11px;color:var(--mt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Best-selling products</div>';
+      var now=Date.now(),DAY=86400000;
+      var todayU=0,weekU=0,monthU=0,profit=0,returnedU=0;
+      orders.forEach(function(o){
+        var q=o.qty||1;var age=now-(o.ts||now);
+        if(age<DAY)todayU+=q;if(age<7*DAY)weekU+=q;if(age<30*DAY)monthU+=q;
+        if(o.status==='returned')returnedU+=q;
+        var sp=parseFloat(String(o.price).replace(/[^0-9.]/g,''))||0;
+        var pr=getProducts().find(function(x){return x.id===o.productId;});
+        var cp=pr?parseFloat(String(pr.cost).replace(/[^0-9.]/g,''))||0:0;
+        if(o.status==='delivered')profit+=(sp-cp)*q;
+      });
+      content='<div class="dispatch-row"><div class="disp-box disp-ship"><b>'+todayU+'</b><small>Today</small></div>'
+        +'<div class="disp-box disp-ship"><b>'+weekU+'</b><small>This week</small></div>'
+        +'<div class="disp-box disp-ship"><b>'+monthU+'</b><small>This month</small></div></div>';
+      content+='<div class="dispatch-row"><div class="disp-box disp-done"><b>'+esc(cur)+' '+profit.toLocaleString()+'</b><small>Profit (delivered)</small></div>'
+        +'<div class="disp-box disp-pend"><b>'+returnedU+'</b><small>Returned</small></div></div>';
+      content+='<div style="font-size:11px;color:var(--mt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Best-selling products</div>';
       content+=ranked.map(function(r,i){
         var pct=Math.round(r.d.units/maxU*100);
         var medal=i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'';
@@ -4770,12 +4913,29 @@ function showMyProducts(tab){
 function productCardSeller(p){
   var sold=getOrders().filter(function(o){return o.productId===p.id;}).reduce(function(s,o){return s+(o.qty||1);},0);
   var remaining=Math.max(0,(p.qty||0)-sold);
+  // idle time since listing
+  var ageMs=Date.now()-(p.ts||Date.now());
+  var ageDays=Math.floor(ageMs/86400000),ageHrs=Math.floor((ageMs%86400000)/3600000);
+  var idleStr=ageDays>0?(ageDays+'d '+ageHrs+'h'):(ageHrs+'h');
+  var idleWarn=(ageDays>=7&&sold===0);
+  // expiry countdown
+  var expStr='';
+  if(p.expiry){
+    var diff=new Date(p.expiry).getTime()-Date.now();
+    if(diff<=0)expStr='<span class="exp-badge exp-gone"><i class="ti ti-alert-triangle"></i> EXPIRED</span>';
+    else{var ed=Math.floor(diff/86400000),eh=Math.floor((diff%86400000)/3600000);
+      var soon=diff<3*86400000;
+      expStr='<span class="exp-badge '+(soon?'exp-soon':'exp-ok')+'"><i class="ti ti-clock"></i> Expires in '+(ed>0?ed+'d ':'')+eh+'h</span>';}
+  }
   return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+(p.photos[0]||'')+'" style="width:54px;height:54px;border-radius:8px;object-fit:cover">'
     +'<div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
     +(p.serialNo?'<div class="order-no">'+esc(p.serialNo)+'</div>':'')
-    +'<div style="font-size:12px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div>'
-    +'<div style="font-size:10px;color:var(--mt2);margin-top:2px">Sold: <b style="color:var(--cyan)">'+sold+'</b> · In stock: <b style="color:'+(remaining>0?'var(--g)':'var(--red)')+'">'+remaining+'</b> · '+(p.photos.length)+' photos</div></div></div>'
-    +'<button class="abtn" onclick="openBoost(\'sell\',null)" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:8px;font-size:11px"><i class="ti ti-speakerphone"></i> Advertise</button></div>';
+    +'<div style="font-size:12px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+(p.offer?' <span style="color:var(--gold);font-size:11px">offer '+esc(p.offer)+'</span>':'')+'</div>'
+    +'<div style="font-size:10px;color:var(--mt2);margin-top:2px">Sold: <b style="color:var(--cyan)">'+sold+'</b> · Stock: <b style="color:'+(remaining>0?'var(--g)':'var(--red)')+'">'+remaining+'</b> · Listed '+idleStr+' ago</div>'
+    +(expStr?'<div style="margin-top:4px">'+expStr+'</div>':'')
+    +'</div></div>'
+    +(idleWarn?'<div class="idle-warn"><i class="ti ti-flame"></i> Idle '+ageDays+' days, no sales — consider an offer or boost</div>':'')
+    +'<button class="abtn" onclick="openBoost(\'sell\',null)" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:8px;font-size:11px"><i class="ti ti-speakerphone"></i> Advertise / Boost</button></div>';
 }
 function orderCardSeller(o){
   var si=orderStatusIndex(o.status);
@@ -4794,17 +4954,38 @@ function orderCardSeller(o){
     +'<div class="ord-current"><i class="ti ti-'+cur.icon+'"></i> Status: <b>'+cur.label+'</b></div>'
     +(next?'<button class="ord-next" onclick="setOrderStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark as: '+next.label+'</button>':'<div style="font-size:11px;color:var(--g);font-weight:600;margin-top:6px"><i class="ti ti-circle-check"></i> Order complete</div>')
     +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Order QR (track)</button>'
+    +'<button class="ord-qr" onclick="openAssignAgent(\''+o.id+'\')"><i class="ti ti-user-check"></i> '+(o.agentName?'Agent: '+esc(o.agentName):'Assign delivery agent')+'</button>'
+    +(o.status!=='returned'&&o.status!=='delivered'?'<button class="ord-qr" style="border-color:var(--red);color:var(--red)" onclick="markReturned(\''+o.id+'\')"><i class="ti ti-arrow-back-up"></i> Mark returned</button>':'')
+    +(o.status==='returned'?'<div style="font-size:11px;color:var(--red);font-weight:600;margin-top:6px"><i class="ti ti-arrow-back-up"></i> Returned</div>':'')
     +'<details style="margin-top:7px"><summary style="font-size:10px;color:var(--mt2);cursor:pointer">Or jump to any stage</summary><div class="ord-steps" style="margin-top:6px">'+steps+'</div></details>'
     +'</div>';
 }
 function setOrderStatus(orderId,idx){
   var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});
-  if(o){o.status=ORDER_STATUS[idx].id;o.statusTs=Date.now();saveOrders(orders);
+  if(o){
+    o.status=ORDER_STATUS[idx].id;o.statusTs=Date.now();
+    if(!o.statusLog)o.statusLog=[];
+    o.statusLog.push({status:ORDER_STATUS[idx].id,ts:Date.now(),by:CU?CU.name:''});
+    saveOrders(orders);
+    // try to capture location at this scan/update (records where the status changed)
+    if(navigator.geolocation){try{navigator.geolocation.getCurrentPosition(function(pos){
+      var os=getOrders();var oo=os.find(function(x){return x.id===orderId;});
+      if(oo){if(!oo.statusLog)oo.statusLog=[];var last=oo.statusLog[oo.statusLog.length-1];if(last)last.loc=pos.coords.latitude.toFixed(4)+','+pos.coords.longitude.toFixed(4);saveOrders(os);
+        if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(oo.id).set(oo,{merge:true}).catch(function(){});}catch(e){}}}
+    },function(){});}catch(e){}}
     if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}
     bcSend({type:'order_status',orderId:o.id});
   }
   showMyProducts('orders');
   toast('Status: '+orderStatusObj(ORDER_STATUS[idx].id).label,'ok');
+}
+function markReturned(orderId){
+  if(!confirm('Mark this order as returned?'))return;
+  var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});
+  if(o){o.status='returned';o.statusTs=Date.now();o.returnedTs=Date.now();saveOrders(orders);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}
+    bcSend({type:'order_status',orderId:o.id});}
+  showMyProducts('orders');toast('Order marked as returned','info');
 }
 /* Buyer — place order + track */
 function buyProduct(productId){
@@ -4887,7 +5068,9 @@ function showMyOrders(){
       +'<div style="font-size:11px;color:var(--mt)">Seller: '+esc(o.sellerName)+'</div>'
       +'<div style="font-size:11px;color:var(--g);font-weight:700;margin-top:3px"><i class="ti ti-'+so.icon+'"></i> '+so.label+'</div>'
       +'<div class="trk">'+track+'</div>'
-      +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Show tracking QR &amp; order #</button></div>';
+      +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Show tracking QR &amp; order #</button>'
+      +((o.status==='delivered'&&o.agentUid&&!o.rated)?'<button class="ord-qr" style="border-color:var(--gold);color:var(--gold)" onclick="openRateDelivery(\''+o.id+'\')"><i class="ti ti-star"></i> Rate delivery</button>':'')
+      +'</div>';
   }).join('');
   document.getElementById('myorders-ovl').classList.add('open');
 }
@@ -5114,5 +5297,147 @@ function printAllPending(){
     +labels+'</body></html>';
   w.document.write(html);w.document.close();
   markAllPrinted();
+}
+/* ============================================================
+   DELIVERY AGENT module — profile, documents, assignment, commission
+   ============================================================ */
+function getAgents(){return LS.get('rb_agents',[])||[];}
+function saveAgents(a){LS.set('rb_agents',a);}
+function getMyAgentProfile(){var uid=CU?CU.uid:'';return getAgents().find(function(a){return a.uid===uid;});}
+
+var agentDocs={license:null,eid:null,vehicle:null,photo:null};
+function openAgentProfile(){
+  if(!requireAuth('register as delivery agent'))return;
+  var p=getMyAgentProfile();
+  agentDocs={license:p?p.license:null,eid:p?p.eid:null,vehicle:p?p.vehicle:null,photo:p?p.photo:null};
+  document.getElementById('ag-name').value=p?p.name:(CU.name||'');
+  document.getElementById('ag-phone').value=p?p.phone:'';
+  document.getElementById('ag-vehicle-no').value=p?p.vehicleNo:'';
+  renderAgentDocs();
+  document.getElementById('agent-ovl').classList.add('open');
+}
+function agentDocSel(kind,inp){
+  var f=inp.files[0];if(!f)return;
+  if(f.size>1024*1024){toast('Each image max 1MB','err');inp.value='';return;}
+  readB64(f).then(function(b64){agentDocs[kind]=b64;renderAgentDocs();}).catch(function(){});
+  inp.value='';
+}
+function renderAgentDocs(){
+  var defs=[['photo','Agent Photo','user'],['license','Driving Licence','id'],['eid','Emirates ID','id-badge-2'],['vehicle','Vehicle Photo','car']];
+  document.getElementById('ag-docs').innerHTML=defs.map(function(d){
+    var has=agentDocs[d[0]];
+    return '<div class="ag-doc">'
+      +(has?'<img src="'+has+'" class="ag-doc-img">':'<div class="ag-doc-ph"><i class="ti ti-'+d[2]+'"></i></div>')
+      +'<div class="ag-doc-lbl">'+d[1]+'</div>'
+      +'<button class="ag-doc-btn" onclick="document.getElementById(\'ag-file-'+d[0]+'\').click()">'+(has?'Change':'Upload')+'</button>'
+      +'<input type="file" id="ag-file-'+d[0]+'" accept="image/*" style="display:none" onchange="agentDocSel(\''+d[0]+'\',this)">'
+      +'</div>';
+  }).join('');
+}
+function saveAgentProfile(){
+  var name=document.getElementById('ag-name').value.trim();
+  var phone=document.getElementById('ag-phone').value.trim();
+  var vno=document.getElementById('ag-vehicle-no').value.trim();
+  if(!name||!phone){toast('Enter name and phone','err');return;}
+  if(!agentDocs.license||!agentDocs.eid){toast('Upload your licence and Emirates ID','err');return;}
+  var agents=getAgents();var p=agents.find(function(a){return a.uid===CU.uid;});
+  if(!p){p={uid:CU.uid,id:'agt'+Date.now(),deliveries:0,earnings:0,ratings:[]};agents.push(p);}
+  p.name=name;p.phone=phone;p.vehicleNo=vno;p.license=agentDocs.license;p.eid=agentDocs.eid;p.vehicle=agentDocs.vehicle;p.photo=agentDocs.photo;p.ts=Date.now();
+  saveAgents(agents);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('agents').doc(p.uid).set(p,{merge:true}).catch(function(){});}catch(e){}}
+  closeOvl('agent-ovl');
+  toast('Delivery agent profile saved!','ok');
+}
+/* Seller assigns an agent to an order */
+function openAssignAgent(orderId){
+  curAssignOrder=orderId;
+  var agents=getAgents();
+  var body=document.getElementById('assign-body');
+  if(!agents.length){body.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No delivery agents registered yet. Agents can register from the menu.</p>';}
+  else{
+    body.innerHTML=agents.map(function(a){
+      var rating=avgRating(a);
+      return '<div class="act-row"><div style="display:flex;gap:8px;align-items:center">'
+        +(a.photo?'<img src="'+a.photo+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover">':'<div class="appl-av av1" style="width:34px;height:34px">'+ini(a.name)+'</div>')
+        +'<div><b>'+esc(a.name)+'</b><small>'+esc(a.phone)+(rating?' · ⭐ '+rating:'')+' · '+(a.deliveries||0)+' deliveries</small></div></div>'
+        +'<button class="act-mini" onclick="assignAgent(\''+a.uid+'\')">Assign</button></div>';
+    }).join('');
+  }
+  document.getElementById('assign-ovl').classList.add('open');
+}
+var curAssignOrder=null;
+function assignAgent(agentUid){
+  var agents=getAgents();var a=agents.find(function(x){return x.uid===agentUid;});
+  var orders=getOrders();var o=orders.find(function(x){return x.id===curAssignOrder;});
+  if(o&&a){o.agentUid=agentUid;o.agentName=a.name;o.agentPhone=a.phone;saveOrders(orders);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}}
+  closeOvl('assign-ovl');showMyProducts('orders');
+  toast('Assigned to '+(a?a.name:'agent'),'ok');
+}
+function avgRating(a){if(!a.ratings||!a.ratings.length)return 0;var s=a.ratings.reduce(function(x,r){return x+r.stars;},0);return (s/a.ratings.length).toFixed(1);}
+/* Agent dashboard — assigned orders, earnings, commission */
+var AGENT_COMMISSION=5; // currency units per delivery (demo)
+function showAgentDashboard(){
+  if(!requireAuth('view agent dashboard'))return;
+  var p=getMyAgentProfile();
+  var body=document.getElementById('agentdash-body');
+  if(!p){body.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">You are not registered as a delivery agent yet.</p><button class="btn btnok" style="width:100%" onclick="closeOvl(\'agentdash-ovl\');openAgentProfile()"><i class="ti ti-user-plus"></i> Register as Agent</button>';document.getElementById('agentdash-ovl').classList.add('open');return;}
+  var myOrders=getOrders().filter(function(o){return o.agentUid===CU.uid;});
+  var delivered=myOrders.filter(function(o){return o.status==='delivered';});
+  var pending=myOrders.filter(function(o){return o.status!=='delivered';});
+  var earnings=delivered.length*AGENT_COMMISSION;
+  var rating=avgRating(p);
+  var head='<div style="background:var(--card2);border-radius:10px;padding:12px;margin-bottom:11px;text-align:center">'
+    +(p.photo?'<img src="'+p.photo+'" style="width:54px;height:54px;border-radius:50%;object-fit:cover;margin:0 auto 6px;display:block">':'')
+    +'<div style="font-weight:700">'+esc(p.name)+'</div><div style="font-size:11px;color:var(--mt2)">'+esc(p.phone)+(rating?' · ⭐ '+rating:'')+'</div></div>';
+  head+='<div class="dispatch-row">'
+    +'<div class="disp-box disp-done"><b>'+delivered.length+'</b><small>Delivered</small></div>'
+    +'<div class="disp-box disp-pend"><b>'+pending.length+'</b><small>Pending</small></div>'
+    +'<div class="disp-box disp-ship"><b>'+(p.currency||'')+earnings+'</b><small>Commission earned</small></div>'
+    +'</div>';
+  var content=myOrders.length?myOrders.map(function(o){
+    var os=orderStatusObj(o.status);var si=orderStatusIndex(o.status);
+    var next=si<ORDER_STATUS.length-1?ORDER_STATUS[si+1]:null;
+    return '<div class="appl-card"><div class="order-no">'+esc(o.orderNo||o.id)+'</div>'
+      +'<div style="font-size:12px;font-weight:600">'+esc(o.productTitle)+' ×'+o.qty+'</div>'
+      +'<div style="font-size:11px;color:var(--mt)">To: '+esc(o.buyerName)+' · '+esc(o.buyerAddr||'')+'</div>'
+      +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> Navigate</a></div>':'')
+      +'<div class="ord-current"><i class="ti ti-'+os.icon+'"></i> '+os.label+'</div>'
+      +(next?'<button class="ord-next" onclick="agentUpdateStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark: '+next.label+'</button>':'<div style="font-size:11px;color:var(--g);margin-top:6px"><i class="ti ti-circle-check"></i> Delivered · +'+AGENT_COMMISSION+' commission</div>')
+      +'</div>';
+  }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No deliveries assigned yet.</p>';
+  body.innerHTML=head+content;
+  document.getElementById('agentdash-ovl').classList.add('open');
+}
+function agentUpdateStatus(orderId,idx){
+  setOrderStatus(orderId,idx); // syncs to seller + buyer
+  if(ORDER_STATUS[idx].id==='delivered'){
+    var agents=getAgents();var p=agents.find(function(a){return a.uid===CU.uid;});
+    if(p){p.deliveries=(p.deliveries||0)+1;saveAgents(agents);
+      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('agents').doc(p.uid).set(p,{merge:true}).catch(function(){});}catch(e){}}}
+  }
+  showAgentDashboard();
+}
+/* Buyer rates the delivery */
+function openRateDelivery(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o||!o.agentUid){toast('No delivery agent to rate','info');return;}
+  curRateOrder=orderId;curRateStars=5;
+  document.getElementById('rate-info').textContent='Rate delivery by '+(o.agentName||'agent');
+  renderStars();
+  document.getElementById('rate-cmt').value='';
+  document.getElementById('rate-ovl').classList.add('open');
+}
+var curRateOrder=null,curRateStars=5;
+function setStars(n){curRateStars=n;renderStars();}
+function renderStars(){
+  document.getElementById('rate-stars').innerHTML=[1,2,3,4,5].map(function(n){return '<span onclick="setStars('+n+')" style="cursor:pointer;font-size:28px;color:'+(n<=curRateStars?'#f5a623':'#ccc')+'">★</span>';}).join('');
+}
+function submitRating(){
+  var o=getOrders().find(function(x){return x.id===curRateOrder;});if(!o)return;
+  var agents=getAgents();var a=agents.find(function(x){return x.uid===o.agentUid;});
+  if(a){if(!a.ratings)a.ratings=[];a.ratings.push({stars:curRateStars,comment:document.getElementById('rate-cmt').value.trim(),buyer:CU.name,ts:Date.now()});saveAgents(agents);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('agents').doc(a.uid).set(a,{merge:true}).catch(function(){});}catch(e){}}}
+  o.rated=true;saveOrders(getOrders().map(function(x){return x.id===o.id?o:x;}));
+  closeOvl('rate-ovl');toast('Thanks for rating!','ok');
 }
 </script></body></html>
