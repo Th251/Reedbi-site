@@ -345,6 +345,13 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .stat-set-btn{font-size:10px;font-weight:600;padding:4px 9px;border-radius:8px;border:1px solid var(--b);background:transparent;color:var(--mt);cursor:pointer;font-family:var(--fn)}
 .stat-set-btn.on{border-color:currentColor}
 .tstack{position:fixed;bottom:20px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.pay-opts{display:flex;gap:8px;margin-top:5px}
+.pay-opt{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border:1.5px solid var(--b);background:var(--card2);border-radius:10px;cursor:pointer;font-family:var(--fn);font-size:11px;font-weight:600;color:var(--mt);transition:all .15s}
+.pay-opt i{font-size:20px}
+.pay-opt.sel{border-color:var(--g);background:rgba(10,102,194,.08);color:var(--g)}
+.pay-badge{display:inline-block;border-radius:7px;padding:2px 8px;font-weight:600}
+.pay-cod-b{background:rgba(195,125,22,.12);color:var(--gold)}
+.pay-online-b{background:rgba(10,102,194,.12);color:var(--g)}
 .act-sec{background:var(--card2);border-radius:10px;padding:11px;margin-bottom:10px}
 .act-h{font-size:12px;font-weight:700;color:var(--tx);display:flex;align-items:center;gap:6px;margin-bottom:8px}
 .act-h i{color:var(--g)}
@@ -442,7 +449,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v38</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v39</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -696,7 +703,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <div id="buy-info" style="background:var(--card2);border-radius:9px;padding:10px;margin-bottom:10px"></div>
     <div class="fg"><label>Quantity</label><input type="number" id="buy-qty" value="1" min="1"></div>
     <div class="fg" style="margin-top:8px"><label>Delivery address</label><textarea id="buy-addr" rows="2" placeholder="Full delivery address"></textarea></div>
-    <div class="fg" style="margin-top:8px"><label>Your phone</label><input type="text" id="buy-phone" placeholder="+1 234 567 8900"></div>
+    <div class="fg" style="margin-top:8px"><label>Delivery location (Google Maps)</label>
+      <div style="display:flex;gap:6px"><input type="text" id="buy-map" placeholder="Paste Maps link or tap pin" style="flex:1">
+      <button class="btn" onclick="detectBuyerLocation()" style="border:1px solid var(--b);background:var(--card2);color:var(--g);white-space:nowrap"><i class="ti ti-current-location"></i></button></div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Your WhatsApp number</label><input type="text" id="buy-phone" placeholder="+1 234 567 8900"></div>
+    <div class="fg" style="margin-top:10px"><label>Payment method</label>
+      <div class="pay-opts">
+        <button type="button" class="pay-opt sel" id="pay-cod" onclick="selectPay('cod')"><i class="ti ti-cash"></i> Cash on Delivery</button>
+        <button type="button" class="pay-opt" id="pay-online" onclick="selectPay('online')"><i class="ti ti-credit-card"></i> Pay Online</button>
+      </div>
+    </div>
     <button class="btn btnok" style="width:100%;margin-top:12px" onclick="placeOrder()"><i class="ti ti-check"></i> Confirm Order</button>
   </div>
 </div></div>
@@ -1512,6 +1529,7 @@ function buildBubble(t,p,isMine){
       var isSeller=CU&&prod.sellerUid===CU.uid;
       applyHtml=isSeller
         ? '<button class="abtn" onclick="showMyProducts()" style="background:var(--card2);color:var(--g);border:1px solid var(--g)"><i class="ti ti-building-store"></i> Manage Listing</button>'
+          +'<button class="abtn" onclick="openBoost(\''+escJS(t.id)+'\','+pid+')" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:5px"><i class="ti ti-speakerphone"></i> Advertise this Product</button>'
         : '<button class="abtn" onclick="buyProduct(\''+prod.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now · '+esc(prod.currency)+' '+esc(prod.price)+'</button>';
     }
   }
@@ -2180,7 +2198,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v38 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v39 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -2337,8 +2355,11 @@ function orderCardSeller(o){
   var si=orderStatusIndex(o.status);
   var steps=ORDER_STATUS.map(function(s,i){return '<button class="ord-step'+(i<=si?' done':'')+(i===si?' cur':'')+'" onclick="setOrderStatus(\''+o.id+'\','+i+')"><i class="ti ti-'+s.icon+'"></i> '+s.label+'</button>';}).join('');
   return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="font-weight:400;color:var(--mt2);font-size:11px">×'+o.qty+'</span></div>'
-    +'<div style="font-size:11px;color:var(--mt)">Buyer: '+esc(o.buyerName)+(o.buyerPhone?' · '+esc(o.buyerPhone):'')+'</div>'
+    +'<div style="font-size:11px;color:var(--mt)">Buyer: '+esc(o.buyerName)+'</div>'
+    +(o.buyerPhone?'<div style="font-size:11px;color:var(--g)"><i class="ti ti-brand-whatsapp"></i> <a href="https://wa.me/'+esc((o.buyerPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(o.buyerPhone)+'</a></div>':'')
     +(o.buyerAddr?'<div style="font-size:11px;color:var(--mt2)">Ship to: '+esc(o.buyerAddr)+'</div>':'')
+    +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> View location on map</a></div>':'')
+    +'<div style="font-size:10px;margin-top:3px"><span class="pay-badge '+(o.payMethod==='online'?'pay-online-b':'pay-cod-b')+'">'+(o.payMethod==='online'?'💳 Pay Online':'💵 Cash on Delivery')+'</span></div>'
     +'<div style="font-size:10px;color:var(--mt2);margin:6px 0 4px;text-transform:uppercase">Update status (tap a stage):</div>'
     +'<div class="ord-steps">'+steps+'</div></div>';
 }
@@ -2358,22 +2379,41 @@ function buyProduct(productId){
   curBuyProduct=p;
   document.getElementById('buy-info').innerHTML='<div style="font-weight:700">'+esc(p.title)+'</div><div style="color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div>';
   document.getElementById('buy-qty').value=1;document.getElementById('buy-addr').value='';document.getElementById('buy-phone').value='';
+  var bm=document.getElementById('buy-map');if(bm)bm.value='';
+  selectPay('cod');
   document.getElementById('buy-ovl').classList.add('open');
 }
 var curBuyProduct=null;
+var selPayMethod='cod';
+function selectPay(m){selPayMethod=m;
+  var c=document.getElementById('pay-cod'),o=document.getElementById('pay-online');
+  if(c)c.className='pay-opt'+(m==='cod'?' sel':'');
+  if(o)o.className='pay-opt'+(m==='online'?' sel':'');
+}
+function detectBuyerLocation(){
+  if(!navigator.geolocation){toast('Location not supported','err');return;}
+  toast('Getting your location…','info');
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var lat=pos.coords.latitude.toFixed(6),lng=pos.coords.longitude.toFixed(6);
+    document.getElementById('buy-map').value='https://maps.google.com/?q='+lat+','+lng;
+    toast('Location captured','ok');
+  },function(){toast('Could not get location — paste your Maps link','err');});
+}
 function placeOrder(){
   if(!curBuyProduct)return;
   var qty=parseInt(document.getElementById('buy-qty').value,10)||1;
   var addr=document.getElementById('buy-addr').value.trim();
   var phone=document.getElementById('buy-phone').value.trim();
-  if(!addr||!phone){toast('Enter delivery address and phone','err');return;}
+  var map=document.getElementById('buy-map').value.trim();
+  if(!addr||!phone){toast('Enter delivery address and WhatsApp number','err');return;}
   var o={id:'ord'+Date.now(),productId:curBuyProduct.id,productTitle:curBuyProduct.title,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
-    sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,buyerUid:CU.uid,buyerName:CU.name,buyerPhone:phone,buyerAddr:addr,
-    status:'placed',ts:Date.now()};
+    sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,buyerUid:CU.uid,buyerName:CU.name,buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:map,
+    payMethod:selPayMethod,status:'placed',ts:Date.now()};
   var orders=getOrders();orders.unshift(o);saveOrders(orders);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o).catch(function(){});}catch(e){}}
   closeOvl('buy-ovl');
-  toast('Order placed! Track it in My Orders.','ok');
+  if(selPayMethod==='online')toast('Order placed! Pay online — seller will share payment link via WhatsApp.','ok');
+  else toast('Order placed (Cash on Delivery)! Track it in My Orders.','ok');
 }
 function showMyOrders(){
   if(!requireAuth('view orders'))return;
