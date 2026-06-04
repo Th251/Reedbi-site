@@ -106,12 +106,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .tis-w i{color:var(--mt2);font-size:12px}
 .tis-w input{border:none;background:transparent;outline:none;font-size:12px;color:var(--tx);flex:1;font-family:var(--fn)}
 .tis-clr{font-size:11px;color:var(--g);cursor:pointer;border:none;background:transparent;font-family:var(--fn);white-space:nowrap}
-.slide-sec{background:var(--sf);border-bottom:1px solid var(--b);flex-shrink:0}
-.srow{display:flex;align-items:center;gap:4px;padding:5px 10px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;min-height:32px;-webkit-overflow-scrolling:touch;touch-action:pan-x;white-space:nowrap}
+.slide-sec{background:var(--sf);border-bottom:1px solid var(--b);flex-shrink:0;width:100%;min-width:0;overflow:hidden}
+#cv-view{min-width:0;overflow-x:hidden}
+.srow{display:flex;flex-wrap:nowrap;align-items:center;gap:4px;padding:5px 10px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;min-height:32px;-webkit-overflow-scrolling:touch;touch-action:pan-x;white-space:nowrap;max-width:100%}
+.srow::-webkit-scrollbar{display:none}
 .srow::-webkit-scrollbar{display:none}
 .srow+.srow{border-top:1px solid rgba(30,45,69,.5)}
 .sl{font-size:9px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:2px}
-.chip{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:14px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;font-family:var(--fn);border:1px solid var(--b);background:transparent;color:var(--mt);touch-action:manipulation}
+.chip{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:14px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;font-family:var(--fn);border:1px solid var(--b);background:transparent;color:var(--mt)}
 .chip.sel{background:var(--g);color:#fff;border-color:var(--g);font-weight:600}
 .chip.reg{border-color:rgba(59,130,246,.35);color:#60a5fa}
 .chip.reg.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
@@ -343,6 +345,16 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .stat-set-btn{font-size:10px;font-weight:600;padding:4px 9px;border-radius:8px;border:1px solid var(--b);background:transparent;color:var(--mt);cursor:pointer;font-family:var(--fn)}
 .stat-set-btn.on{border-color:currentColor}
 .tstack{position:fixed;bottom:20px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.act-sec{background:var(--card2);border-radius:10px;padding:11px;margin-bottom:10px}
+.act-h{font-size:12px;font-weight:700;color:var(--tx);display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.act-h i{color:var(--g)}
+.act-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid var(--b)}
+.act-row b{font-size:12px;display:block}
+.act-row small{font-size:10px;color:var(--mt2);display:block}
+.act-empty{font-size:11px;color:var(--mt2);padding:6px 0}
+.act-link{margin-top:7px;background:transparent;border:none;color:var(--g);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fn);padding:0}
+.act-mini{background:var(--g);color:#fff;border:none;border-radius:7px;padding:4px 9px;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--fn)}
+.ord-badge{font-size:10px;font-weight:600;color:var(--cyan);background:rgba(0,115,177,.1);border-radius:7px;padding:3px 8px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px}
 .lp-photos{display:flex;flex-wrap:wrap;gap:7px}
 .lp-thumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--b)}
 .lp-thumb img{width:100%;height:100%;object-fit:cover}
@@ -379,7 +391,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   .right{width:100%;height:100dvh;position:absolute;inset:0;z-index:5}
   .backbtn{display:flex!important}
   #cv-view{height:100dvh!important}
-  .composer{position:sticky;bottom:0;z-index:5}
+  #cv-view[style*="flex"]{display:flex!important;flex-direction:column}
+  .msgs{flex:1 1 auto;min-height:0}
+  .composer{position:relative;flex-shrink:0;z-index:5}
   .mw textarea{font-size:16px}
   .bub{max-width:85%}
   .tlist{flex:1;min-height:0;-webkit-overflow-scrolling:touch}
@@ -428,11 +442,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v34</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v36</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
           <button class="ib" onclick="openCreateModal()"><i class="ti ti-square-plus"></i></button>
+          <button class="ib" onclick="showMyActivity()" title="My Activity — all in one place"><i class="ti ti-layout-dashboard"></i></button>
           <button class="ib" onclick="showMyProducts()" title="My Shop"><i class="ti ti-building-store"></i></button>
           <button class="ib" onclick="showMyOrders()" title="My Orders"><i class="ti ti-package"></i></button>
           <button class="ib" id="folbtn" onclick="toggleFol()"><i class="ti ti-bookmarks"></i></button>
@@ -696,6 +711,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="overlay" id="myorders-ovl"><div class="modal" style="max-width:420px">
   <div class="mhd"><h3><i class="ti ti-package" style="font-size:13px"></i> My Orders</h3><button class="ib" onclick="closeOvl('myorders-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="myorders-body"></div>
+</div></div>
+<!-- MY ACTIVITY (everything in one place) -->
+<div class="overlay" id="activity-ovl"><div class="modal" style="max-width:440px">
+  <div class="mhd"><h3><i class="ti ti-layout-dashboard" style="font-size:13px"></i> My Activity</h3><button class="ib" onclick="closeOvl('activity-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="activity-body"></div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -2146,7 +2166,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v34 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v36 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -2355,5 +2375,41 @@ function showMyOrders(){
       +'<div class="trk">'+track+'</div></div>';
   }).join('');
   document.getElementById('myorders-ovl').classList.add('open');
+}
+
+/* ===== Unified "My Activity" — everything in one place ===== */
+function showMyActivity(){
+  if(!requireAuth('view your activity'))return;
+  var uid=CU.uid;
+  var myApps=getAllApps().filter(function(a){return a.uid===uid;});
+  var myOrders=getOrders().filter(function(o){return o.buyerUid===uid;});
+  var myProducts=getMyProducts();
+  var incomingOrders=getOrders().filter(function(o){return o.sellerUid===uid;});
+  var ownedPages=getPages().filter(function(p){return p.ownerUid===uid;});
+  var body=document.getElementById('activity-body');
+  var h='';
+  // Job applications
+  h+='<div class="act-sec"><div class="act-h"><i class="ti ti-briefcase"></i> My Job Applications <b>('+myApps.length+')</b></div>';
+  if(myApps.length){h+=myApps.map(function(a){var so=statusObj(a.status);return '<div class="act-row"><div><b>'+esc(a.postTitle||'Job')+'</b><small>'+esc(a.company||'')+'</small></div><span class="stat-badge '+so.cls+'">'+so.label+'</span></div>';}).join('');}
+  else h+='<div class="act-empty">No applications yet</div>';
+  h+='<button class="act-link" onclick="closeOvl(\'activity-ovl\');showMyApps()">Manage applications →</button></div>';
+  // Purchases
+  h+='<div class="act-sec"><div class="act-h"><i class="ti ti-shopping-cart"></i> My Purchases <b>('+myOrders.length+')</b></div>';
+  if(myOrders.length){h+=myOrders.map(function(o){var os=orderStatusObj(o.status);return '<div class="act-row"><div><b>'+esc(o.productTitle)+'</b><small>×'+o.qty+' · '+esc(o.sellerName)+'</small></div><span class="ord-badge"><i class="ti ti-'+os.icon+'"></i> '+os.label+'</span></div>';}).join('');}
+  else h+='<div class="act-empty">No purchases yet</div>';
+  h+='<button class="act-link" onclick="closeOvl(\'activity-ovl\');showMyOrders()">Track orders →</button></div>';
+  // Selling
+  h+='<div class="act-sec"><div class="act-h"><i class="ti ti-building-store"></i> My Shop <b>('+myProducts.length+' listed · '+incomingOrders.length+' orders)</b></div>';
+  if(incomingOrders.length){h+=incomingOrders.slice(0,5).map(function(o){var os=orderStatusObj(o.status);return '<div class="act-row"><div><b>'+esc(o.productTitle)+'</b><small>Buyer: '+esc(o.buyerName)+'</small></div><span class="ord-badge"><i class="ti ti-'+os.icon+'"></i> '+os.label+'</span></div>';}).join('');}
+  else h+='<div class="act-empty">No incoming orders</div>';
+  h+='<button class="act-link" onclick="closeOvl(\'activity-ovl\');showMyProducts()">Manage shop →</button></div>';
+  // HR pages
+  if(ownedPages.length){
+    h+='<div class="act-sec"><div class="act-h"><i class="ti ti-users"></i> My Company Pages (HR) <b>('+ownedPages.length+')</b></div>';
+    h+=ownedPages.map(function(pg){var cnt=getAppsForCompany(pg.name).length;return '<div class="act-row"><div><b>'+esc(pg.name)+'</b><small>'+cnt+' applicants</small></div><button class="act-mini" onclick="closeOvl(\'activity-ovl\');openCompanyPage(\''+escJS(pg.name)+'\')">Open HR →</button></div>';}).join('');
+    h+='</div>';
+  }
+  body.innerHTML=h;
+  document.getElementById('activity-ovl').classList.add('open');
 }
 </script></body></html>
