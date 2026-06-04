@@ -345,6 +345,29 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .stat-set-btn{font-size:10px;font-weight:600;padding:4px 9px;border-radius:8px;border:1px solid var(--b);background:transparent;color:var(--mt);cursor:pointer;font-family:var(--fn)}
 .stat-set-btn.on{border-color:currentColor}
 .tstack{position:fixed;bottom:20px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.seller-tabs{display:flex;gap:6px;margin-bottom:11px}
+.dispatch-row{display:flex;gap:7px;margin-bottom:11px}
+.disp-box{flex:1;border-radius:9px;padding:9px;text-align:center}
+.disp-box b{display:block;font-size:18px;font-weight:800}
+.disp-box small{font-size:9px;color:var(--mt2)}
+.disp-pend{background:rgba(195,125,22,.12)}.disp-pend b{color:var(--gold)}
+.disp-ship{background:rgba(0,115,177,.12)}.disp-ship b{color:var(--cyan)}
+.disp-done{background:rgba(10,102,194,.1)}.disp-done b{color:var(--g)}
+.anal-row{background:var(--card2);border-radius:9px;padding:10px;margin-bottom:8px}
+.anal-top{display:flex;justify-content:space-between;font-size:12px;font-weight:600}
+.anal-bar{height:7px;background:var(--b);border-radius:4px;margin:6px 0;overflow:hidden}
+.anal-fill{height:100%;background:linear-gradient(90deg,var(--g),var(--cyan));border-radius:4px}
+.anal-sub{font-size:10px;color:var(--mt2)}
+.seller-tab{flex:1;padding:9px;border:1px solid var(--b);background:var(--card2);border-radius:9px;font-size:12px;font-weight:600;color:var(--mt);cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:5px;touch-action:manipulation}
+.seller-tab.on{background:var(--g);color:#fff;border-color:var(--g)}
+.ord-current{font-size:12px;color:var(--tx);margin-top:8px;padding:7px 9px;background:var(--card2);border-radius:8px}
+.ord-current i{color:var(--g)}
+.ord-next{width:100%;margin-top:7px;background:var(--g);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:5px;touch-action:manipulation}
+.ord-next:active{transform:scale(.98)}
+.gpay-btn{width:100%;background:#000;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:7px;touch-action:manipulation}
+.gpay-btn:active{transform:scale(.98)}
+.co-or{display:flex;align-items:center;gap:9px;margin:14px 0;color:var(--mt2);font-size:11px}
+.co-or:before,.co-or:after{content:"";flex:1;height:1px;background:var(--b)}
 .pay-opts{display:flex;gap:8px;margin-top:5px}
 .pay-opt{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border:1.5px solid var(--b);background:var(--card2);border-radius:10px;cursor:pointer;font-family:var(--fn);font-size:11px;font-weight:600;color:var(--mt);transition:all .15s}
 .pay-opt i{font-size:20px}
@@ -449,7 +472,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v39</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v42</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -733,6 +756,22 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="overlay" id="activity-ovl"><div class="modal" style="max-width:440px">
   <div class="mhd"><h3><i class="ti ti-layout-dashboard" style="font-size:13px"></i> My Activity</h3><button class="ib" onclick="closeOvl('activity-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="activity-body"></div>
+</div></div>
+<!-- CHECKOUT (online payment) -->
+<div class="overlay" id="checkout-ovl"><div class="modal" style="max-width:360px">
+  <div class="mhd"><h3><i class="ti ti-credit-card" style="font-size:13px"></i> Secure Checkout</h3><button class="ib" onclick="closeOvl('checkout-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <div id="co-summary" style="background:var(--card2);border-radius:9px;padding:11px;margin-bottom:12px;font-size:13px"></div>
+    <button class="gpay-btn" onclick="payByGooglePay()"><i class="ti ti-brand-google"></i> Pay with Google Pay</button>
+    <div class="co-or"><span>or pay by card</span></div>
+    <div class="fg"><label>Card number</label><input type="text" id="co-card" placeholder="1234 5678 9012 3456" inputmode="numeric"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <div class="fg" style="flex:1"><label>Expiry</label><input type="text" id="co-exp" placeholder="MM/YY"></div>
+      <div class="fg" style="flex:1"><label>CVV</label><input type="text" id="co-cvv" placeholder="123" inputmode="numeric"></div>
+    </div>
+    <button class="btn btnok" style="width:100%;margin-top:12px" onclick="payByCard()"><i class="ti ti-lock"></i> Pay Securely</button>
+    <div style="font-size:9px;color:var(--mt2);text-align:center;margin-top:8px"><i class="ti ti-shield-lock"></i> Encrypted &amp; secure checkout</div>
+  </div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -1664,11 +1703,12 @@ function sendPost(){
   if(!body&&!title&&!pendingImg){toast('Write a message or add a photo','err');return;}
   var t=tags.find(function(x){return x.id===activeTagId;});
   pidCtr++;
-  // If this is a job post, ensure the poster has a company page so it appears
-  // under "My Company Pages (HR)" for managing applicants.
+  // The USER is always the poster. For job posts we tag the post with the user's
+  // own hiring space (keyed to their uid) so they can manage applicants — but the
+  // poster shown is always the user, never a separate "page" identity.
   var jobCo=CU.co||'';
   if(activeTagId==='jobs'){
-    if(!jobCo)jobCo=CU.name+"'s Hiring";
+    if(!jobCo)jobCo=CU.name; // post as the user, not a fabricated company name
     if(!getPageByName(jobCo)){
       var pages=getPages();pages.push({id:'pg'+Date.now(),name:jobCo,ownerUid:CU.uid,ownerName:CU.name,about:'',ts:Date.now()});savePages(pages);
       if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(jobCo).set({name:jobCo,ownerUid:CU.uid,ownerName:CU.name,ts:Date.now()},{merge:true}).catch(function(){});}catch(e){}}
@@ -2198,7 +2238,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v39 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v42 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -2331,37 +2371,96 @@ function submitProduct(){
   showMyProducts();
 }
 /* Seller dashboard — my products + orders with shipping status */
-function showMyProducts(){
+var sellerTab='orders';
+function showMyProducts(tab){
   if(!requireAuth('view your products'))return;
+  if(tab)sellerTab=tab;
   var prods=getMyProducts();var orders=getOrders().filter(function(o){return o.sellerUid===CU.uid;});
+  // aggregate stats
+  var totalUnits=0,revenue=0,dispatched=0,pending=0,delivered=0;
+  var perProduct={};
+  orders.forEach(function(o){
+    var q=o.qty||1;totalUnits+=q;
+    var amt=parseFloat(String(o.price).replace(/[^0-9.]/g,''))||0;revenue+=amt*q;
+    var di=orderStatusIndex(o.status);
+    if(o.status==='delivered')delivered+=q;
+    else if(di>=orderStatusIndex('shipped'))dispatched+=q;
+    else pending+=q;
+    if(!perProduct[o.productTitle])perProduct[o.productTitle]={units:0,orders:0,rev:0};
+    perProduct[o.productTitle].units+=q;perProduct[o.productTitle].orders++;perProduct[o.productTitle].rev+=amt*q;
+  });
+  var cur=prods[0]?prods[0].currency:(orders[0]?orders[0].currency:'');
   var body=document.getElementById('seller-body');
-  var head='<div style="background:var(--card2);border-radius:9px;padding:11px;margin-bottom:10px"><div style="font-size:13px;font-weight:700">My Shop</div><div style="font-size:11px;color:var(--mt2);margin-top:2px">'+prods.length+' product'+(prods.length!==1?'s':'')+' · '+orders.length+' order'+(orders.length!==1?'s':'')+'</div>'
-    +'<button class="btn btnok" style="margin-top:9px;border-radius:18px" onclick="closeOvl(\'seller-ovl\');openListProduct()"><i class="ti ti-plus"></i> List a Product</button></div>';
-  var ordHtml='';
-  if(orders.length){
-    ordHtml='<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px">Orders to fulfil</div>'+orders.map(function(o){return orderCardSeller(o);}).join('');
+  var head='<div style="background:var(--card2);border-radius:10px;padding:12px;margin-bottom:12px">'
+    +'<div style="font-size:14px;font-weight:700"><i class="ti ti-building-store" style="color:var(--g)"></i> My Store</div>'
+    +'<div style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap">'
+    +'<div><div style="font-size:18px;font-weight:800;color:var(--g)">'+prods.length+'</div><div style="font-size:10px;color:var(--mt2)">Products</div></div>'
+    +'<div><div style="font-size:18px;font-weight:800;color:var(--cyan)">'+orders.length+'</div><div style="font-size:10px;color:var(--mt2)">Orders</div></div>'
+    +'<div><div style="font-size:18px;font-weight:800;color:var(--tx)">'+totalUnits+'</div><div style="font-size:10px;color:var(--mt2)">Units sold</div></div>'
+    +'<div><div style="font-size:18px;font-weight:800;color:var(--gold)">'+esc(cur)+' '+revenue.toLocaleString()+'</div><div style="font-size:10px;color:var(--mt2)">Revenue</div></div>'
+    +'</div>'
+    +'<button class="btn btnok" style="margin-top:11px;border-radius:18px;width:100%" onclick="closeOvl(\'seller-ovl\');openListProduct()"><i class="ti ti-plus"></i> List a New Product</button></div>';
+  head+='<div class="seller-tabs">'
+    +'<button class="seller-tab'+(sellerTab==='orders'?' on':'')+'" onclick="showMyProducts(\'orders\')"><i class="ti ti-package"></i> Orders</button>'
+    +'<button class="seller-tab'+(sellerTab==='listings'?' on':'')+'" onclick="showMyProducts(\'listings\')"><i class="ti ti-list"></i> Listings</button>'
+    +'<button class="seller-tab'+(sellerTab==='analytics'?' on':'')+'" onclick="showMyProducts(\'analytics\')"><i class="ti ti-chart-bar"></i> Sales</button>'
+    +'</div>';
+  var content='';
+  if(sellerTab==='orders'){
+    // dispatch summary
+    content='<div class="dispatch-row">'
+      +'<div class="disp-box disp-pend"><b>'+pending+'</b><small>To pack/ship</small></div>'
+      +'<div class="disp-box disp-ship"><b>'+dispatched+'</b><small>Dispatched</small></div>'
+      +'<div class="disp-box disp-done"><b>'+delivered+'</b><small>Delivered</small></div>'
+      +'</div>';
+    content+=orders.length?orders.map(function(o){return orderCardSeller(o);}).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:18px"><i class="ti ti-package" style="font-size:30px;color:var(--b2);display:block;margin-bottom:6px"></i>No orders yet.</p>';
+  }else if(sellerTab==='listings'){
+    content=prods.length?prods.map(function(p){return productCardSeller(p);}).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:18px"><i class="ti ti-shopping-bag" style="font-size:30px;color:var(--b2);display:block;margin-bottom:6px"></i>No products yet.</p>';
+  }else{
+    // ANALYTICS
+    var ranked=Object.keys(perProduct).map(function(k){return {name:k,d:perProduct[k]};}).sort(function(a,b){return b.d.units-a.d.units;});
+    if(!ranked.length){content='<p style="font-size:12px;color:var(--mt);text-align:center;padding:18px"><i class="ti ti-chart-bar" style="font-size:30px;color:var(--b2);display:block;margin-bottom:6px"></i>No sales data yet. Stats appear once you receive orders.</p>';}
+    else{
+      var maxU=ranked[0].d.units||1;
+      content='<div style="font-size:11px;color:var(--mt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Best-selling products</div>';
+      content+=ranked.map(function(r,i){
+        var pct=Math.round(r.d.units/maxU*100);
+        var medal=i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'';
+        return '<div class="anal-row"><div class="anal-top"><span>'+medal+esc(r.name)+'</span><b>'+r.d.units+' units</b></div>'
+          +'<div class="anal-bar"><div class="anal-fill" style="width:'+pct+'%"></div></div>'
+          +'<div class="anal-sub">'+r.d.orders+' order'+(r.d.orders!==1?'s':'')+' · '+esc(cur)+' '+r.d.rev.toLocaleString()+' revenue</div></div>';
+      }).join('');
+    }
   }
-  var prodHtml=prods.length?('<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px">My Listings</div>'+prods.map(function(p){return productCardSeller(p);}).join('')):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No products yet. Tap “List a Product”.</p>';
-  body.innerHTML=head+ordHtml+prodHtml;
+  body.innerHTML=head+content;
   document.getElementById('seller-ovl').classList.add('open');
 }
 function productCardSeller(p){
+  var sold=getOrders().filter(function(o){return o.productId===p.id;}).reduce(function(s,o){return s+(o.qty||1);},0);
+  var remaining=Math.max(0,(p.qty||0)-sold);
   return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+(p.photos[0]||'')+'" style="width:54px;height:54px;border-radius:8px;object-fit:cover">'
     +'<div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
     +'<div style="font-size:12px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div>'
-    +'<div style="font-size:10px;color:var(--mt2)">Qty: '+p.qty+' · '+(p.photos.length)+' photos · Sold: '+(p.sold||0)+'</div></div></div></div>';
+    +'<div style="font-size:10px;color:var(--mt2);margin-top:2px">Sold: <b style="color:var(--cyan)">'+sold+'</b> · In stock: <b style="color:'+(remaining>0?'var(--g)':'var(--red)')+'">'+remaining+'</b> · '+(p.photos.length)+' photos</div></div></div>'
+    +'<button class="abtn" onclick="openBoost(\'sell\',null)" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:8px;font-size:11px"><i class="ti ti-speakerphone"></i> Advertise</button></div>';
 }
 function orderCardSeller(o){
   var si=orderStatusIndex(o.status);
+  var cur=orderStatusObj(o.status);
+  var next=si<ORDER_STATUS.length-1?ORDER_STATUS[si+1]:null;
   var steps=ORDER_STATUS.map(function(s,i){return '<button class="ord-step'+(i<=si?' done':'')+(i===si?' cur':'')+'" onclick="setOrderStatus(\''+o.id+'\','+i+')"><i class="ti ti-'+s.icon+'"></i> '+s.label+'</button>';}).join('');
-  return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="font-weight:400;color:var(--mt2);font-size:11px">×'+o.qty+'</span></div>'
-    +'<div style="font-size:11px;color:var(--mt)">Buyer: '+esc(o.buyerName)+'</div>'
-    +(o.buyerPhone?'<div style="font-size:11px;color:var(--g)"><i class="ti ti-brand-whatsapp"></i> <a href="https://wa.me/'+esc((o.buyerPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(o.buyerPhone)+'</a></div>':'')
+  return '<div class="appl-card">'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
+    +'<div><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="font-weight:400;color:var(--mt2);font-size:11px">×'+o.qty+'</span></div>'
+    +'<div style="font-size:11px;color:var(--mt)">Buyer: '+esc(o.buyerName)+'</div></div>'
+    +'<span class="pay-badge '+(o.payMethod==='online'?'pay-online-b':'pay-cod-b')+'">'+(o.payMethod==='online'?'💳 Online'+(o.payStatus==='paid'?' ✓':''):'💵 COD')+'</span></div>'
+    +(o.buyerPhone?'<div style="font-size:11px;color:var(--g);margin-top:3px"><i class="ti ti-brand-whatsapp"></i> <a href="https://wa.me/'+esc((o.buyerPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">Message buyer: '+esc(o.buyerPhone)+'</a></div>':'')
     +(o.buyerAddr?'<div style="font-size:11px;color:var(--mt2)">Ship to: '+esc(o.buyerAddr)+'</div>':'')
-    +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> View location on map</a></div>':'')
-    +'<div style="font-size:10px;margin-top:3px"><span class="pay-badge '+(o.payMethod==='online'?'pay-online-b':'pay-cod-b')+'">'+(o.payMethod==='online'?'💳 Pay Online':'💵 Cash on Delivery')+'</span></div>'
-    +'<div style="font-size:10px;color:var(--mt2);margin:6px 0 4px;text-transform:uppercase">Update status (tap a stage):</div>'
-    +'<div class="ord-steps">'+steps+'</div></div>';
+    +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> View delivery location</a></div>':'')
+    +'<div class="ord-current"><i class="ti ti-'+cur.icon+'"></i> Status: <b>'+cur.label+'</b></div>'
+    +(next?'<button class="ord-next" onclick="setOrderStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark as: '+next.label+'</button>':'<div style="font-size:11px;color:var(--g);font-weight:600;margin-top:6px"><i class="ti ti-circle-check"></i> Order complete</div>')
+    +'<details style="margin-top:7px"><summary style="font-size:10px;color:var(--mt2);cursor:pointer">Or jump to any stage</summary><div class="ord-steps" style="margin-top:6px">'+steps+'</div></details>'
+    +'</div>';
 }
 function setOrderStatus(orderId,idx){
   var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});
@@ -2369,7 +2468,7 @@ function setOrderStatus(orderId,idx){
     if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}
     bcSend({type:'order_status',orderId:o.id});
   }
-  showMyProducts();
+  showMyProducts('orders');
   toast('Status: '+orderStatusObj(ORDER_STATUS[idx].id).label,'ok');
 }
 /* Buyer — place order + track */
@@ -2412,8 +2511,32 @@ function placeOrder(){
   var orders=getOrders();orders.unshift(o);saveOrders(orders);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o).catch(function(){});}catch(e){}}
   closeOvl('buy-ovl');
-  if(selPayMethod==='online')toast('Order placed! Pay online — seller will share payment link via WhatsApp.','ok');
-  else toast('Order placed (Cash on Delivery)! Track it in My Orders.','ok');
+  if(selPayMethod==='online'){
+    closeOvl('buy-ovl');
+    curCheckoutOrder=o;
+    document.getElementById('co-summary').innerHTML='<b>'+esc(o.productTitle)+'</b> ×'+o.qty+'<br><span style="color:var(--g);font-weight:700;font-size:15px">'+esc(o.currency)+' '+esc(o.price)+'</span>';
+    document.getElementById('checkout-ovl').classList.add('open');
+    return;
+  }
+  closeOvl('buy-ovl');
+  toast('Order placed (Cash on Delivery)! Track it in My Orders.','ok');
+}
+var curCheckoutOrder=null;
+function payByCard(){
+  var num=(document.getElementById('co-card')||{}).value||'';
+  if(num.replace(/\s/g,'').length<12){toast('Enter a valid card number','err');return;}
+  finalizeOnlinePayment('Card');
+}
+function payByGooglePay(){finalizeOnlinePayment('Google Pay');}
+function finalizeOnlinePayment(method){
+  if(curCheckoutOrder){
+    curCheckoutOrder.payStatus='paid';curCheckoutOrder.payVia=method;
+    var orders=getOrders();var idx=orders.findIndex(function(x){return x.id===curCheckoutOrder.id;});
+    if(idx>=0){orders[idx]=curCheckoutOrder;saveOrders(orders);
+      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(curCheckoutOrder.id).set(curCheckoutOrder,{merge:true}).catch(function(){});}catch(e){}}}
+  }
+  closeOvl('checkout-ovl');
+  toast('Payment successful via '+method+'! Track your order in My Orders.','ok');
 }
 function showMyOrders(){
   if(!requireAuth('view orders'))return;
@@ -2459,8 +2582,8 @@ function showMyActivity(){
   h+='<button class="act-link" onclick="closeOvl(\'activity-ovl\');showMyProducts()">Manage shop →</button></div>';
   // HR pages
   if(ownedPages.length){
-    h+='<div class="act-sec"><div class="act-h"><i class="ti ti-users"></i> My Company Pages (HR) <b>('+ownedPages.length+')</b></div>';
-    h+=ownedPages.map(function(pg){var cnt=getAppsForCompany(pg.name).length;return '<div class="act-row"><div><b>'+esc(pg.name)+'</b><small>'+cnt+' applicants</small></div><button class="act-mini" onclick="closeOvl(\'activity-ovl\');openCompanyPage(\''+escJS(pg.name)+'\')">Open HR →</button></div>';}).join('');
+    h+='<div class="act-sec"><div class="act-h"><i class="ti ti-users"></i> Jobs I Posted — Manage Applicants <b>('+ownedPages.length+')</b></div>';
+    h+=ownedPages.map(function(pg){var cnt=getAppsForCompany(pg.name).length;return '<div class="act-row"><div><b>'+esc(pg.name)+'</b><small>'+cnt+' applicant'+(cnt!==1?'s':'')+'</small></div><button class="act-mini" onclick="closeOvl(\'activity-ovl\');openCompanyPage(\''+escJS(pg.name)+'\')">Manage →</button></div>';}).join('');
     h+='</div>';
   }
   body.innerHTML=h;
