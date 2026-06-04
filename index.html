@@ -346,6 +346,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .stat-set-btn.on{border-color:currentColor}
 .tstack{position:fixed;bottom:20px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
 .seller-tabs{display:flex;gap:6px;margin-bottom:11px}
+.ps-card{display:flex;gap:10px;background:var(--card2);border-radius:10px;padding:10px;margin-bottom:8px}
+.ps-img{width:62px;height:62px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--b)}
+.ps-btn{margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fn);display:inline-flex;align-items:center;gap:4px;touch-action:manipulation}
 .order-no{display:inline-block;font-size:10px;font-weight:700;color:var(--g);background:rgba(10,102,194,.08);border-radius:6px;padding:2px 8px;margin:3px 0;letter-spacing:.5px}
 .ord-qr{width:100%;margin-top:7px;background:var(--card2);color:var(--g);border:1px solid var(--g);border-radius:8px;padding:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:5px;touch-action:manipulation}
 .dispatch-row{display:flex;gap:7px;margin-bottom:11px}
@@ -474,11 +477,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v45</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v46</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
           <button class="ib" onclick="openCreateModal()"><i class="ti ti-square-plus"></i></button>
+          <button class="ib" onclick="openProductSearch()" title="Search products to buy"><i class="ti ti-search"></i></button>
           <button class="ib" onclick="showMyActivity()" title="My Activity — all in one place"><i class="ti ti-layout-dashboard"></i></button>
           <button class="ib" onclick="showMyProducts()" title="My Shop"><i class="ti ti-building-store"></i></button>
           <button class="ib" onclick="showMyOrders()" title="My Orders"><i class="ti ti-package"></i></button>
@@ -693,6 +697,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       <button class="pc-opt" onclick="startPostType('job')"><i class="ti ti-briefcase" style="color:var(--g)"></i><div><b>Post a Job</b><small>Hire — receive CVs &amp; applications</small></div></button>
       <button class="pc-opt" onclick="startPostType('sell')"><i class="ti ti-shopping-cart" style="color:var(--gold)"></i><div><b>Sell an Item</b><small>List something for sale</small></div></button>
       <button class="pc-opt" onclick="startPostType('hire')"><i class="ti ti-user-search" style="color:var(--cyan)"></i><div><b>Find Work</b><small>Share your skills / CV</small></div></button>
+      <button class="pc-opt" onclick="closeOvl('post-chooser-ovl');openProductSearch()"><i class="ti ti-search" style="color:var(--blue)"></i><div><b>Search Products</b><small>Find items to buy</small></div></button>
       <button class="pc-opt" onclick="startPostType('share')"><i class="ti ti-message-circle" style="color:var(--purple)"></i><div><b>Share / Ask</b><small>Post an update or question</small></div></button>
     </div>
   </div>
@@ -779,6 +784,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="overlay" id="qr-ovl"><div class="modal" style="max-width:320px">
   <div class="mhd"><h3><i class="ti ti-qrcode" style="font-size:13px"></i> Order Tracking QR</h3><button class="ib" onclick="closeOvl('qr-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="qr-body"></div>
+</div></div>
+<!-- SEARCH PRODUCTS -->
+<div class="overlay" id="prodsearch-ovl"><div class="modal" style="max-width:420px">
+  <div class="mhd"><h3><i class="ti ti-search" style="font-size:13px"></i> Search Products</h3><button class="ib" onclick="closeOvl('prodsearch-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <div class="sw" style="margin-bottom:10px"><i class="ti ti-search"></i><input type="text" id="ps-q" placeholder="Search by name, e.g. iPhone, shoes, camera..." oninput="runProductSearch(this.value)" autocomplete="off"></div>
+    <div id="ps-results"></div>
+  </div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -4544,7 +4557,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v45 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v46 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -4980,4 +4993,31 @@ function trackByOrderId(orderId){
     if(m){var id=decodeURIComponent(m[1]);setTimeout(function(){trackByOrderId(id);},900);}
   }catch(e){}
 })();
+
+/* ===== Product search ===== */
+function openProductSearch(){
+  var q=document.getElementById('ps-q');if(q)q.value='';
+  runProductSearch('');
+  document.getElementById('prodsearch-ovl').classList.add('open');
+}
+function runProductSearch(q){
+  q=(q||'').trim().toLowerCase();
+  var prods=getProducts();
+  var matches=q?prods.filter(function(p){return ((p.title||'')+' '+(p.desc||'')).toLowerCase().indexOf(q)>=0;}):prods;
+  var box=document.getElementById('ps-results');if(!box)return;
+  if(!prods.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products listed yet.</p>';return;}
+  if(!matches.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products match “'+esc(q)+'”.</p>';return;}
+  box.innerHTML='<div style="font-size:10px;color:var(--mt2);margin-bottom:6px">'+matches.length+' product'+(matches.length!==1?'s':'')+'</div>'+matches.map(function(p){
+    var mine=CU&&p.sellerUid===CU.uid;
+    return '<div class="ps-card">'
+      +'<img src="'+(p.photos&&p.photos[0]||'')+'" class="ps-img">'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
+      +'<div style="font-size:13px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div>'
+      +'<div style="font-size:10px;color:var(--mt2)">by '+esc(p.sellerName)+(p.addr?' · '+esc(p.addr):'')+'</div>'
+      +(mine?'<button class="ps-btn" style="background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="closeOvl(\'prodsearch-ovl\');showMyProducts(\'listings\')"><i class="ti ti-building-store"></i> Manage</button>'
+            :'<button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button>')
+      +'</div></div>';
+  }).join('');
+}
 </script></body></html>
