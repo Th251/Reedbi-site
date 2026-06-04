@@ -494,7 +494,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v53</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v54</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4692,7 +4692,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v53 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v54 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5137,6 +5137,21 @@ function showMyActivity(){
     h+=ownedPages.map(function(pg){var cnt=getAppsForCompany(pg.name).length;return '<div class="act-row"><div><b>'+esc(pg.name)+'</b><small>'+cnt+' applicant'+(cnt!==1?'s':'')+'</small></div><button class="act-mini" onclick="closeOvl(\'activity-ovl\');openCompanyPage(\''+escJS(pg.name)+'\')">Manage →</button></div>';}).join('');
     h+='</div>';
   }
+  // Delivery agent section
+  var agentProfile=(typeof getMyAgentProfile==='function')?getMyAgentProfile():null;
+  var myAgentOrders=getOrders().filter(function(o){return o.agentUid===uid;});
+  h+='<div class="act-sec"><div class="act-h"><i class="ti ti-moped"></i> Delivery Agent';
+  if(agentProfile){
+    var dlv=myAgentOrders.filter(function(o){return o.status==='delivered';}).length;
+    var pend=myAgentOrders.length-dlv;
+    h+=' <b>('+dlv+' delivered · '+pend+' pending)</b></div>';
+    h+='<div class="act-row"><div><b>'+esc(agentProfile.name)+'</b><small>'+(agentProfile.ratings&&agentProfile.ratings.length?'⭐ '+avgRating(agentProfile):'No ratings yet')+'</small></div>'
+      +'<button class="act-mini" onclick="closeOvl(\'activity-ovl\');showAgentDashboard()">Open dashboard →</button></div>';
+  }else{
+    h+='</div><div class="act-empty">Not registered as a delivery agent.</div>'
+      +'<button class="act-link" onclick="closeOvl(\'activity-ovl\');openAgentProfile()">Register as delivery agent →</button>';
+  }
+  h+='</div>';
   body.innerHTML=h;
   document.getElementById('activity-ovl').classList.add('open');
 }
@@ -5413,8 +5428,22 @@ function openAssignAgent(orderId){
   curAssignOrder=orderId;
   var agents=getAgents();
   var body=document.getElementById('assign-body');
-  var offerBtn='<button class="btn btnok" style="width:100%;margin-bottom:10px" onclick="offerToAllAgents()"><i class="ti ti-broadcast"></i> Offer to ALL agents (first to accept gets it)</button>';
-  if(!agents.length){body.innerHTML=offerBtn+'<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No delivery agents registered yet. Agents can register from the menu.</p>';}
+  var o0=getOrders().find(function(x){return x.id===(orderId||curAssignOrder);});
+  var curVal=o0&&o0.commCurrency?o0.commCurrency:(o0&&o0.currency?o0.currency:'USD $');
+  var commCtrl='<div style="background:var(--card2);border-radius:9px;padding:11px;margin-bottom:11px">'
+    +'<div style="font-size:11px;font-weight:700;margin-bottom:7px"><i class="ti ti-cash"></i> Delivery commission (you set this)</div>'
+    +'<div class="pay-opts" style="margin-bottom:8px">'
+    +'<button type="button" class="pay-opt'+(commMode==='fixed'?' sel':'')+'" id="cm-fixed" onclick="setCommMode(\'fixed\')"><i class="ti ti-currency-dollar"></i> Fixed amount</button>'
+    +'<button type="button" class="pay-opt'+(commMode==='distance'?' sel':'')+'" id="cm-dist" onclick="setCommMode(\'distance\')"><i class="ti ti-map-pin"></i> By distance</button>'
+    +'</div>'
+    +'<div style="display:flex;gap:6px">'
+    +'<select id="cm-currency" style="width:90px;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn)"></select>'
+    +'<input type="number" id="cm-amount" placeholder="'+(commMode==='fixed'?'amount':'per km')+'" value="'+(commMode==='fixed'?(o0&&o0.commFixed||10):(o0&&o0.commPerKm||COMMISSION_PER_KM))+'" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn)">'
+    +'</div>'
+    +'<div id="cm-hint" style="font-size:10px;color:var(--mt2);margin-top:5px">'+(commMode==='fixed'?'Agent earns this flat amount per delivery.':'Agent earns base + this × km (store→buyer).')+'</div>'
+    +'</div>';
+  var offerBtn=commCtrl+'<button class="btn btnok" style="width:100%;margin-bottom:10px" onclick="offerToAllAgents()"><i class="ti ti-broadcast"></i> Offer to ALL agents (first to accept gets it)</button>';
+  if(!agents.length){body.innerHTML=offerBtn+'<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No delivery agents registered yet. Agents can register from the menu.</p>';fillCommCurrency(curVal);}
   else{
     body.innerHTML=offerBtn+'<div style="font-size:10px;color:var(--mt2);text-transform:uppercase;margin-bottom:7px">Or assign one directly</div>'+agents.map(function(a){
       var rating=avgRating(a);
@@ -5424,20 +5453,34 @@ function openAssignAgent(orderId){
         +'<button class="act-mini" onclick="assignAgent(\''+a.uid+'\')">Assign</button></div>';
     }).join('');
   }
+  fillCommCurrency(curVal);
   document.getElementById('assign-ovl').classList.add('open');
+}
+var commMode='fixed';
+var CURRENCIES_LIST=['USD $','EUR €','GBP £','AED د.إ','INR ₹','SAR ﷼','PKR ₨','PHP ₱','JPY ¥','CNY ¥','CAD $','AUD $'];
+function fillCommCurrency(sel){
+  var s=document.getElementById('cm-currency');if(!s)return;
+  s.innerHTML=CURRENCIES_LIST.map(function(c){return '<option value="'+c+'"'+(c===sel?' selected':'')+'>'+c+'</option>';}).join('');
+}
+function setCommMode(m){commMode=m;openAssignAgent(curAssignOrder);}
+function readCommSettings(o){
+  var cur=document.getElementById('cm-currency'),amt=document.getElementById('cm-amount');
+  o.commMode=commMode;o.commCurrency=cur?cur.value:'USD $';
+  var v=amt?parseFloat(amt.value)||0:0;
+  if(commMode==='fixed')o.commFixed=v;else o.commPerKm=v;
 }
 var curAssignOrder=null;
 function assignAgent(agentUid){
   var agents=getAgents();var a=agents.find(function(x){return x.uid===agentUid;});
   var orders=getOrders();var o=orders.find(function(x){return x.id===curAssignOrder;});
-  if(o&&a){o.agentUid=agentUid;o.agentName=a.name;o.agentPhone=a.phone;o.pickupOpen=false;saveOrders(orders);
+  if(o&&a){readCommSettings(o);o.agentUid=agentUid;o.agentName=a.name;o.agentPhone=a.phone;o.pickupOpen=false;saveOrders(orders);
     if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}}
   closeOvl('assign-ovl');showMyProducts('orders');
   toast('Assigned to '+(a?a.name:'agent'),'ok');
 }
 function offerToAllAgents(orderId){
   var orders=getOrders();var o=orders.find(function(x){return x.id===(orderId||curAssignOrder);});
-  if(o){o.pickupOpen=true;o.agentUid=null;o.agentName=null;saveOrders(orders);
+  if(o){readCommSettings(o);o.pickupOpen=true;o.agentUid=null;o.agentName=null;saveOrders(orders);
     if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}}
   closeOvl('assign-ovl');showMyProducts('orders');
   toast('Order offered to all agents — first to accept gets it','ok');
@@ -5466,12 +5509,15 @@ function distanceKm(a,b){
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
 function orderCommission(o){
-  // base + distance-based (store location to buyer location)
+  if(o.commMode==='fixed')return o.commFixed||0;
+  // distance-based: base + perKm × distance(store→buyer)
   var store=parseLatLng(o.storeMap)||parseLatLng(o.sellerMap);
   var buyer=parseLatLng(o.buyerMap);
   var km=(store&&buyer)?distanceKm(store,buyer):0;
-  return Math.round((AGENT_COMMISSION+km*COMMISSION_PER_KM)*10)/10;
+  var perKm=o.commPerKm||COMMISSION_PER_KM;
+  return Math.round((AGENT_COMMISSION+km*perKm)*10)/10;
 }
+function commCurrency(o){return o.commCurrency||o.currency||'';}
 function showAgentDashboard(){
   if(!requireAuth('view agent dashboard'))return;
   var p=getMyAgentProfile();
@@ -5488,7 +5534,7 @@ function showAgentDashboard(){
   head+='<div class="dispatch-row">'
     +'<div class="disp-box disp-done"><b>'+delivered.length+'</b><small>Delivered</small></div>'
     +'<div class="disp-box disp-pend"><b>'+pending.length+'</b><small>Pending</small></div>'
-    +'<div class="disp-box disp-ship"><b>'+(p.currency||'')+earnings+'</b><small>Commission earned</small></div>'
+    +'<div class="disp-box disp-ship"><b>'+(delivered[0]?commCurrency(delivered[0])+' ':'')+earnings+'</b><small>Commission earned</small></div>'
     +'</div>';
   var content=myOrders.length?myOrders.map(function(o){
     var os=orderStatusObj(o.status);var si=orderStatusIndex(o.status);
@@ -5498,7 +5544,7 @@ function showAgentDashboard(){
       +'<div style="font-size:11px;color:var(--mt)">To: '+esc(o.buyerName)+' · '+esc(o.buyerAddr||'')+'</div>'
       +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> Navigate</a></div>':'')
       +'<div class="ord-current"><i class="ti ti-'+os.icon+'"></i> '+os.label+'</div>'
-      +(next?'<button class="ord-next" onclick="agentUpdateStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark: '+next.label+'</button>':'<div style="font-size:11px;color:var(--g);margin-top:6px"><i class="ti ti-circle-check"></i> Delivered · +'+orderCommission(o)+' commission</div>')
+      +(next?'<button class="ord-next" onclick="agentUpdateStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark: '+next.label+'</button>':'<div style="font-size:11px;color:var(--g);margin-top:6px"><i class="ti ti-circle-check"></i> Delivered · +'+commCurrency(o)+' '+orderCommission(o)+' commission</div>')
       +'</div>';
   }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No deliveries assigned yet.</p>';
   // Open pickups available to claim (pool) — hidden once another agent takes them
