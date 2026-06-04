@@ -428,7 +428,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v33</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v34</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -450,7 +450,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       <h2>Welcome to Reedbi</h2>
       <p>Pick a tag on the left to join the conversation, or create your own. Share posts, apply to jobs, and connect worldwide.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px">
-        <button class="btn btnok" onclick="openCreateModal()" style="border-radius:20px;display:flex;align-items:center;gap:5px"><i class="ti ti-plus"></i> Create a Tag</button>
+        <button class="btn btnok" onclick="openCreateModal()" style="border-radius:20px;display:flex;align-items:center;gap:5px"><i class="ti ti-plus"></i> Create a Post</button>
         <button class="btn" onclick="openTag('jobs')" style="border-radius:20px;border:1px solid var(--b);background:var(--card2);color:var(--tx);display:flex;align-items:center;gap:5px"><i class="ti ti-briefcase"></i> Browse Jobs</button>
       </div>
       <div style="margin-top:16px;font-size:11px;color:var(--mt2);display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
@@ -1485,6 +1485,15 @@ function buildBubble(t,p,isMine){
       +(getPageByName(p.co)?'<span class="pg-link" onclick="openCompanyPage(\''+escJS(p.co)+'\')">Page</span>':'');
   }
   var applyHtml='';
+  if(p.productId){
+    var prod=getProducts().find(function(x){return x.id===p.productId;});
+    if(prod){
+      var isSeller=CU&&prod.sellerUid===CU.uid;
+      applyHtml=isSeller
+        ? '<button class="abtn" onclick="showMyProducts()" style="background:var(--card2);color:var(--g);border:1px solid var(--g)"><i class="ti ti-building-store"></i> Manage Listing</button>'
+        : '<button class="abtn" onclick="buyProduct(\''+prod.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now · '+esc(prod.currency)+' '+esc(prod.price)+'</button>';
+    }
+  }
   if(isJob){
     var nApplied=countAppsForPost(t.id,pid);
     var countChip=nApplied>0?'<span class="appl-count" title="'+nApplied+' applicant'+(nApplied!==1?'s':'')+'"><i class="ti ti-users" style="font-size:10px"></i> '+nApplied+' applied</span>':'';
@@ -2107,8 +2116,12 @@ function startPostType(kind){
     toast(cfg.hint,'info');
   },200);
 }
-function openCreateModal(){if(!requireAuth('create a tag'))return;['mn','md'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('cr-ovl').classList.add('open');setTimeout(function(){document.getElementById('mn').focus();},130);}
-function openCreateModalWithName(name){openCreateModal();setTimeout(function(){document.getElementById('mn').value=name.replace(/[^a-z0-9\-_]/gi,'').toLowerCase();},180);}
+function openCreateModal(){
+  // Main tags are fixed. Instead of creating a new main tag, guide the user to
+  // post under an existing main tag — sub-tags are auto-generated from the post.
+  openPostChooser();
+}
+function openCreateModalWithName(name){openPostChooser();}
 function createTag(){
   var name=document.getElementById('mn').value.trim().toLowerCase(),cat=document.getElementById('mc').value,desc=document.getElementById('md').value.trim()||'Community tag';
   if(!name){toast('Enter a tag name','err');return;}
@@ -2133,7 +2146,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v33 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v34 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
