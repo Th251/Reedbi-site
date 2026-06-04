@@ -442,7 +442,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v36</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v38</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1294,6 +1294,7 @@ function extractAT(title,body){
    PAGES (company pages owned by users)
 ============================================================ */
 function getPages(){return LS.get('rb_pages',[])||[];}
+function savePages(p){LS.set('rb_pages',p);}
 function getPageByName(name){return getPages().find(function(p){return p.name.toLowerCase()===String(name).toLowerCase();});}
 function getMyPages(){var uid=CU?CU.uid:'';return getPages().filter(function(p){return p.ownerUid===uid;});}
 function userOwnsPage(name){var p=getPageByName(name);return p&&CU&&p.ownerUid===CU.uid;}
@@ -1517,8 +1518,11 @@ function buildBubble(t,p,isMine){
   if(isJob){
     var nApplied=countAppsForPost(t.id,pid);
     var countChip=nApplied>0?'<span class="appl-count" title="'+nApplied+' applicant'+(nApplied!==1?'s':'')+'"><i class="ti ti-users" style="font-size:10px"></i> '+nApplied+' applied</span>':'';
-    if(userOwnsPage(p.co)){
-      applyHtml='<button class="mgbtn" onclick="openCompanyPage(\''+escJS(p.co)+'\')"><i class="ti ti-users"></i> Manage Applicants ('+getAppsForCompany(p.co).length+')</button>';
+    var iPostedThis=CU&&p.uid&&p.uid===CU.uid;
+    if(iPostedThis||userOwnsPage(p.co)){
+      // My own job post — manage applicants, never apply to myself
+      var co=p.co||CU.co||CU.name;
+      applyHtml='<button class="mgbtn" onclick="openCompanyPage(\''+escJS(co)+'\')"><i class="ti ti-users"></i> Manage Applicants ('+(userOwnsPage(p.co)?getAppsForCompany(p.co).length:countAppsForPost(t.id,pid))+')</button>';
     }else{
       var myApp=getMyApps().find(function(a){return a.postId==pid&&a.tagId===t.id;});
       if(myApp){var so=statusObj(myApp.status);applyHtml='<div class="applbl" style="display:block">Applied · <span class="stat-badge '+so.cls+'"><i class="ti ti-'+so.icon+'" style="font-size:9px"></i> '+so.label+'</span></div>';}
@@ -1565,7 +1569,7 @@ function renderMsgs(t){
   var html='<div class="nbanner" id="nbanner" onclick="scrollLatest()"><i class="ti ti-arrow-down"></i><span id="nbtxt">New posts</span></div>';
   var shownAd=false,lastDay='';
   posts.forEach(function(p){
-    var isMine=p.mine===true||(CU&&p.uid===CU.uid);
+    var isMine=CU&&p.uid&&p.uid===CU.uid;
     var d=new Date(p.ts),dl=d.toDateString()===new Date().toDateString()?'Today':d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
     if(dl!==lastDay){html+='<div class="ddiv">'+dl+'</div>';lastDay=dl;}
     if(isAdActive(p)&&!shownAd){html+='<div class="ad-strip"><i class="ti ti-crown" style="font-size:9px"></i> Sponsored - Boost your post to reach more people</div>';shownAd=true;}
@@ -1573,7 +1577,7 @@ function renderMsgs(t){
   });
   box.innerHTML=html;box.scrollTop=0;
 }
-function appendPostDOM(t,p){var box=document.getElementById('msgs');if(!box)return;var isMine=p.mine===true||(CU&&p.uid===CU.uid);var banner=document.getElementById('nbanner');var div=document.createElement('div');div.id='bw-'+t.id+'-'+p.id;div.className='bwrap '+(isMine?'mine':'theirs')+' nf';div.innerHTML=buildBubble(t,p,isMine);if(banner&&banner.parentNode===box)box.insertBefore(div,banner.nextSibling);else box.insertBefore(div,box.firstChild);if(isAtBot)box.scrollTop=0;}
+function appendPostDOM(t,p){var box=document.getElementById('msgs');if(!box)return;var isMine=CU&&p.uid&&p.uid===CU.uid;var banner=document.getElementById('nbanner');var div=document.createElement('div');div.id='bw-'+t.id+'-'+p.id;div.className='bwrap '+(isMine?'mine':'theirs')+' nf';div.innerHTML=buildBubble(t,p,isMine);if(banner&&banner.parentNode===box)box.insertBefore(div,banner.nextSibling);else box.insertBefore(div,box.firstChild);if(isAtBot)box.scrollTop=0;}
 function appendCommentDOM(tagId,postId,c,ci){var cs=document.getElementById('cs-'+tagId+'-'+postId);if(!cs)return;var addRow=cs.querySelector('.acmt');var div=document.createElement('div');div.className='ci nca';div.innerHTML='<div class="cav '+avC(c.avIdx)+'">'+ini(c.user)+'</div><div class="ccon"><span class="cau">'+esc(c.user)+'</span><div class="ctxt">'+esc(c.text)+'</div><div class="cmeta"><span>'+fmtT(c.ts)+'</span></div></div>';cs.insertBefore(div,addRow);}
 function updateFooter(tagId,postId,p){var bw=document.getElementById('bw-'+tagId+'-'+postId);if(!bw)return;var btns=bw.querySelectorAll('.ba');if(btns[1])btns[1].innerHTML='<i class="ti ti-message-2"></i> '+p.comments.length;}
 function updateTagItem(t){var item=null;var all=document.querySelectorAll('.ti');for(var i=0;i<all.length;i++){if(all[i].getAttribute('data-tid')===t.id){item=all[i];break;}}if(!item)return;var sorted=t.posts.slice().sort(function(a,b){return b.ts-a.ts;});var last=sorted[0];var u=t._unread||0;var prev=item.querySelector('.tprev');var time=item.querySelector('.ttime');if(prev&&last)prev.textContent=(last.title||last.body||'').substring(0,38);if(time&&last)time.textContent=fmtT(last.ts);var badge=item.querySelector('.ubadge');if(u>0){if(badge)badge.textContent=u;else{var mc=item.querySelector('.tmeta');if(mc){var b=document.createElement('div');b.className='ubadge';b.textContent=u;mc.appendChild(b);}}}}
@@ -1642,7 +1646,17 @@ function sendPost(){
   if(!body&&!title&&!pendingImg){toast('Write a message or add a photo','err');return;}
   var t=tags.find(function(x){return x.id===activeTagId;});
   pidCtr++;
-  var np={id:pidCtr,user:CU.name,co:CU.co||'',avIdx:CU.avIdx,mine:true,uid:CU.uid,title:title,body:body||title||'',img:pendingImg||null,mediaType:pendingMediaType||null,region:region,ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false,boosted:null,boostExpiry:0};
+  // If this is a job post, ensure the poster has a company page so it appears
+  // under "My Company Pages (HR)" for managing applicants.
+  var jobCo=CU.co||'';
+  if(activeTagId==='jobs'){
+    if(!jobCo)jobCo=CU.name+"'s Hiring";
+    if(!getPageByName(jobCo)){
+      var pages=getPages();pages.push({id:'pg'+Date.now(),name:jobCo,ownerUid:CU.uid,ownerName:CU.name,about:'',ts:Date.now()});savePages(pages);
+      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(jobCo).set({name:jobCo,ownerUid:CU.uid,ownerName:CU.name,ts:Date.now()},{merge:true}).catch(function(){});}catch(e){}}
+    }
+  }
+  var np={id:pidCtr,user:CU.name,co:(activeTagId==='jobs'?jobCo:(CU.co||'')),avIdx:CU.avIdx,mine:true,uid:CU.uid,title:title,body:body||title||'',img:pendingImg||null,mediaType:pendingMediaType||null,region:region,ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false,boosted:null,boostExpiry:0};
   t.posts.push(np);
   var stored=LS.get('rb_posts_'+activeTagId,[])||[];stored.push(Object.assign({},np,{comments:[]}));LS.set('rb_posts_'+activeTagId,stored.slice(-100));
   bcSend({type:'new_post',tagId:activeTagId,post:Object.assign({},np,{comments:[]})});
@@ -2166,7 +2180,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v36 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v38 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
