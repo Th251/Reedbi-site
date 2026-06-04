@@ -346,6 +346,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .stat-set-btn.on{border-color:currentColor}
 .tstack{position:fixed;bottom:20px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
 .seller-tabs{display:flex;gap:6px;margin-bottom:11px}
+.order-no{display:inline-block;font-size:10px;font-weight:700;color:var(--g);background:rgba(10,102,194,.08);border-radius:6px;padding:2px 8px;margin:3px 0;letter-spacing:.5px}
 .ord-qr{width:100%;margin-top:7px;background:var(--card2);color:var(--g);border:1px solid var(--g);border-radius:8px;padding:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:5px;touch-action:manipulation}
 .dispatch-row{display:flex;gap:7px;margin-bottom:11px}
 .disp-box{flex:1;border-radius:9px;padding:9px;text-align:center}
@@ -473,7 +474,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v43</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v45</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4045,10 +4046,12 @@ function renderCVList(){
   document.getElementById('cv-fill').style.width=info.pct+'%';
   var list=document.getElementById('cv-list');
   if(!cvs.length){list.innerHTML='<p style="font-size:11px;color:var(--mt2);margin-bottom:7px">No CVs saved yet. Upload below.</p>';return;}
-  list.innerHTML=cvs.map(function(cv){return '<div class="cv-item'+(selCVId===cv.id?' sel':'')+'" onclick="selCV(\''+cv.id+'\')"><div class="cv-info"><div class="cv-name">'+esc(cv.name)+'</div><div class="cv-meta">'+fmtB(cv.size||0)+' '+fmtT(cv.ts)+'</div></div><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end"><div class="cv-chk">'+(selCVId===cv.id?'v':'')+'</div><button style="font-size:9px;color:var(--mt2);background:transparent;border:none;cursor:pointer" onclick="event.stopPropagation();delCVPhone(\''+cv.id+'\')">Delete</button></div></div>';}).join('');
+  list.innerHTML=cvs.map(function(cv){return '<div class="cv-item'+(selCVId===cv.id?' sel':'')+'" onclick="selCV(\''+cv.id+'\')"><div class="cv-info"><div class="cv-name">'+esc(cv.name)+'</div><div class="cv-meta">'+fmtB(cv.size||0)+' '+fmtT(cv.ts)+'</div></div><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end"><div class="cv-chk">'+(selCVId===cv.id?'v':'')+'</div><button style="font-size:10px;color:var(--red);background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:2px" onclick="event.stopPropagation();delCVPhone(\''+cv.id+'\')"><i class="ti ti-trash"></i> Remove</button></div></div>';}).join('');
 }
 function selCV(id){selCVId=(selCVId===id)?null:id;renderCVList();}
-function delCVPhone(id){var uid=CU?CU.uid:'guest';delCV(uid,id);if(selCVId===id)selCVId=null;renderCVList();toast('CV deleted','info');}
+function delCVPhone(id){var uid=CU?CU.uid:'guest';delCV(uid,id);if(selCVId===id)selCVId=null;
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('cvs').doc(uid+'_'+id).delete().catch(function(){});}catch(e){}}
+  renderCVList();toast('Document removed','info');}
 function cvDrag(e,over){e.preventDefault();document.getElementById('cv-drop').classList.toggle('over',over);}
 function cvDrop(e){e.preventDefault();document.getElementById('cv-drop').classList.remove('over');var f=e.dataTransfer.files[0];if(f)handleCVFile(f);}
 function cvSel(inp){if(inp.files[0])handleCVFile(inp.files[0]);}
@@ -4541,7 +4544,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v43 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v45 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -4755,6 +4758,7 @@ function orderCardSeller(o){
   return '<div class="appl-card">'
     +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
     +'<div><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="font-weight:400;color:var(--mt2);font-size:11px">×'+o.qty+'</span></div>'
+    +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'
     +'<div style="font-size:11px;color:var(--mt)">Buyer: '+esc(o.buyerName)+'</div></div>'
     +'<span class="pay-badge '+(o.payMethod==='online'?'pay-online-b':'pay-cod-b')+'">'+(o.payMethod==='online'?'💳 Online'+(o.payStatus==='paid'?' ✓':''):'💵 COD')+'</span></div>'
     +(o.buyerPhone?'<div style="font-size:11px;color:var(--g);margin-top:3px"><i class="ti ti-brand-whatsapp"></i> <a href="https://wa.me/'+esc((o.buyerPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">Message buyer: '+esc(o.buyerPhone)+'</a></div>':'')
@@ -4809,7 +4813,8 @@ function placeOrder(){
   var phone=document.getElementById('buy-phone').value.trim();
   var map=document.getElementById('buy-map').value.trim();
   if(!addr||!phone){toast('Enter delivery address and WhatsApp number','err');return;}
-  var o={id:'ord'+Date.now(),productId:curBuyProduct.id,productTitle:curBuyProduct.title,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
+  var orderNo='RB-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
+  var o={id:'ord'+Date.now(),orderNo:orderNo,productId:curBuyProduct.id,productTitle:curBuyProduct.title,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
     sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,buyerUid:CU.uid,buyerName:CU.name,buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:map,
     payMethod:selPayMethod,status:'placed',ts:Date.now()};
   var orders=getOrders();orders.unshift(o);saveOrders(orders);
@@ -4851,10 +4856,11 @@ function showMyOrders(){
     var si=orderStatusIndex(o.status);var so=orderStatusObj(o.status);
     var track=ORDER_STATUS.map(function(s,i){return '<div class="trk-step'+(i<=si?' done':'')+'"><i class="ti ti-'+s.icon+'"></i><span>'+s.label+'</span></div>';}).join('');
     return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="color:var(--mt2);font-weight:400;font-size:11px">×'+o.qty+'</span></div>'
+      +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'
       +'<div style="font-size:11px;color:var(--mt)">Seller: '+esc(o.sellerName)+'</div>'
       +'<div style="font-size:11px;color:var(--g);font-weight:700;margin-top:3px"><i class="ti ti-'+so.icon+'"></i> '+so.label+'</div>'
       +'<div class="trk">'+track+'</div>'
-      +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Show tracking QR</button></div>';
+      +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Show tracking QR &amp; order #</button></div>';
   }).join('');
   document.getElementById('myorders-ovl').classList.add('open');
 }
@@ -4915,12 +4921,49 @@ function showOrderQR(orderId){
   document.getElementById('qr-body').innerHTML=
     '<div style="text-align:center">'
     +'<div style="font-weight:700;font-size:13px;margin-bottom:2px">'+esc(o.productTitle)+' ×'+o.qty+'</div>'
-    +'<div style="font-size:11px;color:var(--mt2);margin-bottom:10px">Order '+esc(o.id)+'</div>'
+    +'<div style="font-size:11px;color:var(--mt2);margin-bottom:10px">Order # <b style="color:var(--tx)">'+esc(o.orderNo||o.id)+'</b></div>'
     +'<div style="display:inline-block;padding:10px;background:#fff;border-radius:10px;border:1px solid var(--b)">'+qrSvg+'</div>'
     +'<div style="font-size:12px;margin-top:10px"><i class="ti ti-'+cur.icon+'" style="color:var(--g)"></i> Status: <b>'+cur.label+'</b></div>'
     +'<div style="font-size:10px;color:var(--mt2);margin-top:4px">Buyer scans this to track the order live.<br>You can scan it to instantly open & update this order.</div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="printShippingLabel(\''+o.id+'\')"><i class="ti ti-printer"></i> Download / Print Shipping Label</button>'
     +'</div>';
   document.getElementById('qr-ovl').classList.add('open');
+}
+function printShippingLabel(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o)return;
+  var trackUrl=(location.origin||'https://reedbi.com')+'/?track='+encodeURIComponent(o.id);
+  var qrSvg=makeQRSvg(trackUrl,220);
+  var cur=orderStatusObj(o.status);
+  var w=window.open('','_blank');
+  if(!w){toast('Allow pop-ups to print the label','err');return;}
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Label '+esc(o.orderNo||o.id)+'</title>'
+    +'<style>'
+    +'*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}'
+    +'body{padding:14px;color:#000}'
+    +'.label{width:380px;border:2px solid #000;border-radius:8px;padding:16px;margin:0 auto}'
+    +'.brand{font-size:20px;font-weight:800;color:#0a66c2;letter-spacing:-.5px}'
+    +'.ono{font-size:24px;font-weight:800;letter-spacing:1px;margin:6px 0;border:2px dashed #0a66c2;border-radius:6px;padding:8px;text-align:center;color:#0a66c2}'
+    +'.row{display:flex;gap:14px;align-items:center;margin-top:10px}'
+    +'.qrbox{flex-shrink:0}'
+    +'.det{font-size:13px;line-height:1.6}'
+    +'.det b{display:block;font-size:11px;color:#555;font-weight:600;text-transform:uppercase;letter-spacing:.04em}'
+    +'.ship{border-top:2px solid #000;margin-top:12px;padding-top:10px;font-size:14px}'
+    +'.foot{font-size:10px;color:#666;text-align:center;margin-top:12px;border-top:1px solid #ccc;padding-top:8px}'
+    +'@media print{.noprint{display:none}body{padding:0}}'
+    +'</style></head><body>'
+    +'<div class="label">'
+    +'<div class="brand">⬡ Reedbi Shipping</div>'
+    +'<div class="ono">'+esc(o.orderNo||o.id)+'</div>'
+    +'<div class="row"><div class="qrbox">'+qrSvg+'</div>'
+    +'<div class="det"><b>Product</b>'+esc(o.productTitle)+' ×'+o.qty+'<br>'
+    +'<b style="margin-top:6px">Status</b>'+esc(cur.label)+'<br>'
+    +'<b style="margin-top:6px">Payment</b>'+(o.payMethod==='online'?'Paid Online':'Cash on Delivery')+'</div></div>'
+    +'<div class="ship"><b style="font-size:11px;color:#555;text-transform:uppercase">Deliver to</b><br>'+esc(o.buyerName)+'<br>'+esc(o.buyerAddr||'')+'<br>'+esc(o.buyerPhone||'')+'</div>'
+    +'<div class="foot">Scan the QR to track this order live at Reedbi · Keep this label on the package</div>'
+    +'</div>'
+    +'<div class="noprint" style="text-align:center;margin-top:16px"><button onclick="window.print()" style="background:#0a66c2;color:#fff;border:none;border-radius:8px;padding:12px 22px;font-size:15px;font-weight:700;cursor:pointer">🖨 Print / Save as PDF</button></div>'
+    +'</body></html>';
+  w.document.write(html);w.document.close();
 }
 // Buyer/seller: open an order directly by its tracking id (from a scanned QR URL)
 function trackByOrderId(orderId){
