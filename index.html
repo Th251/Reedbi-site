@@ -494,7 +494,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v51</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v52</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4692,7 +4692,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v51 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v52 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -4874,7 +4874,10 @@ function showMyProducts(tab){
       +'</div>';
     content+=orders.length?orders.map(function(o){return orderCardSeller(o);}).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:18px"><i class="ti ti-package" style="font-size:30px;color:var(--b2);display:block;margin-bottom:6px"></i>No orders yet.</p>';
   }else if(sellerTab==='listings'){
-    content=prods.length?prods.map(function(p){return productCardSeller(p);}).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:18px"><i class="ti ti-shopping-bag" style="font-size:30px;color:var(--b2);display:block;margin-bottom:6px"></i>No products yet.</p>';
+    var qrP=prods.filter(function(p){return p.qrPrinted;}).length;
+    var qrB=prods.length-qrP;
+    var qrSummary=prods.length?'<div class="dispatch-row"><div class="disp-box disp-done"><b>'+qrP+'</b><small>QR printed</small></div><div class="disp-box disp-pend"><b>'+qrB+'</b><small>QR to print</small></div><div class="disp-box disp-ship"><b>'+prods.length+'</b><small>Total listed</small></div></div>':'';
+    content=qrSummary+(prods.length?prods.map(function(p){return productCardSeller(p);}).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:18px"><i class="ti ti-shopping-bag" style="font-size:30px;color:var(--b2);display:block;margin-bottom:6px"></i>No products yet.</p>');
   }else{
     // ANALYTICS
     var ranked=Object.keys(perProduct).map(function(k){return {name:k,d:perProduct[k]};}).sort(function(a,b){return b.d.units-a.d.units;});
@@ -4916,7 +4919,7 @@ function productCardSeller(p){
   // idle time since listing
   var ageMs=Date.now()-(p.ts||Date.now());
   var ageDays=Math.floor(ageMs/86400000),ageHrs=Math.floor((ageMs%86400000)/3600000);
-  var idleStr=ageDays>0?(ageDays+'d '+ageHrs+'h'):(ageHrs+'h');
+  var idleStr=ageDays+' day'+(ageDays!==1?'s':'')+' '+ageHrs+' hour'+(ageHrs!==1?'s':'');
   var idleWarn=(ageDays>=7&&sold===0);
   // expiry countdown
   var expStr='';
@@ -4925,7 +4928,7 @@ function productCardSeller(p){
     if(diff<=0)expStr='<span class="exp-badge exp-gone"><i class="ti ti-alert-triangle"></i> EXPIRED</span>';
     else{var ed=Math.floor(diff/86400000),eh=Math.floor((diff%86400000)/3600000);
       var soon=diff<3*86400000;
-      expStr='<span class="exp-badge '+(soon?'exp-soon':'exp-ok')+'"><i class="ti ti-clock"></i> Expires in '+(ed>0?ed+'d ':'')+eh+'h</span>';}
+      expStr='<span class="exp-badge '+(soon?'exp-soon':'exp-ok')+'"><i class="ti ti-clock"></i> Expires in '+ed+' day'+(ed!==1?'s':'')+' '+eh+' hour'+(eh!==1?'s':'')+(soon?' — SOON!':'')+'</span>';}
   }
   return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+(p.photos[0]||'')+'" style="width:54px;height:54px;border-radius:8px;object-fit:cover">'
     +'<div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
@@ -4935,7 +4938,34 @@ function productCardSeller(p){
     +(expStr?'<div style="margin-top:4px">'+expStr+'</div>':'')
     +'</div></div>'
     +(idleWarn?'<div class="idle-warn"><i class="ti ti-flame"></i> Idle '+ageDays+' days, no sales — consider an offer or boost</div>':'')
-    +'<button class="abtn" onclick="openBoost(\'sell\',null)" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:8px;font-size:11px"><i class="ti ti-speakerphone"></i> Advertise / Boost</button></div>';
+    +'<div style="display:flex;gap:6px;margin-top:8px">'
+    +'<button class="ps-btn" style="flex:1;justify-content:center" onclick="shareProduct(\''+p.id+'\')"><i class="ti ti-share"></i> Share</button>'
+    +'<button class="ps-btn" style="flex:1;justify-content:center;background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="printProductQR(\''+p.id+'\')"><i class="ti ti-qrcode"></i> '+(p.qrPrinted?'Reprint QR':'Print QR')+'</button>'
+    +'</div>'
+    +'<button class="abtn" onclick="openBoost(\'sell\',null)" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:6px;font-size:11px"><i class="ti ti-speakerphone"></i> Advertise / Boost</button></div>';
+}
+function printProductQR(pid){
+  var p=getProducts().find(function(x){return x.id===pid;});if(!p)return;
+  var url=(location.origin||'https://reedbi.com')+'/?product='+encodeURIComponent(p.id);
+  var qrSvg=makeQRSvg(url,200);
+  var w=window.open('','_blank');
+  if(!w){toast('Allow pop-ups to print','err');return;}
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Product QR '+esc(p.serialNo||p.id)+'</title><style>'
+    +'*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}body{padding:16px;text-align:center}'
+    +'.tag{display:inline-block;border:2px solid #000;border-radius:8px;padding:16px;width:300px}'
+    +'.brand{font-size:16px;font-weight:800;color:#0a66c2}.code{font-size:18px;font-weight:800;letter-spacing:1px;margin:6px 0;color:#0a66c2}'
+    +'.nm{font-size:14px;font-weight:600;margin-top:8px}.pr{font-size:16px;color:#0a66c2;font-weight:700}'
+    +'@media print{.noprint{display:none}body{padding:0}}</style></head><body>'
+    +'<div class="noprint" style="margin-bottom:14px"><button onclick="window.print()" style="background:#0a66c2;color:#fff;border:none;border-radius:8px;padding:12px 22px;font-size:15px;font-weight:700;cursor:pointer">🖨 Print / Save PDF</button></div>'
+    +'<div class="tag"><div class="brand">⬡ Reedbi</div><div class="code">'+esc(p.serialNo||p.id)+'</div>'
+    +qrSvg+'<div class="nm">'+esc(p.title)+'</div><div class="pr">'+esc(p.currency)+' '+esc(p.price)+'</div>'
+    +'<div style="font-size:10px;color:#666;margin-top:8px">Scan to view & buy on Reedbi</div></div></body></html>';
+  w.document.write(html);w.document.close();
+  // mark QR printed
+  var prods=getProducts();var pp=prods.find(function(x){return x.id===pid;});
+  if(pp){pp.qrPrinted=true;pp.qrPrintedTs=Date.now();saveProducts(prods);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(pp.id).set(pp,{merge:true}).catch(function(){});}catch(e){}}}
+  showMyProducts('listings');
 }
 function orderCardSeller(o){
   var si=orderStatusIndex(o.status);
@@ -5183,13 +5213,43 @@ function trackByOrderId(orderId){
   if(CU&&o.sellerUid===CU.uid){showMyProducts('orders');showOrderQR(orderId);}
   else{showMyOrders();}
 }
-// On load, if URL has ?track=, open that order
+// On load, handle deep links: ?track= (order), ?product= (product), ?store= (shop)
 (function(){
   try{
-    var m=(location.search||'').match(/[?&]track=([^&]+)/);
-    if(m){var id=decodeURIComponent(m[1]);setTimeout(function(){trackByOrderId(id);},900);}
+    var s=location.search||'';
+    var mt=s.match(/[?&]track=([^&]+)/);
+    if(mt){var id=decodeURIComponent(mt[1]);setTimeout(function(){trackByOrderId(id);},900);return;}
+    var mp=s.match(/[?&]product=([^&]+)/);
+    if(mp){var pid=decodeURIComponent(mp[1]);setTimeout(function(){openSharedProduct(pid);},900);return;}
+    var ms=s.match(/[?&]store=([^&]+)/);
+    if(ms){var sname=decodeURIComponent(ms[1]);setTimeout(function(){openSharedStore(sname);},900);return;}
   }catch(e){}
 })();
+function openSharedProduct(pid){
+  var p=getProducts().find(function(x){return x.id===pid||x.serialNo===pid;});
+  if(!p){toast('Product not found','err');openProductSearch();return;}
+  if(CU&&p.sellerUid===CU.uid){showMyProducts('listings');}
+  else{buyProduct(p.id);}
+}
+function openSharedStore(sname){
+  // show all products from this store via search
+  openProductSearch();
+  var q=document.getElementById('ps-q');if(q){q.value=sname;runProductSearch(sname);}
+  // also filter by seller name
+  var prods=getProducts().filter(function(p){return (p.sellerName||'').toLowerCase()===String(sname).toLowerCase();});
+  if(prods.length){var box=document.getElementById('ps-results');if(box){box.innerHTML='<div style="font-size:11px;color:var(--g);font-weight:700;margin-bottom:8px"><i class="ti ti-building-store"></i> Store: '+esc(sname)+' ('+prods.length+' products)</div>'+prods.map(function(p){return '<div class="ps-card"><img src="'+(p.photos&&p.photos[0]||'')+'" class="ps-img"><div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div><div style="font-size:13px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div><button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button></div></div>';}).join('');}}
+}
+function shareProduct(pid){
+  var p=getProducts().find(function(x){return x.id===pid;});if(!p)return;
+  var url=(location.origin||'https://reedbi.com')+'/?product='+encodeURIComponent(p.id);
+  var text='Check out '+p.title+' on Reedbi — '+p.currency+' '+p.price+'\n'+url;
+  if(navigator.share){navigator.share({title:p.title,text:text,url:url}).catch(function(){});}
+  else{try{navigator.clipboard.writeText(text);toast('Share link copied!','ok');}catch(e){toast('Link: '+url,'info');}}
+  // also show QR
+  var qrSvg=makeQRSvg(url,180);
+  document.getElementById('qr-body').innerHTML='<div style="text-align:center"><div style="font-weight:700;margin-bottom:8px">'+esc(p.title)+'</div><div style="display:inline-block;padding:10px;background:#fff;border-radius:10px;border:1px solid var(--b)">'+qrSvg+'</div><div style="font-size:11px;color:var(--mt2);margin-top:10px">Scan to open this product on Reedbi.<br>Share on WhatsApp or social media.</div><button class="btn btnok" style="width:100%;margin-top:10px" onclick="(function(){try{navigator.clipboard.writeText(\''+url+'\');toast(\'Link copied\',\'ok\');}catch(e){}})()"><i class="ti ti-copy"></i> Copy share link</button></div>';
+  document.getElementById('qr-ovl').classList.add('open');
+}
 
 /* ===== Product search ===== */
 function openProductSearch(){
