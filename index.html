@@ -494,7 +494,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v52</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v53</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4692,7 +4692,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v52 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v53 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5054,7 +5054,7 @@ function placeOrder(){
   var orderNo='RB-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
   var o={id:'ord'+Date.now(),orderNo:orderNo,productId:curBuyProduct.id,productTitle:curBuyProduct.title,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
     sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,buyerUid:CU.uid,buyerName:CU.name,buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:map,
-    payMethod:selPayMethod,status:'placed',ts:Date.now()};
+    payMethod:selPayMethod,status:'placed',storeMap:(curBuyProduct.map||curBuyProduct.geo||''),storeAddr:(curBuyProduct.addr||''),ts:Date.now()};
   var orders=getOrders();orders.unshift(o);saveOrders(orders);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o).catch(function(){});}catch(e){}}
   closeOvl('buy-ovl');
@@ -5413,9 +5413,10 @@ function openAssignAgent(orderId){
   curAssignOrder=orderId;
   var agents=getAgents();
   var body=document.getElementById('assign-body');
-  if(!agents.length){body.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No delivery agents registered yet. Agents can register from the menu.</p>';}
+  var offerBtn='<button class="btn btnok" style="width:100%;margin-bottom:10px" onclick="offerToAllAgents()"><i class="ti ti-broadcast"></i> Offer to ALL agents (first to accept gets it)</button>';
+  if(!agents.length){body.innerHTML=offerBtn+'<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No delivery agents registered yet. Agents can register from the menu.</p>';}
   else{
-    body.innerHTML=agents.map(function(a){
+    body.innerHTML=offerBtn+'<div style="font-size:10px;color:var(--mt2);text-transform:uppercase;margin-bottom:7px">Or assign one directly</div>'+agents.map(function(a){
       var rating=avgRating(a);
       return '<div class="act-row"><div style="display:flex;gap:8px;align-items:center">'
         +(a.photo?'<img src="'+a.photo+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover">':'<div class="appl-av av1" style="width:34px;height:34px">'+ini(a.name)+'</div>')
@@ -5429,14 +5430,48 @@ var curAssignOrder=null;
 function assignAgent(agentUid){
   var agents=getAgents();var a=agents.find(function(x){return x.uid===agentUid;});
   var orders=getOrders();var o=orders.find(function(x){return x.id===curAssignOrder;});
-  if(o&&a){o.agentUid=agentUid;o.agentName=a.name;o.agentPhone=a.phone;saveOrders(orders);
+  if(o&&a){o.agentUid=agentUid;o.agentName=a.name;o.agentPhone=a.phone;o.pickupOpen=false;saveOrders(orders);
     if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}}
   closeOvl('assign-ovl');showMyProducts('orders');
   toast('Assigned to '+(a?a.name:'agent'),'ok');
 }
+function offerToAllAgents(orderId){
+  var orders=getOrders();var o=orders.find(function(x){return x.id===(orderId||curAssignOrder);});
+  if(o){o.pickupOpen=true;o.agentUid=null;o.agentName=null;saveOrders(orders);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}}
+  closeOvl('assign-ovl');showMyProducts('orders');
+  toast('Order offered to all agents — first to accept gets it','ok');
+}
+function reassignAgent(orderId){curAssignOrder=orderId;openAssignAgent(orderId);}
+// Agent accepts an open pickup (first-come locks it)
+function acceptPickup(orderId){
+  var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});
+  if(!o){return;}
+  if(o.agentUid&&o.agentUid!==CU.uid){toast('Already taken by another agent','err');showAgentDashboard();return;}
+  var p=getMyAgentProfile();
+  o.agentUid=CU.uid;o.agentName=CU.name;o.agentPhone=p?p.phone:'';o.pickupOpen=false;o.pickedTs=Date.now();
+  saveOrders(orders);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}
+  showAgentDashboard();toast('Pickup accepted — it is yours now','ok');
+}
 function avgRating(a){if(!a.ratings||!a.ratings.length)return 0;var s=a.ratings.reduce(function(x,r){return x+r.stars;},0);return (s/a.ratings.length).toFixed(1);}
 /* Agent dashboard — assigned orders, earnings, commission */
-var AGENT_COMMISSION=5; // currency units per delivery (demo)
+var AGENT_COMMISSION=5; // base commission per delivery
+var COMMISSION_PER_KM=1; // additional per km of distance
+function parseLatLng(s){if(!s)return null;var m=String(s).match(/(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)/);return m?{lat:parseFloat(m[1]),lng:parseFloat(m[2])}:null;}
+function distanceKm(a,b){
+  if(!a||!b)return 0;
+  var R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLng=(b.lng-a.lng)*Math.PI/180;
+  var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+function orderCommission(o){
+  // base + distance-based (store location to buyer location)
+  var store=parseLatLng(o.storeMap)||parseLatLng(o.sellerMap);
+  var buyer=parseLatLng(o.buyerMap);
+  var km=(store&&buyer)?distanceKm(store,buyer):0;
+  return Math.round((AGENT_COMMISSION+km*COMMISSION_PER_KM)*10)/10;
+}
 function showAgentDashboard(){
   if(!requireAuth('view agent dashboard'))return;
   var p=getMyAgentProfile();
@@ -5445,7 +5480,7 @@ function showAgentDashboard(){
   var myOrders=getOrders().filter(function(o){return o.agentUid===CU.uid;});
   var delivered=myOrders.filter(function(o){return o.status==='delivered';});
   var pending=myOrders.filter(function(o){return o.status!=='delivered';});
-  var earnings=delivered.length*AGENT_COMMISSION;
+  var earnings=delivered.reduce(function(s,o){return s+orderCommission(o);},0);earnings=Math.round(earnings*10)/10;
   var rating=avgRating(p);
   var head='<div style="background:var(--card2);border-radius:10px;padding:12px;margin-bottom:11px;text-align:center">'
     +(p.photo?'<img src="'+p.photo+'" style="width:54px;height:54px;border-radius:50%;object-fit:cover;margin:0 auto 6px;display:block">':'')
@@ -5463,10 +5498,22 @@ function showAgentDashboard(){
       +'<div style="font-size:11px;color:var(--mt)">To: '+esc(o.buyerName)+' · '+esc(o.buyerAddr||'')+'</div>'
       +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> Navigate</a></div>':'')
       +'<div class="ord-current"><i class="ti ti-'+os.icon+'"></i> '+os.label+'</div>'
-      +(next?'<button class="ord-next" onclick="agentUpdateStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark: '+next.label+'</button>':'<div style="font-size:11px;color:var(--g);margin-top:6px"><i class="ti ti-circle-check"></i> Delivered · +'+AGENT_COMMISSION+' commission</div>')
+      +(next?'<button class="ord-next" onclick="agentUpdateStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark: '+next.label+'</button>':'<div style="font-size:11px;color:var(--g);margin-top:6px"><i class="ti ti-circle-check"></i> Delivered · +'+orderCommission(o)+' commission</div>')
       +'</div>';
   }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No deliveries assigned yet.</p>';
-  body.innerHTML=head+content;
+  // Open pickups available to claim (pool) — hidden once another agent takes them
+  var openPickups=getOrders().filter(function(o){return o.pickupOpen===true&&!o.agentUid;});
+  var poolHtml='';
+  if(openPickups.length){
+    poolHtml='<div style="font-size:11px;font-weight:700;color:var(--gold);margin:14px 0 7px;text-transform:uppercase"><i class="ti ti-broadcast"></i> Available pickups ('+openPickups.length+')</div>'
+      +openPickups.map(function(o){
+        return '<div class="appl-card" style="border:1px solid var(--gold)"><div class="order-no">'+esc(o.orderNo||o.id)+'</div>'
+          +'<div style="font-size:12px;font-weight:600">'+esc(o.productTitle)+' ×'+o.qty+'</div>'
+          +'<div style="font-size:11px;color:var(--mt)">From: '+esc(o.sellerName)+' → '+esc(o.buyerAddr||'')+'</div>'
+          +'<button class="ord-next" style="background:var(--gold);color:#000" onclick="acceptPickup(\''+o.id+'\')"><i class="ti ti-hand-grab"></i> Accept this pickup</button></div>';
+      }).join('');
+  }
+  body.innerHTML=head+poolHtml+(myOrders.length?'<div style="font-size:11px;font-weight:700;color:var(--mt);margin:14px 0 7px;text-transform:uppercase">My deliveries</div>':'')+content;
   document.getElementById('agentdash-ovl').classList.add('open');
 }
 function agentUpdateStatus(orderId,idx){
