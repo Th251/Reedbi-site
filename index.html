@@ -346,6 +346,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .stat-set-btn.on{border-color:currentColor}
 .tstack{position:fixed;bottom:20px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
 .seller-tabs{display:flex;gap:6px;margin-bottom:11px}
+.lbl-sec{font-size:11px;font-weight:700;color:var(--mt);margin:12px 0 7px;text-transform:uppercase;letter-spacing:.04em}
+.lbl-row{display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:8px;padding:9px 11px;margin-bottom:6px}
+.lbl-tag{font-size:10px;font-weight:600;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.lbl-done{background:rgba(10,102,194,.1);color:var(--g)}
+.lbl-mini{font-size:10px;border:1px solid var(--b);background:var(--sf);color:var(--mt);border-radius:6px;padding:5px 9px;cursor:pointer;font-family:var(--fn);white-space:nowrap;touch-action:manipulation}
+.lbl-print{background:var(--g);color:#fff;border-color:var(--g);font-weight:600}
 .ps-card{display:flex;gap:10px;background:var(--card2);border-radius:10px;padding:10px;margin-bottom:8px}
 .ps-img{width:62px;height:62px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--b)}
 .ps-btn{margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fn);display:inline-flex;align-items:center;gap:4px;touch-action:manipulation}
@@ -477,7 +483,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v46</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v47</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -792,6 +798,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <div class="sw" style="margin-bottom:10px"><i class="ti ti-search"></i><input type="text" id="ps-q" placeholder="Search by name, e.g. iPhone, shoes, camera..." oninput="runProductSearch(this.value)" autocomplete="off"></div>
     <div id="ps-results"></div>
   </div>
+</div></div>
+<!-- BULK LABELS -->
+<div class="overlay" id="labels-ovl"><div class="modal" style="max-width:440px">
+  <div class="mhd"><h3><i class="ti ti-printer" style="font-size:13px"></i> Print Order Labels</h3><button class="ib" onclick="closeOvl('labels-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="labels-body"></div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -4557,7 +4568,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v46 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v47 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -4675,7 +4686,8 @@ function submitProduct(){
   if(listPhotos.length<5){toast('Add at least 5 photos of the product','err');return;}
   if(!price){toast('Enter a price','err');return;}
   if(!addr||!phone){toast('Add your address and phone number','err');return;}
-  var prod={id:'prd'+Date.now(),sellerUid:CU.uid,sellerName:CU.name,title:title,desc:desc,price:price,currency:cur,qty:qty,sold:0,
+  var serialNo='PRD-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
+  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:CU.name,title:title,desc:desc,price:price,currency:cur,qty:qty,sold:0,
     photos:listPhotos.slice(),addr:addr,phone:phone,map:map,ts:Date.now()};
   var prods=getProducts();prods.unshift(prod);saveProducts(prods);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(prod.id).set(prod).catch(function(){});}catch(e){}}
@@ -4727,7 +4739,8 @@ function showMyProducts(tab){
   var content='';
   if(sellerTab==='orders'){
     // dispatch summary
-    content='<div class="dispatch-row">'
+    content='<button class="btn btnok" style="width:100%;margin-bottom:10px;border-radius:9px" onclick="closeOvl(\'seller-ovl\');showLabelBatch()"><i class="ti ti-printer"></i> Print Order Labels (QR)</button>'
+      +'<div class="dispatch-row">'
       +'<div class="disp-box disp-pend"><b>'+pending+'</b><small>To pack/ship</small></div>'
       +'<div class="disp-box disp-ship"><b>'+dispatched+'</b><small>Dispatched</small></div>'
       +'<div class="disp-box disp-done"><b>'+delivered+'</b><small>Delivered</small></div>'
@@ -4759,6 +4772,7 @@ function productCardSeller(p){
   var remaining=Math.max(0,(p.qty||0)-sold);
   return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+(p.photos[0]||'')+'" style="width:54px;height:54px;border-radius:8px;object-fit:cover">'
     +'<div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
+    +(p.serialNo?'<div class="order-no">'+esc(p.serialNo)+'</div>':'')
     +'<div style="font-size:12px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div>'
     +'<div style="font-size:10px;color:var(--mt2);margin-top:2px">Sold: <b style="color:var(--cyan)">'+sold+'</b> · In stock: <b style="color:'+(remaining>0?'var(--g)':'var(--red)')+'">'+remaining+'</b> · '+(p.photos.length)+' photos</div></div></div>'
     +'<button class="abtn" onclick="openBoost(\'sell\',null)" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:8px;font-size:11px"><i class="ti ti-speakerphone"></i> Advertise</button></div>';
@@ -5019,5 +5033,86 @@ function runProductSearch(q){
             :'<button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button>')
       +'</div></div>';
   }).join('');
+}
+
+/* ===== Bulk label printing with printed/balance tracking ===== */
+function showLabelBatch(){
+  if(!requireAuth('print labels'))return;
+  var orders=getOrders().filter(function(o){return o.sellerUid===CU.uid;});
+  var printed=orders.filter(function(o){return o.labelPrinted;});
+  var balance=orders.filter(function(o){return !o.labelPrinted;});
+  var body=document.getElementById('labels-body');
+  var head='<div style="background:var(--card2);border-radius:10px;padding:12px;margin-bottom:11px">'
+    +'<div style="font-size:13px;font-weight:700"><i class="ti ti-printer" style="color:var(--g)"></i> Label Printing</div>'
+    +'<div class="dispatch-row" style="margin-top:9px;margin-bottom:0">'
+    +'<div class="disp-box disp-done"><b>'+printed.length+'</b><small>Printed</small></div>'
+    +'<div class="disp-box disp-pend"><b>'+balance.length+'</b><small>Balance to print</small></div>'
+    +'<div class="disp-box disp-ship"><b>'+orders.length+'</b><small>Total orders</small></div>'
+    +'</div></div>';
+  if(balance.length){
+    head+='<button class="btn btnok" style="width:100%;margin-bottom:6px" onclick="printAllPending()"><i class="ti ti-printer"></i> Print all '+balance.length+' pending labels</button>'
+      +'<button class="btn" style="width:100%;margin-bottom:11px;border:1px solid var(--b);background:var(--card2);color:var(--g)" onclick="markAllPrinted()"><i class="ti ti-checks"></i> Mark all as printed</button>';
+  }
+  var rows=function(list,isPrinted){
+    return list.map(function(o){
+      return '<div class="lbl-row"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">'+esc(o.orderNo||o.id)+'</div>'
+        +'<div style="font-size:10px;color:var(--mt2)">'+esc(o.productTitle)+' ×'+o.qty+' · '+esc(o.buyerName)+'</div></div>'
+        +(isPrinted?'<span class="lbl-tag lbl-done"><i class="ti ti-check"></i> Printed</span><button class="lbl-mini" onclick="printSingleLabel(\''+o.id+'\')">Reprint</button>'
+                   :'<button class="lbl-mini lbl-print" onclick="printSingleLabel(\''+o.id+'\')"><i class="ti ti-printer"></i> Print</button>')
+        +'</div>';
+    }).join('');
+  };
+  var content='';
+  if(balance.length)content+='<div class="lbl-sec">⏳ Balance — to print ('+balance.length+')</div>'+rows(balance,false);
+  if(printed.length)content+='<div class="lbl-sec">✓ Printed ('+printed.length+')</div>'+rows(printed,true);
+  if(!orders.length)content='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No orders to print labels for yet.</p>';
+  body.innerHTML=head+content;
+  document.getElementById('labels-ovl').classList.add('open');
+}
+function markPrinted(orderId){
+  var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});
+  if(o){o.labelPrinted=true;o.labelPrintedTs=Date.now();saveOrders(orders);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}}
+}
+function printSingleLabel(orderId){
+  printShippingLabel(orderId);
+  markPrinted(orderId);
+  showLabelBatch();
+}
+function markAllPrinted(){
+  var orders=getOrders();var n=0;
+  orders.forEach(function(o){if(o.sellerUid===CU.uid&&!o.labelPrinted){o.labelPrinted=true;o.labelPrintedTs=Date.now();n++;
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}}});
+  saveOrders(orders);showLabelBatch();toast(n+' marked as printed','ok');
+}
+function printAllPending(){
+  var orders=getOrders().filter(function(o){return o.sellerUid===CU.uid&&!o.labelPrinted;});
+  if(!orders.length){toast('No pending labels','info');return;}
+  var w=window.open('','_blank');
+  if(!w){toast('Allow pop-ups to print labels','err');return;}
+  var labels=orders.map(function(o){
+    var trackUrl=(location.origin||'https://reedbi.com')+'/?track='+encodeURIComponent(o.id);
+    var qrSvg=makeQRSvg(trackUrl,180);
+    var cur=orderStatusObj(o.status);
+    return '<div class="label">'
+      +'<div class="brand">⬡ Reedbi Shipping</div>'
+      +'<div class="ono">'+esc(o.orderNo||o.id)+'</div>'
+      +'<div class="row"><div class="qrbox">'+qrSvg+'</div>'
+      +'<div class="det"><b>Product</b>'+esc(o.productTitle)+' ×'+o.qty+'<br><b style="margin-top:6px">Payment</b>'+(o.payMethod==='online'?'Paid Online':'Cash on Delivery')+'</div></div>'
+      +'<div class="ship"><b style="font-size:11px;color:#555;text-transform:uppercase">Deliver to</b><br>'+esc(o.buyerName)+'<br>'+esc(o.buyerAddr||'')+'<br>'+esc(o.buyerPhone||'')+'</div>'
+      +'<div class="foot">Scan QR to track · Keep on package</div></div>';
+  }).join('');
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+orders.length+' Labels</title><style>'
+    +'*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}body{padding:10px;color:#000}'
+    +'.label{width:360px;border:2px solid #000;border-radius:8px;padding:14px;margin:0 auto 14px;page-break-after:always}'
+    +'.brand{font-size:18px;font-weight:800;color:#0a66c2}.ono{font-size:22px;font-weight:800;letter-spacing:1px;margin:6px 0;border:2px dashed #0a66c2;border-radius:6px;padding:7px;text-align:center;color:#0a66c2}'
+    +'.row{display:flex;gap:12px;align-items:center;margin-top:10px}.det{font-size:13px;line-height:1.5}.det b{display:block;font-size:10px;color:#555;text-transform:uppercase}'
+    +'.ship{border-top:2px solid #000;margin-top:10px;padding-top:9px;font-size:13px}.foot{font-size:10px;color:#666;text-align:center;margin-top:10px;border-top:1px solid #ccc;padding-top:6px}'
+    +'@media print{.noprint{display:none}body{padding:0}}'
+    +'</style></head><body>'
+    +'<div class="noprint" style="text-align:center;margin-bottom:14px"><button onclick="window.print()" style="background:#0a66c2;color:#fff;border:none;border-radius:8px;padding:12px 22px;font-size:15px;font-weight:700;cursor:pointer">🖨 Print all '+orders.length+' labels / Save as PDF</button></div>'
+    +labels+'</body></html>';
+  w.document.write(html);w.document.close();
+  markAllPrinted();
 }
 </script></body></html>
