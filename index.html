@@ -499,7 +499,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v58</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v59</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -866,6 +866,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <textarea id="rate-cmt" rows="2" placeholder="Comment (optional)" style="width:100%;margin-top:10px;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-family:var(--fn)"></textarea>
     <button class="btn btnok" style="width:100%;margin-top:10px" onclick="submitRating()"><i class="ti ti-send"></i> Submit Rating</button>
   </div>
+</div></div>
+<!-- SELLER: AGENT MONITOR -->
+<div class="overlay" id="agentmon-ovl"><div class="modal" style="max-width:440px">
+  <div class="mhd"><h3><i class="ti ti-clipboard-list" style="font-size:13px"></i> Delivery Agents — Monitor</h3><button class="ib" onclick="closeOvl('agentmon-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="agentmon-body"></div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -4717,7 +4722,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v58 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v59 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -4891,7 +4896,8 @@ function showMyProducts(tab){
   var content='';
   if(sellerTab==='orders'){
     // dispatch summary
-    content='<button class="btn btnok" style="width:100%;margin-bottom:10px;border-radius:9px" onclick="closeOvl(\'seller-ovl\');showLabelBatch()"><i class="ti ti-printer"></i> Print Order Labels (QR)</button>'
+    content='<button class="btn btnok" style="width:100%;margin-bottom:8px;border-radius:9px" onclick="closeOvl(\'seller-ovl\');showLabelBatch()"><i class="ti ti-printer"></i> Print Order Labels (QR)</button>'
+      +'<button class="btn" style="width:100%;margin-bottom:10px;border-radius:9px;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="closeOvl(\'seller-ovl\');showAgentMonitor()"><i class="ti ti-clipboard-list"></i> Monitor Delivery Agents</button>'
       +'<div class="dispatch-row">'
       +'<div class="disp-box disp-pend"><b>'+pending+'</b><small>To pack/ship</small></div>'
       +'<div class="disp-box disp-ship"><b>'+dispatched+'</b><small>Dispatched</small></div>'
@@ -5447,7 +5453,7 @@ function saveAgentProfile(){
   if(!name||!phone){toast('Enter name and phone','err');return;}
   if(!agentDocs.license||!agentDocs.eid){toast('Upload your licence and Emirates ID','err');return;}
   var agents=getAgents();var p=agents.find(function(a){return a.uid===CU.uid;});
-  if(!p){p={uid:CU.uid,id:'agt'+Date.now(),deliveries:0,earnings:0,ratings:[]};agents.push(p);}
+  if(!p){p={uid:CU.uid,id:'agt'+Date.now(),agentCode:'AG-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10),deliveries:0,earnings:0,ratings:[]};agents.push(p);}
   p.name=name;p.phone=phone;p.vehicleNo=vno;p.license=agentDocs.license;p.eid=agentDocs.eid;p.vehicle=agentDocs.vehicle;p.photo=agentDocs.photo;p.ts=Date.now();
   saveAgents(agents);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('agents').doc(p.uid).set(p,{merge:true}).catch(function(){});}catch(e){}}
@@ -5561,7 +5567,7 @@ function showAgentDashboard(){
   var rating=avgRating(p);
   var head='<div style="background:var(--card2);border-radius:10px;padding:12px;margin-bottom:11px;text-align:center">'
     +(p.photo?'<img src="'+p.photo+'" style="width:54px;height:54px;border-radius:50%;object-fit:cover;margin:0 auto 6px;display:block">':'')
-    +'<div style="font-weight:700">'+esc(p.name)+'</div><div style="font-size:11px;color:var(--mt2)">'+esc(p.phone)+(rating?' · ⭐ '+rating:'')+'</div></div>';
+    +'<div style="font-weight:700">'+esc(p.name)+'</div><div style="font-size:11px;color:var(--mt2)">'+esc(p.phone)+(rating?' · ⭐ '+rating:'')+'</div>'+(p.agentCode?'<div class="order-no" style="margin-top:4px">Your code: '+esc(p.agentCode)+'</div>':'')+'</div>';
   head+='<div class="dispatch-row">'
     +'<div class="disp-box disp-done"><b>'+delivered.length+'</b><small>Delivered</small></div>'
     +'<div class="disp-box disp-pend"><b>'+pending.length+'</b><small>Pending</small></div>'
@@ -5573,6 +5579,14 @@ function showAgentDashboard(){
   head+='<div style="background:var(--card2);border-radius:9px;padding:9px 11px;margin-bottom:11px;display:flex;justify-content:space-between;align-items:center">'
     +'<div style="font-size:11px"><i class="ti ti-trophy" style="color:'+tier.c+'"></i> Performance: <b style="color:'+tier.c+'">'+tier.n+'</b> ('+totalDel+' delivered)</div>'
     +'<div style="font-size:10px;color:'+tier.c+';font-weight:600">'+tier.b+'</div></div>';
+  // multi-store breakdown — agent can deliver for many shops
+  var byStore={};
+  myOrders.forEach(function(o){var k=o.sellerName||o.sellerUid||'Store';if(!byStore[k])byStore[k]={del:0,bal:0,earned:0,cur:commCurrency(o)};var s=byStore[k];if(o.status==='delivered'){s.del++;s.earned+=orderCommission(o);}else s.bal++;});
+  var storeKeys=Object.keys(byStore);
+  if(storeKeys.length){
+    head+='<div style="font-size:11px;font-weight:700;color:var(--mt);margin:4px 0 7px;text-transform:uppercase">Stores I deliver for</div>';
+    head+=storeKeys.map(function(k){var s=byStore[k];return '<div class="act-row"><div><b>'+esc(k)+'</b><small>'+s.del+' delivered · '+s.bal+' pending</small></div><span class="pay-badge pay-online-b">'+esc(s.cur)+' '+(Math.round(s.earned*10)/10)+'</span></div>';}).join('');
+  }
   var content=myOrders.length?myOrders.map(function(o){
     var os=orderStatusObj(o.status);var si=orderStatusIndex(o.status);
     var next=si<ORDER_STATUS.length-1?ORDER_STATUS[si+1]:null;
@@ -5629,5 +5643,48 @@ function submitRating(){
     if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('agents').doc(a.uid).set(a,{merge:true}).catch(function(){});}catch(e){}}}
   o.rated=true;saveOrders(getOrders().map(function(x){return x.id===o.id?o:x;}));
   closeOvl('rate-ovl');toast('Thanks for rating!','ok');
+}
+
+/* ===== Seller's delivery-agent monitor ===== */
+function showAgentMonitor(){
+  if(!requireAuth('monitor agents'))return;
+  var myOrders=getOrders().filter(function(o){return o.sellerUid===CU.uid&&o.agentUid;});
+  var byAgent={};
+  myOrders.forEach(function(o){
+    var k=o.agentUid;
+    if(!byAgent[k])byAgent[k]={name:o.agentName,phone:o.agentPhone,collected:0,delivered:0,balance:0,earned:0,cur:commCurrency(o),orders:[]};
+    var a=byAgent[k];a.orders.push(o);
+    // collected = picked up or beyond; delivered = delivered; balance = assigned but not delivered
+    var si=orderStatusIndex(o.status);
+    if(o.status==='delivered'){a.delivered++;a.earned+=orderCommission(o);}
+    else a.balance++;
+    if(si>=orderStatusIndex('shipped')||o.pickedTs)a.collected++;
+  });
+  var body=document.getElementById('agentmon-body');
+  var keys=Object.keys(byAgent);
+  if(!keys.length){body.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No agents have handled your orders yet. Assign an agent to an order first.</p>';}
+  else{
+    body.innerHTML=keys.map(function(k){
+      var a=byAgent[k];var ag=getAgents().find(function(x){return x.uid===k;});
+      return '<div class="appl-card">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+        +'<div><div style="font-weight:700;font-size:13px">'+esc(a.name||'Agent')+'</div>'
+        +(ag&&ag.agentCode?'<div class="order-no">'+esc(ag.agentCode)+'</div>':'')
+        +(a.phone?'<div style="font-size:11px"><a href="https://wa.me/'+esc((a.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)"><i class="ti ti-brand-whatsapp"></i> '+esc(a.phone)+'</a></div>':'')
+        +'</div>'
+        +(ag&&ag.ratings&&ag.ratings.length?'<span class="pay-badge pay-online-b">⭐ '+avgRating(ag)+'</span>':'')
+        +'</div>'
+        +'<div class="dispatch-row" style="margin-top:8px;margin-bottom:0">'
+        +'<div class="disp-box disp-ship"><b>'+a.collected+'</b><small>Collected</small></div>'
+        +'<div class="disp-box disp-done"><b>'+a.delivered+'</b><small>Delivered</small></div>'
+        +'<div class="disp-box disp-pend"><b>'+a.balance+'</b><small>Balance</small></div>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--mt);margin-top:7px">Commission earned via you: <b style="color:var(--g)">'+esc(a.cur)+' '+(Math.round(a.earned*10)/10)+'</b></div>'
+        +'<details style="margin-top:6px"><summary style="font-size:10px;color:var(--mt2);cursor:pointer">View orders ('+a.orders.length+')</summary>'
+        +a.orders.map(function(o){return '<div style="font-size:11px;padding:4px 0;border-top:1px solid var(--b)">'+esc(o.orderNo||o.id)+' · '+esc(o.productTitle)+' · '+orderStatusObj(o.status).label+'</div>';}).join('')
+        +'</details></div>';
+    }).join('');
+  }
+  document.getElementById('agentmon-ovl').classList.add('open');
 }
 </script></body></html>
