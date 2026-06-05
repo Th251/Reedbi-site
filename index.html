@@ -234,6 +234,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sndbtn:active{transform:scale(.93)}
 .sndbtn:active{transform:scale(.93)}
 .ib-activity{background:var(--g)!important;color:#fff!important}
+.otp-box{background:rgba(10,102,194,.1);border:1px dashed var(--g);border-radius:8px;padding:8px;margin-top:6px;font-size:12px;color:var(--g);font-weight:600}
+.otp-box b{font-size:18px;letter-spacing:3px}
 .ib-activity i{color:#fff!important}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9000;align-items:flex-end;justify-content:center}
 .buy-gallery{display:flex;gap:7px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;border-radius:10px;touch-action:pan-x}
@@ -499,7 +501,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v59</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v61</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -871,6 +873,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="overlay" id="agentmon-ovl"><div class="modal" style="max-width:440px">
   <div class="mhd"><h3><i class="ti ti-clipboard-list" style="font-size:13px"></i> Delivery Agents — Monitor</h3><button class="ib" onclick="closeOvl('agentmon-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="agentmon-body"></div>
+</div></div>
+<!-- OFFERS & EXPIRY MANAGER -->
+<div class="overlay" id="offers-ovl"><div class="modal" style="max-width:440px">
+  <div class="mhd"><h3><i class="ti ti-discount-2" style="font-size:13px"></i> Offers & Expiry</h3><button class="ib" onclick="closeOvl('offers-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="offers-body"></div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -4722,7 +4729,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v59 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v61 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -4907,7 +4914,7 @@ function showMyProducts(tab){
   }else if(sellerTab==='listings'){
     var qrP=prods.filter(function(p){return p.qrPrinted;}).length;
     var qrB=prods.length-qrP;
-    var qrSummary=prods.length?'<div class="dispatch-row"><div class="disp-box disp-done"><b>'+qrP+'</b><small>QR printed</small></div><div class="disp-box disp-pend"><b>'+qrB+'</b><small>QR to print</small></div><div class="disp-box disp-ship"><b>'+prods.length+'</b><small>Total listed</small></div></div>':'';
+    var qrSummary=prods.length?'<button class="btn" style="width:100%;margin-bottom:9px;border-radius:9px;border:1px solid var(--gold);background:rgba(195,125,22,.08);color:var(--gold)" onclick="closeOvl(\'seller-ovl\');showOffersManager()"><i class="ti ti-discount-2"></i> Offers &amp; Expiring-Soon Manager</button><div class="dispatch-row"><div class="disp-box disp-done"><b>'+qrP+'</b><small>QR printed</small></div><div class="disp-box disp-pend"><b>'+qrB+'</b><small>QR to print</small></div><div class="disp-box disp-ship"><b>'+prods.length+'</b><small>Total listed</small></div></div>':'';
     content=qrSummary+(prods.length?prods.map(function(p){return productCardSeller(p);}).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:18px"><i class="ti ti-shopping-bag" style="font-size:30px;color:var(--b2);display:block;margin-bottom:6px"></i>No products yet.</p>');
   }else{
     // ANALYTICS
@@ -5025,6 +5032,9 @@ function setOrderStatus(orderId,idx){
   var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});
   if(o){
     o.status=ORDER_STATUS[idx].id;o.statusTs=Date.now();
+    if(o.status==='out_delivery'&&!o.outForDeliveryTs)o.outForDeliveryTs=Date.now();
+    if(o.status==='out_delivery'&&!o.deliveryOtp)o.deliveryOtp=(''+Math.floor(1000+Math.random()*9000));
+    if(o.status==='delivered'&&!o.deliveredTs)o.deliveredTs=Date.now();
     if(!o.statusLog)o.statusLog=[];
     o.statusLog.push({status:ORDER_STATUS[idx].id,ts:Date.now(),by:CU?CU.name:''});
     saveOrders(orders);
@@ -5133,6 +5143,7 @@ function showMyOrders(){
       +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'
       +'<div style="font-size:11px;color:var(--mt)">Seller: '+esc(o.sellerName)+'</div>'
       +(o.agentName?'<div style="font-size:11px;color:var(--g)"><i class="ti ti-moped"></i> Agent: '+esc(o.agentName)+(o.agentPhone?' · <a href="https://wa.me/'+esc((o.agentPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(o.agentPhone)+'</a>':'')+'</div>':'')
+      +((o.status==='out_delivery'&&o.deliveryOtp)?'<div class="otp-box"><i class="ti ti-shield-lock"></i> Delivery OTP: <b>'+esc(o.deliveryOtp)+'</b><div style="font-size:9px;color:var(--mt2);font-weight:400">Give this to the agent to confirm delivery</div></div>':'')
       +'<div style="font-size:11px;color:var(--g);font-weight:700;margin-top:3px"><i class="ti ti-'+so.icon+'"></i> '+so.label+'</div>'
       +'<div class="trk">'+track+'</div>'
       +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Show tracking QR &amp; order #</button>'
@@ -5410,6 +5421,55 @@ function printAllPending(){
   w.document.write(html);w.document.close();
   markAllPrinted();
 }
+
+/* ===== Offers & Expiring-soon manager ===== */
+function showOffersManager(){
+  if(!requireAuth('manage offers'))return;
+  var prods=getMyProducts();
+  var now=Date.now();
+  var expiringSoon=[],idleLong=[],onOffer=[];
+  prods.forEach(function(p){
+    if(p.offer)onOffer.push(p);
+    if(p.expiry){var diff=new Date(p.expiry).getTime()-now;if(diff>0&&diff<3*86400000)expiringSoon.push(p);}
+    var age=now-(p.ts||now);var sold=getOrders().filter(function(o){return o.productId===p.id;}).length;
+    if(age>=7*86400000&&sold===0)idleLong.push(p);
+  });
+  // revenue earned from offered products (delivered orders of products that have an offer)
+  var offerRevenue=0,offerCur='';
+  getOrders().filter(function(o){return o.sellerUid===CU.uid&&o.status==='delivered';}).forEach(function(o){
+    var pr=prods.find(function(x){return x.id===o.productId;});
+    if(pr&&pr.offer){var op=parseFloat(String(pr.offer).replace(/[^0-9.]/g,''))||0;offerRevenue+=op*(o.qty||1);offerCur=pr.currency;}
+  });
+  var body=document.getElementById('offers-body');
+  var h='<div style="background:var(--card2);border-radius:10px;padding:12px;margin-bottom:11px">'
+    +'<div style="font-size:13px;font-weight:700"><i class="ti ti-discount-2" style="color:var(--gold)"></i> Offers & Expiry Manager</div>'
+    +'<div class="dispatch-row" style="margin-top:8px;margin-bottom:0">'
+    +'<div class="disp-box disp-pend"><b>'+expiringSoon.length+'</b><small>Expiring soon</small></div>'
+    +'<div class="disp-box disp-ship"><b>'+onOffer.length+'</b><small>On offer</small></div>'
+    +'<div class="disp-box disp-done"><b>'+esc(offerCur)+' '+offerRevenue.toLocaleString()+'</b><small>Offer revenue</small></div>'
+    +'</div></div>';
+  function offerRow(p,tagHtml){
+    return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+(p.photos&&p.photos[0]||'')+'" style="width:46px;height:46px;border-radius:7px;object-fit:cover">'
+      +'<div style="flex:1"><div style="font-weight:700;font-size:12px">'+esc(p.title)+'</div>'
+      +'<div style="font-size:11px;color:var(--g)">'+esc(p.currency)+' '+esc(p.price)+(p.offer?' → <span style="color:var(--gold);font-weight:700">offer '+esc(p.offer)+'</span>':'')+'</div>'
+      +tagHtml+'</div></div>'
+      +'<div style="display:flex;gap:6px;margin-top:7px"><input type="text" id="off-'+p.id+'" placeholder="Set offer price" value="'+esc(p.offer||'')+'" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:7px;padding:7px;color:var(--tx);font-family:var(--fn);font-size:12px">'
+      +'<button class="ps-btn" onclick="setOfferPrice(\''+p.id+'\')"><i class="ti ti-tag"></i> Apply</button></div></div>';
+  }
+  if(expiringSoon.length){h+='<div class="lbl-sec">⏰ Expiring soon — add an offer</div>';h+=expiringSoon.map(function(p){var diff=new Date(p.expiry).getTime()-now;var ed=Math.floor(diff/86400000),eh=Math.floor((diff%86400000)/3600000);return offerRow(p,'<div style="font-size:10px;color:var(--red)">Expires in '+ed+'d '+eh+'h — SOON!</div>');}).join('');}
+  if(idleLong.length){h+='<div class="lbl-sec">🔥 Idle (no sales 7+ days)</div>';h+=idleLong.map(function(p){var age=now-(p.ts||now);var d=Math.floor(age/86400000);return offerRow(p,'<div style="font-size:10px;color:var(--gold)">Idle '+d+' days</div>');}).join('');}
+  if(onOffer.length){h+='<div class="lbl-sec">🏷️ Currently on offer</div>';h+=onOffer.map(function(p){return offerRow(p,'<div style="font-size:10px;color:var(--gold)">Offer active</div>');}).join('');}
+  if(!expiringSoon.length&&!idleLong.length&&!onOffer.length)h+='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products expiring soon or idle. All good!</p>';
+  body.innerHTML=h;
+  document.getElementById('offers-ovl').classList.add('open');
+}
+function setOfferPrice(pid){
+  var val=(document.getElementById('off-'+pid)||{}).value||'';
+  var prods=getProducts();var p=prods.find(function(x){return x.id===pid;});
+  if(p){p.offer=val.trim();saveProducts(prods);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(p.id).set(p,{merge:true}).catch(function(){});}catch(e){}}}
+  showOffersManager();toast(val?'Offer price set':'Offer removed','ok');
+}
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
    ============================================================ */
@@ -5595,7 +5655,11 @@ function showAgentDashboard(){
       +'<div style="font-size:11px;color:var(--mt)">To: '+esc(o.buyerName)+' · '+esc(o.buyerAddr||'')+'</div>'
       +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> Navigate</a></div>':'')
       +'<div class="ord-current"><i class="ti ti-'+os.icon+'"></i> '+os.label+'</div>'
-      +(next?'<button class="ord-next" onclick="agentUpdateStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark: '+next.label+'</button>':'<div style="font-size:11px;color:var(--g);margin-top:6px"><i class="ti ti-circle-check"></i> Delivered · +'+commCurrency(o)+' '+orderCommission(o)+' commission</div>')
+      +(deliveryTimeStr(o)?'<div style="margin-top:5px">'+deliveryTimeStr(o)+'</div>':'')
+      +(next?(next.id==='delivered'
+          ?'<button class="ord-next" onclick="agentConfirmDelivery(\''+o.id+'\')"><i class="ti ti-shield-check"></i> Confirm delivery (enter OTP)</button>'
+          :'<button class="ord-next" onclick="agentUpdateStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark: '+next.label+'</button>')
+        :'<div style="font-size:11px;color:var(--g);margin-top:6px"><i class="ti ti-circle-check"></i> Delivered · +'+commCurrency(o)+' '+orderCommission(o)+' commission</div>')
       +'</div>';
   }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No deliveries assigned yet.</p>';
   // Open pickups available to claim (pool) — hidden once another agent takes them
@@ -5646,6 +5710,26 @@ function submitRating(){
 }
 
 /* ===== Seller's delivery-agent monitor ===== */
+var LATE_DELIVERY_HOURS=24; // flag deliveries that took longer than this
+function deliveryDuration(o){
+  // ms from out-for-delivery (or picked) to delivered; if not delivered yet, elapsed so far
+  var start=o.outForDeliveryTs||o.pickedTs||o.statusTs;
+  if(!start)return null;
+  var end=o.deliveredTs||Date.now();
+  return end-start;
+}
+function fmtDuration(ms){
+  if(ms==null)return '—';
+  var h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
+  if(h>=24){var d=Math.floor(h/24);return d+'d '+(h%24)+'h';}
+  return h+'h '+m+'m';
+}
+function deliveryTimeStr(o){
+  var ms=deliveryDuration(o);if(ms==null)return '';
+  var late=ms>LATE_DELIVERY_HOURS*3600000;
+  var label=(o.deliveredTs?'Delivered in ':'In progress ')+fmtDuration(ms);
+  return '<span class="exp-badge '+(late?'exp-soon':'exp-ok')+'"><i class="ti ti-clock"></i> '+label+(late?' — LATE':'')+'</span>';
+}
 function showAgentMonitor(){
   if(!requireAuth('monitor agents'))return;
   var myOrders=getOrders().filter(function(o){return o.sellerUid===CU.uid&&o.agentUid;});
@@ -5681,10 +5765,31 @@ function showAgentMonitor(){
         +'</div>'
         +'<div style="font-size:11px;color:var(--mt);margin-top:7px">Commission earned via you: <b style="color:var(--g)">'+esc(a.cur)+' '+(Math.round(a.earned*10)/10)+'</b></div>'
         +'<details style="margin-top:6px"><summary style="font-size:10px;color:var(--mt2);cursor:pointer">View orders ('+a.orders.length+')</summary>'
-        +a.orders.map(function(o){return '<div style="font-size:11px;padding:4px 0;border-top:1px solid var(--b)">'+esc(o.orderNo||o.id)+' · '+esc(o.productTitle)+' · '+orderStatusObj(o.status).label+'</div>';}).join('')
+        +a.orders.map(function(o){return '<div style="font-size:11px;padding:4px 0;border-top:1px solid var(--b)">'+esc(o.orderNo||o.id)+' · '+esc(o.productTitle)+' · '+orderStatusObj(o.status).label+(deliveryTimeStr(o)?' '+deliveryTimeStr(o):'')+'</div>';}).join('')
         +'</details></div>';
     }).join('');
   }
   document.getElementById('agentmon-ovl').classList.add('open');
+}
+
+/* OTP-gated delivery: buyer shows the agent their delivery OTP; agent enters it */
+function agentConfirmDelivery(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o)return;
+  if(!o.deliveryOtp){
+    // not yet out for delivery — move it there first to generate OTP
+    var oi=ORDER_STATUS.findIndex(function(s){return s.id==='out_delivery';});
+    setOrderStatus(orderId,oi);
+    toast('Order set to Out for Delivery. Buyer now has an OTP — ask them for it.','info');
+    showAgentDashboard();return;
+  }
+  var entered=prompt('Enter the 4-digit delivery OTP from the buyer:');
+  if(entered===null)return;
+  if(entered.trim()===o.deliveryOtp){
+    var di=ORDER_STATUS.findIndex(function(s){return s.id==='delivered';});
+    agentUpdateStatus(orderId,di);
+    toast('OTP verified — delivery confirmed!','ok');
+  }else{
+    toast('Incorrect OTP. Ask the buyer to read it from their order tracking.','err');
+  }
 }
 </script></body></html>
