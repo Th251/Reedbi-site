@@ -233,7 +233,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sndbtn{width:44px;height:44px;border-radius:50%;border:none;background:var(--g);cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;touch-action:manipulation;box-shadow:0 2px 6px rgba(10,102,194,.35)}
 .sndbtn:active{transform:scale(.93)}
 .sndbtn:active{transform:scale(.93)}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
+.ib-activity{background:var(--g)!important;color:#fff!important}
+.ib-activity i{color:#fff!important}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9000;align-items:flex-end;justify-content:center}
+.buy-gallery{display:flex;gap:7px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;border-radius:10px;touch-action:pan-x}
+.buy-gallery::-webkit-scrollbar{display:none}
+.buy-gimg{width:100%;flex:0 0 100%;height:200px;object-fit:cover;border-radius:10px;scroll-snap-align:center}
 .overlay.open{display:flex}
 .modal{background:var(--sf);border:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;display:flex;flex-direction:column;max-height:92vh}
 .mhd{padding:13px 16px 10px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
@@ -494,14 +499,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v55</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v57</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
           <button class="ib" onclick="openCreateModal()"><i class="ti ti-square-plus"></i></button>
           <button class="ib" onclick="openProductSearch()" title="Search products to buy"><i class="ti ti-search"></i></button>
           <button class="ib" onclick="showAgentDashboard()" title="Delivery Agent"><i class="ti ti-moped"></i></button>
-          <button class="ib" onclick="showMyActivity()" title="My Activity — all in one place"><i class="ti ti-layout-dashboard"></i></button>
+          <button class="ib ib-activity" onclick="showMyActivity()" title="My Activity — all in one place"><i class="ti ti-layout-dashboard"></i></button>
           <button class="ib" onclick="showMyProducts()" title="My Shop"><i class="ti ti-building-store"></i></button>
           <button class="ib" onclick="showMyOrders()" title="My Orders"><i class="ti ti-package"></i></button>
           <button class="ib" id="folbtn" onclick="toggleFol()"><i class="ti ti-bookmarks"></i></button>
@@ -3340,6 +3345,50 @@ function fbListenComments(tagId,postId){
   }catch(e){console.warn(e);}
 }
 /* Realtime listener: applications for a company (page owner sees instantly) */
+/* Load-back listeners so data survives browser/localStorage clearing.
+   Products/orders/agents/pages are written to Firestore but must also be
+   read back on each session, or a cleared localStorage looks "erased". */
+function fbListenMarketData(){
+  if(!FB.ready||FB_CLOUD_DISABLED||!FB.db)return;
+  try{
+    if(!FB_LISTENERS['products']){
+      FB_LISTENERS['products']=FB.db.collection('products').onSnapshot(function(snap){
+        var local=getProducts();var map={};local.forEach(function(p){map[p.id]=p;});
+        snap.forEach(function(doc){var d=doc.data();d.id=d.id||doc.id;map[d.id]=Object.assign(map[d.id]||{},d);});
+        var merged=Object.keys(map).map(function(k){return map[k];});
+        saveProducts(merged);
+        if(document.getElementById('seller-ovl').classList.contains('open'))showMyProducts(sellerTab);
+      },function(err){if(fbIsPermErr(err))fbStopListener('products','perm');});
+    }
+    if(!FB_LISTENERS['orders']){
+      FB_LISTENERS['orders']=FB.db.collection('orders').onSnapshot(function(snap){
+        var local=getOrders();var map={};local.forEach(function(o){map[o.id]=o;});
+        snap.forEach(function(doc){var d=doc.data();d.id=d.id||doc.id;map[d.id]=Object.assign(map[d.id]||{},d);});
+        var merged=Object.keys(map).map(function(k){return map[k];});
+        saveOrders(merged);
+        if(document.getElementById('seller-ovl').classList.contains('open'))showMyProducts(sellerTab);
+        if(document.getElementById('myorders-ovl').classList.contains('open'))showMyOrders();
+        if(document.getElementById('agentdash-ovl').classList.contains('open'))showAgentDashboard();
+      },function(err){if(fbIsPermErr(err))fbStopListener('orders','perm');});
+    }
+    if(!FB_LISTENERS['agents']){
+      FB_LISTENERS['agents']=FB.db.collection('agents').onSnapshot(function(snap){
+        var local=getAgents();var map={};local.forEach(function(a){map[a.uid]=a;});
+        snap.forEach(function(doc){var d=doc.data();map[d.uid||doc.id]=Object.assign(map[d.uid||doc.id]||{},d);});
+        var merged=Object.keys(map).map(function(k){return map[k];});
+        saveAgents(merged);
+      },function(err){if(fbIsPermErr(err))fbStopListener('agents','perm');});
+    }
+    if(!FB_LISTENERS['pages']){
+      FB_LISTENERS['pages']=FB.db.collection('pages').onSnapshot(function(snap){
+        var local=getPages();var map={};local.forEach(function(p){map[(p.name||'').toLowerCase()]=p;});
+        snap.forEach(function(doc){var d=doc.data();var k=(d.name||doc.id).toLowerCase();map[k]=Object.assign(map[k]||{},d);});
+        var merged=Object.keys(map).map(function(k){return map[k];});
+        savePages(merged);
+      },function(err){if(fbIsPermErr(err))fbStopListener('pages','perm');});
+    }
+  }catch(e){console.warn('market listeners',e);}
+}
 function fbListenCompanyApps(company){
   if(!FB.ready||FB_CLOUD_DISABLED||!FB.db)return;
   try{
@@ -3586,7 +3635,7 @@ function enterApp(){
   followedTags=new Set(LS.get('rb_ftags',[])||[]);followedUsers=new Set(LS.get('rb_fusers',[])||[]);
   tags.forEach(function(t){t.followed=followedTags.has(t.id);});
   renderTagList();
-  if(FB.ready&&CU&&!CU.guest){fbListenMyApps();}
+  if(FB.ready&&CU&&!CU.guest){fbListenMyApps();fbListenMarketData();}
   // Friendly one-time welcome for new users
   if(!LS.get('rb_seen_welcome')){LS.set('rb_seen_welcome',1);setTimeout(function(){toast('👋 Welcome to Reedbi! Tap any tag to start, or create your own.','info');},700);}
 }
@@ -4692,7 +4741,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v55 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v57 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5022,7 +5071,12 @@ function buyProduct(productId){
   if(!requireAuth('place an order'))return;
   var p=getProducts().find(function(x){return x.id===productId;});if(!p){toast('Product not found','err');return;}
   curBuyProduct=p;
-  document.getElementById('buy-info').innerHTML='<div style="font-weight:700">'+esc(p.title)+'</div><div style="color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div>';
+  var gallery='';
+  if(p.photos&&p.photos.length){
+    gallery='<div class="buy-gallery">'+p.photos.map(function(ph,i){return '<img src="'+ph+'" class="buy-gimg" alt="photo '+(i+1)+'">';}).join('')+'</div>'
+      +(p.photos.length>1?'<div style="font-size:10px;color:var(--mt2);text-align:center;margin-top:3px">← swipe to see all '+p.photos.length+' photos →</div>':'');
+  }
+  document.getElementById('buy-info').innerHTML=gallery+'<div style="font-weight:700;margin-top:8px">'+esc(p.title)+'</div><div style="color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+(p.offer?' <span style="color:var(--gold);font-size:12px">offer '+esc(p.offer)+'</span>':'')+'</div>'+(p.desc?'<div style="font-size:12px;color:var(--mt);margin-top:4px">'+esc(p.desc)+'</div>':'');
   document.getElementById('buy-qty').value=1;document.getElementById('buy-addr').value='';document.getElementById('buy-phone').value='';
   var bm=document.getElementById('buy-map');if(bm)bm.value='';
   selectPay('cod');
