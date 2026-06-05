@@ -494,7 +494,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v54</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v55</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4692,7 +4692,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v54 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v55 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5096,6 +5096,7 @@ function showMyOrders(){
     return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="color:var(--mt2);font-weight:400;font-size:11px">×'+o.qty+'</span></div>'
       +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'
       +'<div style="font-size:11px;color:var(--mt)">Seller: '+esc(o.sellerName)+'</div>'
+      +(o.agentName?'<div style="font-size:11px;color:var(--g)"><i class="ti ti-moped"></i> Agent: '+esc(o.agentName)+(o.agentPhone?' · <a href="https://wa.me/'+esc((o.agentPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(o.agentPhone)+'</a>':'')+'</div>':'')
       +'<div style="font-size:11px;color:var(--g);font-weight:700;margin-top:3px"><i class="ti ti-'+so.icon+'"></i> '+so.label+'</div>'
       +'<div class="trk">'+track+'</div>'
       +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Show tracking QR &amp; order #</button>'
@@ -5536,6 +5537,12 @@ function showAgentDashboard(){
     +'<div class="disp-box disp-pend"><b>'+pending.length+'</b><small>Pending</small></div>'
     +'<div class="disp-box disp-ship"><b>'+(delivered[0]?commCurrency(delivered[0])+' ':'')+earnings+'</b><small>Commission earned</small></div>'
     +'</div>';
+  // performance tier — bonus for high performers
+  var totalDel=p.deliveries||delivered.length;
+  var tier=totalDel>=50?{n:'Gold',b:'+20% bonus',c:'var(--gold)'}:totalDel>=20?{n:'Silver',b:'+10% bonus',c:'var(--cyan)'}:totalDel>=10?{n:'Bronze',b:'+5% bonus',c:'var(--g)'}:{n:'Starter',b:'no bonus yet',c:'var(--mt2)'};
+  head+='<div style="background:var(--card2);border-radius:9px;padding:9px 11px;margin-bottom:11px;display:flex;justify-content:space-between;align-items:center">'
+    +'<div style="font-size:11px"><i class="ti ti-trophy" style="color:'+tier.c+'"></i> Performance: <b style="color:'+tier.c+'">'+tier.n+'</b> ('+totalDel+' delivered)</div>'
+    +'<div style="font-size:10px;color:'+tier.c+';font-weight:600">'+tier.b+'</div></div>';
   var content=myOrders.length?myOrders.map(function(o){
     var os=orderStatusObj(o.status);var si=orderStatusIndex(o.status);
     var next=si<ORDER_STATUS.length-1?ORDER_STATUS[si+1]:null;
