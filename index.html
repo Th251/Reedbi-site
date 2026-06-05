@@ -499,7 +499,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v57</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v58</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -3659,12 +3659,8 @@ function dismissAuth(){hideAuthScreen();if(!CU){CU={uid:'guest_'+Date.now(),name
 ============================================================ */
 var CST={jobs:{emoji:'💼',bg:'#162a1c',fg:'#4ade80'},tech:{emoji:'💻',bg:'#162033',fg:'#60a5fa'},ai:{emoji:'🤖',bg:'#1e1533',fg:'#c084fc'},insurance:{emoji:'🛡️',bg:'#15212a',fg:'#38bdf8'},cyber:{emoji:'🛡️',bg:'#2a1520',fg:'#f472b6'},sell:{emoji:'🛒',bg:'#2a1f10',fg:'#fb923c'},general:{emoji:'💬',bg:'#1a1a2e',fg:'#94a3b8'},news:{emoji:'📰',bg:'#1a1f10',fg:'#a3e635'},health:{emoji:'🏥',bg:'#101f1a',fg:'#34d399'},edu:{emoji:'🎓',bg:'#1a1020',fg:'#e879f9'},finance:{emoji:'💰',bg:'#1f1a10',fg:'#fbbf24'},travel:{emoji:'✈️',bg:'#101a2a',fg:'#38bdf8'},remote:{emoji:'🌐',bg:'#101a20',fg:'#2dd4bf'}};
 var AVS=['av0','av1','av2','av3','av4','av5','av6'];
-var WN=['Alex','Jordan','Priya','Omar','Yuki','Lena','Dev','Sara','Mohammed','Chen','Fatima','Lucas','Ananya','Ivan','Aisha','Marco'];
-var WR=['🌍 Global','🇦🇪 UAE','🇮🇳 India','🇺🇸 USA','🇬🇧 UK','🇩🇪 Germany','🇸🇬 Singapore','🇨🇦 Canada','🇦🇺 Australia','🇧🇷 Brazil','🇵🇰 Pakistan','🇵🇭 Philippines'];
 var KW={react:'frontend',javascript:'frontend',typescript:'frontend',nextjs:'frontend',node:'backend',python:'backend',golang:'backend',docker:'devops',kubernetes:'devops',terraform:'devops',aws:'cloud',azure:'cloud',sql:'database',postgres:'database',mongodb:'database',remote:'remote',hybrid:'hybrid',freelance:'freelance',salary:'compensation',aed:'uae',usd:'usa',gbp:'uk',sgd:'singapore',llm:'ai',gpt:'ai',claude:'ai',openai:'ai',insurance:'insurance',policy:'insurance',premium:'insurance',claim:'insurance',underwriting:'insurance',actuary:'insurance',startup:'startup',saas:'saas',fintech:'fintech',senior:'senior',junior:'junior',visa:'visa-sponsor',relocation:'relocation'};
-var LP={jobs:['Sr React Dev - 100% REMOTE','iOS Developer - Dubai / Hybrid','Data Engineer - Singapore SGD 9K','UX Designer - London / Remote','ML Engineer - AED 25K Dubai'],tech:['VSCode extension saving 2hrs/day','TypeScript 5.5 whats new','Bun vs Node 22 benchmarks','PostgreSQL vs MongoDB take'],ai:['Gemini 2 Ultra hands-on review','Building RAG without LangChain','Open source LLM leaderboard'],insurance:['New health policy comparison 2026','Underwriting automation tools','Claims processing best practices','Actuary roles - remote'],sell:['iPhone 16 Pro Like New $850','Graphic design $50/hr','RTX 5090 Gaming PC'],remote:['Stay productive across timezones','Best co-working Bali 2026','Nomad visa Thailand']};
 var LBD=['DMs open for anyone interested.','Full details in comments.','Happy to answer questions.','Would love community feedback!'];
-var LC=['This is exactly what I needed!','Can you share more details?','Bookmarked!','Great post!','Very helpful thanks!'];
 var LCO=['TechCorp','GlobalHire','StartupHub','RemoteFirst','NomadCo','DevStudio','AICo','SecureEdge'];
 function mAgo(m){return Date.now()-m*60000;}
 var tags=[
@@ -4111,25 +4107,6 @@ function scrollLatest(){flushPending();var box=document.getElementById('msgs');i
 /* LIVE ENGINE */
 function startLive(tagId){stopLive();/* auto-posting disabled - real posts only */}
 function stopLive(){if(liveIvl){clearInterval(liveIvl);liveIvl=null;}}
-function injectLive(tagId){
-  var t=tags.find(function(x){return x.id===tagId;});if(!t)return;
-  var user=WN[Math.floor(Math.random()*WN.length)],avIdx=Math.floor(Math.random()*7),region=WR[Math.floor(Math.random()*WR.length)];
-  if(Math.random()<0.55&&t.posts.length){
-    var p=t.posts[Math.floor(Math.random()*t.posts.length)];
-    var c={user:user,avIdx:avIdx,text:LC[Math.floor(Math.random()*LC.length)],likes:0,liked:false,ts:Date.now(),region:region};
-    p.comments.push(c);
-    var key='rb_cmts_'+tagId+'_'+p.id;var sc=LS.get(key,[])||[];sc.push(c);LS.set(key,sc);
-    bcSend({type:'new_comment',tagId:tagId,postId:p.id,c:c});
-    if(activeTagId===tagId){if(p.showComments)appendCommentDOM(tagId,p.id,c,p.comments.length-1);updateFooter(tagId,p.id,p);renderSbar(t);setTick('<i class="ti ti-brand-whatsapp" style="font-size:9px;color:var(--g)"></i> <b>'+esc(user)+'</b> commented <span class="rc">'+esc(region)+'</span>');}else{t._unread=(t._unread||0)+1;updateTagItem(t);}
-  }else{
-    var titles=LP[tagId]||LP.tech;pidCtr++;
-    var np={id:pidCtr,user:user,co:LCO[Math.floor(Math.random()*LCO.length)],avIdx:avIdx,title:titles[Math.floor(Math.random()*titles.length)],body:LBD[Math.floor(Math.random()*LBD.length)],region:region,ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false,boosted:null,boostExpiry:0};
-    t.posts.push(np);
-    var stored=LS.get('rb_posts_'+tagId,[])||[];stored.push(Object.assign({},np,{comments:[]}));LS.set('rb_posts_'+tagId,stored.slice(-100));
-    bcSend({type:'new_post',tagId:tagId,post:Object.assign({},np,{comments:[]})});
-    if(activeTagId===tagId){if(isAtBot){appendPostDOM(t,np);renderSbar(t);renderSlideRows(t);updateTagItem(t);}else{pendingPosts.push(np);showBanner();}setTick('<i class="ti ti-brand-whatsapp" style="font-size:9px;color:var(--g)"></i> <b>'+esc(user)+'</b> posted <span class="rc">'+esc(region)+'</span>');}else{t._unread=(t._unread||0)+1;updateTagItem(t);}
-  }
-}
 /* ============================================================
    ACTIONS
 ============================================================ */
@@ -4552,7 +4529,6 @@ function ownerSetAllFiltered(company,status){
   openCompanyPage(company);
   toast(apps.length+' applicant'+(apps.length!==1?'s':'')+' set to: '+statusObj(status).label,'ok');
 }
-function ownerSetAll(company,status){ownerSetAllFiltered(company,status);}
 var schedAppId=null,schedCompany=null;
 function openSchedule(appId,company){schedAppId=appId;schedCompany=company;var d=document.getElementById('sched-dt');if(d)d.value='';document.getElementById('sched-ovl').classList.add('open');}
 function saveSchedule(){
@@ -4741,7 +4717,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v57 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v58 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
