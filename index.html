@@ -63,11 +63,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sw i{color:var(--mt2);font-size:13px}
 .sw input{border:none;background:transparent;outline:none;font-size:13px;color:var(--tx);flex:1;font-family:var(--fn)}
 .tlist{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.ti{touch-action:manipulation}
-.ti{display:flex;align-items:center;gap:10px;padding:9px 11px;cursor:pointer;border-bottom:1px solid rgba(30,45,69,.4)}
-.ti:hover{background:var(--card2)}
-.ti:active{background:#e8eef3;transform:scale(.995)}
-.ti.act{background:var(--card2);border-left:3px solid var(--g)}
+.tgrow{touch-action:manipulation}
+.tgrow{display:flex;align-items:center;gap:10px;padding:9px 11px;cursor:pointer;border-bottom:1px solid rgba(30,45,69,.4)}
+.tgrow:hover{background:var(--card2)}
+.tgrow:active{background:#e8eef3;transform:scale(.995)}
+.tgrow.act{background:var(--card2);border-left:3px solid var(--g)}
 .tav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:1px solid var(--b)}
 .tinf{flex:1;min-width:0}
 .tnr1{display:flex;align-items:center;gap:4px;margin-bottom:2px}
@@ -456,7 +456,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   .mw textarea{font-size:16px}
   .bub{max-width:85%}
   .tlist{flex:1;min-height:0;-webkit-overflow-scrolling:touch}
-  .ti{padding:13px 12px}
+  .tgrow{padding:13px 12px}
   .fol-btn{width:30px;height:30px}
   .srow{padding:7px 10px}
   .chip{padding:6px 11px;font-size:12px}
@@ -501,7 +501,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v61</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v62</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -3864,7 +3864,7 @@ function renderTagList(filter){
   if(!filtered.length){list.innerHTML='<div class="nores"><i class="ti ti-tag-off"></i>'+(filter?'<p>No tags for "'+esc(filter)+'"</p><button onclick="openCreateModalWithName(\''+escJS(filter)+'\')">+ Create #'+esc(filter)+'</button>':'<p>No followed tags yet.</p>')+'</div>';return;}
   filtered.sort(function(a,b){var aT=a.posts.length?Math.max.apply(null,a.posts.map(function(p){return p.ts;})):0,bT=b.posts.length?Math.max.apply(null,b.posts.map(function(p){return p.ts;})):0;return bT-aT;});
   list.innerHTML=filtered.map(function(t){var s=cs(t.cat),posts=t.posts.slice().sort(function(a,b){return b.ts-a.ts;}),last=posts[0],u=t._unread||0;
-    return '<div class="ti'+(activeTagId===t.id?' act':'')+'" data-tid="'+esc(t.id)+'" onclick="openTag(\''+escJS(t.id)+'\')">'
+    return '<div class="tgrow'+(activeTagId===t.id?' act':'')+'" data-tid="'+esc(t.id)+'" onclick="openTag(\''+escJS(t.id)+'\')">'
       +'<div class="tav" style="background:'+s.bg+';color:'+s.fg+'">'+s.emoji+'</div>'
       +'<div class="tinf"><div class="tnr1"><span class="tnm">#'+esc(t.name)+'</span>'+(t.followed?'<span class="tbadge">Following</span>':'')+'</div>'
       +'<div class="tprev">'+(last?esc((last.title||last.body||'').substring(0,38)):esc(t.desc))+'</div></div>'
@@ -4108,7 +4108,7 @@ function renderMsgs(t){
 function appendPostDOM(t,p){var box=document.getElementById('msgs');if(!box)return;var isMine=CU&&p.uid&&p.uid===CU.uid;var banner=document.getElementById('nbanner');var div=document.createElement('div');div.id='bw-'+t.id+'-'+p.id;div.className='bwrap '+(isMine?'mine':'theirs')+' nf';div.innerHTML=buildBubble(t,p,isMine);if(banner&&banner.parentNode===box)box.insertBefore(div,banner.nextSibling);else box.insertBefore(div,box.firstChild);if(isAtBot)box.scrollTop=0;}
 function appendCommentDOM(tagId,postId,c,ci){var cs=document.getElementById('cs-'+tagId+'-'+postId);if(!cs)return;var addRow=cs.querySelector('.acmt');var div=document.createElement('div');div.className='ci nca';div.innerHTML='<div class="cav '+avC(c.avIdx)+'">'+ini(c.user)+'</div><div class="ccon"><span class="cau">'+esc(c.user)+'</span><div class="ctxt">'+esc(c.text)+'</div><div class="cmeta"><span>'+fmtT(c.ts)+'</span></div></div>';cs.insertBefore(div,addRow);}
 function updateFooter(tagId,postId,p){var bw=document.getElementById('bw-'+tagId+'-'+postId);if(!bw)return;var btns=bw.querySelectorAll('.ba');if(btns[1])btns[1].innerHTML='<i class="ti ti-message-2"></i> '+p.comments.length;}
-function updateTagItem(t){var item=null;var all=document.querySelectorAll('.ti');for(var i=0;i<all.length;i++){if(all[i].getAttribute('data-tid')===t.id){item=all[i];break;}}if(!item)return;var sorted=t.posts.slice().sort(function(a,b){return b.ts-a.ts;});var last=sorted[0];var u=t._unread||0;var prev=item.querySelector('.tprev');var time=item.querySelector('.ttime');if(prev&&last)prev.textContent=(last.title||last.body||'').substring(0,38);if(time&&last)time.textContent=fmtT(last.ts);var badge=item.querySelector('.ubadge');if(u>0){if(badge)badge.textContent=u;else{var mc=item.querySelector('.tmeta');if(mc){var b=document.createElement('div');b.className='ubadge';b.textContent=u;mc.appendChild(b);}}}}
+function updateTagItem(t){var item=null;var all=document.querySelectorAll('.tgrow');for(var i=0;i<all.length;i++){if(all[i].getAttribute('data-tid')===t.id){item=all[i];break;}}if(!item)return;var sorted=t.posts.slice().sort(function(a,b){return b.ts-a.ts;});var last=sorted[0];var u=t._unread||0;var prev=item.querySelector('.tprev');var time=item.querySelector('.ttime');if(prev&&last)prev.textContent=(last.title||last.body||'').substring(0,38);if(time&&last)time.textContent=fmtT(last.ts);var badge=item.querySelector('.ubadge');if(u>0){if(badge)badge.textContent=u;else{var mc=item.querySelector('.tmeta');if(mc){var b=document.createElement('div');b.className='ubadge';b.textContent=u;mc.appendChild(b);}}}}
 function refreshTimes(){var t=tags.find(function(x){return x.id===activeTagId;});if(!t)return;t.posts.forEach(function(p){var bw=document.getElementById('bw-'+t.id+'-'+p.id);if(!bw)return;var pts=bw.querySelector('.pts');if(pts)pts.innerHTML='<i class="ti ti-clock" style="font-size:8px"></i>'+fmtT(p.ts)+' '+fmtC(p.ts);});}
 function trackScroll(){var box=document.getElementById('msgs');if(!box)return;box.addEventListener('scroll',function(){isAtBot=box.scrollTop<80;if(isAtBot)flushPending();},{passive:true});}
 function showBanner(){var b=document.getElementById('nbanner');if(b){b.classList.add('show');document.getElementById('nbtxt').textContent=pendingPosts.length+' new';}}
@@ -4729,7 +4729,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v61 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v62 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
