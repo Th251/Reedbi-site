@@ -485,7 +485,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       <div id="sform" style="display:none">
         <div class="frow" style="margin-bottom:0">
           <div class="afg"><label>Name</label><input type="text" id="sn" placeholder="Your name"></div>
-          <div class="afg"><label>Company</label><input type="text" id="sc" placeholder="DevCorp"></div>
+          <div class="afg"><label>Company (select existing page)</label><select id="sc" style="width:100%"><option value="">— None / Independent —</option></select></div>
         </div>
         <div class="afg"><label>Email</label><input type="email" id="se" placeholder="you@email.com"></div>
         <div class="afg"><label>Password</label><input type="password" id="sp" placeholder="Min 6 chars"></div>
@@ -501,7 +501,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v62</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v63</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -537,7 +537,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     </div>
     <div id="cv-view" style="display:none;flex-direction:column;flex:1;min-height:0;height:100%">
       <div class="ch">
-        <button class="backbtn" onclick="goBack()"><i class="ti ti-arrow-left"></i></button>
+        <button class="backbtn" onclick="goBack()" title="Back to tags"><i class="ti ti-arrow-left"></i></button>
+        <button class="backbtn" onclick="goHome()" title="Home" style="background:transparent"><i class="ti ti-home"></i></button>
         <div class="chav" id="chav"></div>
         <div class="chin"><div class="chn" id="chn"></div><div class="chs" id="chs"></div></div>
         <div class="chacts">
@@ -3530,7 +3531,12 @@ function readB64(f){return new Promise(function(r,j){var fr=new FileReader();fr.
    AUTH
 ============================================================ */
 var CU=null;
-function switchTab(t){['l','s'].forEach(function(x){document.getElementById('tab-'+x).className='atab'+(x===t?' on':'');});document.getElementById('lform').style.display=t==='l'?'block':'none';document.getElementById('sform').style.display=t==='s'?'block':'none';document.getElementById('aerr').textContent='';}
+function populateCompanyDropdown(){
+  var sel=document.getElementById('sc');if(!sel||sel.tagName!=='SELECT')return;
+  var pages=getPages();
+  sel.innerHTML='<option value="">— None / Independent —</option>'+pages.map(function(p){return '<option value="'+esc(p.name)+'">'+esc(p.name)+'</option>';}).join('');
+}
+function switchTab(t){['l','s'].forEach(function(x){document.getElementById('tab-'+x).className='atab'+(x===t?' on':'');});document.getElementById('lform').style.display=t==='l'?'block':'none';document.getElementById('sform').style.display=t==='s'?'block':'none';document.getElementById('aerr').textContent='';if(t==='s')populateCompanyDropdown();}
 function setErr(m){document.getElementById('aerr').textContent=m;}
 function fbErr(err){
   var c=(err&&err.code)||'';
@@ -4729,7 +4735,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v62 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v63 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5182,7 +5188,7 @@ function showMyActivity(){
   // HR pages
   if(ownedPages.length){
     h+='<div class="act-sec"><div class="act-h"><i class="ti ti-users"></i> Jobs I Posted — Manage Applicants <b>('+ownedPages.length+')</b></div>';
-    h+=ownedPages.map(function(pg){var cnt=getAppsForCompany(pg.name).length;return '<div class="act-row"><div><b>'+esc(pg.name)+'</b><small>'+cnt+' applicant'+(cnt!==1?'s':'')+'</small></div><button class="act-mini" onclick="closeOvl(\'activity-ovl\');openCompanyPage(\''+escJS(pg.name)+'\')">Manage →</button></div>';}).join('');
+    h+=ownedPages.map(function(pg){var cnt=getAppsForCompany(pg.name).length;var emp=(pg.members?pg.members.length:0)+1;return '<div class="act-row"><div><b>'+esc(pg.name)+'</b><small>'+emp+' employee'+(emp!==1?'s':'')+' · '+cnt+' applicant'+(cnt!==1?'s':'')+'</small></div><button class="act-mini" onclick="closeOvl(\'activity-ovl\');openCompanyPage(\''+escJS(pg.name)+'\')">Manage →</button></div>';}).join('');
     h+='</div>';
   }
   // Delivery agent section
