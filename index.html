@@ -401,6 +401,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .cart-trust{display:flex;justify-content:space-between;margin-top:11px;font-size:9px;color:var(--mt2);gap:4px}
 .cart-trust span{display:flex;align-items:center;gap:3px}
 .cart-trust i{color:#1a8f3c;font-size:13px}
+.ps-cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:9px;margin-bottom:9px;-webkit-overflow-scrolling:touch;touch-action:pan-x;border-bottom:1px solid var(--b)}
+.cat-chip{flex-shrink:0;background:var(--card2);border:1px solid var(--b);border-radius:16px;padding:6px 13px;font-size:11px;font-weight:600;color:var(--mt);cursor:pointer;font-family:var(--fn);white-space:nowrap;touch-action:manipulation;transition:all .15s}
+.cat-chip.on{background:var(--g);color:#fff;border-color:var(--g)}
 .order-no{display:inline-block;font-size:10px;font-weight:700;color:var(--g);background:rgba(10,102,194,.08);border-radius:6px;padding:2px 8px;margin:3px 0;letter-spacing:.5px}
 .ord-qr{width:100%;margin-top:7px;background:var(--card2);color:var(--g);border:1px solid var(--g);border-radius:8px;padding:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:5px;touch-action:manipulation}
 .dispatch-row{display:flex;gap:7px;margin-bottom:11px}
@@ -529,7 +532,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v69</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v70</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -852,6 +855,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   <div class="mhd"><h3><i class="ti ti-search" style="font-size:13px"></i> Search Products</h3><button class="ib" onclick="closeOvl('prodsearch-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd">
     <div class="sw" style="margin-bottom:10px"><i class="ti ti-search"></i><input type="text" id="ps-q" placeholder="Search by name, e.g. iPhone, shoes, camera..." oninput="runProductSearch(this.value)" autocomplete="off"></div>
+    <div id="ps-cats" class="ps-cats"></div>
     <div id="ps-results"></div>
   </div>
 </div></div>
@@ -4811,7 +4815,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v69 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v70 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5473,9 +5477,23 @@ function shareProduct(pid){
 /* ===== Product search ===== */
 function openProductSearch(){
   var q=document.getElementById('ps-q');if(q)q.value='';
+  psCategory='';
+  renderCategoryChips();
   runProductSearch('');
   document.getElementById('prodsearch-ovl').classList.add('open');
 }
+var psCategory='';
+function renderCategoryChips(){
+  var box=document.getElementById('ps-cats');if(!box)return;
+  var prods=getProducts().filter(function(p){return !p.withdrawn;});
+  var counts={};
+  prods.forEach(function(p){var c=p.category||'Other';counts[c]=(counts[c]||0)+1;});
+  var cats=Object.keys(counts).sort();
+  var chips='<button class="cat-chip'+(psCategory===''?' on':'')+'" onclick="setPsCategory(\'\')">All ('+prods.length+')</button>';
+  chips+=cats.map(function(c){return '<button class="cat-chip'+(psCategory===c?' on':'')+'" onclick="setPsCategory(\''+escJS(c)+'\')">'+esc(c)+' ('+counts[c]+')</button>';}).join('');
+  box.innerHTML=chips;
+}
+function setPsCategory(c){psCategory=c;renderCategoryChips();runProductSearch((document.getElementById('ps-q')||{}).value||'');}
 function shopRibbon(p){
   // decide a badge: offer > expiring soon > new (listed < 3 days) > none
   if(p.offer)return '<span class="shop-ribbon ribbon-offer">Offer</span>';
@@ -5490,6 +5508,7 @@ function priceHtml(p){
 function runProductSearch(q){
   q=(q||'').trim().toLowerCase();
   var prods=getProducts().filter(function(p){return !p.withdrawn;});
+  if(psCategory)prods=prods.filter(function(p){return (p.category||'Other')===psCategory;});
   var matches=q?prods.filter(function(p){return ((p.title||'')+' '+(p.desc||'')+' '+(p.category||'')).toLowerCase().indexOf(q)>=0;}):prods;
   var box=document.getElementById('ps-results');if(!box)return;
   if(!prods.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products listed yet.</p>';return;}
