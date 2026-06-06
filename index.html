@@ -372,20 +372,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .lbl-done{background:rgba(10,102,194,.1);color:var(--g)}
 .lbl-mini{font-size:10px;border:1px solid var(--b);background:var(--sf);color:var(--mt);border-radius:6px;padding:5px 9px;cursor:pointer;font-family:var(--fn);white-space:nowrap;touch-action:manipulation}
 .lbl-print{background:var(--g);color:#fff;border-color:var(--g);font-weight:600}
-.ps-card{position:relative;display:flex;gap:11px;background:var(--sf);border:1px solid var(--b);border-radius:12px;padding:11px;margin-bottom:9px;transition:box-shadow .18s,transform .18s;overflow:hidden}
-.ps-card:hover{box-shadow:0 6px 20px rgba(10,102,194,.12);transform:translateY(-1px)}
-.ps-img{width:72px;height:72px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--b)}
-.ps-btn{margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fn);display:inline-flex;align-items:center;gap:4px;touch-action:manipulation;transition:background .15s}
-.ps-btn:hover{background:var(--bo)}
-.shop-ribbon{position:absolute;top:9px;left:-1px;z-index:2;font-size:9px;font-weight:800;letter-spacing:.5px;color:#fff;padding:3px 10px 3px 8px;text-transform:uppercase;border-radius:0 3px 3px 0;box-shadow:0 2px 5px rgba(0,0,0,.18)}
-.shop-ribbon::after{content:"";position:absolute;right:-6px;top:0;border-top:11px solid transparent;border-bottom:11px solid transparent}
-.ribbon-sale{background:#cc1016}.ribbon-sale::after{border-left:6px solid #cc1016}
-.ribbon-new{background:var(--g)}.ribbon-new::after{border-left:6px solid var(--g)}
-.ribbon-offer{background:#1a8f3c}.ribbon-offer::after{border-left:6px solid #1a8f3c}
-.ribbon-soon{background:#c37d16}.ribbon-soon::after{border-left:6px solid #c37d16}
-.price-was{text-decoration:line-through;color:var(--mt2);font-size:11px;font-weight:400;margin-left:5px}
-.price-now{color:#cc1016;font-weight:800}
-.stars-row{color:#f5a623;font-size:11px;letter-spacing:1px}
+.ps-card{display:flex;gap:10px;background:var(--card2);border-radius:10px;padding:10px;margin-bottom:8px}
+.ps-img{width:62px;height:62px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--b)}
+.ps-btn{margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fn);display:inline-flex;align-items:center;gap:4px;touch-action:manipulation}
 .order-no{display:inline-block;font-size:10px;font-weight:700;color:var(--g);background:rgba(10,102,194,.08);border-radius:6px;padding:2px 8px;margin:3px 0;letter-spacing:.5px}
 .ord-qr{width:100%;margin-top:7px;background:var(--card2);color:var(--g);border:1px solid var(--g);border-radius:8px;padding:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:5px;touch-action:manipulation}
 .dispatch-row{display:flex;gap:7px;margin-bottom:11px}
@@ -514,7 +503,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v68</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v66</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -3377,11 +3366,6 @@ function fbListenTag(tagId){
           }else if(ch.type==='modified'){
             var ex=t.posts.find(function(p){return String(p.id)===String(d.id);});
             if(ex){ex.likes=d.likes;ex.boosted=d.boosted;ex.boostExpiry=d.boostExpiry;if(activeTagId===tagId)renderMsgs(t);}
-          }else if(ch.type==='removed'){
-            t.posts=t.posts.filter(function(p){return String(p.id)!==String(d.id);});
-            LS.set('rb_posts_'+tagId,t.posts.slice(-100));
-            var el=document.getElementById('bw-'+tagId+'-'+d.id);if(el&&el.parentNode)el.parentNode.removeChild(el);
-            if(activeTagId===tagId)renderMsgs(t);
           }
         });
       },function(err){if(fbIsPermErr(err))fbDisableCloud('listen posts');else console.warn('listen posts',err);});
@@ -4129,7 +4113,6 @@ function buildBubble(t,p,isMine){
     +'<button class="ba ba-wa" onclick="waShare('+pid+',\''+waT+'\',\''+waB+'\',\''+escJS(p.region||'')+'\')"><i class="ti ti-brand-whatsapp"></i></button>'
     +'<button class="ba" onclick="sharePost('+pid+')"><i class="ti ti-share"></i></button>'
     +(isAd?'':'<button class="ba ba-boost" onclick="openBoost(\''+escJS(t.id)+'\','+pid+')"><i class="ti ti-rocket"></i></button>')
-    +((CU&&p.uid&&p.uid===CU.uid)?'<button class="ba" style="color:var(--red)" onclick="deleteMyPost(\''+escJS(t.id)+'\','+pid+')"><i class="ti ti-trash"></i></button>':'')
     +'</div><div class="btime">'+(isMine?' ✓✓':'')+'</div></div>'
     +applyHtml
     +'<div class="cs'+(p.showComments?' open':'')+'" id="cs-'+t.id+'-'+pid+'">'+commHtml
@@ -4141,13 +4124,6 @@ function waShare(pid,title,body,region){var text=encodeURIComponent(title+'\n'+b
 function renderMsgs(t){
   var box=document.getElementById('msgs');if(!box)return;
   var posts=t.posts.slice();
-  // hide withdrawn product listings from everyone except the owner
-  posts=posts.filter(function(p){
-    if(!p.productId)return true;
-    var pr=getProducts().find(function(x){return x.id===p.productId;});
-    if(pr&&pr.withdrawn&&!(CU&&pr.sellerUid===CU.uid))return false;
-    return true;
-  });
   if(actRegion)posts=posts.filter(function(p){return p.region===actRegion;});
   if(actUser)posts=posts.filter(function(p){return p.user===actUser;});
   if(actAutoTag){var kw=actAutoTag;posts=posts.filter(function(p){return extractAT(p.title,p.body).indexOf(kw)>=0;});}
@@ -4790,7 +4766,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v68 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v66 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5389,36 +5365,23 @@ function openProductSearch(){
   runProductSearch('');
   document.getElementById('prodsearch-ovl').classList.add('open');
 }
-function shopRibbon(p){
-  // decide a badge: offer > expiring soon > new (listed < 3 days) > none
-  if(p.offer)return '<span class="shop-ribbon ribbon-offer">Offer</span>';
-  if(p.expiry){var d=new Date(p.expiry).getTime()-Date.now();if(d>0&&d<3*86400000)return '<span class="shop-ribbon ribbon-soon">Soon</span>';}
-  if(Date.now()-(p.ts||0)<3*86400000)return '<span class="shop-ribbon ribbon-new">New</span>';
-  return '';
-}
-function priceHtml(p){
-  if(p.offer)return '<span class="price-now">'+esc(p.currency)+' '+esc(p.offer)+'</span><span class="price-was">'+esc(p.currency)+' '+esc(p.price)+'</span>';
-  return '<span style="color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</span>';
-}
 function runProductSearch(q){
   q=(q||'').trim().toLowerCase();
-  var prods=getProducts().filter(function(p){return !p.withdrawn;});
-  var matches=q?prods.filter(function(p){return ((p.title||'')+' '+(p.desc||'')+' '+(p.category||'')).toLowerCase().indexOf(q)>=0;}):prods;
+  var prods=getProducts();
+  var matches=q?prods.filter(function(p){return ((p.title||'')+' '+(p.desc||'')).toLowerCase().indexOf(q)>=0;}):prods;
   var box=document.getElementById('ps-results');if(!box)return;
   if(!prods.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products listed yet.</p>';return;}
   if(!matches.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products match “'+esc(q)+'”.</p>';return;}
   box.innerHTML='<div style="font-size:10px;color:var(--mt2);margin-bottom:6px">'+matches.length+' product'+(matches.length!==1?'s':'')+'</div>'+matches.map(function(p){
     var mine=CU&&p.sellerUid===CU.uid;
-    var avail=productAvailable(p);
-    return '<div class="ps-card">'+shopRibbon(p)
+    return '<div class="ps-card">'
       +'<img src="'+(p.photos&&p.photos[0]||'')+'" class="ps-img">'
       +'<div style="flex:1;min-width:0">'
       +'<div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
-      +'<div style="font-size:13px">'+priceHtml(p)+'</div>'
-      +'<div style="font-size:10px;color:var(--mt2)">by '+esc(p.sellerName)+(p.category?' · '+esc(p.category):'')+'</div>'
+      +'<div style="font-size:13px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div>'
+      +'<div style="font-size:10px;color:var(--mt2)">by '+esc(p.sellerName)+(p.addr?' · '+esc(p.addr):'')+'</div>'
       +(mine?'<button class="ps-btn" style="background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="closeOvl(\'prodsearch-ovl\');showMyProducts(\'listings\')"><i class="ti ti-building-store"></i> Manage</button>'
-            :(avail?'<button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button>'
-                   :'<button class="ps-btn" style="background:var(--card2);color:var(--gold);border:1px solid var(--gold)" onclick="expressInterest(\''+p.id+'\')"><i class="ti ti-heart"></i> Notify me</button>'))
+            :'<button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button>')
       +'</div></div>';
   }).join('');
 }
@@ -5598,37 +5561,13 @@ function addBatch(){
   renderBatches(p);document.getElementById('ep-qty').value=remainingStock(p);
   toast('Batch added (+'+qty+' units)','ok');
 }
-function deleteMyPost(tagId,postId){
-  var t=tags.find(function(x){return x.id===tagId;});if(!t)return;
-  var post=(t.posts||[]).find(function(p){return String(p.id)===String(postId);});
-  if(!post)return;
-  if(!(CU&&post.uid===CU.uid)){toast('You can only delete your own posts','err');return;}
-  if(!confirm('Delete this post permanently?'))return;
-  // if it is a product listing, mark the product withdrawn too
-  if(post.productId){var prods=getProducts();var pr=prods.find(function(x){return x.id===post.productId;});if(pr){pr.withdrawn=true;saveProducts(prods);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(pr.id).set(pr,{merge:true}).catch(function(){});}catch(e){}}}}
-  removePostFromFeed(tagId,function(x){return String(x.id)===String(postId);});
-  toast('Post deleted','info');
-}
-function removePostFromFeed(tagId,matchFn){
-  var t=tags.find(function(x){return x.id===tagId;});
-  if(t&&t.posts){
-    var toDel=t.posts.filter(matchFn);
-    t.posts=t.posts.filter(function(p){return !matchFn(p);});
-    // persist the trimmed feed to localStorage
-    LS.set('rb_posts_'+tagId,t.posts.slice(-100));
-    // delete each from Firestore so it does not reload
-    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){toDel.forEach(function(p){try{FB.db.collection('tags').doc(tagId).collection('posts').doc(String(p.id)).delete().catch(function(){});}catch(e){}});}
-    // remove from the DOM immediately
-    toDel.forEach(function(p){var el=document.getElementById('bw-'+tagId+'-'+p.id);if(el&&el.parentNode)el.parentNode.removeChild(el);});
-    if(activeTagId===tagId)renderMsgs(t);
-  }
-}
 function withdrawProduct(pid){
   if(!confirm('Withdraw this listing? Buyers will no longer see it.'))return;
   var prods=getProducts();var p=prods.find(function(x){return x.id===pid;});
   if(p){p.withdrawn=true;saveProducts(prods);
     if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(p.id).set(p,{merge:true}).catch(function(){});}catch(e){}}
-    removePostFromFeed('sell',function(x){return x.productId===pid;});
+    // remove from sell feed
+    var t=tags.find(function(x){return x.id==='sell';});if(t)t.posts=t.posts.filter(function(x){return x.productId!==pid;});
   }
   showMyProducts('listings');toast('Listing withdrawn','info');
 }
