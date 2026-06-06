@@ -503,7 +503,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v65</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v66</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -738,6 +738,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <div id="lp-photo-hint" style="font-size:10px;color:var(--mt2);margin:4px 0 10px">Add at least 5 photos (0/5)</div>
     <input type="file" id="lp-photo-file" accept="image/*" multiple style="display:none" onchange="listPhotoSel(this)">
     <div class="fg"><label>Product title</label><input type="text" id="lp-title" placeholder="e.g. iPhone 14 Pro 256GB"></div>
+    <div class="fg" style="margin-top:8px"><label>Category</label><input type="text" id="lp-category" list="cat-list" placeholder="e.g. Eggs, Electronics, Grocery"><datalist id="cat-list"><option>Grocery</option><option>Electronics</option><option>Clothing</option><option>Eggs</option><option>Dairy</option><option>Vegetables</option><option>Fruits</option><option>Meat</option><option>Household</option><option>Other</option></datalist></div>
     <div class="fg" style="margin-top:8px"><label>Description</label><textarea id="lp-desc" rows="2" placeholder="Condition, specs, details..."></textarea></div>
     <div style="display:flex;gap:8px;margin-top:8px">
       <div class="fg" style="flex:1"><label>Currency</label><select id="lp-cur"></select></div>
@@ -886,6 +887,27 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="overlay" id="admin-ovl"><div class="modal" style="max-width:460px">
   <div class="mhd"><h3><i class="ti ti-shield-lock" style="font-size:13px"></i> Admin Control Panel</h3><button class="ib" onclick="closeOvl('admin-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="admin-body"></div>
+</div></div>
+<!-- EDIT PRODUCT / ADD BATCH -->
+<div class="overlay" id="editprod-ovl"><div class="modal" style="max-width:420px">
+  <div class="mhd"><h3><i class="ti ti-edit" style="font-size:13px"></i> Edit Listing &amp; Stock</h3><button class="ib" onclick="closeOvl('editprod-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd">
+    <div class="fg"><label>Title</label><input type="text" id="ep-title"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <div class="fg" style="flex:1"><label>Price</label><input type="text" id="ep-price"></div>
+      <div class="fg" style="flex:1"><label>Offer price</label><input type="text" id="ep-offer"></div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Current stock (read-only)</label><input type="text" id="ep-qty" readonly style="opacity:.7"></div>
+    <button class="btn btnok" style="width:100%;margin-top:10px" onclick="saveEditProduct()"><i class="ti ti-check"></i> Save changes</button>
+    <div id="ep-batches"></div>
+    <div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:7px"><i class="ti ti-package-import"></i> Add new batch (stock received)</div>
+      <div style="display:flex;gap:8px"><input type="number" id="eb-qty" placeholder="Qty received" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn)"><input type="text" id="eb-cost" placeholder="Cost/unit" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn)"></div>
+      <input type="text" id="eb-brand" placeholder="Brand (e.g. FarmFresh)" style="width:100%;margin-top:6px;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn)">
+      <div style="display:flex;gap:8px;margin-top:6px"><input type="text" id="eb-vendor" placeholder="Vendor name" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn)"><input type="text" id="eb-vphone" placeholder="Vendor phone" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn)"></div>
+      <button class="btn" style="width:100%;margin-top:8px;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="addBatch()"><i class="ti ti-plus"></i> Add Batch &amp; Increase Stock</button>
+    </div>
+  </div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -4053,7 +4075,9 @@ function buildBubble(t,p,isMine){
       applyHtml=isSeller
         ? '<button class="abtn" onclick="showMyProducts()" style="background:var(--card2);color:var(--g);border:1px solid var(--g)"><i class="ti ti-building-store"></i> Manage Listing</button>'
           +'<button class="abtn" onclick="openBoost(\''+escJS(t.id)+'\','+pid+')" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:5px"><i class="ti ti-speakerphone"></i> Advertise this Product</button>'
-        : '<button class="abtn" onclick="buyProduct(\''+prod.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now · '+esc(prod.currency)+' '+esc(prod.price)+'</button>';
+        : (typeof productAvailable==='function'&&!productAvailable(prod)
+            ? '<button class="abtn" onclick="expressInterest(\''+prod.id+'\')" style="background:var(--card2);color:var(--gold);border:1px solid var(--gold)"><i class="ti ti-heart"></i> Out of stock — Notify me when available</button>'
+            : '<button class="abtn" onclick="buyProduct(\''+prod.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now · '+esc(prod.currency)+' '+esc(prod.price)+'</button>');
     }
   }
   if(isJob){
@@ -4742,7 +4766,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v65 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v66 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -4812,7 +4836,7 @@ var listPhotos=[]; // base64 photos for the product being listed
 function openListProduct(){
   if(!requireAuth('list a product'))return;
   listPhotos=[];
-  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   var cs=document.getElementById('lp-cur');if(cs&&!cs.options.length){CURRENCIES.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o);});}
   renderListPhotos();
   document.getElementById('list-prod-ovl').classList.add('open');
@@ -4864,7 +4888,9 @@ function submitProduct(){
   var cost=(document.getElementById('lp-cost')||{}).value||'';
   var offer=(document.getElementById('lp-offer')||{}).value||'';
   var expiry=(document.getElementById('lp-expiry')||{}).value||'';
-  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:CU.name,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,
+  var category=(document.getElementById('lp-category')||{}).value||'Other';
+  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:CU.name,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,
+    batches:[{batchCode:'B-'+Date.now().toString(36).toUpperCase().slice(-4),qty:qty,cost:cost,vendor:'',vendorPhone:'',brand:'',date:Date.now()}],interest:0,interestLog:[],
     photos:listPhotos.slice(),addr:addr,phone:phone,map:map,ts:Date.now()};
   var prods=getProducts();prods.unshift(prod);saveProducts(prods);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(prod.id).set(prod).catch(function(){});}catch(e){}}
@@ -4993,6 +5019,12 @@ function productCardSeller(p){
     +'<button class="ps-btn" style="flex:1;justify-content:center" onclick="shareProduct(\''+p.id+'\')"><i class="ti ti-share"></i> Share</button>'
     +'<button class="ps-btn" style="flex:1;justify-content:center;background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="printProductQR(\''+p.id+'\')"><i class="ti ti-qrcode"></i> '+(p.qrPrinted?'Reprint QR':'Print QR')+'</button>'
     +'</div>'
+    +'<div style="display:flex;gap:6px;margin-top:6px">'
+    +'<button class="ps-btn" style="flex:1;justify-content:center;background:var(--card2);color:var(--g);border:1px solid var(--b)" onclick="editProduct(\''+p.id+'\')"><i class="ti ti-edit"></i> Edit / Add stock</button>'
+    +(p.withdrawn?'<button class="ps-btn" style="flex:1;justify-content:center;background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="relistProduct(\''+p.id+'\')"><i class="ti ti-rotate"></i> Relist</button>':'<button class="ps-btn" style="flex:1;justify-content:center;background:var(--card2);color:var(--red);border:1px solid var(--red)" onclick="withdrawProduct(\''+p.id+'\')"><i class="ti ti-eye-off"></i> Withdraw</button>')
+    +'</div>'
+    +((p.interest||0)>0?'<div style="font-size:11px;color:var(--gold);margin-top:7px;background:rgba(195,125,22,.1);border-radius:7px;padding:6px 9px"><i class="ti ti-heart"></i> <b>'+p.interest+'</b> buyer'+(p.interest!==1?'s':'')+' interested'+(remainingStock(p)===0?' — restock to sell!':'')+'</div>':'')
+    +(p.withdrawn?'<div style="font-size:10px;color:var(--red);margin-top:5px"><i class="ti ti-eye-off"></i> Withdrawn (hidden from buyers)</div>':'')
     +'<button class="abtn" onclick="openBoost(\'sell\',null)" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:6px;font-size:11px"><i class="ti ti-speakerphone"></i> Advertise / Boost</button></div>';
 }
 function printProductQR(pid){
@@ -5483,6 +5515,79 @@ function setOfferPrice(pid){
     if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(p.id).set(p,{merge:true}).catch(function(){});}catch(e){}}}
   showOffersManager();toast(val?'Offer price set':'Offer removed','ok');
 }
+
+/* ===== Product management: edit, withdraw, batches, vendors, interest ===== */
+function editProduct(pid){
+  var p=getProducts().find(function(x){return x.id===pid;});if(!p)return;
+  curEditProd=pid;
+  document.getElementById('ep-title').value=p.title||'';
+  document.getElementById('ep-price').value=p.price||'';
+  document.getElementById('ep-offer').value=p.offer||'';
+  document.getElementById('ep-qty').value=remainingStock(p);
+  renderBatches(p);
+  document.getElementById('editprod-ovl').classList.add('open');
+}
+var curEditProd=null;
+function remainingStock(p){var sold=getOrders().filter(function(o){return o.productId===p.id&&o.status!=='returned';}).reduce(function(s,o){return s+(o.qty||1);},0);return Math.max(0,(p.qty||0)-sold);}
+function renderBatches(p){
+  var box=document.getElementById('ep-batches');if(!box)return;
+  var b=p.batches||[];
+  box.innerHTML='<div style="font-size:11px;font-weight:700;margin:8px 0 6px">Stock batches ('+b.length+')</div>'
+    +b.map(function(bt,i){return '<div class="appl-card" style="padding:9px"><div style="font-size:11px"><b>'+esc(bt.batchCode)+'</b> · '+bt.qty+' units · cost '+esc(p.currency)+' '+esc(bt.cost||'0')+'</div>'
+      +(bt.brand||bt.vendor?'<div style="font-size:10px;color:var(--mt2)">'+esc(bt.brand||'')+(bt.vendor?' · '+esc(bt.vendor):'')+(bt.vendorPhone?' · <a href="https://wa.me/'+esc((bt.vendorPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(bt.vendorPhone)+'</a>':'')+'</div>':'')
+      +'<div style="font-size:10px;color:var(--mt2)">Received: '+new Date(bt.date).toLocaleDateString()+'</div></div>';}).join('');
+}
+function saveEditProduct(){
+  var prods=getProducts();var p=prods.find(function(x){return x.id===curEditProd;});if(!p)return;
+  p.title=document.getElementById('ep-title').value.trim()||p.title;
+  p.price=document.getElementById('ep-price').value.trim()||p.price;
+  p.offer=document.getElementById('ep-offer').value.trim();
+  saveProducts(prods);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(p.id).set(p,{merge:true}).catch(function(){});}catch(e){}}
+  closeOvl('editprod-ovl');showMyProducts('listings');toast('Listing updated','ok');
+}
+function addBatch(){
+  var prods=getProducts();var p=prods.find(function(x){return x.id===curEditProd;});if(!p)return;
+  var qty=parseInt(document.getElementById('eb-qty').value,10)||0;
+  if(qty<=0){toast('Enter batch quantity','err');return;}
+  var batch={batchCode:'B-'+Date.now().toString(36).toUpperCase().slice(-4),qty:qty,
+    cost:document.getElementById('eb-cost').value.trim(),vendor:document.getElementById('eb-vendor').value.trim(),
+    vendorPhone:document.getElementById('eb-vphone').value.trim(),brand:document.getElementById('eb-brand').value.trim(),date:Date.now()};
+  if(!p.batches)p.batches=[];p.batches.push(batch);
+  p.qty=(p.qty||0)+qty; // increase total stock by received batch
+  saveProducts(prods);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(p.id).set(p,{merge:true}).catch(function(){});}catch(e){}}
+  ['eb-qty','eb-cost','eb-vendor','eb-vphone','eb-brand'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  renderBatches(p);document.getElementById('ep-qty').value=remainingStock(p);
+  toast('Batch added (+'+qty+' units)','ok');
+}
+function withdrawProduct(pid){
+  if(!confirm('Withdraw this listing? Buyers will no longer see it.'))return;
+  var prods=getProducts();var p=prods.find(function(x){return x.id===pid;});
+  if(p){p.withdrawn=true;saveProducts(prods);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(p.id).set(p,{merge:true}).catch(function(){});}catch(e){}}
+    // remove from sell feed
+    var t=tags.find(function(x){return x.id==='sell';});if(t)t.posts=t.posts.filter(function(x){return x.productId!==pid;});
+  }
+  showMyProducts('listings');toast('Listing withdrawn','info');
+}
+function relistProduct(pid){
+  var prods=getProducts();var p=prods.find(function(x){return x.id===pid;});
+  if(p){p.withdrawn=false;saveProducts(prods);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(p.id).set(p,{merge:true}).catch(function(){});}catch(e){}}}
+  showMyProducts('listings');toast('Listing is live again','ok');
+}
+// Buyer expresses interest in a sold-out / unavailable product
+function expressInterest(pid){
+  var prods=getProducts();var p=prods.find(function(x){return x.id===pid;});if(!p)return;
+  if(!p.interestLog)p.interestLog=[];
+  if(CU&&p.interestLog.find(function(x){return x.uid===CU.uid;})){toast('You already registered interest','info');return;}
+  p.interest=(p.interest||0)+1;p.interestLog.push({uid:CU?CU.uid:'guest',name:CU?CU.name:'Guest',ts:Date.now()});
+  saveProducts(prods);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(p.id).set(p,{merge:true}).catch(function(){});}catch(e){}}
+  toast('Thanks! The seller will be notified of your interest.','ok');
+}
+// is a product available to buyers?
+function productAvailable(p){return !p.withdrawn && remainingStock(p)>0;}
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
    ============================================================ */
