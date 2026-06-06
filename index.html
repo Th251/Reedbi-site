@@ -234,6 +234,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sndbtn:active{transform:scale(.93)}
 .sndbtn:active{transform:scale(.93)}
 .ib-activity{background:var(--g)!important;color:#fff!important}
+.admin-tabs{display:flex;gap:5px;margin-bottom:11px;flex-wrap:wrap}
+.admin-tabs .seller-tab{flex:1;min-width:70px;font-size:11px;padding:7px 4px}
 .otp-box{background:rgba(10,102,194,.1);border:1px dashed var(--g);border-radius:8px;padding:8px;margin-top:6px;font-size:12px;color:var(--g);font-weight:600}
 .otp-box b{font-size:18px;letter-spacing:3px}
 .ib-activity i{color:#fff!important}
@@ -501,7 +503,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400">v63</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v65</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -879,6 +881,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="overlay" id="offers-ovl"><div class="modal" style="max-width:440px">
   <div class="mhd"><h3><i class="ti ti-discount-2" style="font-size:13px"></i> Offers & Expiry</h3><button class="ib" onclick="closeOvl('offers-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="offers-body"></div>
+</div></div>
+<!-- ADMIN CONTROL PANEL -->
+<div class="overlay" id="admin-ovl"><div class="modal" style="max-width:460px">
+  <div class="mhd"><h3><i class="ti ti-shield-lock" style="font-size:13px"></i> Admin Control Panel</h3><button class="ib" onclick="closeOvl('admin-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="admin-body"></div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -4735,7 +4742,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v63 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v65 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5797,5 +5804,133 @@ function agentConfirmDelivery(orderId){
   }else{
     toast('Incorrect OTP. Ask the buyer to read it from their order tracking.','err');
   }
+}
+
+/* ============================================================
+   ADMIN CONTROL PANEL  (client-side gate — see honest note below)
+   NOTE: A single HTML file cannot truly hide a password. This hash
+   only keeps casual users out; real security requires a backend.
+   ============================================================ */
+function adminHash(s){var x=5381;for(var i=0;i<s.length;i++){x=((x<<5)+x)+s.charCodeAt(i);x=x&0xffffffff;}return (x>>>0).toString(16);}
+function getAdminConfig(){return LS.get('rb_admin',{hash:'5c2744fd',admins:[]});} // default pwd set by owner; change it
+function saveAdminConfig(c){LS.set('rb_admin',c);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('admin').set(c,{merge:true}).catch(function(){});}catch(e){}}}
+var adminUnlocked=false;
+function openAdminPanel(){
+  if(adminUnlocked){renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');return;}
+  // PREFERRED: server-enforced admin via Firebase custom claim (cannot be faked for real data actions)
+  if(FB.ready&&FB.auth&&FB.auth.currentUser){
+    FB.auth.currentUser.getIdTokenResult().then(function(r){
+      if(r&&r.claims&&r.claims.admin===true){
+        adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');
+      }else{
+        adminPasswordGate();
+      }
+    }).catch(function(){adminPasswordGate();});
+    return;
+  }
+  adminPasswordGate();
+}
+function adminPasswordGate(){
+  var pwd=prompt('Admin password:\n(Note: real protection requires the backend setup — this gate is for convenience only.)');
+  if(pwd===null)return;
+  var cfg=getAdminConfig();
+  if(adminHash(pwd)===cfg.hash){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');}
+  else toast('Incorrect admin password','err');
+}
+function adminCanManage(){
+  // owner (unlocked) OR a user listed as admin-team member with manage rights
+  if(adminUnlocked)return true;
+  var cfg=getAdminConfig();var m=(cfg.admins||[]).find(function(a){return CU&&a.uid===CU.uid;});
+  return !!(m&&(m.role==='superadmin'||m.role==='manager'));
+}
+function renderAdminPanel(){
+  var body=document.getElementById('admin-body');
+  var cfg=getAdminConfig();
+  var users=getAllUsersIndex();
+  var pages=getPages();var prods=getProducts();var orders=getOrders();var agents=getAgents();
+  var h='<div class="admin-tabs">'
+    +'<button class="seller-tab on" onclick="adminTab(\'overview\')">Overview</button>'
+    +'<button class="seller-tab" onclick="adminTab(\'team\')">Admin Team</button>'
+    +'<button class="seller-tab" onclick="adminTab(\'users\')">Users</button>'
+    +'<button class="seller-tab" onclick="adminTab(\'content\')">Content</button>'
+    +'</div><div id="admin-tabbody"></div>';
+  body.innerHTML=h;
+  adminTab('overview');
+}
+var adminCurrentTab='overview';
+function adminTab(t){
+  adminCurrentTab=t;
+  var tb=document.getElementById('admin-tabbody');if(!tb)return;
+  var pages=getPages();var prods=getProducts();var orders=getOrders();var agents=getAgents();var users=getAllUsersIndex();
+  if(t==='overview'){
+    tb.innerHTML='<div class="dispatch-row"><div class="disp-box disp-ship"><b>'+users.length+'</b><small>Users</small></div>'
+      +'<div class="disp-box disp-done"><b>'+pages.length+'</b><small>Pages</small></div>'
+      +'<div class="disp-box disp-pend"><b>'+prods.length+'</b><small>Products</small></div></div>'
+      +'<div class="dispatch-row"><div class="disp-box disp-ship"><b>'+orders.length+'</b><small>Orders</small></div>'
+      +'<div class="disp-box disp-done"><b>'+agents.length+'</b><small>Agents</small></div></div>'
+      +'<div style="font-size:11px;color:var(--mt);margin-top:10px;background:rgba(204,16,22,.08);border-radius:8px;padding:10px"><i class="ti ti-shield-lock"></i> <b>Security note:</b> This panel is gated client-side. For true protection of admin access and data, a backend server is required — a single HTML file cannot hide credentials from someone viewing the source.</div>';
+  }else if(t==='team'){
+    var cfg=getAdminConfig();var admins=cfg.admins||[];
+    tb.innerHTML='<div style="font-size:11px;color:var(--mt);margin-bottom:8px">Assign teams to manage the app with roles.</div>'
+      +'<div class="act-row" style="border:none"><div><b>You (Owner)</b><small>Super Admin · full control</small></div></div>'
+      +admins.map(function(a){return '<div class="act-row"><div><b>'+esc(a.name)+'</b><small>'+esc(a.role)+'</small></div><button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="adminRemoveTeam(\''+escJS(a.uid)+'\')">Remove</button></div>';}).join('')
+      +(admins.length?'':'<div class="act-empty">No admin team yet.</div>')
+      +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px">'
+      +'<input type="text" id="adm-uid" placeholder="User ID or email" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
+      +'<input type="text" id="adm-name" placeholder="Display name" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
+      +'<select id="adm-role" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:8px"><option value="viewer">Viewer (read)</option><option value="moderator">Moderator (read+delete content)</option><option value="manager">Manager (read+write+post+delete)</option><option value="superadmin">Super Admin (full)</option></select>'
+      +'<button class="btn btnok" style="width:100%" onclick="adminAddTeam()"><i class="ti ti-user-plus"></i> Add to Admin Team</button></div>'
+      +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px"><div style="font-size:11px;font-weight:700;margin-bottom:6px">Change admin password</div>'
+      +'<input type="password" id="adm-newpwd" placeholder="New admin password" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
+      +'<button class="btn" style="width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="adminChangePwd()">Update password</button></div>';
+  }else if(t==='users'){
+    tb.innerHTML=users.length?users.map(function(u){
+      return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(u.name||'User')+'</div>'
+        +(u.email?'<div style="font-size:11px;color:var(--mt)">'+esc(u.email)+'</div>':'')
+        +(u.phone?'<div style="font-size:11px;color:var(--g)"><a href="https://wa.me/'+esc((u.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)"><i class="ti ti-brand-whatsapp"></i> '+esc(u.phone)+'</a></div>':'')
+        +(u.interests?'<div style="font-size:11px;color:var(--mt2)">Interests: '+esc(u.interests)+'</div>':'')
+        +(u.location?'<div style="font-size:11px;color:var(--mt2)"><i class="ti ti-map-pin"></i> '+esc(u.location)+'</div>':'')
+        +(u.co?'<div style="font-size:11px;color:var(--mt2)">Company: '+esc(u.co)+'</div>':'')
+        +'</div>';
+    }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No user directory data. Users appear here once profiles sync via cloud.</p>';
+  }else if(t==='content'){
+    // moderation: list recent posts across tags with delete
+    var rows=[];
+    tags.forEach(function(tg){(tg.posts||[]).forEach(function(p){rows.push({tag:tg,post:p});});});
+    rows.sort(function(a,b){return (b.post.ts||0)-(a.post.ts||0);});
+    rows=rows.slice(0,80);
+    tb.innerHTML=rows.length?rows.map(function(r){
+      return '<div class="appl-card"><div style="font-size:12px"><b>'+esc(r.post.user||'?')+'</b> <span style="color:var(--mt2)">in #'+esc(r.tag.name)+'</span></div>'
+        +'<div style="font-size:12px;color:var(--tx);margin:3px 0">'+esc((r.post.title||r.post.body||'').substring(0,140))+'</div>'
+        +'<button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="adminDeletePost(\''+escJS(r.tag.id)+'\','+r.post.id+')"><i class="ti ti-trash"></i> Delete</button></div>';
+    }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No posts.</p>';
+  }
+  // highlight active tab
+  var btns=document.querySelectorAll('.admin-tabs .seller-tab');
+  for(var i=0;i<btns.length;i++){btns[i].className='seller-tab'+(btns[i].textContent.toLowerCase().indexOf(t)>=0?' on':'');}
+}
+function getAllUsersIndex(){
+  // merge local known users + followed users index if present
+  var arr=LS.get('rb_fusers',[])||[];
+  if(CU&&!arr.find(function(u){return u.uid===CU.uid;}))arr=arr.concat([CU]);
+  return arr;
+}
+function adminAddTeam(){
+  var uid=document.getElementById('adm-uid').value.trim();var name=document.getElementById('adm-name').value.trim()||uid;var role=document.getElementById('adm-role').value;
+  if(!uid){toast('Enter user ID/email','err');return;}
+  var cfg=getAdminConfig();if(!cfg.admins)cfg.admins=[];
+  if(cfg.admins.find(function(a){return a.uid===uid;})){toast('Already on admin team','info');return;}
+  cfg.admins.push({uid:uid,name:name,role:role,ts:Date.now()});saveAdminConfig(cfg);adminTab('team');toast(name+' added as '+role,'ok');
+}
+function adminRemoveTeam(uid){var cfg=getAdminConfig();cfg.admins=(cfg.admins||[]).filter(function(a){return a.uid!==uid;});saveAdminConfig(cfg);adminTab('team');toast('Removed','info');}
+function adminChangePwd(){var v=document.getElementById('adm-newpwd').value;if(!v||v.length<6){toast('Min 6 characters','err');return;}var cfg=getAdminConfig();cfg.hash=adminHash(v);saveAdminConfig(cfg);document.getElementById('adm-newpwd').value='';toast('Admin password updated','ok');}
+function adminDeletePost(tagId,postId){
+  if(!confirm('Delete this post permanently?'))return;
+  var tg=tags.find(function(x){return x.id===tagId;});if(!tg)return;
+  tg.posts=(tg.posts||[]).filter(function(p){return p.id!==postId;});
+  LS.set('rb_posts_'+tagId,tg.posts);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('tags').doc(tagId).collection('posts').doc(String(postId)).delete().catch(function(){});}catch(e){}}
+  if(activeTagId===tagId)renderMsgs(tg);
+  adminTab('content');toast('Post deleted','info');
 }
 </script></body></html>
