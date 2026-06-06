@@ -503,7 +503,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v66</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v67</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -3366,6 +3366,11 @@ function fbListenTag(tagId){
           }else if(ch.type==='modified'){
             var ex=t.posts.find(function(p){return String(p.id)===String(d.id);});
             if(ex){ex.likes=d.likes;ex.boosted=d.boosted;ex.boostExpiry=d.boostExpiry;if(activeTagId===tagId)renderMsgs(t);}
+          }else if(ch.type==='removed'){
+            t.posts=t.posts.filter(function(p){return String(p.id)!==String(d.id);});
+            LS.set('rb_posts_'+tagId,t.posts.slice(-100));
+            var el=document.getElementById('bw-'+tagId+'-'+d.id);if(el&&el.parentNode)el.parentNode.removeChild(el);
+            if(activeTagId===tagId)renderMsgs(t);
           }
         });
       },function(err){if(fbIsPermErr(err))fbDisableCloud('listen posts');else console.warn('listen posts',err);});
@@ -4113,6 +4118,7 @@ function buildBubble(t,p,isMine){
     +'<button class="ba ba-wa" onclick="waShare('+pid+',\''+waT+'\',\''+waB+'\',\''+escJS(p.region||'')+'\')"><i class="ti ti-brand-whatsapp"></i></button>'
     +'<button class="ba" onclick="sharePost('+pid+')"><i class="ti ti-share"></i></button>'
     +(isAd?'':'<button class="ba ba-boost" onclick="openBoost(\''+escJS(t.id)+'\','+pid+')"><i class="ti ti-rocket"></i></button>')
+    +((CU&&p.uid&&p.uid===CU.uid)?'<button class="ba" style="color:var(--red)" onclick="deleteMyPost(\''+escJS(t.id)+'\','+pid+')"><i class="ti ti-trash"></i></button>':'')
     +'</div><div class="btime">'+(isMine?' ✓✓':'')+'</div></div>'
     +applyHtml
     +'<div class="cs'+(p.showComments?' open':'')+'" id="cs-'+t.id+'-'+pid+'">'+commHtml
@@ -4124,6 +4130,13 @@ function waShare(pid,title,body,region){var text=encodeURIComponent(title+'\n'+b
 function renderMsgs(t){
   var box=document.getElementById('msgs');if(!box)return;
   var posts=t.posts.slice();
+  // hide withdrawn product listings from everyone except the owner
+  posts=posts.filter(function(p){
+    if(!p.productId)return true;
+    var pr=getProducts().find(function(x){return x.id===p.productId;});
+    if(pr&&pr.withdrawn&&!(CU&&pr.sellerUid===CU.uid))return false;
+    return true;
+  });
   if(actRegion)posts=posts.filter(function(p){return p.region===actRegion;});
   if(actUser)posts=posts.filter(function(p){return p.user===actUser;});
   if(actAutoTag){var kw=actAutoTag;posts=posts.filter(function(p){return extractAT(p.title,p.body).indexOf(kw)>=0;});}
@@ -4766,7 +4779,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v66 loaded ✓','color:#25d366;font-weight:bold');
+console.log('%cReedbi build 2026-06-02-v67 loaded ✓','color:#25d366;font-weight:bold');
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5561,13 +5574,37 @@ function addBatch(){
   renderBatches(p);document.getElementById('ep-qty').value=remainingStock(p);
   toast('Batch added (+'+qty+' units)','ok');
 }
+function deleteMyPost(tagId,postId){
+  var t=tags.find(function(x){return x.id===tagId;});if(!t)return;
+  var post=(t.posts||[]).find(function(p){return String(p.id)===String(postId);});
+  if(!post)return;
+  if(!(CU&&post.uid===CU.uid)){toast('You can only delete your own posts','err');return;}
+  if(!confirm('Delete this post permanently?'))return;
+  // if it is a product listing, mark the product withdrawn too
+  if(post.productId){var prods=getProducts();var pr=prods.find(function(x){return x.id===post.productId;});if(pr){pr.withdrawn=true;saveProducts(prods);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(pr.id).set(pr,{merge:true}).catch(function(){});}catch(e){}}}}
+  removePostFromFeed(tagId,function(x){return String(x.id)===String(postId);});
+  toast('Post deleted','info');
+}
+function removePostFromFeed(tagId,matchFn){
+  var t=tags.find(function(x){return x.id===tagId;});
+  if(t&&t.posts){
+    var toDel=t.posts.filter(matchFn);
+    t.posts=t.posts.filter(function(p){return !matchFn(p);});
+    // persist the trimmed feed to localStorage
+    LS.set('rb_posts_'+tagId,t.posts.slice(-100));
+    // delete each from Firestore so it does not reload
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){toDel.forEach(function(p){try{FB.db.collection('tags').doc(tagId).collection('posts').doc(String(p.id)).delete().catch(function(){});}catch(e){}});}
+    // remove from the DOM immediately
+    toDel.forEach(function(p){var el=document.getElementById('bw-'+tagId+'-'+p.id);if(el&&el.parentNode)el.parentNode.removeChild(el);});
+    if(activeTagId===tagId)renderMsgs(t);
+  }
+}
 function withdrawProduct(pid){
   if(!confirm('Withdraw this listing? Buyers will no longer see it.'))return;
   var prods=getProducts();var p=prods.find(function(x){return x.id===pid;});
   if(p){p.withdrawn=true;saveProducts(prods);
     if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(p.id).set(p,{merge:true}).catch(function(){});}catch(e){}}
-    // remove from sell feed
-    var t=tags.find(function(x){return x.id==='sell';});if(t)t.posts=t.posts.filter(function(x){return x.productId!==pid;});
+    removePostFromFeed('sell',function(x){return x.productId===pid;});
   }
   showMyProducts('listings');toast('Listing withdrawn','info');
 }
