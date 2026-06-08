@@ -1,1108 +1,912 @@
-Here is the **complete merged code** in one single file you can copy:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REEDBI — Complete E-commerce App</title>
+<meta name="description" content="REEDBI — a complete single-file e-commerce app (home, shop, product, cart, wishlist, account).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   REEDBI — e-commerce website styles
+   Custom design system, no framework.
+============================================================ */
+:root{
+  --pink:#ff3f6c; --pink-dark:#e02e58; --accent:#0a8f6e;
+  --ink:#1a1a1f; --ink-soft:#3a3a44; --muted:#8a8a93;
+  --bg:#faf8f5; --surface:#ffffff; --line:#ece8e2; --line-2:#f4f1ec;
+  --gold:#c79a3a; --radius:14px; --radius-sm:10px;
+  --shadow:0 1px 2px rgba(26,26,31,.04),0 8px 24px rgba(26,26,31,.06);
+  --shadow-lg:0 12px 40px rgba(26,26,31,.12);
+  --maxw:1280px;
+  --display:"Bricolage Grotesque","Plus Jakarta Sans",system-ui,sans-serif;
+  --body:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+.container{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.display{font-family:var(--display);font-weight:700;letter-spacing:-.02em;line-height:1.05}
+.muted{color:var(--muted)}
+.hide{display:none!important}
 
-```jsx
-// ============================================================
-// REEDBI - Complete Single-File Version
-// Save as: src/App.jsx (replace everything)
-// ============================================================
+/* ---------- announcement bar ---------- */
+.announce{background:var(--ink);color:#fff;text-align:center;font-size:12.5px;letter-spacing:.04em;padding:8px 16px;font-weight:500}
+.announce b{color:var(--pink)}
 
-import React, { useState, useEffect, useRef, createContext, useContext, useCallback } from 'react';
-import ReactDOM from 'react-dom/client';
-import { Heart, Star, ShoppingBag, ArrowLeft, Share2, Zap, CheckCircle2, HelpCircle, Truck, Copy, Package, ThumbsUp, ThumbsDown, MessageCircle, Shield, Store, Search, X, ArrowRight, Filter, Grid, List, ChevronDown, Menu, Phone, Mail, LogOut, MapPin, Settings, ShoppingCart, User, Minus, Plus, Tag, Check, Sparkles, ChevronRight, TrendingUp, Clock, Mic, ArrowUpRight, Globe, Calendar, Users, Info, Edit, Trash2, Home, Award, CreditCard, Briefcase } from 'lucide-react';
+/* ---------- header ---------- */
+.site-header{position:sticky;top:0;z-index:100;background:rgba(250,248,245,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.header-row{display:flex;align-items:center;gap:28px;padding:16px 24px;max-width:var(--maxw);margin:0 auto}
+.brand{font-family:var(--display);font-weight:800;font-size:25px;letter-spacing:-.04em;display:flex;align-items:center;gap:2px}
+.brand .dot{color:var(--pink)}
+.nav{display:flex;gap:26px;margin-left:8px}
+.nav a{font-size:14px;font-weight:600;color:var(--ink-soft);position:relative;padding:6px 0;transition:color .2s}
+.nav a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--pink);transition:right .25s ease}
+.nav a:hover{color:var(--ink)}.nav a:hover::after,.nav a.active::after{right:0}
+.nav a.active{color:var(--ink)}
+.search{flex:1;max-width:420px;margin-left:auto;position:relative}
+.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:11px 44px 11px 18px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+.search input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,63,108,.12)}
+.search button{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.icons{display:flex;align-items:center;gap:6px}
+.icon-btn{position:relative;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:var(--ink);transition:background .2s}
+.icon-btn:hover{background:var(--line-2)}
+.icon-btn svg{width:21px;height:21px}
+.badge{position:absolute;top:4px;right:4px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:var(--pink);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
+.burger{display:none}
 
-// ============================================================
-// DATA
-// ============================================================
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14px;border-radius:999px;padding:13px 26px;transition:transform .15s,box-shadow .2s,background .2s;white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--pink);color:#fff}.btn-primary:hover{background:var(--pink-dark);box-shadow:0 8px 20px rgba(255,63,108,.3)}
+.btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{background:#000}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}.btn-ghost:hover{border-color:var(--ink)}
+.btn-block{width:100%}
+.btn-sm{padding:9px 16px;font-size:13px}
 
-const MEGA_MENU = {
-  Grocery: ['Fresh to Home', 'Fish', 'Milk', 'Meat', 'Fruits', 'Vegetables'],
-  Restaurants: ['Fast Food', 'Fine Dining', 'Cafes', 'Bakeries'],
-  Fashion: ['Men', 'Women', 'Kids', 'Accessories', 'Footwear', 'Watches'],
-  'Infant & Kids': ['Toys', 'Clothing', 'Feeding', 'Diapers'],
-  Electronics: ['Mobiles', 'Laptops', 'TV', 'Audio', 'Cameras'],
-  Industrial: ['Tools', 'Safety', 'Machinery', 'Electrical'],
-  Jobs: ['Sales', 'BPO', 'Driver', 'Office Assistant'],
-  More: ['Beauty', 'Sports', 'Books', 'Pharmacy']
-};
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;border-radius:0}
+.hero-inner{max-width:var(--maxw);margin:0 auto;padding:64px 24px 56px;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);background:rgba(255,63,108,.1);padding:7px 14px;border-radius:999px}
+.hero h1{font-size:clamp(40px,6vw,72px);margin:20px 0 18px}
+.hero h1 em{font-style:italic;color:var(--pink)}
+.hero p{font-size:18px;color:var(--ink-soft);max-width:440px;margin-bottom:28px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero-stats{display:flex;gap:34px;margin-top:38px}
+.hero-stats .n{font-family:var(--display);font-size:30px;font-weight:800}
+.hero-stats .l{font-size:13px;color:var(--muted)}
+.hero-art{position:relative;aspect-ratio:4/4.4;border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.hero-art img{width:100%;height:100%;object-fit:cover}
+.hero-float{position:absolute;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:14px;padding:12px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600}
+.hero-float.tl{top:18px;left:18px}.hero-float.br{bottom:18px;right:18px}
+.hero-float .pill{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--pink);color:#fff}
 
-const CATEGORIES = [
-  { name: 'Fashion', icon: '👗' },
-  { name: 'Electronics', icon: '📱' },
-  { name: 'Home', icon: '🏠' },
-  { name: 'Beauty', icon: '💄' },
-  { name: 'Sports', icon: '⚽' },
-  { name: 'Jobs', icon: '💼' },
-];
+/* ---------- marquee categories ---------- */
+.cat-strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
+.cat-strip .container{display:flex;gap:10px;overflow-x:auto;padding:16px 24px;scrollbar-width:none}
+.cat-strip .container::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:9px 18px;font-size:13.5px;font-weight:600;color:var(--ink-soft);transition:all .2s}
+.chip:hover,.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ---------- section heading ---------- */
+.section{padding:56px 0}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:28px}
+.sec-head h2{font-size:clamp(26px,3.4vw,38px)}
+.sec-head p{color:var(--muted);font-size:15px;margin-top:4px}
+.link-arrow{font-weight:700;font-size:14px;color:var(--ink);display:inline-flex;gap:6px;align-items:center;border-bottom:2px solid var(--pink);padding-bottom:2px}
+
+/* ---------- product grid + card ---------- */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .25s,box-shadow .25s,border-color .25s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:transparent}
+.card-media{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--line-2)}
+.card-media img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.card:hover .card-media img{transform:scale(1.06)}
+.card-media.oos img{filter:grayscale(1);opacity:.55}
+.tag{position:absolute;top:12px;left:12px;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:5px 9px;border-radius:7px}
+.tag.SALE{background:var(--pink)}.tag.NEW{background:var(--accent)}.tag.TRENDING{background:var(--ink)}
+.wish{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);display:grid;place-items:center;box-shadow:var(--shadow);transition:transform .15s}
+.wish:hover{transform:scale(1.1)}
+.wish svg{width:18px;height:18px;color:var(--ink)}
+.wish.on svg{fill:var(--pink);color:var(--pink)}
+.oos-flag{position:absolute;inset:auto 0 0 0;background:rgba(26,26,31,.78);color:#fff;text-align:center;font-size:11px;font-weight:700;letter-spacing:.04em;padding:7px}
+.card-body{padding:14px 15px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card-brand{font-weight:700;font-size:14.5px}
+.card-name{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rating{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--accent)}
+.price{display:flex;align-items:baseline;gap:8px;margin-top:2px}
+.price .now{font-weight:800;font-size:16px}
+.price .was{font-size:13px;color:var(--muted);text-decoration:line-through}
+.price .off{font-size:12.5px;font-weight:700;color:var(--pink)}
+.card .btn{margin-top:auto}
+
+/* ---------- page header / breadcrumb ---------- */
+.page-head{padding:38px 0 8px}
+.page-head h1{font-size:clamp(28px,4vw,42px)}
+.crumb{font-size:13px;color:var(--muted);margin-bottom:6px}
+.crumb a:hover{color:var(--pink)}
+
+/* ---------- shop layout ---------- */
+.shop{display:grid;grid-template-columns:248px 1fr;gap:34px;padding-bottom:64px}
+.filters{position:sticky;top:96px;align-self:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+.filters h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:18px 0 10px}
+.filters h3:first-child{margin-top:0}
+.f-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.check{display:flex;align-items:center;gap:9px;font-size:14px;padding:5px 0;cursor:pointer;color:var(--ink-soft)}
+.check input{accent-color:var(--pink);width:16px;height:16px}
+.shop-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.shop-bar .count{font-size:14px;color:var(--muted)}
+.select{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 16px;font-size:14px;font-weight:600;font-family:inherit;outline:none;cursor:pointer}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:var(--radius);padding:80px 20px;text-align:center;color:var(--muted)}
+.empty svg{width:46px;height:46px;margin:0 auto 12px;color:var(--line)}
+
+/* ---------- product detail ---------- */
+.pdp{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;padding:24px 0 64px}
+.gallery{display:flex;gap:14px}
+.thumbs{display:flex;flex-direction:column;gap:10px}
+.thumbs img{width:62px;height:74px;object-fit:cover;border-radius:10px;border:2px solid transparent;cursor:pointer;opacity:.7;transition:.2s}
+.thumbs img.active,.thumbs img:hover{border-color:var(--pink);opacity:1}
+.stage{flex:1;border-radius:20px;overflow:hidden;background:var(--surface);border:1px solid var(--line);position:relative}
+.stage img{width:100%;aspect-ratio:1;object-fit:cover}
+.pdp-brand{font-size:20px;font-weight:800}
+.pdp-name{font-size:18px;color:var(--muted);margin-top:2px}
+.pdp .rating-lg{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font-weight:700;font-size:13px;padding:3px 10px;border-radius:7px;margin-top:14px}
+.pdp-price{display:flex;align-items:baseline;gap:12px;margin:18px 0 4px}
+.pdp-price .now{font-family:var(--display);font-size:34px;font-weight:800}
+.pdp-price .was{font-size:18px;color:var(--muted);text-decoration:line-through}
+.pdp-price .off{font-size:18px;font-weight:700;color:var(--pink)}
+.tax{color:var(--accent);font-weight:600;font-size:13.5px}
+.sizes{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.size{min-width:48px;height:48px;padding:0 8px;border:1.5px solid var(--line);border-radius:50%;font-weight:700;font-size:14px;display:grid;place-items:center;transition:.2s;color:var(--ink)}
+.size:hover{border-color:var(--ink)}
+.size.sel{border-color:var(--pink);color:var(--pink);background:rgba(255,63,108,.07)}
+.pdp-actions{display:flex;gap:12px;margin-top:26px}
+.perks{margin-top:24px;border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:grid;gap:12px;background:var(--surface)}
+.perk{display:flex;align-items:center;gap:12px;font-size:14px}
+.perk svg{width:20px;height:20px;color:var(--accent);flex-shrink:0}
+.specs{margin-top:14px;border-top:1px solid var(--line);padding-top:18px}
+.specs h4{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.spec-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.spec-row .k{color:var(--muted)}.spec-row .v{font-weight:600}
+
+/* ---------- cart ---------- */
+.cart-wrap{display:grid;grid-template-columns:1fr 360px;gap:30px;padding-bottom:64px;align-items:start}
+.cart-item{display:flex;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.cart-item.oos{opacity:.65}
+.cart-item img{width:96px;height:120px;border-radius:10px;object-fit:cover;flex-shrink:0}
+.cart-item .ci-body{flex:1;display:flex;flex-direction:column}
+.ci-top{display:flex;justify-content:space-between;gap:10px}
+.ci-meta{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.ci-meta b{color:var(--ink)}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px}
+.qty button{width:34px;height:34px;display:grid;place-items:center;font-size:16px;color:var(--ink)}
+.qty button:disabled{opacity:.35;cursor:not-allowed}
+.qty span{min-width:30px;text-align:center;font-weight:700;font-size:14px}
+.ci-bottom{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:10px;gap:10px}
+.x-btn{color:var(--muted);width:30px;height:30px;display:grid;place-items:center;border-radius:50%}
+.x-btn:hover{background:var(--line-2);color:var(--pink)}
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;position:sticky;top:96px}
+.summary h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px}
+.sum-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px}
+.sum-row .g{color:var(--accent);font-weight:700}
+.sum-total{display:flex;justify-content:space-between;font-family:var(--display);font-weight:800;font-size:20px;padding:12px 0;border-top:1px solid var(--line);margin-top:6px}
+.coupon{display:flex;gap:8px;margin-bottom:8px}
+.coupon input{flex:1;border:1px solid var(--line);border-radius:999px;padding:11px 16px;font-size:14px;font-family:inherit;outline:none}
+.coupon input:focus{border-color:var(--pink)}
+.coupon-on{display:flex;align-items:center;justify-content:space-between;background:rgba(10,143,110,.08);border-radius:10px;padding:11px 14px;font-size:13.5px;font-weight:700;color:var(--accent)}
+.steps{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 30px;max-width:420px}
+.step{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--muted)}
+.step.on{color:var(--pink)}
+.step .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:var(--line);color:var(--ink)}
+.step.on .n{background:var(--pink);color:#fff}
+.step-line{width:38px;height:2px;background:var(--line)}
+.state{text-align:center;padding:90px 20px}
+.state .ico{width:96px;height:96px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;margin:0 auto 22px}
+.state .ico svg{width:40px;height:40px;color:var(--muted)}
+.state h2{font-size:26px;margin-bottom:8px}
+.state p{color:var(--muted);margin-bottom:22px}
+
+/* ---------- account ---------- */
+.acct{display:grid;grid-template-columns:260px 1fr;gap:30px;padding-bottom:64px;align-items:start}
+.acct-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.acct-profile{padding:24px;text-align:center;border-bottom:1px solid var(--line)}
+.avatar{width:64px;height:64px;border-radius:50%;background:rgba(255,63,108,.12);color:var(--pink);display:grid;place-items:center;margin:0 auto 12px}
+.avatar svg{width:30px;height:30px}
+.acct-menu a{display:flex;align-items:center;gap:12px;padding:14px 20px;font-size:14px;font-weight:600;color:var(--ink-soft);border-bottom:1px solid var(--line-2);transition:.15s}
+.acct-menu a:last-child{border-bottom:none}
+.acct-menu a:hover{background:var(--line-2)}
+.acct-menu a.active{color:var(--pink);background:rgba(255,63,108,.05)}
+.acct-menu a svg{width:18px;height:18px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin-bottom:18px}
+.welcome{background:linear-gradient(120deg,var(--ink),#34343f);color:#fff;border:none}
+.welcome h2{font-size:26px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.stat .n{font-family:var(--display);font-size:26px;font-weight:800}
+.stat .l{font-size:13px;color:var(--muted)}
+.order{border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.order-top{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.order-status{font-weight:700}.order-status.ok{color:var(--accent)}.order-status.transit{color:var(--gold)}
+.order-line{display:flex;align-items:center;gap:12px}
+.order-line img{width:54px;height:64px;border-radius:8px;object-fit:cover}
+.addr{border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.addr .type{font-size:10px;font-weight:800;letter-spacing:.06em;background:var(--line-2);padding:3px 8px;border-radius:6px;text-transform:uppercase}
+.addr .def{font-size:10px;font-weight:800;letter-spacing:.06em;background:rgba(10,143,110,.12);color:var(--accent);padding:3px 8px;border-radius:6px;text-transform:uppercase;margin-left:6px}
+
+/* ---------- footer ---------- */
+.site-footer{background:var(--ink);color:#cfcfd6;margin-top:40px}
+.foot-trust{border-bottom:1px solid rgba(255,255,255,.08)}
+.foot-trust .container{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding:34px 24px}
+.trust{display:flex;align-items:center;gap:12px}
+.trust .ic{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.06);display:grid;place-items:center;color:var(--pink)}
+.trust .ic svg{width:20px;height:20px}
+.trust .t{font-weight:700;color:#fff;font-size:14px}
+.trust .d{font-size:12.5px;color:var(--muted)}
+.foot-main{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px;padding:48px 24px;max-width:var(--maxw);margin:0 auto}
+.foot-main .brand{color:#fff;margin-bottom:14px}
+.foot-main p{font-size:14px;max-width:280px;color:var(--muted)}
+.foot-col h4{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#fff;margin-bottom:16px}
+.foot-col a{display:block;font-size:14px;padding:5px 0;color:#cfcfd6;transition:.15s}
+.foot-col a:hover{color:var(--pink)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.08);text-align:center;padding:20px;font-size:13px;color:var(--muted)}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:14px 22px;border-radius:999px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.3s;z-index:2000}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast svg{width:18px;height:18px;color:#5fe0b0}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(16px)}
+.reveal.in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+
+/* ---------- responsive ---------- */
+@media(max-width:1000px){
+  .hero-inner{grid-template-columns:1fr;gap:30px}
+  .hero-art{max-width:420px}
+  .pdp,.cart-wrap,.acct{grid-template-columns:1fr}
+  .shop{grid-template-columns:1fr}
+  .filters{position:static;display:none}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .foot-main{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+  .nav,.search{display:none}
+  .burger{display:grid}
+  .header-row{gap:14px}
+  .icons{margin-left:auto}
+  .grid,.grid.cols-3{grid-template-columns:repeat(2,1fr);gap:14px}
+  .hero-inner{padding:36px 20px}
+  .hero-stats{gap:22px}
+  .summary,.filters{position:static}
+  .foot-trust .container{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .container{padding:0 18px}
+  .gallery{flex-direction:column-reverse}
+  .thumbs{flex-direction:row}
+}
+/* mobile slide menu */
+.mobile-menu{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:.25s}
+.mobile-menu.open{opacity:1;pointer-events:auto}
+.mobile-panel{position:absolute;top:0;left:0;bottom:0;width:280px;background:var(--bg);padding:24px;transform:translateX(-100%);transition:transform .3s;overflow-y:auto}
+.mobile-menu.open .mobile-panel{transform:none}
+.mobile-panel a{display:block;padding:14px 0;font-size:16px;font-weight:600;border-bottom:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<main id="app"></main>
+<div id="site-footer"></div>
+<script>
+/* ====== DATA ====== */
+/* ============================================================
+   REEDBI — site data. Edit here to change catalogue / content.
+============================================================ */
+const IMG = (id, s = 700) => `https://images.unsplash.com/${id}?w=${s}&h=${s}&fit=crop`;
+const GAL = (ids) => ids.map((i) => IMG(i, 800));
 
 const PRODUCTS = [
-  { id: 1, brand: "Levi's", name: "Sports Shoe For Men", price: 1299, originalPrice: 1850, discount: 67, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop", images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop","https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&h=600&fit=crop","https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&h=600&fit=crop"], rating: 4.2, reviews: 128, sizes: ['7','8','9','10','11'], badge: 'SALE', category: 'fashion', color: 'Black', seller: 'Aditya Birla Fashion', description: 'High-performance sports shoes with cushioned sole and breathable mesh upper.', details: { Material: 'Mesh & Synthetic', Sole: 'Rubber', Closure: 'Lace-up', Warranty: '3 months' }, care: 'Wipe with clean, dry cloth.', specs: { 'Ideal For': 'Men', Occasion: 'Sports', Pattern: 'Solid' } },
-  { id: 2, brand: "Sheen", name: "Women Analog Watch", price: 4999, originalPrice: 7999, discount: 37, image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=500&h=500&fit=crop", images: ["https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&h=600&fit=crop","https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?w=600&h=600&fit=crop"], rating: 4.5, reviews: 2341, badge: 'NEW', category: 'fashion', color: 'Rose Gold', seller: 'Swiss Timepieces', sizes: null, description: 'Elegant analog watch with rose gold stainless steel strap.', details: { Strap: 'Stainless Steel', Dial: 'Rose Gold', 'Water Resist': '30m', Warranty: '1 year' }, care: 'Avoid water contact.', specs: { 'Ideal For': 'Women', Occasion: 'Formal', Display: 'Analog' } },
-  { id: 3, brand: "Lee", name: "100% Cotton Jacket", price: 899, originalPrice: 1499, discount: 40, image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=500&fit=crop", images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=600&fit=crop","https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&h=600&fit=crop"], rating: 4.0, reviews: 567, sizes: ['S','M','L','XL','XXL'], badge: 'TRENDING', category: 'fashion', color: 'Grey', seller: 'Lee Cooper India', description: 'Premium cotton jacket with zip closure.', details: { Fabric: '100% Cotton', Fit: 'Regular', Length: 'Hip Length', Closure: 'Zipper' }, care: 'Machine wash cold.', specs: { 'Ideal For': 'Men', Occasion: 'Casual', Sleeves: 'Full' } },
-  { id: 4, brand: "Vivo", name: "V15 32MP Pop-Up Selfie Smartphone", price: 19999, originalPrice: 24999, discount: 20, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&h=500&fit=crop", images: ["https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=600&fit=crop","https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=600&h=600&fit=crop"], rating: 4.3, reviews: 4521, badge: 'NEW', category: 'electronics', color: 'Blue', seller: 'Vivo India', sizes: ['64GB','128GB'], description: '32MP Pop-Up Selfie.', details: { Camera: '32MP Front', Display: '6.39" FHD+', Battery: '4000 mAh', RAM: '6GB' }, care: 'Use screen protector.', specs: { OS: 'Android 9', Processor: 'Helio P70', '5G': 'No' } },
-  { id: 5, brand: "iBall", name: "CompBook Laptop", price: 9999, originalPrice: 14999, discount: 33, image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=500&fit=crop", images: ["https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=600&fit=crop","https://images.unsplash.com/photo-1517336714731-489689fd1ca4?w=600&h=600&fit=crop"], rating: 3.9, reviews: 234, badge: 'SALE', category: 'electronics', color: 'Silver', seller: 'iBall Technologies', sizes: null, description: 'Lightweight laptop.', details: { Processor: 'Intel Celeron', RAM: '4GB', Storage: '64GB', Display: '11.6" HD' }, care: 'Use laptop sleeve.', specs: { OS: 'Windows 10', Battery: '6 hours', Weight: '1.3 kg' } },
-  { id: 6, brand: "Mango", name: "Women Red Solid A-Line Dress", price: 1299, originalPrice: 2599, discount: 50, image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500&h=500&fit=crop", images: ["https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600&h=600&fit=crop"], rating: 4.4, reviews: 1234, badge: 'NEW', category: 'fashion', color: 'Red', seller: 'Mango Fashion', sizes: ['XS','S','M','L'], description: 'Beautiful A-line dress in vibrant red.', details: { Fabric: 'Polyester Blend', Fit: 'A-Line', Length: 'Knee Length', Neck: 'V-Neck' }, care: 'Hand wash cold.', specs: { 'Ideal For': 'Women', Occasion: 'Party', Pattern: 'Solid' } },
-  { id: 7, brand: "Nike", name: "Men Running Shoes", price: 4499, originalPrice: 5999, discount: 25, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop", images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop","https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600&h=600&fit=crop"], rating: 4.6, reviews: 8765, badge: 'TRENDING', category: 'sports', color: 'Red', seller: 'Nike India', sizes: ['UK 7','UK 8','UK 9','UK 10'], description: 'Lightweight running shoes.', details: { Upper: 'Mesh', Midsole: 'Foam', Outsole: 'Rubber', Warranty: '6 months' }, care: 'Clean with soft brush.', specs: { 'Ideal For': 'Men', Occasion: 'Sports', Ankle: 'Low Top' } },
-  { id: 8, brand: "Hidesign", name: "Women Leather Handbag", price: 3499, originalPrice: 6999, discount: 50, image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500&h=500&fit=crop", images: ["https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&h=600&fit=crop","https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&h=600&fit=crop"], rating: 4.3, reviews: 456, badge: 'SALE', category: 'fashion', color: 'Brown', seller: 'Hidesign Ltd', sizes: null, description: 'Genuine leather handbag.', details: { Material: 'Genuine Leather', Closure: 'Zip', Compartments: '3', Warranty: '6 months' }, care: 'Professional cleaning.', specs: { 'Ideal For': 'Women', Occasion: 'Formal', Type: 'Handheld' } },
-  { id: 9, brand: "Boat", name: "Wireless Bluetooth Earbuds", price: 1299, originalPrice: 2999, discount: 57, image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&h=500&fit=crop", images: ["https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=600&fit=crop"], rating: 4.0, reviews: 12345, badge: 'TRENDING', category: 'electronics', color: 'Black', seller: 'Boat Lifestyle', sizes: null, description: 'True wireless earbuds with deep bass.', details: { Driver: '10mm', Battery: '20 hours', 'BT Version': '5.0', Water: 'IPX5' }, care: 'Keep dry.', specs: { Type: 'In-Ear', 'Noise Cancel': 'No', Mic: 'Yes' } },
-  { id: 10, brand: "Samsung", name: "Galaxy Watch Active", price: 14999, originalPrice: 19999, discount: 25, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop", images: ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=600&fit=crop"], rating: 4.4, reviews: 890, badge: 'NEW', category: 'electronics', color: 'Silver', seller: 'Samsung India', sizes: null, description: 'Smart fitness watch.', details: { Display: '1.1" AMOLED', Battery: '2 days', Water: '5ATM', OS: 'Tizen' }, care: 'Rinse after swimming.', specs: { GPS: 'Yes', NFC: 'Yes', 'Heart Rate': 'Yes' } },
+  { id:1, brand:"Levi's", name:"Sports Shoe For Men", price:1299, mrp:1850, off:30,
+    image:IMG("photo-1542291026-7eec264c27ff"),
+    images:GAL(["photo-1542291026-7eec264c27ff","photo-1606107557195-0e29a4b5b4aa","photo-1608231387042-66d1773070a5","photo-1595950653106-6c9ebd614d3a"]),
+    rating:4.2, reviews:128, sizes:["7","8","9","10","11"], tag:"SALE", category:"Footwear", color:"Black", seller:"Aventura Outfitters", stock:8,
+    desc:"High-performance sports shoes with a cushioned sole and breathable mesh upper. Built for running and training.",
+    specs:{ Material:"Mesh & Synthetic Leather", Sole:"EVA Cushion", Closure:"Lace-up", Warranty:"6 Months" } },
+  { id:2, brand:"Sheen", name:"Women Analog Watch", price:1299, mrp:1850, off:30,
+    image:IMG("photo-1524592094714-0f0654e20314"),
+    images:GAL(["photo-1524592094714-0f0654e20314","photo-1523275335684-37898b6baf30","photo-1434056886845-dac89ffe9b56","photo-1547996160-81dfa63595aa"]),
+    rating:4.5, reviews:89, sizes:null, tag:"NEW", category:"Watches", color:"Rose Gold", seller:"Aventura Outfitters", stock:5,
+    desc:"Elegant rose-gold chronograph with a stainless steel strap and water resistance up to 30m.",
+    specs:{ "Dial Shape":"Round", Strap:"Stainless Steel", "Water Resistance":"30m", Warranty:"2 Years" } },
+  { id:3, brand:"Lee", name:"100% Cotton Denim Jacket", price:1299, mrp:1850, off:30,
+    image:IMG("photo-1551028719-00167b16eac5"),
+    images:GAL(["photo-1551028719-00167b16eac5","photo-1591047139829-d91aecb6caea","photo-1576871337622-98d48d1cf531","photo-1544022613-e87ca75a784a"]),
+    rating:4.0, reviews:45, sizes:["S","M","L","XL","XXL"], tag:"NEW", category:"Fashion", color:"Blue", seller:"Madura Lifestyle", stock:0, oos:true,
+    desc:"Classic denim jacket in 100% cotton with a regular fit and timeless wash.",
+    specs:{ Material:"100% Cotton", Fit:"Regular", Pattern:"Solid", Care:"Machine Wash" } },
+  { id:4, brand:"GUCCI", name:"Women Leather Crossbody Bag", price:3599, mrp:4560, off:21,
+    image:IMG("photo-1548036328-c9fa89d128fa"),
+    images:GAL(["photo-1548036328-c9fa89d128fa","photo-1584917865442-de89df76afd3","photo-1591561954557-26941169b49e","photo-1566150905458-1bf1fc113f0d"]),
+    rating:4.8, reviews:210, sizes:null, tag:null, category:"Accessories", color:"Brown", seller:"Madura Lifestyle", stock:7,
+    desc:"Premium genuine-leather crossbody bag with gold-tone hardware and an adjustable strap.",
+    specs:{ Material:"Genuine Leather", Compartments:"2", Closure:"Zip", Warranty:"1 Year" } },
+  { id:5, brand:"ASUS", name:"VivoBook Ultra Laptop", price:45999, mrp:52999, off:13,
+    image:IMG("photo-1496181133206-80ce9b88a853"),
+    images:GAL(["photo-1496181133206-80ce9b88a853","photo-1525547719571-a2d4ac8945e2","photo-1517336714731-489689fd1ca8","photo-1593642702821-c8da6771f0c6"]),
+    rating:4.3, reviews:342, sizes:null, tag:"SALE", category:"Electronics", color:"Silver", seller:"TechBazaar", stock:3,
+    desc:'14" thin-and-light laptop with Intel Core i5, 16GB RAM and a 512GB SSD.',
+    specs:{ Processor:"Intel Core i5", RAM:"16GB", Storage:"512GB SSD", Display:'14" FHD' } },
+  { id:6, brand:"Apple", name:"iPhone 15 Pro Max", price:149900, mrp:159900, off:6,
+    image:IMG("photo-1592750475338-74b7b21085ab"),
+    images:GAL(["photo-1592750475338-74b7b21085ab","photo-1511707171634-5f897ff02aa9","photo-1510557880182-3d4d3cba35a5","photo-1556656793-08538906a9f8"]),
+    rating:4.9, reviews:892, sizes:null, tag:"NEW", category:"Electronics", color:"Natural Titanium", seller:"TechBazaar", stock:12,
+    desc:"Titanium design, A17 Pro chip, and a pro camera system with 5x telephoto zoom.",
+    specs:{ Chip:"A17 Pro", Storage:"256GB", Display:'6.7" Super Retina XDR', Camera:"48MP Pro" } },
+  { id:7, brand:"Nike", name:"Air Jordan 1 Retro High", price:8999, mrp:12999, off:31,
+    image:IMG("photo-1556906781-9a412961c28c"),
+    images:GAL(["photo-1556906781-9a412961c28c","photo-1597045566677-8cf032ed6634","photo-1600269452121-4f2416e55c28","photo-1605348532760-6753d2c43329"]),
+    rating:4.7, reviews:567, sizes:["7","8","9","10","11"], tag:"SALE", category:"Footwear", color:"Red", seller:"Aventura Outfitters", stock:20,
+    desc:"Iconic high-top sneakers with premium leather and Air cushioning.",
+    specs:{ Material:"Premium Leather", Sole:"Rubber", Style:"High-Top", Cushioning:"Nike Air" } },
+  { id:8, brand:"Sony", name:"WH-1000XM5 Headphones", price:29990, mrp:34990, off:14,
+    image:IMG("photo-1505740420928-5e560c06d30e"),
+    images:GAL(["photo-1505740420928-5e560c06d30e","photo-1546435770-a3e426bf472b","photo-1484704849700-f032a568e944","photo-1583394838336-acd977736f90"]),
+    rating:4.6, reviews:342, sizes:null, tag:"SALE", category:"Electronics", color:"Black", seller:"TechBazaar", stock:9,
+    desc:"Industry-leading noise cancellation with up to 30 hours of battery life.",
+    specs:{ Type:"Over-Ear", "Battery Life":"30 Hours", Connectivity:"Bluetooth 5.2", ANC:"Yes" } },
+  { id:9, brand:"Boat", name:"Wireless Bluetooth Earbuds", price:1299, mrp:2999, off:57,
+    image:IMG("photo-1590658268037-6bf12165a8df"),
+    images:GAL(["photo-1590658268037-6bf12165a8df","photo-1606220588913-b3aacb4d2f46","photo-1572569511254-d8f925fe2cbb","photo-1610438235354-a6ae5528385c"]),
+    rating:4.0, reviews:12345, sizes:null, tag:"TRENDING", category:"Electronics", color:"Black", seller:"TechBazaar", stock:25,
+    desc:"True-wireless earbuds with deep bass, IPX5 splash resistance and a charging case.",
+    specs:{ Driver:"10mm", "Battery Life":"24 Hours", "Water Resistance":"IPX5", Mic:"Yes" } },
+  { id:10, brand:"Mango", name:"Women Red A-Line Dress", price:1299, mrp:2599, off:50,
+    image:IMG("photo-1572804013309-59a88b7e92f1"),
+    images:GAL(["photo-1572804013309-59a88b7e92f1","photo-1595777457583-95e059d581b8","photo-1566174053879-31528523f8ae","photo-1539008835657-9e8e9680c956"]),
+    rating:4.4, reviews:1234, sizes:["XS","S","M","L"], tag:"NEW", category:"Fashion", color:"Red", seller:"Madura Lifestyle", stock:15,
+    desc:"Flowy A-line midi dress in a vibrant red, perfect for occasions.",
+    specs:{ Material:"Polyester Blend", Length:"Midi", Pattern:"Solid", Fit:"A-Line" } },
+  { id:11, brand:"Ray-Ban", name:"Aviator Classic Sunglasses", price:6990, mrp:8990, off:22,
+    image:IMG("photo-1572635196237-14b3f281503f"),
+    images:GAL(["photo-1572635196237-14b3f281503f","photo-1511499767150-a48a237f0083","photo-1473496169904-658ba7c44d8a","photo-1577803645773-f96470509666"]),
+    rating:4.6, reviews:421, sizes:null, tag:null, category:"Accessories", color:"Gold", seller:"Aventura Outfitters", stock:18,
+    desc:"Timeless aviator sunglasses with 100% UV protection and a lightweight metal frame.",
+    specs:{ Lens:"Polarized", Frame:"Metal", "UV Protection":"100%", Warranty:"1 Year" } },
+  { id:12, brand:"Adidas", name:"Ultraboost Running Shoes", price:6499, mrp:8999, off:28,
+    image:IMG("photo-1608231387042-66d1773070a5"),
+    images:GAL(["photo-1608231387042-66d1773070a5","photo-1595950653106-6c9ebd614d3a","photo-1460353581641-37baddab0fa2","photo-1543508282-6319a3e2621f"]),
+    rating:4.5, reviews:783, sizes:["7","8","9","10","11"], tag:"TRENDING", category:"Footwear", color:"Grey", seller:"Aventura Outfitters", stock:14,
+    desc:"Responsive Boost cushioning with a Primeknit upper for all-day comfort.",
+    specs:{ Material:"Primeknit", Cushioning:"Boost", Drop:"10mm", Use:"Running" } },
 ];
 
-const FILTER_DATA = {
-  brands: ["Levi's","Sheen","Lee","Vivo","iBall","Mango","Nike","Hidesign","Boat","Samsung"],
-  priceRanges: [
-    { label: 'Under ₹1,000', min: 0, max: 1000 },
-    { label: '₹1,000 - ₹5,000', min: 1000, max: 5000 },
-    { label: '₹5,000 - ₹10,000', min: 5000, max: 10000 },
-    { label: '₹10,000 - ₹50,000', min: 10000, max: 50000 },
-    { label: 'Over ₹50,000', min: 50000, max: Infinity }
-  ],
+const CATEGORIES = ["All","Fashion","Footwear","Electronics","Watches","Accessories"];
+
+const SORTS = [
+  { v:"popular", l:"Most Popular" },
+  { v:"priceLow", l:"Price: Low to High" },
+  { v:"priceHigh", l:"Price: High to Low" },
+  { v:"discount", l:"Biggest Discount" },
+  { v:"rating", l:"Top Rated" },
+];
+
+const BRANDS = [...new Set(PRODUCTS.map((p) => p.brand))].sort();
+const PRICE_RANGES = [
+  { l:"Under \u20b91,000", min:0, max:1000 },
+  { l:"\u20b91,000 \u2013 \u20b95,000", min:1000, max:5000 },
+  { l:"\u20b95,000 \u2013 \u20b920,000", min:5000, max:20000 },
+  { l:"Over \u20b920,000", min:20000, max:Infinity },
+];
+
+const COUPONS = { REEDBI10:{ type:"pct", v:0.10 }, FIRST50:{ type:"pct", v:0.50 }, SAVE200:{ type:"flat", v:200 } };
+
+const REVIEWS = [
+  { user:"Tejas R.", rating:5, title:"Excellent, must buy", date:"4 days ago", verified:true,
+    text:"The quality is amazing for this price point. Fits perfectly and the material feels premium." },
+  { user:"Priya S.", rating:5, title:"Best purchase ever", date:"1 week ago", verified:true,
+    text:"Absolutely love it. The colour is exactly as shown and delivery was fast." },
+  { user:"Rahul V.", rating:4, title:"Good, but runs small", date:"2 weeks ago", verified:false,
+    text:"Good quality overall but the size runs a bit small. Order one size up to be safe." },
+];
+
+const ORDERS = [
+  { id:"OD123456789", date:"12 Jan 2025", status:"Delivered", items:[{ name:"Levi's Sports Shoe For Men", image:PRODUCTS[0].image, price:1172, qty:1, sub:"Delivered on 16 Jan" }] },
+  { id:"OD987654321", date:"28 Dec 2024", status:"Delivered", items:[{ name:"Sheen Women Analog Watch", image:PRODUCTS[1].image, price:1299, qty:1, sub:"Delivered on 02 Jan" }] },
+  { id:"OD555444333", date:"05 Feb 2025", status:"In Transit", items:[{ name:"Nike Air Jordan 1 Retro", image:PRODUCTS[6].image, price:8999, qty:1, sub:"Arriving 09 Feb" }] },
+];
+
+const ADDRESSES = [
+  { name:"Alex Johnson", type:"Home", def:true, line:"24 Marina Residences, Dubai Marina, Dubai, AE", phone:"+971 50 123 4567" },
+  { name:"Alex Johnson", type:"Work", def:false, line:"Office 1402, Boulevard Plaza, Downtown Dubai, AE", phone:"+971 50 765 4321" },
+];
+
+const USER = { name:"Alex Johnson", email:"alex.johnson@example.com", phone:"+971 50 123 4567", member:"REEDBI Insider since 2021" };
+/* ====== STORE ====== */
+/* ============================================================
+   REEDBI — store: cart + wishlist state (localStorage)
+============================================================ */
+const Store = (() => {
+  const read = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+  const write = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+  let cart = read("reedbi_cart", []);      // [{id, qty, size}]
+  let wish = read("reedbi_wish", []);      // [id]
+  let coupon = read("reedbi_coupon", null);
+  let gift = read("reedbi_gift", false);
+
+  const save = () => { write("reedbi_cart", cart); write("reedbi_wish", wish); write("reedbi_coupon", coupon); write("reedbi_gift", gift); emit(); };
+  const product = (id) => PRODUCTS.find((p) => p.id === id);
+
+  const listeners = [];
+  const on = (fn) => listeners.push(fn);
+  const emit = () => listeners.forEach((fn) => fn());
+
+  return {
+    on,
+    get cart() { return cart; },
+    get wish() { return wish; },
+    get coupon() { return coupon; },
+    get gift() { return gift; },
+    count() { return cart.reduce((s, i) => s + i.qty, 0); },
+    wishCount() { return wish.length; },
+    inWish(id) { return wish.includes(id); },
+
+    add(id, size = null) {
+      const p = product(id); if (!p || p.oos) return;
+      size = size || (p.sizes ? p.sizes[0] : null);
+      const found = cart.find((i) => i.id === id && i.size === size);
+      if (found) found.qty = Math.min(found.qty + 1, p.stock);
+      else cart.push({ id, qty: 1, size });
+      save();
+    },
+    setQty(id, size, delta) {
+      const p = product(id);
+      const it = cart.find((i) => i.id === id && i.size === size);
+      if (it) it.qty = Math.max(1, Math.min(it.qty + delta, p ? p.stock : 10));
+      save();
+    },
+    remove(id, size) { cart = cart.filter((i) => !(i.id === id && i.size === size)); save(); },
+    toggleWish(id) {
+      if (wish.includes(id)) wish = wish.filter((x) => x !== id);
+      else wish.push(id);
+      save();
+      return wish.includes(id);
+    },
+    applyCoupon(code) {
+      code = (code || "").trim().toUpperCase();
+      if (COUPONS[code]) { coupon = code; save(); return true; }
+      return false;
+    },
+    removeCoupon() { coupon = null; save(); },
+    toggleGift() { gift = !gift; save(); },
+    clear() { cart = []; coupon = null; gift = false; save(); },
+
+    detail() {
+      return cart.map((i) => {
+        const p = product(i.id);
+        return p && { ...p, qty: i.qty, size: i.size, lineTotal: p.price * i.qty, lineMrp: p.mrp * i.qty };
+      }).filter(Boolean);
+    },
+    totals() {
+      const rows = this.detail().filter((r) => !r.oos);
+      const totalMrp = rows.reduce((s, r) => s + r.lineMrp, 0);
+      const subtotal = rows.reduce((s, r) => s + r.lineTotal, 0);
+      const bagDiscount = totalMrp - subtotal;
+      let couponDiscount = 0;
+      if (coupon && COUPONS[coupon]) {
+        const c = COUPONS[coupon];
+        couponDiscount = c.type === "pct" ? Math.round(subtotal * c.v) : c.v;
+      }
+      const giftFee = gift ? 25 : 0;
+      const shipping = subtotal > 500 ? 0 : (subtotal > 0 ? 49 : 0);
+      const total = Math.max(0, subtotal - couponDiscount + shipping + giftFee);
+      const items = rows.reduce((s, r) => s + r.qty, 0);
+      return { totalMrp, subtotal, bagDiscount, couponDiscount, giftFee, shipping, total, items };
+    },
+  };
+})();
+
+const INR = (n) => "\u20b9" + Math.round(n).toLocaleString("en-IN");
+/* ====== APP (SPA engine + views + router) ====== */
+/* ============================================================
+   REEDBI — single-file SPA engine (hash router)
+   Reuses global PRODUCTS / Store / INR from data.js + store.js
+============================================================ */
+const ICONS = {
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21S4 14.5 4 9a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 5.5-8 12-8 12Z"/></svg>',
+  bag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 7h12l1 13H5L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>',
+  menu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 13 4 4 10-10"/></svg>',
+  truck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7h12v9H2z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="6.5" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 5 6v6c0 4 3 7 7 9 4-2 7-5 7-9V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>',
+  refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 7"/><path d="M21 3v4h-4"/><path d="M21 12a9 9 0 0 1-15 6.7L3 17"/><path d="M3 21v-4h4"/></svg>',
+  headset:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="2.5" y="13" width="4" height="6" rx="1.5"/><rect x="17.5" y="13" width="4" height="6" rx="1.5"/><path d="M20 19a4 4 0 0 1-4 3h-2"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6Z"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8 12 3l9 5v8l-9 5-9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6 7-11a7 7 0 1 0-14 0c0 5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>',
+  store:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9 5 4h14l1 5M4 9h16M4 9v11h16V9M9 20v-6h6v6"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+/* ---------- hash router ---------- */
+function parseHash() {
+  let h = location.hash.replace(/^#\/?/, "");          // e.g. "shop?q=watch"  or "product/3"
+  const [path, query] = h.split("?");
+  const seg = path.split("/").filter(Boolean);          // ["product","3"]
+  const params = new URLSearchParams(query || "");
+  return { name: seg[0] || "home", arg: seg[1], params };
+}
+function go(hash) { location.hash = hash; }
+
+/* ---------- chrome ---------- */
+function buildChrome() {
+  $("#site-header").innerHTML = `
+    <div class="announce">Free shipping on orders over <b>\u20b9500</b> &nbsp;\u00b7&nbsp; Use code <b>REEDBI10</b> for 10% off</div>
+    <header class="site-header"><div class="header-row">
+      <button class="icon-btn burger" id="burger" aria-label="Menu">${ICONS.menu}</button>
+      <a href="#/" class="brand">reed<span class="dot">bi</span>.</a>
+      <nav class="nav" id="nav">
+        <a href="#/" data-r="home">Home</a>
+        <a href="#/shop" data-r="shop">Shop</a>
+        <a href="#/shop?category=Electronics">Electronics</a>
+        <a href="#/shop?category=Fashion">Fashion</a>
+      </nav>
+      <form class="search" id="searchForm">
+        <input id="searchIn" name="q" placeholder="Search products, brands\u2026">
+        <button type="submit" aria-label="Search">${ICONS.search}</button>
+      </form>
+      <div class="icons">
+        <a href="#/account" class="icon-btn" aria-label="Account">${ICONS.user}</a>
+        <a href="#/wishlist" class="icon-btn" aria-label="Wishlist">${ICONS.heart}<span class="badge" id="wishBadge"></span></a>
+        <a href="#/cart" class="icon-btn" aria-label="Cart">${ICONS.bag}<span class="badge" id="cartBadge"></span></a>
+      </div>
+    </div></header>
+    <div class="mobile-menu" id="mobileMenu"><div class="mobile-panel">
+      <a href="#/" class="brand" style="margin-bottom:18px">reed<span class="dot">bi</span>.</a>
+      <a href="#/">Home</a><a href="#/shop">Shop All</a>
+      <a href="#/shop?category=Electronics">Electronics</a><a href="#/shop?category=Fashion">Fashion</a>
+      <a href="#/shop?category=Footwear">Footwear</a>
+      <a href="#/account">My Account</a><a href="#/wishlist">Wishlist</a><a href="#/cart">Cart</a>
+    </div></div>`;
+
+  const trust = [
+    [ICONS.refresh,"14-Day Returns","Easy & free"],
+    [ICONS.truck,"Free Delivery","On orders \u20b9500+"],
+    [ICONS.shield,"Secure Payments","100% protected"],
+    [ICONS.headset,"24/7 Support","Always here"],
+  ].map(([i,t,d]) => `<div class="trust"><div class="ic">${i}</div><div><div class="t">${t}</div><div class="d">${d}</div></div></div>`).join("");
+  const col = (h, items) => `<div class="foot-col"><h4>${h}</h4>${items.map((x)=>`<a href="#/shop">${x}</a>`).join("")}</div>`;
+  $("#site-footer").innerHTML = `
+    <footer class="site-footer">
+      <div class="foot-trust"><div class="container">${trust}</div></div>
+      <div class="foot-main">
+        <div><div class="brand">reed<span class="dot">bi</span>.</div>
+          <p>Your one-stop marketplace for online shopping & jobs. Shop millions of products from trusted sellers.</p></div>
+        ${col("Shop",["New Arrivals","Best Sellers","Fashion","Electronics","Footwear"])}
+        ${col("Help",["Track Order","Returns","Shipping","Contact Us","FAQ"])}
+        ${col("Company",["About","Become a Seller","Careers","Privacy","Terms"])}
+      </div>
+      <div class="foot-bottom">\u00a9 ${new Date().getFullYear()} REEDBI \u2014 Demo store \u00b7 single-file app.</div>
+    </footer>`;
+
+  $("#burger").onclick = () => $("#mobileMenu").classList.add("open");
+  $("#mobileMenu").onclick = (e) => { if (e.target.id === "mobileMenu" || e.target.closest("a")) e.currentTarget.classList.remove("open"); };
+  $("#searchForm").onsubmit = (e) => { e.preventDefault(); go("#/shop?q=" + encodeURIComponent($("#searchIn").value.trim())); };
+  refreshBadges();
+  Store.on(refreshBadges);
+}
+function refreshBadges() {
+  const c = Store.count(), w = Store.wishCount();
+  const cb = $("#cartBadge"), wb = $("#wishBadge");
+  if (cb) { cb.textContent = c; cb.style.display = c ? "grid" : "none"; }
+  if (wb) { wb.textContent = w; wb.style.display = w ? "grid" : "none"; }
+}
+function setActiveNav(name) { $$("#nav a[data-r]").forEach((a)=>a.classList.toggle("active", a.dataset.r === name)); }
+
+/* ---------- toast ---------- */
+let toastEl;
+function toast(msg) {
+  if (!toastEl) { toastEl = document.createElement("div"); toastEl.className = "toast"; document.body.appendChild(toastEl); }
+  toastEl.innerHTML = ICONS.check + "<span>" + msg + "</span>";
+  toastEl.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => toastEl.classList.remove("show"), 2000);
+}
+
+/* ---------- product card ---------- */
+function cardHTML(p) {
+  return `<article class="card reveal">
+    <div class="card-media ${p.oos ? "oos" : ""}">
+      <a href="#/product/${p.id}"><img src="${p.image}" alt="${p.name}" loading="lazy"></a>
+      ${p.tag ? `<span class="tag ${p.tag}">${p.tag}</span>` : ""}
+      <button class="wish ${Store.inWish(p.id) ? "on" : ""}" data-wish="${p.id}" aria-label="Wishlist">${ICONS.heart}</button>
+      ${p.oos ? `<span class="oos-flag">OUT OF STOCK</span>` : ""}
+    </div>
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="card-brand">${p.brand}</span><span class="rating">${p.rating} ${ICONS.spark}</span>
+      </div>
+      <a href="#/product/${p.id}" class="card-name">${p.name}</a>
+      <div class="price"><span class="now">${INR(p.price)}</span><span class="was">${INR(p.mrp)}</span><span class="off">${p.off}% off</span></div>
+      ${p.oos ? "" : `<button class="btn btn-ghost btn-sm" data-add="${p.id}">Add to Bag</button>`}
+    </div></article>`;
+}
+function wireCards(scope = document) {
+  $$("[data-add]", scope).forEach((b) => b.onclick = () => { Store.add(+b.dataset.add); toast("Added to bag"); });
+  $$("[data-wish]", scope).forEach((b) => b.onclick = () => {
+    const on = Store.toggleWish(+b.dataset.wish); b.classList.toggle("on", on);
+    toast(on ? "Saved to wishlist" : "Removed from wishlist");
+  });
+  observeReveal(scope);
+}
+function observeReveal(scope = document) {
+  if (!("IntersectionObserver" in window)) { $$(".reveal", scope).forEach((el)=>el.classList.add("in")); return; }
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .08 });
+  $$(".reveal", scope).forEach((el) => io.observe(el));
+}
+
+/* ============================================================
+   VIEWS
+============================================================ */
+const VIEWS = {
+  home() {
+    const deals = PRODUCTS.filter((p) => p.tag === "SALE").slice(0, 4);
+    const trending = PRODUCTS.filter((p) => p.tag === "TRENDING" || p.rating >= 4.5).slice(0, 4);
+    const app = $("#app");
+    app.innerHTML = `
+      <section class="hero"><div class="hero-inner">
+        <div class="reveal in">
+          <span class="hero-eyebrow">${ICONS.spark} New season drop</span>
+          <h1 class="display">Shop the<br>things you <em>love</em>.</h1>
+          <p>From everyday essentials to standout pieces \u2014 thousands of products from trusted sellers, delivered fast.</p>
+          <div class="hero-cta"><a href="#/shop" class="btn btn-primary">Shop Now ${ICONS.arrow}</a>
+            <a href="#/shop?category=Electronics" class="btn btn-ghost">Explore Electronics</a></div>
+          <div class="hero-stats">
+            <div><div class="n">12k+</div><div class="l">Products</div></div>
+            <div><div class="n">4.8\u2605</div><div class="l">Avg. rating</div></div>
+            <div><div class="n">45k+</div><div class="l">Happy buyers</div></div></div>
+        </div>
+        <div class="hero-art reveal in"><img src="${IMG("photo-1483985988355-763728e1935b",900)}" alt="Shopping">
+          <div class="hero-float tl"><span class="pill">${ICONS.truck}</span>Free & fast delivery</div>
+          <div class="hero-float br"><span class="pill">${ICONS.spark}</span>Up to 70% off</div></div>
+      </div></section>
+      <div class="cat-strip"><div class="container">${CATEGORIES.map((c)=>`<a class="chip" href="#/shop${c==="All"?"":"?category="+encodeURIComponent(c)}">${c}</a>`).join("")}</div></div>
+      <section class="section"><div class="container">
+        <div class="sec-head"><div><h2 class="display">Deals of the day</h2><p>Best prices, limited time only.</p></div>
+          <a href="#/shop" class="link-arrow">View all ${ICONS.arrow}</a></div>
+        <div class="grid">${deals.map(cardHTML).join("")}</div></div></section>
+      <section class="section" style="padding-top:0"><div class="container">
+        <div class="sec-head"><div><h2 class="display">Trending now</h2><p>What everyone\u2019s adding to their bag.</p></div>
+          <a href="#/shop" class="link-arrow">View all ${ICONS.arrow}</a></div>
+        <div class="grid">${trending.map(cardHTML).join("")}</div></div></section>`;
+    wireCards(app);
+  },
+
+  shop(_, params) {
+    const app = $("#app");
+    app.innerHTML = `<div class="container">
+      <div class="page-head"><div class="crumb"><a href="#/">Home</a> / Shop</div><h1 class="display" id="title">All Products</h1></div>
+      <div class="shop">
+        <aside class="filters" id="filters"></aside>
+        <div><div class="shop-bar"><span class="count" id="count"></span><select class="select" id="sort"></select></div>
+          <div class="grid cols-3" id="grid"></div></div>
+      </div></div>`;
+    const state = { q:(params.get("q")||"").toLowerCase(), category:params.get("category")||"All", brands:[], price:null, sort:"popular" };
+    $("#sort").innerHTML = SORTS.map((s)=>`<option value="${s.v}">${s.l}</option>`).join("");
+    $("#filters").innerHTML = `
+      <div class="f-row"><strong style="font-size:14px;text-transform:uppercase;letter-spacing:.06em">Filters</strong>
+        <button id="clear" style="font-size:12px;font-weight:700;color:var(--pink)">Clear</button></div>
+      <h3>Category</h3><div id="fCat"></div>
+      <h3>Brand</h3><div id="fBrand" style="max-height:180px;overflow:auto"></div>
+      <h3>Price</h3><div id="fPrice"></div>`;
+    $("#fCat").innerHTML = CATEGORIES.map((c)=>`<label class="check"><input type="radio" name="cat" value="${c}" ${c===state.category?"checked":""}> ${c}</label>`).join("");
+    $("#fBrand").innerHTML = BRANDS.map((b)=>`<label class="check"><input type="checkbox" value="${b}"> ${b}</label>`).join("");
+    $("#fPrice").innerHTML = PRICE_RANGES.map((r,i)=>`<label class="check"><input type="radio" name="price" value="${i}"> ${r.l}</label>`).join("");
+    if (state.q) $("#searchIn").value = params.get("q");
+    function apply() {
+      let list = PRODUCTS.slice();
+      if (state.q) list = list.filter((p)=>(p.name+p.brand+p.category).toLowerCase().includes(state.q));
+      if (state.category !== "All") list = list.filter((p)=>p.category===state.category);
+      if (state.brands.length) list = list.filter((p)=>state.brands.includes(p.brand));
+      if (state.price!==null){ const r=PRICE_RANGES[state.price]; list=list.filter((p)=>p.price>=r.min&&p.price<=r.max); }
+      const by = { priceLow:(a,b)=>a.price-b.price, priceHigh:(a,b)=>b.price-a.price, discount:(a,b)=>b.off-a.off, rating:(a,b)=>b.rating-a.rating, popular:(a,b)=>b.reviews-a.reviews }[state.sort];
+      list.sort(by);
+      $("#title").textContent = state.q ? `Results for \u201c${state.q}\u201d` : (state.category==="All"?"All Products":state.category);
+      $("#count").textContent = `${list.length} product${list.length!==1?"s":""}`;
+      $("#grid").innerHTML = list.length ? list.map(cardHTML).join("") : `<div class="empty" style="grid-column:1/-1">${ICONS.box}<p>No products match your filters.</p></div>`;
+      wireCards($("#grid"));
+    }
+    $("#sort").onchange = (e)=>{ state.sort=e.target.value; apply(); };
+    $$('input[name="cat"]').forEach((i)=>i.onchange=()=>{ state.category=i.value; apply(); });
+    $$('#fBrand input').forEach((i)=>i.onchange=()=>{ state.brands=$$('#fBrand input:checked').map((x)=>x.value); apply(); });
+    $$('input[name="price"]').forEach((i)=>i.onchange=()=>{ state.price=+i.value; apply(); });
+    $("#clear").onclick=()=>{ state.brands=[];state.price=null;state.category="All";
+      $$('#fBrand input').forEach((x)=>x.checked=false);$$('input[name="price"]').forEach((x)=>x.checked=false);
+      $('input[name="cat"][value="All"]').checked=true; apply(); };
+    apply();
+  },
+
+  product(id) {
+    const pid = +id || PRODUCTS[0].id;
+    const p = PRODUCTS.find((x)=>x.id===pid) || PRODUCTS[0];
+    let size = p.sizes ? p.sizes[0] : null;
+    const related = PRODUCTS.filter((x)=>x.category===p.category && x.id!==p.id).slice(0,4);
+    const app = $("#app");
+    app.innerHTML = `<div class="container">
+      <div class="page-head"><div class="crumb"><a href="#/">Home</a> / <a href="#/shop?category=${encodeURIComponent(p.category)}">${p.category}</a> / ${p.brand}</div></div>
+      <div class="pdp">
+        <div class="gallery">
+          <div class="thumbs" id="thumbs">${p.images.map((im,i)=>`<img src="${im}" class="${i===0?"active":""}" data-i="${i}">`).join("")}</div>
+          <div class="stage">${p.tag?`<span class="tag ${p.tag}" style="top:16px;left:16px">${p.tag}</span>`:""}<img id="stage" src="${p.images[0]}" alt="${p.name}"></div>
+        </div>
+        <div>
+          <div class="pdp-brand">${p.brand}</div><div class="pdp-name">${p.name}</div>
+          <span class="rating-lg">${p.rating} ${ICONS.spark} &nbsp;\u00b7&nbsp; ${p.reviews.toLocaleString()} ratings</span>
+          <div class="pdp-price"><span class="now">${INR(p.price)}</span><span class="was">${INR(p.mrp)}</span><span class="off">${p.off}% OFF</span></div>
+          <div class="tax">inclusive of all taxes</div>
+          ${p.sizes?`<div style="margin-top:20px"><div style="font-weight:700;text-transform:uppercase;font-size:13px;letter-spacing:.05em;margin-bottom:10px">Select size</div>
+            <div class="sizes" id="sizes">${p.sizes.map((s,i)=>`<button class="size ${i===0?"sel":""}" data-size="${s}">${s}</button>`).join("")}</div></div>`:""}
+          <div class="pdp-actions">
+            ${p.oos?`<button class="btn btn-ghost btn-block" disabled style="opacity:.6">Out of Stock</button>`
+              :`<button class="btn btn-primary" style="flex:1" id="addBtn">${ICONS.bag} Add to Bag</button>
+                <button class="btn btn-dark" style="flex:1" id="buyBtn">Buy Now</button>`}
+            <button class="btn btn-ghost" id="wishBtn" style="padding:13px 16px">${ICONS.heart}</button>
+          </div>
+          <div class="perks"><div class="perk">${ICONS.truck} Free delivery on orders over \u20b9500</div>
+            <div class="perk">${ICONS.refresh} 14-day easy returns</div>
+            <div class="perk" style="color:var(--pink)">${ICONS.store} Sold by ${p.seller}</div></div>
+          <div class="specs"><h4>Product details</h4>
+            <p style="font-size:14.5px;color:var(--ink-soft);margin-bottom:12px">${p.desc}</p>
+            ${Object.entries(p.specs).map(([k,v])=>`<div class="spec-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}</div>
+        </div>
+      </div>
+      <section class="section" style="padding-top:10px"><div class="sec-head"><h2 class="display">Reviews</h2></div>
+        <div class="grid cols-3">${REVIEWS.map((r)=>`<div class="panel reveal" style="margin:0">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span class="rating-lg" style="margin:0">${r.rating} ${ICONS.spark}</span>
+            ${r.verified?`<span style="font-size:12px;color:var(--accent);font-weight:700">Verified</span>`:""}</div>
+          <strong style="display:block;margin:10px 0 4px">${r.title}</strong>
+          <p style="font-size:14px;color:var(--ink-soft)">${r.text}</p>
+          <div class="muted" style="font-size:12.5px;margin-top:8px">${r.user} \u00b7 ${r.date}</div></div>`).join("")}</div></section>
+      ${related.length?`<section class="section" style="padding-top:0"><div class="sec-head"><h2 class="display">You may also like</h2></div>
+        <div class="grid">${related.map(cardHTML).join("")}</div></section>`:""}
+    </div>`;
+    $("#thumbs").onclick = (e)=>{ const t=e.target.closest("[data-i]"); if(!t)return;
+      $("#stage").src=p.images[+t.dataset.i]; $$("#thumbs img").forEach((im,i)=>im.classList.toggle("active",i===+t.dataset.i)); };
+    if (p.sizes) $("#sizes").onclick=(e)=>{ const b=e.target.closest("[data-size]"); if(!b)return;
+      size=b.dataset.size; $$("#sizes .size").forEach((x)=>x.classList.remove("sel")); b.classList.add("sel"); };
+    $("#addBtn") && ($("#addBtn").onclick=()=>{ Store.add(p.id,size); toast("Added to bag"); });
+    $("#buyBtn") && ($("#buyBtn").onclick=()=>{ Store.add(p.id,size); go("#/cart"); });
+    const wb=$("#wishBtn"); if(Store.inWish(p.id)) wb.classList.add("on");
+    wb.onclick=()=>{ const on=Store.toggleWish(p.id); wb.classList.toggle("on",on); toast(on?"Saved to wishlist":"Removed from wishlist"); };
+    wireCards(app);
+  },
+
+  cart() { renderCart(); },
+
+  wishlist() {
+    const app = $("#app");
+    const render = () => {
+      const items = Store.wish.map((id)=>PRODUCTS.find((p)=>p.id===id)).filter(Boolean);
+      app.innerHTML = `<div class="container">
+        <div class="page-head"><div class="crumb"><a href="#/">Home</a> / Wishlist</div>
+          <h1 class="display">My Wishlist <span class="muted" style="font-weight:400">(${items.length})</span></h1></div>
+        ${items.length?`<div class="grid" style="padding-bottom:64px" id="wl">${items.map(cardHTML).join("")}</div>`
+          :`<div class="state"><div class="ico">${ICONS.heart}</div><h2 class="display">Your wishlist is empty</h2>
+            <p>Tap the heart on any product to save it here.</p><a href="#/shop" class="btn btn-primary">Explore Products</a></div>`}</div>`;
+      if (items.length) { wireCards($("#wl")); $$("[data-wish]").forEach((b)=>b.addEventListener("click",()=>setTimeout(render,10))); }
+    };
+    render();
+  },
+
+  account(_, params) {
+    const tab = params.get("tab") || "overview";
+    const app = $("#app");
+    const menu = [["overview","Overview",ICONS.spark],["orders","My Orders",ICONS.box],["addresses","Addresses",ICONS.pin],["settings","Settings",ICONS.gear]];
+    const panels = {
+      overview:`<div class="panel welcome"><div class="muted" style="color:rgba(255,255,255,.7)">Welcome back,</div>
+          <h2 class="display">${USER.name}</h2><div style="color:rgba(255,255,255,.6);font-size:13px;margin-top:4px">${USER.member}</div></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n">${ORDERS.length}</div><div class="l">Orders</div></div>
+          <div class="stat"><div class="n">${Store.wishCount()}</div><div class="l">Wishlist</div></div>
+          <div class="stat"><div class="n">${ADDRESSES.length}</div><div class="l">Addresses</div></div>
+          <div class="stat"><div class="n">3</div><div class="l">Coupons</div></div></div>`,
+      orders:ORDERS.map((o)=>`<div class="order"><div class="order-top"><span>${o.id} \u00b7 ${o.date}</span>
+          <span class="order-status ${o.status==="Delivered"?"ok":"transit"}">${o.status}</span></div>
+          ${o.items.map((it)=>`<div class="order-line"><img src="${it.image}"><div style="flex:1"><strong style="font-size:14px">${it.name}</strong>
+            <div class="muted" style="font-size:12.5px">Qty ${it.qty} \u00b7 ${it.sub}</div></div><strong>${INR(it.price)}</strong></div>`).join("")}</div>`).join(""),
+      addresses:ADDRESSES.map((a)=>`<div class="addr"><span class="type">${a.type}</span>${a.def?`<span class="def">Default</span>`:""}
+          <div style="font-weight:700;margin-top:8px">${a.name}</div><div class="muted" style="font-size:14px">${a.line}</div>
+          <div class="muted" style="font-size:14px;margin-top:2px">Mobile: ${a.phone}</div></div>`).join(""),
+      settings:`<div class="panel"><h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px">Profile</h3>
+          ${[["Full Name",USER.name],["Email",USER.email],["Phone",USER.phone]].map(([k,v])=>`<div class="spec-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}</div>`,
+    };
+    app.innerHTML = `<div class="container"><div class="page-head"><h1 class="display">My Account</h1></div>
+      <div class="acct">
+        <aside class="acct-card"><div class="acct-profile"><div class="avatar">${ICONS.user}</div>
+          <strong>${USER.name}</strong><div class="muted" style="font-size:12.5px">${USER.email}</div></div>
+          <nav class="acct-menu">${menu.map(([k,l,ic])=>`<a href="#/account?tab=${k}" class="${tab===k?"active":""}">${ic} ${l}</a>`).join("")}
+          <a href="#/" style="color:var(--pink)">${ICONS.arrow} Logout</a></nav></aside>
+        <div>${panels[tab]||panels.overview}</div></div></div>`;
+  },
 };
 
-const SORT_OPTIONS = [
-  { label: 'Popularity', value: 'popularity' },
-  { label: 'Latest', value: 'latest' },
-  { label: 'Discount', value: 'discount' },
-  { label: 'Price: High to Low', value: 'price_desc' },
-  { label: 'Price: Low to High', value: 'price_asc' },
-];
-
-const USER_PROFILE = { name: 'Alex Johnson', email: 'alex.johnson@email.com', phone: '+91 987 654 3210', gender: 'Male', dob: '15/03/1990', bio: 'Creative UI/UX Designer', location: 'Bangalore, Karnataka', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face' };
-const ORDERS = [{ id: '407-4493612-4066701', date: '30 Dec 2024', total: 1299, status: 'Delivered', items: [{ name: "Levi's Sports Shoe For Men", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop", seller: "Aditya Birla Fashion", price: 1299, status: 'delivered', size: '9', color: 'Black', brand: "Levi's" }], shipTo: 'Alex Johnson' }, { id: '407-4493612-4066702', date: '15 Jan 2025', total: 4999, status: 'Shipped', items: [{ name: "Sheen Women Analog Watch", image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=200&h=200&fit=crop", seller: "Swiss Timepieces", price: 4999, status: 'shipped', size: null, color: 'Rose Gold', brand: 'Sheen' }], shipTo: 'Alex Johnson' }];
-const ADDRESSES = [{ id: 1, name: 'Alex Johnson', line1: '42, Koramangala 5th Block', line2: 'Near Sony World Signal', city: 'Bangalore', state: 'Karnataka', zip: '560095', phone: '+91 987 654 3210', isDefault: true }, { id: 2, name: 'Haris Karat', line1: '71, 2nd Flr, Marine Line Street', line2: 'Dhobi Talao Lane', city: 'Mumbai', state: 'Maharashtra', zip: '400002', phone: '00222200601', isDefault: false }];
-const REVIEWS = [{ id: 1, user: 'Tejas Redkar', rating: 4.3, title: 'Excellent product', date: '4 days ago', likes: 12, dislikes: 0, content: 'The quality is amazing for this price point.' }, { id: 2, user: 'Priya Sharma', rating: 5, title: 'Best purchase ever', date: '1 week ago', likes: 8, dislikes: 1, content: 'Absolutely love this product.' }];
-const QNA = [{ id: 1, question: 'Is this product washable?', answer: 'Yes, machine washable.', user: 'Tejas', date: '4 days ago' }, { id: 2, question: 'Does it come with a warranty?', answer: 'Yes, 6-month warranty.', user: 'Priya', date: '1 week ago' }];
-const OFFERS = [{ title: 'Best Price', desc: 'Applicable on orders above ₹1499', code: 'WELCOME500' }, { title: 'Bank Offer', desc: '10% off on HDFC Credit Cards', code: 'HDFC10' }, { title: 'No Cost EMI', desc: 'Available on select cards', code: null }];
-const SELLER_DATA = { name: 'Aventura Outfitters', tagline: 'We would love to hear from you!', verified: true, location: 'C Scheme, Jaipur, Rajasthan', followers: '1.2k', rating: 4.3, totalProducts: 156, totalSales: '45k+', joined: '2020', description: 'We have our own brands "Aventura Outfitters" and "American Crew".', country: 'India', contact: { email: 'support@aventura.com', phone: '+91 141 123 4567' }, categories: ['Fashion', 'Footwear', 'Accessories', 'Watches'], banner: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=300&fit=crop', logo: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=200&h=200&fit=crop' };
-const TRENDING_SEARCHES = ['Nike shoes under ₹2000', 'Samsung Galaxy Watch', 'Wireless earbuds', 'Women dresses', 'Laptop under ₹10000'];
-const COLLECTIONS = [{ title: 'New Range', sub: 'Min. 50% Off', tag: 'Min. 50% Off', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=280&h=374&fit=crop', bg: 'from-blue-50 to-indigo-100', accent: 'text-indigo-600', category: 'sports' }, { title: 'Top Sellers', sub: 'Special Offer', tag: 'Special offer', img: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=280&h=374&fit=crop', bg: 'from-rose-50 to-pink-100', accent: 'text-pink-600', category: 'fashion' }, { title: 'Top Collection', sub: 'Best Picks', tag: 'Top Rated', img: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=280&h=374&fit=crop', bg: 'from-amber-50 to-yellow-100', accent: 'text-amber-600', category: 'fashion' }, { title: 'Best Deals', sub: 'Top Rated', tag: 'Top Rated', img: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=280&h=374&fit=crop', bg: 'from-green-50 to-emerald-100', accent: 'text-emerald-600', category: 'electronics' }];
-const INTEREST_TABS = [{ id: 'all', label: '✨ For You' }, { id: 'fashion', label: '👗 Fashion' }, { id: 'electronics', label: '📱 Electronics' }, { id: 'sports', label: '⚽ Sports' }, { id: 'topRated', label: '⭐ Top Rated' }, { id: 'deals', label: '🔥 Best Deals' }];
-
-// ============================================================
-// STORE (Global State)
-// ============================================================
-const StoreContext = createContext(null);
-function StoreProvider({ children }) {
-  const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
-  const [toast, setToast] = useState({ message: '', visible: false });
-  const [currentPage, setCurrentPage] = useState('home');
-  const [selectedProductId, setSelectedProductId] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [accountTab, setAccountTab] = useState('overview');
-
-  const showToast = useCallback((message) => {
-    setToast({ message, visible: true });
-    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 2500);
-  }, []);
-
-  const addToCart = useCallback((product) => {
-    setCart(prev => {
-      const key = `${product.id}-${product.selectedSize || 'default'}`;
-      const existing = prev.find(item => `${item.id}-${item.selectedSize || 'default'}` === key);
-      if (existing) return prev.map(item => `${item.id}-${item.selectedSize || 'default'}` === key ? { ...item, quantity: item.quantity + (product.quantity || 1) } : item);
-      return [...prev, { ...product, quantity: product.quantity || 1 }];
-    });
-    showToast(`${product.name} added to bag`);
-  }, [showToast]);
-
-  const removeFromCart = useCallback((id, size) => {
-    setCart(prev => prev.filter(item => !(item.id === id && (item.selectedSize || 'default') === (size || 'default'))));
-  }, []);
-
-  const updateQuantity = useCallback((id, size, delta) => {
-    setCart(prev => prev.map(item => item.id === id && (item.selectedSize || 'default') === (size || 'default') ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item));
-  }, []);
-
-  const toggleWishlist = useCallback((id) => {
-    setWishlist(prev => {
-      if (prev.includes(id)) { showToast('Removed from wishlist'); return prev.filter(wid => wid !== id); }
-      showToast('Added to wishlist'); return [...prev, id];
-    });
-  }, [showToast]);
-
-  const navigate = useCallback((page, options = {}) => {
-    if (page === 'product' && options.productId) setSelectedProductId(options.productId);
-    if (['account', 'overview', 'orders', 'addresses', 'settings'].includes(page)) {
-      setCurrentPage('account'); setAccountTab(page === 'account' ? 'overview' : page);
-    } else { setCurrentPage(page); }
-    window.scrollTo(0, 0);
-  }, []);
-
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const cartSavings = cart.reduce((sum, item) => sum + (item.originalPrice - item.price) * item.quantity, 0);
-
-  return (
-    <StoreContext.Provider value={{ cart, wishlist, toast, currentPage, selectedProductId, searchQuery, accountTab, setSearchQuery, setAccountTab, addToCart, removeFromCart, updateQuantity, toggleWishlist, navigate, showToast, cartCount, cartTotal, cartSavings }}>
-      {children}
-    </StoreContext.Provider>
-  );
-}
-const useStore = () => useContext(StoreContext);
-
-// ============================================================
-// TOAST
-// ============================================================
-function ToastNotification() {
-  const { toast } = useStore();
-  return (
-    <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 pointer-events-none ${toast.visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-      <div className="bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3">
-        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center"><Check size={14} className="text-white" strokeWidth={3} /></div>
-        <span className="text-sm font-medium">{toast.message}</span>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// SMART SEARCH
-// ============================================================
-function SmartSearch({ onClose }) {
-  const { setSearchQuery } = useStore();
-  const [query, setQuery] = useState('');
-  const [recentSearches, setRecentSearches] = useState(() => { try { return JSON.parse(localStorage.getItem('reedbi_recent') || '[]'); } catch { return []; } });
-  const inputRef = useRef(null);
-  useEffect(() => { inputRef.current?.focus(); }, []);
-
-  const suggestions = query.length > 1 ? PRODUCTS.filter(p => p.name.toLowerCase().includes(query.toLowerCase()) || p.brand.toLowerCase().includes(query.toLowerCase()) || p.category.toLowerCase().includes(query.toLowerCase())).slice(0, 6) : [];
-
-  const handleSearch = (term) => {
-    const recent = [term, ...recentSearches.filter(r => r !== term)].slice(0, 5);
-    setRecentSearches(recent); localStorage.setItem('reedbi_recent', JSON.stringify(recent));
-    setSearchQuery(term); onClose();
+function renderCart() {
+  const app = $("#app");
+  const rows = Store.detail(), t = Store.totals();
+  if (!rows.length) {
+    app.innerHTML = `<div class="container"><div class="state"><div class="ico">${ICONS.bag}</div>
+      <h2 class="display">Your bag is empty</h2><p>Looks like you haven\u2019t added anything yet.</p>
+      <a href="#/shop" class="btn btn-primary">Continue Shopping</a></div></div>`; return;
+  }
+  const steps = ["Bag","Address","Payment"].map((s,i)=>`<div class="step ${i===0?"on":""}"><span class="n">${i+1}</span>${s}</div>${i<2?'<span class="step-line"></span>':""}`).join("");
+  app.innerHTML = `<div class="container"><div class="page-head"><h1 class="display">Shopping Bag</h1></div>
+    <div class="steps">${steps}</div>
+    <div class="cart-wrap">
+      <div id="items">${rows.map(cartRow).join("")}</div>
+      <aside class="summary">
+        <h3>Coupons</h3>
+        ${t.couponDiscount||Store.coupon?`<div class="coupon-on"><span>${ICONS.spark} ${Store.coupon} applied</span><button id="rmCoupon" style="color:var(--pink);font-weight:700">Remove</button></div>`
+          :`<div class="coupon"><input id="couponIn" placeholder="Enter code"><button class="btn btn-dark btn-sm" id="applyCoupon">Apply</button></div>`}
+        <div class="muted" style="font-size:12px;margin-bottom:18px">Try: REEDBI10 \u00b7 FIRST50 \u00b7 SAVE200</div>
+        <h3>Price Details (${t.items} item${t.items!==1?"s":""})</h3>
+        <div class="sum-row"><span class="muted">Total MRP</span><span>${INR(t.totalMrp)}</span></div>
+        <div class="sum-row"><span class="muted">Bag discount</span><span class="g">\u2212 ${INR(t.bagDiscount)}</span></div>
+        ${t.couponDiscount?`<div class="sum-row"><span class="muted">Coupon discount</span><span class="g">\u2212 ${INR(t.couponDiscount)}</span></div>`:""}
+        <div class="sum-row"><span class="muted">Shipping</span><span class="${t.shipping===0?"g":""}">${t.shipping===0?"FREE":INR(t.shipping)}</span></div>
+        <label class="sum-row" style="cursor:pointer"><span class="muted">${ICONS.spark} Gift wrap (+${INR(25)})</span>
+          <input type="checkbox" id="giftChk" ${Store.gift?"checked":""} style="accent-color:var(--pink);width:17px;height:17px"></label>
+        <div class="sum-total"><span>Total</span><span>${INR(t.total)}</span></div>
+        <button class="btn btn-primary btn-block" id="placeOrder" style="margin-top:8px">Place Order</button>
+        <div class="muted" style="text-align:center;font-size:12.5px;margin-top:10px">${ICONS.shield} 100% secure payments</div>
+      </aside></div></div>`;
+  $("#items").onclick = (e) => {
+    const dec=e.target.closest("[data-dec]"),inc=e.target.closest("[data-inc]"),rm=e.target.closest("[data-rm]"),wl=e.target.closest("[data-wl]");
+    const parse=(el,a)=>[+el.dataset[a].split("|")[0], el.dataset[a].split("|")[1]||null];
+    if(dec){const[id,s]=parse(dec,"dec");Store.setQty(id,s,-1);renderCart();}
+    else if(inc){const[id,s]=parse(inc,"inc");Store.setQty(id,s,1);renderCart();}
+    else if(rm){const[id,s]=parse(rm,"rm");Store.remove(id,s);toast("Removed from bag");renderCart();}
+    else if(wl){const[id,s]=parse(wl,"wl");Store.toggleWish(id);Store.remove(id,s);toast("Moved to wishlist");renderCart();}
   };
-  const removeRecent = (e, term) => { e.stopPropagation(); const updated = recentSearches.filter(r => r !== term); setRecentSearches(updated); localStorage.setItem('reedbi_recent', JSON.stringify(updated)); };
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white w-full max-w-2xl mx-auto mt-4 rounded-2xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
-          <Search size={20} className="text-pink-500 flex-shrink-0" />
-          <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && query && handleSearch(query)} placeholder="Search for products, brands and more..." className="flex-1 text-sm outline-none text-gray-800 placeholder-gray-400" />
-          {query && <button onClick={() => setQuery('')}><X size={16} className="text-gray-400" /></button>}
-          <button className="p-1.5 bg-pink-50 rounded-lg text-pink-500"><Mic size={16} /></button>
-          <button onClick={onClose} className="text-sm text-gray-500 font-medium hover:text-pink-600 ml-1">Cancel</button>
-        </div>
-        <div className="p-4 max-h-[70vh] overflow-y-auto">
-          {suggestions.length > 0 ? (
-            <div className="mb-4">
-              {suggestions.map(product => (
-                <button key={product.id} onClick={() => handleSearch(product.name)} className="w-full flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg group">
-                  <img src={product.image} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
-                  <div className="flex-1 text-left"><div className="text-sm font-medium text-gray-800 group-hover:text-pink-600">{product.name}</div><div className="text-xs text-gray-400">{product.brand} · {product.category}</div></div>
-                  <div className="text-sm font-bold text-gray-900">₹{product.price.toLocaleString()}</div>
-                  <ArrowUpRight size={14} className="text-gray-300 group-hover:text-pink-500" />
-                </button>
-              ))}
-            </div>
-          ) : (
-            <>
-              {recentSearches.length > 0 && (
-                <div className="mb-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5"><Clock size={12} /> Recent Searches</h4>
-                    <button onClick={() => { setRecentSearches([]); localStorage.removeItem('reedbi_recent'); }} className="text-xs text-pink-500">Clear</button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {recentSearches.map(term => (
-                      <button key={term} onClick={() => handleSearch(term)} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-pink-50 rounded-full text-sm text-gray-700 hover:text-pink-600">
-                        {term}<span onClick={e => removeRecent(e, term)} className="text-gray-400 hover:text-red-400"><X size={12} /></span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div className="mb-5">
-                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5 mb-3"><TrendingUp size={12} /> Trending Searches</h4>
-                <div className="space-y-1">
-                  {TRENDING_SEARCHES.map((term, i) => (
-                    <button key={term} onClick={() => handleSearch(term)} className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg text-left group">
-                      <span className="text-xs text-gray-300 font-mono w-4">{i + 1}</span>
-                      <TrendingUp size={14} className="text-pink-400" />
-                      <span className="text-sm text-gray-700 group-hover:text-pink-600">{term}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Popular Categories</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Fashion', 'Electronics', 'Sports', 'Beauty'].map(cat => (
-                    <button key={cat} onClick={() => handleSearch(cat)} className="flex items-center gap-2 p-2.5 border border-gray-100 rounded-xl hover:border-pink-300 hover:bg-pink-50 text-sm font-medium text-gray-700 hover:text-pink-600">
-                      <span>{cat === 'Fashion' ? '👗' : cat === 'Electronics' ? '📱' : cat === 'Sports' ? '⚽' : '💄'}</span>{cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+  $("#applyCoupon") && ($("#applyCoupon").onclick=()=>{ if(Store.applyCoupon($("#couponIn").value)){toast("Coupon applied");renderCart();}else toast("Invalid coupon"); });
+  $("#rmCoupon") && ($("#rmCoupon").onclick=()=>{ Store.removeCoupon(); renderCart(); });
+  $("#giftChk") && ($("#giftChk").onchange=()=>{ Store.toggleGift(); renderCart(); });
+  $("#placeOrder").onclick=()=>{ Store.clear(); toast("Order placed \u2014 thank you!"); setTimeout(()=>go("#/"),900); };
+}
+function cartRow(it) {
+  const key = `${it.id}|${it.size||""}`;
+  return `<div class="cart-item ${it.oos?"oos":""}"><img src="${it.image}" alt="${it.name}">
+    <div class="ci-body"><div class="ci-top"><div>
+      <strong>${it.brand}</strong><div class="muted" style="font-size:13px">${it.name}</div>
+      <div class="ci-meta">${it.size?`<span>Size: <b>${it.size}</b></span>`:""}<span>Color: <b>${it.color}</b></span><span>Sold by ${it.seller}</span></div></div>
+      <button class="x-btn" data-rm="${key}" aria-label="Remove">\u2715</button></div>
+      ${it.oos?`<span style="margin-top:8px;color:var(--pink);font-weight:700;font-size:13px">Out of stock</span>`:`
+      <div class="ci-bottom"><div style="display:flex;align-items:center;gap:14px">
+        <div class="qty"><button data-dec="${key}" ${it.qty<=1?"disabled":""}>\u2212</button><span>${it.qty}</span><button data-inc="${key}" ${it.qty>=it.stock?"disabled":""}>+</button></div>
+        <button data-wl="${key}" class="muted" style="font-size:12.5px;font-weight:700">Move to wishlist</button></div>
+        <div style="text-align:right"><strong>${INR(it.lineTotal)}</strong><div class="muted" style="font-size:12px;text-decoration:line-through">${INR(it.lineMrp)}</div></div></div>`}
+    </div></div>`;
 }
 
-// ============================================================
-// HEADER
-// ============================================================
-function Header() {
-  const { cartCount, wishlist, searchQuery, setSearchQuery, navigate } = useStore();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const [activeMega, setActiveMega] = useState(null);
-  const [showSmartSearch, setShowSmartSearch] = useState(false);
-
-  return (
-    <>
-      {showSmartSearch && <SmartSearch onClose={() => setShowSmartSearch(false)} />}
-      <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <div className="bg-gray-50 text-xs text-gray-600 border-b border-gray-200 hidden sm:block">
-          <div className="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
-            <div className="flex gap-4">
-              <span className="flex items-center gap-1.5"><Phone size={12} className="text-gray-400" /> 1800 300 400</span>
-              <span className="flex items-center gap-1.5"><Mail size={12} className="text-gray-400" /> Support@reedbi.com</span>
-            </div>
-            <div className="flex gap-4">
-              <button className="hover:text-pink-600">Blog</button>
-              <button className="hover:text-pink-600">Support</button>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <button onClick={() => setIsMenuOpen(true)} className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"><Menu size={24} /></button>
-              <button onClick={() => navigate('home')} className="text-2xl font-extrabold tracking-tight text-gray-900">REED<span className="text-pink-600">BI</span></button>
-            </div>
-            <div className="hidden md:flex flex-1 max-w-2xl mx-8 relative">
-              <button onClick={() => setShowSmartSearch(true)} className="w-full pl-4 pr-12 py-2.5 border-2 border-gray-200 rounded-lg text-sm text-gray-400 text-left hover:border-pink-400 transition-colors">
-                {searchQuery || 'Search for products, brands and more...'}
-              </button>
-              {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><X size={16} /></button>}
-              <button onClick={() => setShowSmartSearch(true)} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-pink-600 text-white rounded-md hover:bg-pink-700"><Search size={18} /></button>
-            </div>
-            <div className="flex items-center gap-1 md:gap-3">
-              <div className="relative">
-                <button onClick={() => setIsAccountOpen(!isAccountOpen)} className="flex items-center gap-1.5 p-2 hover:bg-gray-100 rounded-lg text-sm font-medium">
-                  <User size={20} className="text-gray-700" /><span className="hidden lg:inline">Account</span>
-                </button>
-                {isAccountOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsAccountOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50">
-                      {[{ icon: User, label: 'My Account', page: 'account' }, { icon: Heart, label: 'My Wishlist', page: 'wishlist' }, { icon: ShoppingCart, label: 'My Orders', page: 'orders' }, { icon: MapPin, label: 'Addresses', page: 'addresses' }, { icon: Settings, label: 'Settings', page: 'settings' }].map((item, idx) => (
-                        <button key={idx} onClick={() => { navigate(item.page); setIsAccountOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700"><item.icon size={16} className="text-gray-400" /> {item.label}</button>
-                      ))}
-                      <div className="border-t mt-1 pt-1"><button className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-red-600"><LogOut size={16} /> Logout</button></div>
-                    </div>
-                  </>
-                )}
-              </div>
-              <button onClick={() => navigate('wishlist')} className="relative p-2 hover:bg-gray-100 rounded-lg">
-                <Heart size={20} className="text-gray-700" />
-                {wishlist.length > 0 && <span className="absolute -top-0.5 -right-0.5 bg-pink-600 text-white text-[10px] w-[18px] h-[18px] flex items-center justify-center rounded-full font-bold">{wishlist.length}</span>}
-              </button>
-              <button onClick={() => navigate('cart')} className="relative p-2 hover:bg-gray-100 rounded-lg">
-                <ShoppingBag size={20} className="text-gray-700" />
-                {cartCount > 0 && <span className="absolute -top-0.5 -right-0.5 bg-pink-600 text-white text-[10px] w-[18px] h-[18px] flex items-center justify-center rounded-full font-bold">{cartCount}</span>}
-              </button>
-            </div>
-          </div>
-          <div className="md:hidden mt-3 relative">
-            <button onClick={() => setShowSmartSearch(true)} className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-lg text-sm text-gray-400 text-left hover:border-pink-400">
-              {searchQuery || 'Search products...'}
-            </button>
-            <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-          </div>
-        </div>
-        <nav className="border-t border-gray-100 hidden lg:block">
-          <div className="max-w-7xl mx-auto px-4">
-            <ul className="flex items-center gap-1 py-1 text-sm font-medium text-gray-700">
-              {Object.entries(MEGA_MENU).map(([name, items]) => (
-                <li key={name} className="relative" onMouseEnter={() => setActiveMega(name)} onMouseLeave={() => setActiveMega(null)}>
-                  <span className="flex items-center gap-1 px-3 py-2.5 hover:text-pink-600 hover:bg-gray-50 rounded-lg cursor-pointer">{name} <ChevronDown size={14} className={`transition-transform ${activeMega === name ? 'rotate-180' : ''}`} /></span>
-                  {activeMega === name && (
-                    <div className="absolute top-full left-0 w-64 bg-white shadow-2xl border border-gray-100 rounded-xl py-3 z-40">
-                      <div className="px-4 py-2 font-bold text-gray-900 border-b mb-1">{name}</div>
-                      {items.map((item, idx) => <button key={idx} className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 hover:text-pink-600">{item}</button>)}
-                    </div>
-                  )}
-                </li>
-              ))}
-              <li className="ml-auto flex items-center gap-4">
-                <button className="text-pink-600 font-semibold px-3 py-2.5">Today's Deals</button>
-                <button className="text-pink-600 font-semibold px-3 py-2.5">Offer Zone</button>
-              </li>
-            </ul>
-          </div>
-        </nav>
-        {isMenuOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 lg:hidden" onClick={() => setIsMenuOpen(false)}>
-            <div className="absolute left-0 top-0 h-full w-80 bg-white shadow-2xl overflow-y-auto" onClick={e => e.stopPropagation()}>
-              <div className="flex justify-between items-center p-4 border-b">
-                <span className="text-xl font-bold">REED<span className="text-pink-600">BI</span></span>
-                <button onClick={() => setIsMenuOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X size={24} /></button>
-              </div>
-              <div className="p-4 space-y-1">
-                {Object.keys(MEGA_MENU).map(name => <button key={name} className="block w-full text-left p-3 hover:bg-gray-50 rounded-lg font-medium" onClick={() => setIsMenuOpen(false)}>{name}</button>)}
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
-    </>
-  );
+/* ---------- router boot ---------- */
+function route() {
+  const { name, arg, params } = parseHash();
+  const view = VIEWS[name] || VIEWS.home;
+  setActiveNav(VIEWS[name] ? name : "home");
+  view(arg, params);
+  observeReveal();
+  window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
 }
-
-// ============================================================
-// FOOTER
-// ============================================================
-function Footer() {
-  return (
-    <footer className="bg-white border-t border-gray-200 mt-12">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 className="text-lg font-bold mb-4">REED<span className="text-pink-600">BI</span></h3>
-            <p className="text-sm text-gray-500 mb-4 leading-relaxed">Your one-stop destination for online shopping, jobs, and more.</p>
-            <div className="flex gap-2">{['📘','🐦','📸','📺'].map((icon, i) => <button key={i} className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-pink-600 hover:text-white text-sm">{icon}</button>)}</div>
-          </div>
-          <div><h4 className="font-bold mb-4 text-sm uppercase tracking-wider">Customer Care</h4><ul className="space-y-2 text-sm text-gray-600">{['Contact Us','FAQs','Returns','Shipping'].map(link => <li key={link}><button className="hover:text-pink-600">{link}</button></li>)}</ul></div>
-          <div><h4 className="font-bold mb-4 text-sm uppercase tracking-wider">Company</h4><ul className="space-y-2 text-sm text-gray-600">{['About Us','Careers','Press','Blog'].map(link => <li key={link}><button className="hover:text-pink-600">{link}</button></li>)}</ul></div>
-          <div>
-            <h4 className="font-bold mb-4 text-sm uppercase tracking-wider">Contact</h4>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-center gap-2"><Phone size={14} /> 1800 300 400</li>
-              <li className="flex items-center gap-2"><Mail size={14} /> Support@reedbi.com</li>
-            </ul>
-            <div className="mt-4"><h5 className="text-xs font-bold uppercase tracking-wider mb-2 text-gray-500">Office Address</h5><p className="text-xs text-gray-500 leading-relaxed">9876 Design Blvd, Suite 543,<br />Beverly Hills, CA 90212</p></div>
-          </div>
-        </div>
-        <div className="border-t border-gray-100 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-          <span>© 2026 Reedbi.com. All Rights Reserved.</span>
-          <div className="flex items-center gap-2 text-gray-400 text-lg"><span className="text-xs mr-2">Powered By</span>💳 💳 💳 💳</div>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-// ============================================================
-// PRODUCT CARD
-// ============================================================
-function ProductCard({ product, showSellerRating }) {
-  const { addToCart, toggleWishlist, wishlist, navigate } = useStore();
-  const [selectedSize, setSelectedSize] = useState(null);
-  const isWishlisted = wishlist.includes(product.id);
-  return (
-    <div className="group relative bg-white rounded-xl border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer" onClick={() => navigate('product', { productId: product.id })}>
-      {product.badge && <div className={`absolute top-3 left-3 z-10 px-2.5 py-1 text-[10px] font-bold text-white rounded uppercase tracking-wider ${product.badge === 'SALE' ? 'bg-red-500' : product.badge === 'NEW' ? 'bg-green-500' : 'bg-amber-500'}`}>{product.badge}</div>}
-      <button onClick={e => { e.stopPropagation(); toggleWishlist(product.id); }} className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/90 shadow-sm opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
-        <Heart size={16} className={isWishlisted ? 'fill-pink-600 text-pink-600' : 'text-gray-500'} />
-      </button>
-      <div className="relative aspect-square overflow-hidden bg-gray-50">
-        <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-      </div>
-      <div className="p-4">
-        <div className="text-xs text-gray-500 font-medium uppercase mb-1">{product.brand}</div>
-        <h3 className="font-medium text-gray-900 mb-2 text-sm line-clamp-1 group-hover:text-pink-600">{product.name}</h3>
-        <div className="flex items-center gap-1.5 mb-2">
-          <div className="flex items-center bg-green-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold"><span>{product.rating}</span><Star size={8} className="fill-white ml-0.5" /></div>
-          <span className="text-xs text-gray-400">({product.reviews.toLocaleString()})</span>
-          {showSellerRating && product.sellerRating && <span className="text-xs text-gray-400 ml-auto">Seller: {product.sellerRating}</span>}
-        </div>
-        <div className="flex items-baseline gap-2 mb-3 flex-wrap">
-          <span className="text-lg font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
-          <span className="text-sm text-gray-400 line-through">₹{product.originalPrice.toLocaleString()}</span>
-          <span className="text-xs text-green-600 font-semibold bg-green-50 px-1.5 py-0.5 rounded">{product.discount}% off</span>
-        </div>
-        {product.sizes && (
-          <div className="flex gap-1.5 mb-3 flex-wrap">
-            {product.sizes.slice(0, 4).map(size => <button key={size} onClick={e => { e.stopPropagation(); setSelectedSize(size); }} className={`px-2 py-0.5 text-[11px] font-medium border rounded-md transition-colors ${selectedSize === size ? 'border-pink-600 text-pink-600 bg-pink-50' : 'border-gray-200 text-gray-600'}`}>{size}</button>)}
-          </div>
-        )}
-        <button onClick={e => { e.stopPropagation(); addToCart({ ...product, selectedSize }); }} className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-pink-600 text-pink-600 font-semibold text-sm rounded-lg hover:bg-pink-600 hover:text-white transition-all active:scale-95">
-          <ShoppingBag size={16} /> ADD TO BAG
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// GRAB OR GONE
-// ============================================================
-function CountdownTimer({ endTime }) {
-  const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
-  useEffect(() => {
-    const calc = () => { const diff = Math.max(0, endTime - Date.now()); setTimeLeft({ h: Math.floor(diff / 3600000), m: Math.floor((diff % 3600000) / 60000), s: Math.floor((diff % 60000) / 1000) }); };
-    calc(); const timer = setInterval(calc, 1000); return () => clearInterval(timer);
-  }, [endTime]);
-  const pad = n => String(n).padStart(2, '0');
-  return (
-    <div className="flex items-center gap-1">
-      {[timeLeft.h, timeLeft.m, timeLeft.s].map((val, i) => (
-        <React.Fragment key={i}>
-          <div className="bg-gray-900 text-white text-xs font-bold px-1.5 py-0.5 rounded">{pad(val)}</div>
-          {i < 2 && <span className="text-gray-500 text-xs font-bold">:</span>}
-        </React.Fragment>
-      ))}
-    </div>
-  );
-}
-const DEAL_END = Date.now() + 8 * 3600000;
-function GrabOrGone() {
-  const { navigate } = useStore();
-  const dealProducts = PRODUCTS.filter(p => p.discount >= 40).slice(0, 5);
-  return (
-    <div className="bg-white border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 py-5">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-pink-600 text-white px-3 py-1.5 rounded-lg"><Zap size={15} className="fill-white" /><span className="font-extrabold text-sm tracking-wide">GRAB OR GONE</span></div>
-            <div className="flex items-center gap-2 text-sm text-gray-500"><Clock size={14} /><span>Ends in</span><CountdownTimer endTime={DEAL_END} /></div>
-          </div>
-          <button className="text-sm text-pink-600 font-semibold hover:underline">See All</button>
-        </div>
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {dealProducts.map(product => {
-            const stockPct = Math.floor(Math.random() * 40 + 10);
-            return (
-              <div key={product.id} onClick={() => navigate('product', { productId: product.id })} className="flex-shrink-0 w-40 cursor-pointer group">
-                <div className="relative rounded-xl overflow-hidden bg-gray-50 aspect-square mb-2 border border-gray-100 group-hover:shadow-lg transition-shadow">
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">{product.discount}% OFF</div>
-                </div>
-                <div className="text-xs font-medium text-gray-800 line-clamp-1 mb-1">{product.name}</div>
-                <div className="flex items-baseline gap-1 mb-1.5"><span className="text-sm font-bold text-gray-900">₹{product.price.toLocaleString()}</span><span className="text-[10px] text-gray-400 line-through">₹{product.originalPrice.toLocaleString()}</span></div>
-                <div className="mb-1">
-                  <div className="flex justify-between text-[10px] text-gray-500 mb-0.5"><span className="text-orange-600 font-semibold">{stockPct}% left</span></div>
-                  <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden"><div className={`h-full rounded-full ${stockPct < 20 ? 'bg-red-500' : 'bg-orange-400'}`} style={{ width: `${stockPct}%` }} /></div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// COLLECTION BANNER
-// ============================================================
-function CollectionBanner() {
-  const { setSearchQuery } = useStore();
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-4">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {COLLECTIONS.map((col, i) => (
-          <button key={i} onClick={() => setSearchQuery(col.category)} className={`relative bg-gradient-to-br ${col.bg} rounded-2xl overflow-hidden group text-left hover:shadow-lg transition-all duration-300`}>
-            <div className="p-4 pb-0">
-              <div className={`text-[10px] font-bold uppercase tracking-wider ${col.accent} mb-0.5`}>{col.tag}</div>
-              <h3 className="text-base font-extrabold text-gray-900">{col.title}</h3>
-              <p className="text-xs text-gray-500 mb-2">{col.sub}</p>
-            </div>
-            <div className="relative h-36 overflow-hidden"><img src={col.img} alt={col.title} className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500" /></div>
-            <div className={`absolute bottom-3 right-3 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center ${col.accent} opacity-0 group-hover:opacity-100 transition-opacity`}><ArrowRight size={13} /></div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// FOR YOU SECTION
-// ============================================================
-function ForYouSection() {
-  const { navigate, wishlist } = useStore();
-  const [activeTab, setActiveTab] = useState('all');
-  const getProducts = () => {
-    switch (activeTab) {
-      case 'fashion': return PRODUCTS.filter(p => p.category === 'fashion');
-      case 'electronics': return PRODUCTS.filter(p => p.category === 'electronics');
-      case 'sports': return PRODUCTS.filter(p => p.category === 'sports');
-      case 'topRated': return [...PRODUCTS].sort((a, b) => b.rating - a.rating).slice(0, 6);
-      case 'deals': return [...PRODUCTS].sort((a, b) => b.discount - a.discount).slice(0, 6);
-      default: return PRODUCTS;
-    }
-  };
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2"><Sparkles size={20} className="text-pink-500" /><h2 className="text-xl font-bold text-gray-900">Recommended For You</h2><span className="text-xs bg-pink-100 text-pink-600 font-semibold px-2 py-0.5 rounded-full">AI Picks</span></div>
-        <button className="flex items-center gap-1 text-sm text-pink-600 font-semibold hover:underline">View All <ChevronRight size={14} /></button>
-      </div>
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-5">
-        {INTEREST_TABS.map(tab => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all border ${activeTab === tab.id ? 'bg-pink-600 text-white border-pink-600 shadow-md shadow-pink-200' : 'bg-white text-gray-600 border-gray-200 hover:border-pink-300'}`}>{tab.label}</button>
-        ))}
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {getProducts().slice(0, 10).map(product => (
-          <div key={product.id} onClick={() => navigate('product', { productId: product.id })} className="group cursor-pointer bg-white rounded-xl border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden">
-            <div className="relative aspect-square bg-gray-50 overflow-hidden">
-              <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-              {product.badge && <span className={`absolute top-2 left-2 text-[10px] font-bold text-white px-1.5 py-0.5 rounded uppercase ${product.badge === 'SALE' ? 'bg-red-500' : product.badge === 'NEW' ? 'bg-green-500' : 'bg-amber-500'}`}>{product.badge}</span>}
-              {wishlist.includes(product.id) && <span className="absolute top-2 right-2 text-sm">❤️</span>}
-            </div>
-            <div className="p-3">
-              <div className="text-[10px] text-gray-400 uppercase font-semibold mb-0.5">{product.brand}</div>
-              <div className="text-xs font-medium text-gray-800 line-clamp-2 mb-1.5 group-hover:text-pink-600">{product.name}</div>
-              <div className="flex items-center gap-1 mb-1.5">
-                <div className="flex items-center bg-green-600 text-white text-[9px] px-1 py-0.5 rounded font-bold">{product.rating} <Star size={7} className="fill-white ml-0.5" /></div>
-                <span className="text-[10px] text-gray-400">({product.reviews.toLocaleString()})</span>
-              </div>
-              <div className="flex items-baseline gap-1"><span className="text-sm font-bold text-gray-900">₹{product.price.toLocaleString()}</span><span className="text-[10px] text-green-600 font-bold">{product.discount}%off</span></div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// CART PAGE
-// ============================================================
-function CartPage() {
-  const { cart, removeFromCart, updateQuantity, cartTotal, cartSavings, navigate, showToast } = useStore();
-  const [showOffers, setShowOffers] = useState(false);
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [giftWrap, setGiftWrap] = useState(false);
-  const tax = Math.round(cartTotal * 0.18);
-  const couponDiscount = appliedCoupon === 'REEDBI10' ? Math.round(cartTotal * 0.1) : appliedCoupon === 'SAVE500' ? 500 : 0;
-  const finalTotal = cartTotal + tax - couponDiscount + (giftWrap ? 25 : 0);
-  const applyCoupon = () => {
-    const code = couponCode.trim().toUpperCase();
-    if (['REEDBI10','SAVE500','WELCOME'].includes(code)) { setAppliedCoupon(code); showToast(`Coupon ${code} applied!`); } else { showToast('Invalid coupon code'); }
-    setCouponCode('');
-  };
-  if (cart.length === 0) return (
-    <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-      <div className="text-6xl mb-4">🛍️</div>
-      <h3 className="text-xl font-bold text-gray-900 mb-2">Your shopping bag is empty</h3>
-      <p className="text-gray-500 mb-6">Looks like you haven't added anything yet.</p>
-      <button onClick={() => navigate('home')} className="px-8 py-3 bg-pink-600 text-white font-bold rounded-lg hover:bg-pink-700">Start Shopping</button>
-    </div>
-  );
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
-      <div className="flex items-center gap-3 mb-6 text-sm font-semibold uppercase tracking-wider">
-        <span className="text-pink-600 border-b-2 border-pink-600 pb-1">🛍️ Bag</span><span className="text-gray-300">›</span><span className="text-gray-400">📍 Address</span><span className="text-gray-300">›</span><span className="text-gray-400">💳 Payment</span>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
-        <div>
-          <div className="bg-white border border-gray-200 rounded-lg mb-4 overflow-hidden">
-            <button onClick={() => setShowOffers(!showOffers)} className="w-full flex items-center justify-between px-5 py-4 bg-pink-50/50 border-b border-gray-200">
-              <div className="flex items-center gap-2 font-bold text-sm"><Tag size={18} className="text-pink-600" /> Available Offers</div>
-              <span className="text-xs text-pink-600 font-semibold flex items-center gap-1">{showOffers ? 'Show Less' : 'Show More'} <ChevronDown size={14} className={`transition-transform ${showOffers ? 'rotate-180' : ''}`} /></span>
-            </button>
-            {showOffers && <div className="p-4 space-y-3 text-sm text-gray-600"><p>• 10% Instant Discount upto Rs 500 on Standard Chartered Cards</p><p>• Flat Rs. 150 off on first purchase above Rs. 1,499. Code: WELCOME</p><p>• Free delivery on all orders above Rs. 499</p></div>}
-          </div>
-          <div className="bg-white border border-gray-200 rounded-lg">
-            <div className="px-5 py-4 border-b border-gray-200 flex justify-between items-center">
-              <div><span className="font-bold text-base">My Shopping Bag</span><span className="text-gray-400 text-sm ml-2">({cart.reduce((s, i) => s + i.quantity, 0)} Items)</span></div>
-            </div>
-            {cart.map(item => (
-              <div key={`${item.id}-${item.selectedSize || 'def'}`} className="grid grid-cols-[100px_1fr] sm:grid-cols-[120px_1fr] gap-4 p-5 border-b border-gray-200 relative hover:bg-gray-50/50">
-                <img src={item.image} alt={item.name} className="w-full h-[130px] sm:h-[150px] object-cover rounded-lg bg-gray-100" />
-                <div className="flex flex-col gap-1.5 pr-8">
-                  <div className="text-xs font-bold uppercase tracking-wider text-gray-700">{item.brand}</div>
-                  <div className="text-sm text-gray-600 line-clamp-2">{item.name}</div>
-                  <div className="flex gap-4 text-xs text-gray-500 mt-1">{item.selectedSize && <span>Size: {item.selectedSize}</span>}<span>Color: {item.color}</span></div>
-                  <div className="flex items-center gap-4 mt-2">
-                    <div className="flex items-center border border-gray-200 rounded overflow-hidden">
-                      <button onClick={() => updateQuantity(item.id, item.selectedSize, -1)} disabled={item.quantity <= 1} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 disabled:opacity-30"><Minus size={12} /></button>
-                      <div className="w-10 h-8 flex items-center justify-center text-sm font-semibold border-x border-gray-200">{item.quantity}</div>
-                      <button onClick={() => updateQuantity(item.id, item.selectedSize, 1)} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100"><Plus size={12} /></button>
-                    </div>
-                    <button className="text-sm text-gray-500 hover:text-pink-600 flex items-center gap-1"><Heart size={14} /> Move to Wishlist</button>
-                  </div>
-                  <div className="mt-2"><span className="font-bold">₹{(item.price * item.quantity).toLocaleString()}</span><span className="text-sm text-gray-400 line-through ml-2">₹{(item.originalPrice * item.quantity).toLocaleString()}</span><span className="text-xs text-green-600 font-semibold ml-2">{item.discount}% off</span></div>
-                </div>
-                <button onClick={() => removeFromCart(item.id, item.selectedSize)} className="absolute top-5 right-5 text-gray-400 hover:text-red-500"><X size={18} /></button>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="lg:sticky lg:top-24 h-fit space-y-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h3 className="text-xs font-bold uppercase tracking-wider border-b border-gray-200 pb-3 mb-4">Price Details</h3>
-            <div className="mb-4">
-              <div className="flex gap-2">
-                <input type="text" value={couponCode} onChange={e => setCouponCode(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyCoupon()} placeholder="Enter coupon code" className="flex-1 px-3 py-2.5 border border-gray-200 rounded text-sm focus:border-pink-600 focus:outline-none" />
-                <button onClick={applyCoupon} className="px-4 py-2.5 bg-pink-600 text-white text-sm font-semibold rounded hover:bg-pink-700">Apply</button>
-              </div>
-              {appliedCoupon && <div className="flex items-center justify-between bg-green-50 p-2.5 rounded mt-2 text-sm text-green-700 font-semibold"><span>{appliedCoupon}</span><button onClick={() => setAppliedCoupon(null)} className="text-red-500 text-xs">Remove</button></div>}
-            </div>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between text-gray-600"><span>Total MRP</span><span>₹{(cartTotal + cartSavings).toLocaleString()}</span></div>
-              <div className="flex justify-between text-green-600"><span>Bag Discount</span><span>-₹{cartSavings.toLocaleString()}</span></div>
-              <div className="flex justify-between text-gray-600"><span>Tax (18%)</span><span>₹{tax.toLocaleString()}</span></div>
-              {appliedCoupon && <div className="flex justify-between text-green-600"><span>Coupon Discount</span><span>-₹{couponDiscount.toLocaleString()}</span></div>}
-              <div className="flex justify-between text-gray-600"><span>Delivery</span><span className="text-green-600 font-semibold">FREE</span></div>
-              <div className="flex justify-between font-bold text-base pt-3 border-t border-dashed border-gray-200"><span>Total</span><span>₹{finalTotal.toLocaleString()}</span></div>
-            </div>
-          </div>
-          <label className="flex items-center gap-3 bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-pink-300"><input type="checkbox" checked={giftWrap} onChange={() => setGiftWrap(!giftWrap)} className="w-4 h-4 accent-pink-600" /><span className="flex-1 text-sm font-medium">Gift Wrap For</span><span className="text-sm font-semibold">₹25</span></label>
-          <button onClick={() => showToast('Proceeding to checkout...')} className="w-full py-4 bg-pink-600 text-white font-bold rounded-lg uppercase tracking-wider hover:bg-pink-700">Proceed to Checkout</button>
-          <p className="text-center text-xs text-red-500 font-medium">ℹ️ Cash/Card On Delivery not available</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// PRODUCT DETAIL PAGE
-// ============================================================
-function ProductDetailPage({ product }) {
-  const { addToCart, toggleWishlist, wishlist, navigate } = useStore();
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [activeTab, setActiveTab] = useState('details');
-  const [pinCode, setPinCode] = useState('');
-  const [pinChecked, setPinChecked] = useState(false);
-  const isWishlisted = wishlist.includes(product.id);
-
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <button onClick={() => navigate('home')} className="flex items-center gap-2 text-sm text-gray-500 hover:text-pink-600 mb-4"><ArrowLeft size={16} /> Back to Products</button>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-        <div className="space-y-4">
-          <div className="relative aspect-square bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
-            <img src={product.images[selectedImage]} alt={product.name} className="w-full h-full object-cover" />
-            {product.badge && <div className={`absolute top-4 left-4 px-3 py-1.5 text-xs font-bold text-white rounded-lg uppercase ${product.badge === 'SALE' ? 'bg-red-500' : product.badge === 'NEW' ? 'bg-green-500' : 'bg-amber-500'}`}>{product.badge}</div>}
-            <button onClick={() => toggleWishlist(product.id)} className="absolute top-4 right-4 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:scale-110 transition-all"><Heart size={20} className={isWishlisted ? 'fill-pink-600 text-pink-600' : 'text-gray-500'} /></button>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {product.images.map((img, idx) => <button key={idx} onClick={() => setSelectedImage(idx)} className={`w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 ${selectedImage === idx ? 'border-pink-600 ring-2 ring-pink-100' : 'border-gray-200'}`}><img src={img} alt="" className="w-full h-full object-cover" /></button>)}
-          </div>
-        </div>
-        <div className="space-y-5">
-          <div>
-            <div className="text-sm text-gray-500 font-medium mb-1">{product.brand}</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">{product.name}</h1>
-            <button onClick={() => navigate('seller')} className="text-sm text-pink-600 hover:underline flex items-center gap-1"><Store size={14} /> by {product.seller}</button>
-          </div>
-          <div className="flex items-baseline gap-3 flex-wrap">
-            <span className="text-3xl font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
-            <span className="text-lg text-gray-400 line-through">₹{product.originalPrice.toLocaleString()}</span>
-            <span className="text-sm font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-lg">{product.discount}% off</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-amber-600 font-medium"><Zap size={16} /> Hurry, Only a few left!</div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center bg-green-600 text-white text-sm px-3 py-1.5 rounded-lg font-bold">{product.rating} <Star size={14} className="fill-white ml-1.5" /></div>
-            <span className="text-sm text-gray-500">{product.reviews.toLocaleString()} Ratings & Reviews</span>
-          </div>
-          {product.sizes && (
-            <div>
-              <div className="flex items-center justify-between mb-3"><h3 className="font-semibold text-gray-900">Select Size</h3><button className="text-sm text-pink-600 font-medium flex items-center gap-1"><HelpCircle size={14} /> Size Guide</button></div>
-              <div className="flex gap-3 flex-wrap">
-                {product.sizes.map(size => <button key={size} onClick={() => setSelectedSize(size)} className={`w-14 h-14 rounded-xl font-semibold text-sm border-2 transition-all ${selectedSize === size ? 'border-pink-600 bg-pink-50 text-pink-600' : 'border-gray-200 text-gray-700'}`}>{size}</button>)}
-              </div>
-              {selectedSize && <p className="text-sm text-green-600 mt-2 flex items-center gap-1"><CheckCircle2 size={14} /> Size {selectedSize} selected</p>}
-            </div>
-          )}
-          <div className="flex gap-3">
-            <button onClick={() => addToCart({ ...product, selectedSize })} className="flex-1 flex items-center justify-center gap-2 py-4 bg-pink-600 text-white font-bold rounded-xl hover:bg-pink-700 shadow-lg shadow-pink-600/20 active:scale-95 transition-all"><ShoppingBag size={20} /> ADD TO BAG</button>
-            <button onClick={() => toggleWishlist(product.id)} className={`flex items-center justify-center gap-2 px-6 py-4 border-2 rounded-xl font-bold transition-all ${isWishlisted ? 'border-pink-600 text-pink-600 bg-pink-50' : 'border-gray-200 text-gray-700 hover:border-pink-600 hover:text-pink-600'}`}><Heart size={20} className={isWishlisted ? 'fill-pink-600' : ''} /> {isWishlisted ? 'WISHLISTED' : 'WISHLIST'}</button>
-          </div>
-          <div className="border border-gray-200 rounded-xl overflow-hidden">
-            <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex items-center gap-2"><Star size={18} className="text-pink-600" /><h3 className="font-bold text-gray-900">Best Offers</h3></div>
-            <div className="divide-y divide-gray-100">
-              {OFFERS.map((offer, idx) => (
-                <div key={idx} className="p-4 flex items-start gap-3">
-                  <div className="w-10 h-10 bg-pink-50 rounded-lg flex items-center justify-center flex-shrink-0"><CheckCircle2 size={20} className="text-pink-600" /></div>
-                  <div className="flex-1"><h4 className="font-semibold text-gray-900 text-sm">{offer.title}</h4><p className="text-xs text-gray-500 mt-1">{offer.desc}</p>{offer.code && <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs font-mono font-medium text-gray-700 mt-2">{offer.code} <Copy size={12} /></span>}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-12">
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-xl mb-6 overflow-x-auto">
-          {['details','specs','reviews','Q&A'].map(tab => <button key={tab} onClick={() => setActiveTab(tab === 'Q&A' ? 'qna' : tab)} className={`px-5 py-2.5 rounded-lg text-sm font-medium capitalize whitespace-nowrap transition-all ${activeTab === (tab === 'Q&A' ? 'qna' : tab) ? 'bg-white text-pink-600 shadow-sm' : 'text-gray-500'}`}>{tab}</button>)}
-        </div>
-        {activeTab === 'details' && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
-            <p className="text-gray-600 leading-relaxed">{product.description}</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{Object.entries(product.details).map(([key, value]) => <div key={key} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"><span className="text-sm font-medium text-gray-500 w-32">{key}</span><span className="text-sm text-gray-900 font-medium">{value}</span></div>)}</div>
-            <p className="text-gray-600 text-sm">{product.care}</p>
-          </div>
-        )}
-        {activeTab === 'specs' && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{Object.entries(product.specs).map(([key, value]) => <div key={key} className="p-4 border border-gray-100 rounded-lg"><div className="text-xs text-gray-500 uppercase mb-1">{key}</div><div className="text-sm font-medium text-gray-900">{value}</div></div>)}</div>
-          </div>
-        )}
-        {activeTab === 'reviews' && (
-          <div className="space-y-4">
-            {REVIEWS.map(review => (
-              <div key={review.id} className="bg-white rounded-xl border border-gray-200 p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3"><div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-600">{review.user[0]}</div><div><div className="font-medium text-gray-900 text-sm">{review.user}</div><div className="text-xs text-gray-500">{review.date}</div></div></div>
-                  <div className="flex items-center gap-1 bg-green-600 text-white text-xs px-2 py-1 rounded font-bold">{review.rating} <Star size={10} className="fill-white" /></div>
-                </div>
-                <h4 className="font-medium text-gray-900 mb-2">{review.title}</h4>
-                <p className="text-sm text-gray-600 mb-3">{review.content}</p>
-                <div className="flex items-center gap-4 text-sm text-gray-500"><button className="flex items-center gap-1 hover:text-pink-600"><ThumbsUp size={14} /> {review.likes}</button><button className="flex items-center gap-1 hover:text-pink-600"><ThumbsDown size={14} /> {review.dislikes}</button></div>
-              </div>
-            ))}
-          </div>
-        )}
-        {activeTab === 'qna' && (
-          <div className="space-y-4">
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <div className="flex gap-3"><input type="text" placeholder="Post Your Question" className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:border-pink-600 focus:outline-none text-sm" /><button className="px-6 py-3 bg-pink-600 text-white font-medium rounded-lg hover:bg-pink-700">Post</button></div>
-            </div>
-            {QNA.map(qna => (
-              <div key={qna.id} className="bg-white rounded-xl border border-gray-200 p-6">
-                <div className="flex items-start gap-3 mb-3"><MessageCircle size={18} className="text-pink-600 mt-0.5" /><div><h4 className="font-medium text-gray-900 mb-1">{qna.question}</h4><div className="text-xs text-gray-500">{qna.user} • {qna.date}</div></div></div>
-                <p className="text-sm text-gray-600 pl-8">{qna.answer}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-12">
-        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2"><Truck size={18} className="text-pink-600" /> Delivery Options</h3>
-        <div className="flex gap-3 mb-4 max-w-md">
-          <input type="text" placeholder="Enter PIN code" value={pinCode} onChange={e => setPinCode(e.target.value.replace(/\D/g,'').slice(0,6))} className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:border-pink-600 focus:outline-none text-sm" />
-          <button onClick={() => pinCode.length === 6 && setPinChecked(true)} className="px-6 py-3 bg-pink-600 text-white font-medium rounded-lg hover:bg-pink-700">Check</button>
-        </div>
-        {pinChecked && <div className="space-y-2 mb-4"><div className="flex items-center gap-2 text-sm text-green-600"><CheckCircle2 size={16} /> Delivery available by {new Date(Date.now() + 3 * 86400000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div><div className="flex items-center gap-2 text-sm text-green-600"><CheckCircle2 size={16} /> Cash on Delivery available</div></div>}
-      </div>
-
-      <div className="mb-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-5">You May Also Like</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">{PRODUCTS.filter(p => p.id !== product.id).slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}</div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// SELLER PAGE
-// ============================================================
-function SellerPage() {
-  const { navigate } = useStore();
-  const [activeTab, setActiveTab] = useState('products');
-  const [isFollowing, setIsFollowing] = useState(false);
-  const sellerProducts = PRODUCTS.slice(0, 6);
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="relative mb-6">
-        <div className="h-48 md:h-64 rounded-2xl overflow-hidden"><img src={SELLER_DATA.banner} alt="Banner" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-2xl" /></div>
-        <div className="relative md:absolute md:bottom-0 md:left-0 md:right-0 p-4 md:p-6 flex flex-col md:flex-row items-start md:items-end gap-4 md:gap-6">
-          <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white -mt-16 md:mt-0"><img src={SELLER_DATA.logo} alt="Logo" className="w-full h-full object-cover" /></div>
-          <div className="flex-1 md:text-white">
-            <div className="flex items-center gap-2 mb-1"><h1 className="text-xl md:text-2xl font-bold">{SELLER_DATA.name}</h1>{SELLER_DATA.verified && <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-500 text-white text-xs font-medium rounded-full">✓ Verified</span>}</div>
-            <p className="text-sm md:text-white/80 text-gray-600 mb-2 max-w-xl">{SELLER_DATA.tagline}</p>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500"><span className="flex items-center gap-1"><MapPin size={14} /> {SELLER_DATA.location}</span><span className="flex items-center gap-1"><Users size={14} /> {SELLER_DATA.followers} Followers</span><span className="flex items-center gap-1"><Star size={14} className="fill-amber-400 text-amber-400" /> {SELLER_DATA.rating}</span></div>
-          </div>
-          <div className="flex gap-3 w-full md:w-auto">
-            <button onClick={() => setIsFollowing(!isFollowing)} className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm ${isFollowing ? 'bg-white text-gray-900 border border-gray-200' : 'bg-pink-600 text-white'}`}>{isFollowing ? <><Check size={16} /> Following</> : <><Plus size={16} /> Follow</>}</button>
-            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium text-sm border border-gray-200"><MessageCircle size={16} /> Contact</button>
-          </div>
-        </div>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {[{ icon: Package, label: 'Products', value: SELLER_DATA.totalProducts }, { icon: Star, label: 'Total Sales', value: SELLER_DATA.totalSales }, { icon: Star, label: 'Rating', value: `${SELLER_DATA.rating}/5` }, { icon: Calendar, label: 'Joined', value: SELLER_DATA.joined }].map((stat, i) => (
-          <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3"><div className="w-10 h-10 bg-pink-50 rounded-lg flex items-center justify-center"><stat.icon size={20} className="text-pink-600" /></div><div><div className="text-lg font-bold text-gray-900">{stat.value}</div><div className="text-xs text-gray-500">{stat.label}</div></div></div>
-        ))}
-      </div>
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl mb-6 overflow-x-auto">
-        {[{ id: 'products', label: 'Products' }, { id: 'categories', label: 'Categories' }, { id: 'about', label: 'About Us' }].map(tab => <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab.id ? 'bg-white text-pink-600 shadow-sm' : 'text-gray-500'}`}>{tab.label}</button>)}
-      </div>
-      {activeTab === 'products' && <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">{sellerProducts.map(product => <ProductCard key={product.id} product={product} />)}</div>}
-      {activeTab === 'categories' && <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{SELLER_DATA.categories.map((cat, idx) => <div key={idx} className="bg-white rounded-xl border border-gray-200 p-6 text-center hover:shadow-lg cursor-pointer group"><div className="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-pink-100"><Package size={28} className="text-pink-600" /></div><h3 className="font-bold text-gray-900">{cat}</h3></div>)}</div>}
-      {activeTab === 'about' && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <p className="text-gray-600 leading-relaxed mb-6">{SELLER_DATA.description}</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[{ icon: Globe, label: 'Country', value: SELLER_DATA.country }, { icon: MapPin, label: 'Location', value: SELLER_DATA.location }, { icon: Mail, label: 'Email', value: SELLER_DATA.contact.email }, { icon: Phone, label: 'Phone', value: SELLER_DATA.contact.phone }].map((item, i) => <div key={i} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg"><item.icon size={18} className="text-pink-600 mt-0.5" /><div><div className="text-sm font-medium text-gray-900">{item.label}</div><div className="text-sm text-gray-600">{item.value}</div></div></div>)}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ============================================================
-// ACCOUNT PAGE
-// ============================================================
-function AccountPage() {
-  const { accountTab, setAccountTab, navigate, wishlist } = useStore();
-  const [showAddForm, setShowAddForm] = useState(false);
-  const wishlistProducts = PRODUCTS.filter(p => wishlist.includes(p.id));
-  const menuItems = [{ id: 'overview', icon: User, label: 'Overview' }, { id: 'orders', icon: Package, label: 'My Orders' }, { id: 'wishlist', icon: Heart, label: 'My Wishlist' }, { id: 'addresses', icon: MapPin, label: 'Addresses' }, { id: 'settings', icon: Settings, label: 'Settings' }];
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="flex gap-6 items-start">
-        <aside className="hidden lg:block w-64 flex-shrink-0">
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-28">
-            <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-pink-50 to-white">
-              <div className="flex items-center gap-3"><img src={USER_PROFILE.avatar} alt="Profile" className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md" /><div><h3 className="font-bold text-gray-900">{USER_PROFILE.name}</h3><p className="text-xs text-gray-500">{USER_PROFILE.email}</p></div></div>
-            </div>
-            <div className="p-2">{menuItems.map(item => <button key={item.id} onClick={() => setAccountTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${accountTab === item.id ? 'bg-pink-50 text-pink-600' : 'text-gray-600 hover:bg-gray-50'}`}><item.icon size={18} /> {item.label}</button>)}</div>
-            <div className="p-4 border-t"><button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg"><LogOut size={18} /> Logout</button></div>
-          </div>
-        </aside>
-        <div className="flex-1 min-w-0">
-          <div className="lg:hidden flex gap-1 overflow-x-auto pb-4 mb-4">{menuItems.map(item => <button key={item.id} onClick={() => setAccountTab(item.id)} className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${accountTab === item.id ? 'bg-pink-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>{item.label}</button>)}</div>
-          {accountTab === 'overview' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-5">Primary Information</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{[{ label: 'Name', value: USER_PROFILE.name }, { label: 'Gender', value: USER_PROFILE.gender }, { label: 'Date of birth', value: USER_PROFILE.dob }, { label: 'Bio', value: USER_PROFILE.bio }, { label: 'Mobile', value: USER_PROFILE.phone }, { label: 'Location', value: USER_PROFILE.location }, { label: 'E-mail', value: USER_PROFILE.email }].map((f, i) => <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"><span className="text-sm font-medium text-gray-500 w-28">{f.label}:</span><span className="text-sm text-gray-900 font-medium">{f.value}</span></div>)}</div>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{[{ icon: Package, label: 'Total Orders', value: '12', color: 'bg-blue-50 text-blue-600' }, { icon: Heart, label: 'Wishlist', value: String(wishlist.length), color: 'bg-pink-50 text-pink-600' }, { icon: MapPin, label: 'Addresses', value: '2', color: 'bg-purple-50 text-purple-600' }, { icon: Award, label: 'Rewards', value: '450', color: 'bg-amber-50 text-amber-600' }].map((stat, i) => <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3"><div className={`w-10 h-10 rounded-lg ${stat.color} flex items-center justify-center`}><stat.icon size={20} /></div><div><div className="text-lg font-bold text-gray-900">{stat.value}</div><div className="text-xs text-gray-500">{stat.label}</div></div></div>)}</div>
-            </div>
-          )}
-          {accountTab === 'orders' && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-5">My Orders & Returns</h2>
-              {ORDERS.map(order => (
-                <div key={order.id} className="border border-gray-200 rounded-xl mb-4 overflow-hidden">
-                  <div className="bg-gray-50 px-5 py-3 flex flex-wrap items-center justify-between gap-3 border-b text-sm">
-                    <div className="flex flex-wrap gap-6"><div><div className="text-xs text-gray-500">Order Placed</div><div className="font-medium">{order.date}</div></div><div><div className="text-xs text-gray-500">Total</div><div className="font-medium">₹{order.total.toLocaleString()}</div></div><div><div className="text-xs text-gray-500">Ship to</div><div className="font-medium">{order.shipTo}</div></div></div>
-                    <span className="text-gray-500">ORDER <span className="font-bold text-gray-900">#{order.id}</span></span>
-                  </div>
-                  {order.items.map((item, idx) => (
-                    <div key={idx} className="p-5 flex flex-col md:flex-row gap-5">
-                      <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded-lg bg-gray-50" />
-                      <div className="flex-1"><h3 className="font-medium text-gray-900 mb-2">{item.name}</h3><div className="text-xs text-gray-500 space-y-1 mb-3"><p>Sold By: {item.seller}</p>{item.size && <p>Size: {item.size}</p>}<p>Color: {item.color}</p></div><span className={`text-xs font-medium px-2 py-1 rounded ${item.status === 'delivered' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>{item.status === 'delivered' ? '✅ Delivered' : '📦 Shipped'}</span></div>
-                      <div className="flex flex-col gap-2 md:items-end"><div className="text-lg font-bold">₹{item.price.toLocaleString()}</div><button className="px-4 py-2 bg-pink-600 text-white text-sm font-medium rounded-lg">Buy Again</button></div>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-          {accountTab === 'wishlist' && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-5">My Wishlist ({wishlistProducts.length})</h2>
-              {wishlistProducts.length === 0 ? <div className="text-center py-12"><Heart size={48} className="mx-auto mb-4 text-gray-200" /><h3 className="font-medium text-gray-600 mb-2">Your wishlist is empty</h3><button onClick={() => navigate('home')} className="text-pink-600 font-medium">Start Shopping</button></div> : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">{wishlistProducts.map(p => <ProductCard key={p.id} product={p} />)}</div>}
-            </div>
-          )}
-          {accountTab === 'addresses' && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-5"><h2 className="text-lg font-bold text-gray-900">My Addresses</h2><button onClick={() => setShowAddForm(!showAddForm)} className="flex items-center gap-2 px-4 py-2 bg-pink-600 text-white text-sm font-medium rounded-lg"><Plus size={16} /> Add New</button></div>
-              {showAddForm && (
-                <div className="bg-gray-50 rounded-xl p-5 mb-6 border border-gray-200">
-                  <h3 className="font-medium text-gray-900 mb-4">Add New Address</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{['Full Name','Mobile Number','Address Line 1','Address Line 2','City','State','ZIP Code','Email'].map(field => <input key={field} type="text" placeholder={field} className="px-4 py-2.5 border border-gray-200 rounded-lg focus:border-pink-600 focus:outline-none text-sm" />)}</div>
-                  <div className="flex gap-3 mt-4"><button className="px-6 py-2.5 bg-pink-600 text-white text-sm font-medium rounded-lg">Save</button><button onClick={() => setShowAddForm(false)} className="px-6 py-2.5 border border-gray-200 text-sm rounded-lg">Cancel</button></div>
-                </div>
-              )}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{ADDRESSES.map(addr => <div key={addr.id} className={`border rounded-xl p-5 relative ${addr.isDefault ? 'border-pink-300 bg-pink-50/30' : 'border-gray-200'}`}>{addr.isDefault && <span className="absolute top-3 right-3 text-xs font-medium text-pink-600 bg-pink-100 px-2 py-1 rounded-full">Default</span>}<h4 className="font-bold text-gray-900 mb-1">{addr.name}</h4><p className="text-sm text-gray-600">{addr.line1}, {addr.city}, {addr.state} - {addr.zip}</p><div className="flex gap-2 mt-3"><button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"><Edit size={14} /> Edit</button></div></div>)}</div>
-            </div>
-          )}
-          {accountTab === 'settings' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-6">Account Settings</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{[{ label: 'Full Name', value: USER_PROFILE.name, type: 'text' }, { label: 'Email', value: USER_PROFILE.email, type: 'email' }, { label: 'Phone', value: USER_PROFILE.phone, type: 'tel' }, { label: 'Gender', value: USER_PROFILE.gender, type: 'text' }].map((f, i) => <div key={i}><label className="block text-sm font-medium text-gray-700 mb-1.5">{f.label}</label><input type={f.type} defaultValue={f.value} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-pink-600 focus:outline-none text-sm" /></div>)}</div>
-                <div className="flex gap-3 pt-6"><button className="px-6 py-2.5 bg-pink-600 text-white font-medium rounded-lg">Save Changes</button><button className="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-lg">Cancel</button></div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// HOME PAGE
-// ============================================================
-function HomePage() {
-  const { currentPage, searchQuery, selectedProductId, navigate, setSearchQuery } = useStore();
-  const [products, setProducts] = useState(PRODUCTS);
-  const [sortBy, setSortBy] = useState('popularity');
-  const [selectedFilters, setSelectedFilters] = useState({ brands: [], priceRange: null });
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [viewMode, setViewMode] = useState('grid');
-  const [heroSlide, setHeroSlide] = useState(0);
-
-  useEffect(() => {
-    let result = [...PRODUCTS];
-    if (searchQuery) { const q = searchQuery.toLowerCase(); result = result.filter(p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)); }
-    if (selectedFilters.brands.length > 0) result = result.filter(p => selectedFilters.brands.includes(p.brand));
-    if (selectedFilters.priceRange) { const { min, max } = selectedFilters.priceRange; result = result.filter(p => p.price >= min && p.price <= max); }
-    switch (sortBy) {
-      case 'price_asc': result.sort((a, b) => a.price - b.price); break;
-      case 'price_desc': result.sort((a, b) => b.price - a.price); break;
-      case 'discount': result.sort((a, b) => b.discount - a.discount); break;
-      case 'latest': result.sort((a, b) => b.id - a.id); break;
-      default: result.sort((a, b) => b.reviews - a.reviews);
-    }
-    setProducts(result);
-  }, [searchQuery, sortBy, selectedFilters]);
-
-  useEffect(() => { const timer = setInterval(() => setHeroSlide(prev => (prev + 1) % 3), 5000); return () => clearInterval(timer); }, []);
-
-  const handleFilterChange = (type, value) => {
-    if (type === 'clear') { setSelectedFilters({ brands: [], priceRange: null }); return; }
-    if (type === 'brand') setSelectedFilters(prev => ({ ...prev, brands: prev.brands.includes(value) ? prev.brands.filter(b => b !== value) : [...prev.brands, value] }));
-    if (type === 'price') setSelectedFilters(prev => ({ ...prev, priceRange: prev.priceRange?.label === value.label ? null : value }));
-  };
-
-  const activeFilterCount = selectedFilters.brands.length + (selectedFilters.priceRange ? 1 : 0);
-  const heroSlides = [
-    { img: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&h=400&fit=crop', title: 'VIVO V15', subtitle: '32MP Pop-Up Selfie. Benefits worth ₹10,000' },
-    { img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&h=400&fit=crop', title: 'SALEBRATION', subtitle: 'Fashion Extra 42% off | Home Flat 50% off' },
-    { img: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=1200&h=400&fit=crop', title: 'Best Deals on Laptops', subtitle: 'Laptops from ₹9,999. Limited time offer!' },
-  ];
-
-  if (currentPage === 'product') { const product = PRODUCTS.find(p => p.id === selectedProductId); if (product) return <><Header /><ProductDetailPage product={product} /><Footer /><ToastNotification /></>; }
-  if (currentPage === 'cart') return <><Header /><CartPage /><Footer /><ToastNotification /></>;
-  if (currentPage === 'account') return <><Header /><AccountPage /><Footer /><ToastNotification /></>;
-  if (currentPage === 'seller') return <><Header /><SellerPage /><Footer /><ToastNotification /></>;
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      {!searchQuery && (
-        <div className="relative overflow-hidden bg-white">
-          <div className="relative h-[220px] sm:h-[320px] md:h-[400px]" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('${heroSlides[heroSlide].img}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            <div className="absolute bottom-8 left-8 md:left-12 max-w-md">
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-white mb-2 drop-shadow-lg">{heroSlides[heroSlide].title}</h2>
-              <p className="text-sm sm:text-base text-white/90 mb-4">{heroSlides[heroSlide].subtitle}</p>
-              <button className="px-6 py-2.5 bg-pink-600 text-white font-bold text-sm rounded-lg hover:bg-pink-700 uppercase tracking-wider">Shop Now</button>
-            </div>
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-              {[0,1,2].map(i => <button key={i} onClick={() => setHeroSlide(i)} className={`h-2.5 rounded-full transition-all ${heroSlide === i ? 'bg-white w-7' : 'bg-white/50 w-2.5'}`} />)}
-            </div>
-          </div>
-        </div>
-      )}
-      {!searchQuery && (
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-5">Categories</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-            {CATEGORIES.map(cat => <button key={cat.name} className="bg-white border border-gray-100 rounded-xl p-4 text-center hover:shadow-lg hover:border-pink-300 transition-all group"><div className="text-3xl mb-2">{cat.icon}</div><div className="text-sm font-semibold text-gray-700 group-hover:text-pink-600">{cat.name}</div></button>)}
-          </div>
-        </div>
-      )}
-      {!searchQuery && <GrabOrGone />}
-      {!searchQuery && <CollectionBanner />}
-      {!searchQuery && <ForYouSection />}
-      {!searchQuery && (
-        <div className="max-w-7xl mx-auto px-4 pb-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[{ img: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=340&fit=crop', title: 'Fashion Sale', sub: 'Up to 70% off' }, { img: 'https://images.unsplash.com/photo-1498049860654-af1a5c5668ba?w=600&h=340&fit=crop', title: 'Electronics Fest', sub: 'Best deals on gadgets' }, { img: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&h=340&fit=crop', title: 'Home Essentials', sub: 'Flat 50% off on decor' }].map((banner, i) => (
-              <div key={i} className="relative rounded-xl overflow-hidden aspect-video cursor-pointer group"><img src={banner.img} alt={banner.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /><div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-5"><h3 className="text-white font-bold text-lg">{banner.title}</h3><p className="text-white/90 text-sm">{banner.sub}</p></div></div>
-            ))}
-          </div>
-        </div>
-      )}
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        <div className="mb-5"><h1 className="text-2xl font-bold text-gray-900 mb-1">{searchQuery ? `Results for "${searchQuery}"` : '#Featured Products'}</h1><p className="text-gray-500 text-sm">{products.length} items found</p></div>
-        {activeFilterCount > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="text-sm text-gray-500">Active Filters:</span>
-            {selectedFilters.brands.map(brand => <span key={brand} className="inline-flex items-center gap-1 px-3 py-1 bg-pink-50 text-pink-700 text-xs font-medium rounded-full">{brand} <button onClick={() => handleFilterChange('brand', brand)}><X size={12} /></button></span>)}
-            {selectedFilters.priceRange && <span className="inline-flex items-center gap-1 px-3 py-1 bg-pink-50 text-pink-700 text-xs font-medium rounded-full">{selectedFilters.priceRange.label} <button onClick={() => handleFilterChange('price', selectedFilters.priceRange)}><X size={12} /></button></span>}
-            <button onClick={() => handleFilterChange('clear')} className="text-xs text-pink-600 font-medium hover:underline ml-2">Clear All</button>
-          </div>
-        )}
-        <div className="flex gap-6 items-start">
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="bg-white rounded-xl border border-gray-200 p-5 sticky top-28">
-              <div className="flex items-center justify-between mb-5"><h3 className="font-bold text-lg flex items-center gap-2"><Filter size={18} className="text-pink-600" /> Filters</h3><button onClick={() => handleFilterChange('clear')} className="text-xs text-pink-600 font-semibold">Clear All</button></div>
-              <div className="border-b border-gray-100 pb-4 mb-4">
-                <h4 className="font-semibold text-sm mb-3">BRAND</h4>
-                <div className="space-y-2 max-h-48 overflow-y-auto">{FILTER_DATA.brands.map(brand => <label key={brand} className="flex items-center gap-3 cursor-pointer"><div className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-colors ${selectedFilters.brands.includes(brand) ? 'bg-pink-600 border-pink-600' : 'border-gray-300'}`}>{selectedFilters.brands.includes(brand) && <Check size={12} className="text-white" strokeWidth={3} />}</div><input type="checkbox" className="hidden" onChange={() => handleFilterChange('brand', brand)} /><span className="text-sm text-gray-600">{brand}</span></label>)}</div>
-              </div>
-              <div>
-                <h4 className="font-semibold text-sm mb-3">PRICE</h4>
-                <div className="space-y-2">{FILTER_DATA.priceRanges.map((range, idx) => <label key={idx} className="flex items-center gap-3 cursor-pointer"><div className={`w-4 h-4 border-2 rounded-full flex items-center justify-center ${selectedFilters.priceRange?.label === range.label ? 'border-pink-600' : 'border-gray-300'}`}>{selectedFilters.priceRange?.label === range.label && <div className="w-2 h-2 bg-pink-600 rounded-full" />}</div><input type="radio" className="hidden" onChange={() => handleFilterChange('price', range)} /><span className="text-sm text-gray-600">{range.label}</span></label>)}</div>
-              </div>
-            </div>
-          </aside>
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-6 bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-2">
-                <button onClick={() => setIsMobileFilterOpen(true)} className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg font-medium text-sm"><Filter size={16} /> Filter {activeFilterCount > 0 && <span className="bg-pink-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">{activeFilterCount}</span>}</button>
-                <div className="hidden md:flex items-center gap-2 text-sm">
-                  <span className="text-gray-500">Sort By:</span>
-                  <div className="relative group">
-                    <button className="flex items-center gap-1 font-medium px-3 py-1.5 hover:bg-gray-50 rounded-lg border border-gray-200">{SORT_OPTIONS.find(o => o.value === sortBy)?.label}<ChevronDown size={14} className="text-gray-400" /></button>
-                    <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-xl shadow-2xl border border-gray-100 py-1 hidden group-hover:block z-20">
-                      {SORT_OPTIONS.map(opt => <button key={opt.value} onClick={() => setSortBy(opt.value)} className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 ${sortBy === opt.value ? 'text-pink-600 font-medium bg-pink-50' : 'text-gray-700'}`}>{opt.label}</button>)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
-                <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md ${viewMode === 'grid' ? 'bg-white text-pink-600 shadow-sm' : 'text-gray-400'}`}><Grid size={16} /></button>
-                <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-md ${viewMode === 'list' ? 'bg-white text-pink-600 shadow-sm' : 'text-gray-400'}`}><List size={16} /></button>
-              </div>
-            </div>
-            {isMobileFilterOpen && (
-              <div className="fixed inset-0 z-50 lg:hidden">
-                <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileFilterOpen(false)} />
-                <div className="absolute left-0 top-0 h-full w-80 bg-white shadow-2xl overflow-y-auto p-4">
-                  <div className="flex justify-between items-center mb-4"><h2 className="text-lg font-bold">Filters</h2><button onClick={() => setIsMobileFilterOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X size={24} /></button></div>
-                  <div className="mb-4"><h4 className="font-semibold text-sm mb-3">BRAND</h4>{FILTER_DATA.brands.map(brand => <label key={brand} className="flex items-center gap-3 cursor-pointer mb-2"><input type="checkbox" className="accent-pink-600" checked={selectedFilters.brands.includes(brand)} onChange={() => handleFilterChange('brand', brand)} /><span className="text-sm text-gray-600">{brand}</span></label>)}</div>
-                </div>
-              </div>
-            )}
-            {products.length > 0 ? (
-              <div className={`grid gap-5 ${viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
-                {products.map(product => <ProductCard key={product.id} product={product} />)}
-              </div>
-            ) : (
-              <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
-                <Search size={48} className="mx-auto mb-4 text-gray-200" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-                <p className="text-gray-500 mb-6">Try adjusting your search or filters</p>
-                <button onClick={() => handleFilterChange('clear')} className="px-6 py-2.5 bg-pink-600 text-white rounded-lg font-medium">Clear All Filters</button>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-      {!searchQuery && (
-        <div className="bg-gradient-to-br from-purple-600 to-purple-800 py-16 px-6 relative overflow-hidden">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
-            <div><h2 className="text-3xl font-extrabold text-white mb-4">JOBS</h2><p className="text-white/80 mb-6 leading-relaxed">Connect with top employers and discover opportunities across all industries.</p><button className="px-6 py-3 bg-white text-purple-700 font-bold rounded-lg flex items-center gap-2 hover:bg-gray-100">Explore Jobs <ArrowRight size={16} /></button></div>
-            <div className="grid grid-cols-2 gap-4">{[{ n: '2,500+', l: 'Active Jobs' }, { n: '150+', l: 'Companies' }, { n: '50K+', l: 'Job Seekers' }, { n: '98%', l: 'Success Rate' }].map((s, i) => <div key={i} className="bg-white/15 backdrop-blur-sm p-5 rounded-xl text-center border border-white/20"><div className="text-2xl font-extrabold text-white">{s.n}</div><div className="text-sm text-white/70">{s.l}</div></div>)}</div>
-          </div>
-        </div>
-      )}
-      <Footer />
-      <ToastNotification />
-    </div>
-  );
-}
-
-// ============================================================
-// ROOT APP
-// ============================================================
-export default function App() {
-  return (
-    <StoreProvider>
-      <HomePage />
-    </StoreProvider>
-  );
-}
-```
-
----
-
-**Setup instructions:**
-1. Create a Vite + React project: `npm create vite@latest reedbi -- --template react`
-2. Install Tailwind CSS and lucide-react: `npm install tailwindcss @tailwindcss/vite lucide-react`
-3. Replace `src/App.jsx` with the code above
-4. Add Tailwind to your CSS and configure it
-5. Run `npm run dev`
+window.addEventListener("hashchange", route);
+document.addEventListener("DOMContentLoaded", () => { buildChrome(); route(); });
+</script>
+</body>
+</html>
