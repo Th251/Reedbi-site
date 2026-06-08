@@ -1,716 +1,912 @@
-/* ====== STATE & STORAGE CONTROL ====== */
-const State = {
-  cart: JSON.parse(localStorage.getItem('reedbi_cart')) || [],
-  wishlist: JSON.parse(localStorage.getItem('reedbi_wishlist')) || [],
-  currentTab: 'home',
-  activeCategory: 'All',
-  selectedProduct: null,
-  searchQuery: '',
-  
-  // Shop View Filters
-  filters: {
-    sort: 'popular',
-    brands: [],
-    priceRanges: []
-  },
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REEDBI — Complete E-commerce App</title>
+<meta name="description" content="REEDBI — a complete single-file e-commerce app (home, shop, product, cart, wishlist, account).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   REEDBI — e-commerce website styles
+   Custom design system, no framework.
+============================================================ */
+:root{
+  --pink:#ff3f6c; --pink-dark:#e02e58; --accent:#0a8f6e;
+  --ink:#1a1a1f; --ink-soft:#3a3a44; --muted:#8a8a93;
+  --bg:#faf8f5; --surface:#ffffff; --line:#ece8e2; --line-2:#f4f1ec;
+  --gold:#c79a3a; --radius:14px; --radius-sm:10px;
+  --shadow:0 1px 2px rgba(26,26,31,.04),0 8px 24px rgba(26,26,31,.06);
+  --shadow-lg:0 12px 40px rgba(26,26,31,.12);
+  --maxw:1280px;
+  --display:"Bricolage Grotesque","Plus Jakarta Sans",system-ui,sans-serif;
+  --body:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+.container{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.display{font-family:var(--display);font-weight:700;letter-spacing:-.02em;line-height:1.05}
+.muted{color:var(--muted)}
+.hide{display:none!important}
 
-  // Checkout Session Engine
-  checkout: {
-    step: 1, // 1: Cart Summary, 2: Address Select, 3: Success State
-    couponCode: '',
-    appliedDiscount: 0,
-    selectedAddressIndex: 0
-  },
+/* ---------- announcement bar ---------- */
+.announce{background:var(--ink);color:#fff;text-align:center;font-size:12.5px;letter-spacing:.04em;padding:8px 16px;font-weight:500}
+.announce b{color:var(--pink)}
 
-  // State Persistence Pipeline
-  save() {
-    localStorage.setItem('reedbi_cart', JSON.stringify(this.cart));
-    localStorage.setItem('reedbi_wishlist', JSON.stringify(this.wishlist));
-    this.updateGlobalBadges();
-  },
+/* ---------- header ---------- */
+.site-header{position:sticky;top:0;z-index:100;background:rgba(250,248,245,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.header-row{display:flex;align-items:center;gap:28px;padding:16px 24px;max-width:var(--maxw);margin:0 auto}
+.brand{font-family:var(--display);font-weight:800;font-size:25px;letter-spacing:-.04em;display:flex;align-items:center;gap:2px}
+.brand .dot{color:var(--pink)}
+.nav{display:flex;gap:26px;margin-left:8px}
+.nav a{font-size:14px;font-weight:600;color:var(--ink-soft);position:relative;padding:6px 0;transition:color .2s}
+.nav a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--pink);transition:right .25s ease}
+.nav a:hover{color:var(--ink)}.nav a:hover::after,.nav a.active::after{right:0}
+.nav a.active{color:var(--ink)}
+.search{flex:1;max-width:420px;margin-left:auto;position:relative}
+.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:11px 44px 11px 18px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+.search input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,63,108,.12)}
+.search button{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.icons{display:flex;align-items:center;gap:6px}
+.icon-btn{position:relative;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:var(--ink);transition:background .2s}
+.icon-btn:hover{background:var(--line-2)}
+.icon-btn svg{width:21px;height:21px}
+.badge{position:absolute;top:4px;right:4px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:var(--pink);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
+.burger{display:none}
 
-  /* ====== MUTATION ENGINES ====== */
-  addToCart(productId, size = null) {
-    const product = PRODUCTS.find(p => p.id === productId);
-    if (!product || product.oos) {
-      this.showToast("Item is currently out of stock!");
-      return;
-    }
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14px;border-radius:999px;padding:13px 26px;transition:transform .15s,box-shadow .2s,background .2s;white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--pink);color:#fff}.btn-primary:hover{background:var(--pink-dark);box-shadow:0 8px 20px rgba(255,63,108,.3)}
+.btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{background:#000}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}.btn-ghost:hover{border-color:var(--ink)}
+.btn-block{width:100%}
+.btn-sm{padding:9px 16px;font-size:13px}
 
-    const existingItem = this.cart.find(item => item.id === productId && item.selectedSize === size);
-    if (existingItem) {
-      if (existingItem.qty >= product.stock) {
-        this.showToast(`Only ${product.stock} units available in stock.`);
-        return;
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;border-radius:0}
+.hero-inner{max-width:var(--maxw);margin:0 auto;padding:64px 24px 56px;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);background:rgba(255,63,108,.1);padding:7px 14px;border-radius:999px}
+.hero h1{font-size:clamp(40px,6vw,72px);margin:20px 0 18px}
+.hero h1 em{font-style:italic;color:var(--pink)}
+.hero p{font-size:18px;color:var(--ink-soft);max-width:440px;margin-bottom:28px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero-stats{display:flex;gap:34px;margin-top:38px}
+.hero-stats .n{font-family:var(--display);font-size:30px;font-weight:800}
+.hero-stats .l{font-size:13px;color:var(--muted)}
+.hero-art{position:relative;aspect-ratio:4/4.4;border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.hero-art img{width:100%;height:100%;object-fit:cover}
+.hero-float{position:absolute;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:14px;padding:12px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600}
+.hero-float.tl{top:18px;left:18px}.hero-float.br{bottom:18px;right:18px}
+.hero-float .pill{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--pink);color:#fff}
+
+/* ---------- marquee categories ---------- */
+.cat-strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
+.cat-strip .container{display:flex;gap:10px;overflow-x:auto;padding:16px 24px;scrollbar-width:none}
+.cat-strip .container::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:9px 18px;font-size:13.5px;font-weight:600;color:var(--ink-soft);transition:all .2s}
+.chip:hover,.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ---------- section heading ---------- */
+.section{padding:56px 0}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:28px}
+.sec-head h2{font-size:clamp(26px,3.4vw,38px)}
+.sec-head p{color:var(--muted);font-size:15px;margin-top:4px}
+.link-arrow{font-weight:700;font-size:14px;color:var(--ink);display:inline-flex;gap:6px;align-items:center;border-bottom:2px solid var(--pink);padding-bottom:2px}
+
+/* ---------- product grid + card ---------- */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .25s,box-shadow .25s,border-color .25s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:transparent}
+.card-media{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--line-2)}
+.card-media img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.card:hover .card-media img{transform:scale(1.06)}
+.card-media.oos img{filter:grayscale(1);opacity:.55}
+.tag{position:absolute;top:12px;left:12px;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:5px 9px;border-radius:7px}
+.tag.SALE{background:var(--pink)}.tag.NEW{background:var(--accent)}.tag.TRENDING{background:var(--ink)}
+.wish{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);display:grid;place-items:center;box-shadow:var(--shadow);transition:transform .15s}
+.wish:hover{transform:scale(1.1)}
+.wish svg{width:18px;height:18px;color:var(--ink)}
+.wish.on svg{fill:var(--pink);color:var(--pink)}
+.oos-flag{position:absolute;inset:auto 0 0 0;background:rgba(26,26,31,.78);color:#fff;text-align:center;font-size:11px;font-weight:700;letter-spacing:.04em;padding:7px}
+.card-body{padding:14px 15px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card-brand{font-weight:700;font-size:14.5px}
+.card-name{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rating{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--accent)}
+.price{display:flex;align-items:baseline;gap:8px;margin-top:2px}
+.price .now{font-weight:800;font-size:16px}
+.price .was{font-size:13px;color:var(--muted);text-decoration:line-through}
+.price .off{font-size:12.5px;font-weight:700;color:var(--pink)}
+.card .btn{margin-top:auto}
+
+/* ---------- page header / breadcrumb ---------- */
+.page-head{padding:38px 0 8px}
+.page-head h1{font-size:clamp(28px,4vw,42px)}
+.crumb{font-size:13px;color:var(--muted);margin-bottom:6px}
+.crumb a:hover{color:var(--pink)}
+
+/* ---------- shop layout ---------- */
+.shop{display:grid;grid-template-columns:248px 1fr;gap:34px;padding-bottom:64px}
+.filters{position:sticky;top:96px;align-self:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+.filters h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:18px 0 10px}
+.filters h3:first-child{margin-top:0}
+.f-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.check{display:flex;align-items:center;gap:9px;font-size:14px;padding:5px 0;cursor:pointer;color:var(--ink-soft)}
+.check input{accent-color:var(--pink);width:16px;height:16px}
+.shop-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.shop-bar .count{font-size:14px;color:var(--muted)}
+.select{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 16px;font-size:14px;font-weight:600;font-family:inherit;outline:none;cursor:pointer}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:var(--radius);padding:80px 20px;text-align:center;color:var(--muted)}
+.empty svg{width:46px;height:46px;margin:0 auto 12px;color:var(--line)}
+
+/* ---------- product detail ---------- */
+.pdp{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;padding:24px 0 64px}
+.gallery{display:flex;gap:14px}
+.thumbs{display:flex;flex-direction:column;gap:10px}
+.thumbs img{width:62px;height:74px;object-fit:cover;border-radius:10px;border:2px solid transparent;cursor:pointer;opacity:.7;transition:.2s}
+.thumbs img.active,.thumbs img:hover{border-color:var(--pink);opacity:1}
+.stage{flex:1;border-radius:20px;overflow:hidden;background:var(--surface);border:1px solid var(--line);position:relative}
+.stage img{width:100%;aspect-ratio:1;object-fit:cover}
+.pdp-brand{font-size:20px;font-weight:800}
+.pdp-name{font-size:18px;color:var(--muted);margin-top:2px}
+.pdp .rating-lg{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font-weight:700;font-size:13px;padding:3px 10px;border-radius:7px;margin-top:14px}
+.pdp-price{display:flex;align-items:baseline;gap:12px;margin:18px 0 4px}
+.pdp-price .now{font-family:var(--display);font-size:34px;font-weight:800}
+.pdp-price .was{font-size:18px;color:var(--muted);text-decoration:line-through}
+.pdp-price .off{font-size:18px;font-weight:700;color:var(--pink)}
+.tax{color:var(--accent);font-weight:600;font-size:13.5px}
+.sizes{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.size{min-width:48px;height:48px;padding:0 8px;border:1.5px solid var(--line);border-radius:50%;font-weight:700;font-size:14px;display:grid;place-items:center;transition:.2s;color:var(--ink)}
+.size:hover{border-color:var(--ink)}
+.size.sel{border-color:var(--pink);color:var(--pink);background:rgba(255,63,108,.07)}
+.pdp-actions{display:flex;gap:12px;margin-top:26px}
+.perks{margin-top:24px;border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:grid;gap:12px;background:var(--surface)}
+.perk{display:flex;align-items:center;gap:12px;font-size:14px}
+.perk svg{width:20px;height:20px;color:var(--accent);flex-shrink:0}
+.specs{margin-top:14px;border-top:1px solid var(--line);padding-top:18px}
+.specs h4{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.spec-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.spec-row .k{color:var(--muted)}.spec-row .v{font-weight:600}
+
+/* ---------- cart ---------- */
+.cart-wrap{display:grid;grid-template-columns:1fr 360px;gap:30px;padding-bottom:64px;align-items:start}
+.cart-item{display:flex;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.cart-item.oos{opacity:.65}
+.cart-item img{width:96px;height:120px;border-radius:10px;object-fit:cover;flex-shrink:0}
+.cart-item .ci-body{flex:1;display:flex;flex-direction:column}
+.ci-top{display:flex;justify-content:space-between;gap:10px}
+.ci-meta{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.ci-meta b{color:var(--ink)}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px}
+.qty button{width:34px;height:34px;display:grid;place-items:center;font-size:16px;color:var(--ink)}
+.qty button:disabled{opacity:.35;cursor:not-allowed}
+.qty span{min-width:30px;text-align:center;font-weight:700;font-size:14px}
+.ci-bottom{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:10px;gap:10px}
+.x-btn{color:var(--muted);width:30px;height:30px;display:grid;place-items:center;border-radius:50%}
+.x-btn:hover{background:var(--line-2);color:var(--pink)}
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;position:sticky;top:96px}
+.summary h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px}
+.sum-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px}
+.sum-row .g{color:var(--accent);font-weight:700}
+.sum-total{display:flex;justify-content:space-between;font-family:var(--display);font-weight:800;font-size:20px;padding:12px 0;border-top:1px solid var(--line);margin-top:6px}
+.coupon{display:flex;gap:8px;margin-bottom:8px}
+.coupon input{flex:1;border:1px solid var(--line);border-radius:999px;padding:11px 16px;font-size:14px;font-family:inherit;outline:none}
+.coupon input:focus{border-color:var(--pink)}
+.coupon-on{display:flex;align-items:center;justify-content:space-between;background:rgba(10,143,110,.08);border-radius:10px;padding:11px 14px;font-size:13.5px;font-weight:700;color:var(--accent)}
+.steps{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 30px;max-width:420px}
+.step{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--muted)}
+.step.on{color:var(--pink)}
+.step .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:var(--line);color:var(--ink)}
+.step.on .n{background:var(--pink);color:#fff}
+.step-line{width:38px;height:2px;background:var(--line)}
+.state{text-align:center;padding:90px 20px}
+.state .ico{width:96px;height:96px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;margin:0 auto 22px}
+.state .ico svg{width:40px;height:40px;color:var(--muted)}
+.state h2{font-size:26px;margin-bottom:8px}
+.state p{color:var(--muted);margin-bottom:22px}
+
+/* ---------- account ---------- */
+.acct{display:grid;grid-template-columns:260px 1fr;gap:30px;padding-bottom:64px;align-items:start}
+.acct-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.acct-profile{padding:24px;text-align:center;border-bottom:1px solid var(--line)}
+.avatar{width:64px;height:64px;border-radius:50%;background:rgba(255,63,108,.12);color:var(--pink);display:grid;place-items:center;margin:0 auto 12px}
+.avatar svg{width:30px;height:30px}
+.acct-menu a{display:flex;align-items:center;gap:12px;padding:14px 20px;font-size:14px;font-weight:600;color:var(--ink-soft);border-bottom:1px solid var(--line-2);transition:.15s}
+.acct-menu a:last-child{border-bottom:none}
+.acct-menu a:hover{background:var(--line-2)}
+.acct-menu a.active{color:var(--pink);background:rgba(255,63,108,.05)}
+.acct-menu a svg{width:18px;height:18px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin-bottom:18px}
+.welcome{background:linear-gradient(120deg,var(--ink),#34343f);color:#fff;border:none}
+.welcome h2{font-size:26px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.stat .n{font-family:var(--display);font-size:26px;font-weight:800}
+.stat .l{font-size:13px;color:var(--muted)}
+.order{border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.order-top{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.order-status{font-weight:700}.order-status.ok{color:var(--accent)}.order-status.transit{color:var(--gold)}
+.order-line{display:flex;align-items:center;gap:12px}
+.order-line img{width:54px;height:64px;border-radius:8px;object-fit:cover}
+.addr{border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.addr .type{font-size:10px;font-weight:800;letter-spacing:.06em;background:var(--line-2);padding:3px 8px;border-radius:6px;text-transform:uppercase}
+.addr .def{font-size:10px;font-weight:800;letter-spacing:.06em;background:rgba(10,143,110,.12);color:var(--accent);padding:3px 8px;border-radius:6px;text-transform:uppercase;margin-left:6px}
+
+/* ---------- footer ---------- */
+.site-footer{background:var(--ink);color:#cfcfd6;margin-top:40px}
+.foot-trust{border-bottom:1px solid rgba(255,255,255,.08)}
+.foot-trust .container{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding:34px 24px}
+.trust{display:flex;align-items:center;gap:12px}
+.trust .ic{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.06);display:grid;place-items:center;color:var(--pink)}
+.trust .ic svg{width:20px;height:20px}
+.trust .t{font-weight:700;color:#fff;font-size:14px}
+.trust .d{font-size:12.5px;color:var(--muted)}
+.foot-main{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px;padding:48px 24px;max-width:var(--maxw);margin:0 auto}
+.foot-main .brand{color:#fff;margin-bottom:14px}
+.foot-main p{font-size:14px;max-width:280px;color:var(--muted)}
+.foot-col h4{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#fff;margin-bottom:16px}
+.foot-col a{display:block;font-size:14px;padding:5px 0;color:#cfcfd6;transition:.15s}
+.foot-col a:hover{color:var(--pink)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.08);text-align:center;padding:20px;font-size:13px;color:var(--muted)}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:14px 22px;border-radius:999px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.3s;z-index:2000}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast svg{width:18px;height:18px;color:#5fe0b0}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(16px)}
+.reveal.in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+
+/* ---------- responsive ---------- */
+@media(max-width:1000px){
+  .hero-inner{grid-template-columns:1fr;gap:30px}
+  .hero-art{max-width:420px}
+  .pdp,.cart-wrap,.acct{grid-template-columns:1fr}
+  .shop{grid-template-columns:1fr}
+  .filters{position:static;display:none}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .foot-main{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+  .nav,.search{display:none}
+  .burger{display:grid}
+  .header-row{gap:14px}
+  .icons{margin-left:auto}
+  .grid,.grid.cols-3{grid-template-columns:repeat(2,1fr);gap:14px}
+  .hero-inner{padding:36px 20px}
+  .hero-stats{gap:22px}
+  .summary,.filters{position:static}
+  .foot-trust .container{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .container{padding:0 18px}
+  .gallery{flex-direction:column-reverse}
+  .thumbs{flex-direction:row}
+}
+/* mobile slide menu */
+.mobile-menu{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:.25s}
+.mobile-menu.open{opacity:1;pointer-events:auto}
+.mobile-panel{position:absolute;top:0;left:0;bottom:0;width:280px;background:var(--bg);padding:24px;transform:translateX(-100%);transition:transform .3s;overflow-y:auto}
+.mobile-menu.open .mobile-panel{transform:none}
+.mobile-panel a{display:block;padding:14px 0;font-size:16px;font-weight:600;border-bottom:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<main id="app"></main>
+<div id="site-footer"></div>
+<script>
+/* ====== DATA ====== */
+/* ============================================================
+   REEDBI — site data. Edit here to change catalogue / content.
+============================================================ */
+const IMG = (id, s = 700) => `https://images.unsplash.com/${id}?w=${s}&h=${s}&fit=crop`;
+const GAL = (ids) => ids.map((i) => IMG(i, 800));
+
+const PRODUCTS = [
+  { id:1, brand:"Levi's", name:"Sports Shoe For Men", price:1299, mrp:1850, off:30,
+    image:IMG("photo-1542291026-7eec264c27ff"),
+    images:GAL(["photo-1542291026-7eec264c27ff","photo-1606107557195-0e29a4b5b4aa","photo-1608231387042-66d1773070a5","photo-1595950653106-6c9ebd614d3a"]),
+    rating:4.2, reviews:128, sizes:["7","8","9","10","11"], tag:"SALE", category:"Footwear", color:"Black", seller:"Aventura Outfitters", stock:8,
+    desc:"High-performance sports shoes with a cushioned sole and breathable mesh upper. Built for running and training.",
+    specs:{ Material:"Mesh & Synthetic Leather", Sole:"EVA Cushion", Closure:"Lace-up", Warranty:"6 Months" } },
+  { id:2, brand:"Sheen", name:"Women Analog Watch", price:1299, mrp:1850, off:30,
+    image:IMG("photo-1524592094714-0f0654e20314"),
+    images:GAL(["photo-1524592094714-0f0654e20314","photo-1523275335684-37898b6baf30","photo-1434056886845-dac89ffe9b56","photo-1547996160-81dfa63595aa"]),
+    rating:4.5, reviews:89, sizes:null, tag:"NEW", category:"Watches", color:"Rose Gold", seller:"Aventura Outfitters", stock:5,
+    desc:"Elegant rose-gold chronograph with a stainless steel strap and water resistance up to 30m.",
+    specs:{ "Dial Shape":"Round", Strap:"Stainless Steel", "Water Resistance":"30m", Warranty:"2 Years" } },
+  { id:3, brand:"Lee", name:"100% Cotton Denim Jacket", price:1299, mrp:1850, off:30,
+    image:IMG("photo-1551028719-00167b16eac5"),
+    images:GAL(["photo-1551028719-00167b16eac5","photo-1591047139829-d91aecb6caea","photo-1576871337622-98d48d1cf531","photo-1544022613-e87ca75a784a"]),
+    rating:4.0, reviews:45, sizes:["S","M","L","XL","XXL"], tag:"NEW", category:"Fashion", color:"Blue", seller:"Madura Lifestyle", stock:0, oos:true,
+    desc:"Classic denim jacket in 100% cotton with a regular fit and timeless wash.",
+    specs:{ Material:"100% Cotton", Fit:"Regular", Pattern:"Solid", Care:"Machine Wash" } },
+  { id:4, brand:"GUCCI", name:"Women Leather Crossbody Bag", price:3599, mrp:4560, off:21,
+    image:IMG("photo-1548036328-c9fa89d128fa"),
+    images:GAL(["photo-1548036328-c9fa89d128fa","photo-1584917865442-de89df76afd3","photo-1591561954557-26941169b49e","photo-1566150905458-1bf1fc113f0d"]),
+    rating:4.8, reviews:210, sizes:null, tag:null, category:"Accessories", color:"Brown", seller:"Madura Lifestyle", stock:7,
+    desc:"Premium genuine-leather crossbody bag with gold-tone hardware and an adjustable strap.",
+    specs:{ Material:"Genuine Leather", Compartments:"2", Closure:"Zip", Warranty:"1 Year" } },
+  { id:5, brand:"ASUS", name:"VivoBook Ultra Laptop", price:45999, mrp:52999, off:13,
+    image:IMG("photo-1496181133206-80ce9b88a853"),
+    images:GAL(["photo-1496181133206-80ce9b88a853","photo-1525547719571-a2d4ac8945e2","photo-1517336714731-489689fd1ca8","photo-1593642702821-c8da6771f0c6"]),
+    rating:4.3, reviews:342, sizes:null, tag:"SALE", category:"Electronics", color:"Silver", seller:"TechBazaar", stock:3,
+    desc:'14" thin-and-light laptop with Intel Core i5, 16GB RAM and a 512GB SSD.',
+    specs:{ Processor:"Intel Core i5", RAM:"16GB", Storage:"512GB SSD", Display:'14" FHD' } },
+  { id:6, brand:"Apple", name:"iPhone 15 Pro Max", price:149900, mrp:159900, off:6,
+    image:IMG("photo-1592750475338-74b7b21085ab"),
+    images:GAL(["photo-1592750475338-74b7b21085ab","photo-1511707171634-5f897ff02aa9","photo-1510557880182-3d4d3cba35a5","photo-1556656793-08538906a9f8"]),
+    rating:4.9, reviews:892, sizes:null, tag:"NEW", category:"Electronics", color:"Natural Titanium", seller:"TechBazaar", stock:12,
+    desc:"Titanium design, A17 Pro chip, and a pro camera system with 5x telephoto zoom.",
+    specs:{ Chip:"A17 Pro", Storage:"256GB", Display:'6.7" Super Retina XDR', Camera:"48MP Pro" } },
+  { id:7, brand:"Nike", name:"Air Jordan 1 Retro High", price:8999, mrp:12999, off:31,
+    image:IMG("photo-1556906781-9a412961c28c"),
+    images:GAL(["photo-1556906781-9a412961c28c","photo-1597045566677-8cf032ed6634","photo-1600269452121-4f2416e55c28","photo-1605348532760-6753d2c43329"]),
+    rating:4.7, reviews:567, sizes:["7","8","9","10","11"], tag:"SALE", category:"Footwear", color:"Red", seller:"Aventura Outfitters", stock:20,
+    desc:"Iconic high-top sneakers with premium leather and Air cushioning.",
+    specs:{ Material:"Premium Leather", Sole:"Rubber", Style:"High-Top", Cushioning:"Nike Air" } },
+  { id:8, brand:"Sony", name:"WH-1000XM5 Headphones", price:29990, mrp:34990, off:14,
+    image:IMG("photo-1505740420928-5e560c06d30e"),
+    images:GAL(["photo-1505740420928-5e560c06d30e","photo-1546435770-a3e426bf472b","photo-1484704849700-f032a568e944","photo-1583394838336-acd977736f90"]),
+    rating:4.6, reviews:342, sizes:null, tag:"SALE", category:"Electronics", color:"Black", seller:"TechBazaar", stock:9,
+    desc:"Industry-leading noise cancellation with up to 30 hours of battery life.",
+    specs:{ Type:"Over-Ear", "Battery Life":"30 Hours", Connectivity:"Bluetooth 5.2", ANC:"Yes" } },
+  { id:9, brand:"Boat", name:"Wireless Bluetooth Earbuds", price:1299, mrp:2999, off:57,
+    image:IMG("photo-1590658268037-6bf12165a8df"),
+    images:GAL(["photo-1590658268037-6bf12165a8df","photo-1606220588913-b3aacb4d2f46","photo-1572569511254-d8f925fe2cbb","photo-1610438235354-a6ae5528385c"]),
+    rating:4.0, reviews:12345, sizes:null, tag:"TRENDING", category:"Electronics", color:"Black", seller:"TechBazaar", stock:25,
+    desc:"True-wireless earbuds with deep bass, IPX5 splash resistance and a charging case.",
+    specs:{ Driver:"10mm", "Battery Life":"24 Hours", "Water Resistance":"IPX5", Mic:"Yes" } },
+  { id:10, brand:"Mango", name:"Women Red A-Line Dress", price:1299, mrp:2599, off:50,
+    image:IMG("photo-1572804013309-59a88b7e92f1"),
+    images:GAL(["photo-1572804013309-59a88b7e92f1","photo-1595777457583-95e059d581b8","photo-1566174053879-31528523f8ae","photo-1539008835657-9e8e9680c956"]),
+    rating:4.4, reviews:1234, sizes:["XS","S","M","L"], tag:"NEW", category:"Fashion", color:"Red", seller:"Madura Lifestyle", stock:15,
+    desc:"Flowy A-line midi dress in a vibrant red, perfect for occasions.",
+    specs:{ Material:"Polyester Blend", Length:"Midi", Pattern:"Solid", Fit:"A-Line" } },
+  { id:11, brand:"Ray-Ban", name:"Aviator Classic Sunglasses", price:6990, mrp:8990, off:22,
+    image:IMG("photo-1572635196237-14b3f281503f"),
+    images:GAL(["photo-1572635196237-14b3f281503f","photo-1511499767150-a48a237f0083","photo-1473496169904-658ba7c44d8a","photo-1577803645773-f96470509666"]),
+    rating:4.6, reviews:421, sizes:null, tag:null, category:"Accessories", color:"Gold", seller:"Aventura Outfitters", stock:18,
+    desc:"Timeless aviator sunglasses with 100% UV protection and a lightweight metal frame.",
+    specs:{ Lens:"Polarized", Frame:"Metal", "UV Protection":"100%", Warranty:"1 Year" } },
+  { id:12, brand:"Adidas", name:"Ultraboost Running Shoes", price:6499, mrp:8999, off:28,
+    image:IMG("photo-1608231387042-66d1773070a5"),
+    images:GAL(["photo-1608231387042-66d1773070a5","photo-1595950653106-6c9ebd614d3a","photo-1460353581641-37baddab0fa2","photo-1543508282-6319a3e2621f"]),
+    rating:4.5, reviews:783, sizes:["7","8","9","10","11"], tag:"TRENDING", category:"Footwear", color:"Grey", seller:"Aventura Outfitters", stock:14,
+    desc:"Responsive Boost cushioning with a Primeknit upper for all-day comfort.",
+    specs:{ Material:"Primeknit", Cushioning:"Boost", Drop:"10mm", Use:"Running" } },
+];
+
+const CATEGORIES = ["All","Fashion","Footwear","Electronics","Watches","Accessories"];
+
+const SORTS = [
+  { v:"popular", l:"Most Popular" },
+  { v:"priceLow", l:"Price: Low to High" },
+  { v:"priceHigh", l:"Price: High to Low" },
+  { v:"discount", l:"Biggest Discount" },
+  { v:"rating", l:"Top Rated" },
+];
+
+const BRANDS = [...new Set(PRODUCTS.map((p) => p.brand))].sort();
+const PRICE_RANGES = [
+  { l:"Under \u20b91,000", min:0, max:1000 },
+  { l:"\u20b91,000 \u2013 \u20b95,000", min:1000, max:5000 },
+  { l:"\u20b95,000 \u2013 \u20b920,000", min:5000, max:20000 },
+  { l:"Over \u20b920,000", min:20000, max:Infinity },
+];
+
+const COUPONS = { REEDBI10:{ type:"pct", v:0.10 }, FIRST50:{ type:"pct", v:0.50 }, SAVE200:{ type:"flat", v:200 } };
+
+const REVIEWS = [
+  { user:"Tejas R.", rating:5, title:"Excellent, must buy", date:"4 days ago", verified:true,
+    text:"The quality is amazing for this price point. Fits perfectly and the material feels premium." },
+  { user:"Priya S.", rating:5, title:"Best purchase ever", date:"1 week ago", verified:true,
+    text:"Absolutely love it. The colour is exactly as shown and delivery was fast." },
+  { user:"Rahul V.", rating:4, title:"Good, but runs small", date:"2 weeks ago", verified:false,
+    text:"Good quality overall but the size runs a bit small. Order one size up to be safe." },
+];
+
+const ORDERS = [
+  { id:"OD123456789", date:"12 Jan 2025", status:"Delivered", items:[{ name:"Levi's Sports Shoe For Men", image:PRODUCTS[0].image, price:1172, qty:1, sub:"Delivered on 16 Jan" }] },
+  { id:"OD987654321", date:"28 Dec 2024", status:"Delivered", items:[{ name:"Sheen Women Analog Watch", image:PRODUCTS[1].image, price:1299, qty:1, sub:"Delivered on 02 Jan" }] },
+  { id:"OD555444333", date:"05 Feb 2025", status:"In Transit", items:[{ name:"Nike Air Jordan 1 Retro", image:PRODUCTS[6].image, price:8999, qty:1, sub:"Arriving 09 Feb" }] },
+];
+
+const ADDRESSES = [
+  { name:"Alex Johnson", type:"Home", def:true, line:"24 Marina Residences, Dubai Marina, Dubai, AE", phone:"+971 50 123 4567" },
+  { name:"Alex Johnson", type:"Work", def:false, line:"Office 1402, Boulevard Plaza, Downtown Dubai, AE", phone:"+971 50 765 4321" },
+];
+
+const USER = { name:"Alex Johnson", email:"alex.johnson@example.com", phone:"+971 50 123 4567", member:"REEDBI Insider since 2021" };
+/* ====== STORE ====== */
+/* ============================================================
+   REEDBI — store: cart + wishlist state (localStorage)
+============================================================ */
+const Store = (() => {
+  const read = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+  const write = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+  let cart = read("reedbi_cart", []);      // [{id, qty, size}]
+  let wish = read("reedbi_wish", []);      // [id]
+  let coupon = read("reedbi_coupon", null);
+  let gift = read("reedbi_gift", false);
+
+  const save = () => { write("reedbi_cart", cart); write("reedbi_wish", wish); write("reedbi_coupon", coupon); write("reedbi_gift", gift); emit(); };
+  const product = (id) => PRODUCTS.find((p) => p.id === id);
+
+  const listeners = [];
+  const on = (fn) => listeners.push(fn);
+  const emit = () => listeners.forEach((fn) => fn());
+
+  return {
+    on,
+    get cart() { return cart; },
+    get wish() { return wish; },
+    get coupon() { return coupon; },
+    get gift() { return gift; },
+    count() { return cart.reduce((s, i) => s + i.qty, 0); },
+    wishCount() { return wish.length; },
+    inWish(id) { return wish.includes(id); },
+
+    add(id, size = null) {
+      const p = product(id); if (!p || p.oos) return;
+      size = size || (p.sizes ? p.sizes[0] : null);
+      const found = cart.find((i) => i.id === id && i.size === size);
+      if (found) found.qty = Math.min(found.qty + 1, p.stock);
+      else cart.push({ id, qty: 1, size });
+      save();
+    },
+    setQty(id, size, delta) {
+      const p = product(id);
+      const it = cart.find((i) => i.id === id && i.size === size);
+      if (it) it.qty = Math.max(1, Math.min(it.qty + delta, p ? p.stock : 10));
+      save();
+    },
+    remove(id, size) { cart = cart.filter((i) => !(i.id === id && i.size === size)); save(); },
+    toggleWish(id) {
+      if (wish.includes(id)) wish = wish.filter((x) => x !== id);
+      else wish.push(id);
+      save();
+      return wish.includes(id);
+    },
+    applyCoupon(code) {
+      code = (code || "").trim().toUpperCase();
+      if (COUPONS[code]) { coupon = code; save(); return true; }
+      return false;
+    },
+    removeCoupon() { coupon = null; save(); },
+    toggleGift() { gift = !gift; save(); },
+    clear() { cart = []; coupon = null; gift = false; save(); },
+
+    detail() {
+      return cart.map((i) => {
+        const p = product(i.id);
+        return p && { ...p, qty: i.qty, size: i.size, lineTotal: p.price * i.qty, lineMrp: p.mrp * i.qty };
+      }).filter(Boolean);
+    },
+    totals() {
+      const rows = this.detail().filter((r) => !r.oos);
+      const totalMrp = rows.reduce((s, r) => s + r.lineMrp, 0);
+      const subtotal = rows.reduce((s, r) => s + r.lineTotal, 0);
+      const bagDiscount = totalMrp - subtotal;
+      let couponDiscount = 0;
+      if (coupon && COUPONS[coupon]) {
+        const c = COUPONS[coupon];
+        couponDiscount = c.type === "pct" ? Math.round(subtotal * c.v) : c.v;
       }
-      existingItem.qty++;
-    } else {
-      this.cart.push({ id: productId, qty: 1, selectedSize: size });
-    }
-    this.save();
-    this.showToast("Added to Cart successfully!");
-    this.render();
-  },
+      const giftFee = gift ? 25 : 0;
+      const shipping = subtotal > 500 ? 0 : (subtotal > 0 ? 49 : 0);
+      const total = Math.max(0, subtotal - couponDiscount + shipping + giftFee);
+      const items = rows.reduce((s, r) => s + r.qty, 0);
+      return { totalMrp, subtotal, bagDiscount, couponDiscount, giftFee, shipping, total, items };
+    },
+  };
+})();
 
-  updateCartQty(productId, size, delta) {
-    const item = this.cart.find(i => i.id === productId && i.selectedSize === size);
-    const product = PRODUCTS.find(p => p.id === productId);
-    if (!item) return;
+const INR = (n) => "\u20b9" + Math.round(n).toLocaleString("en-IN");
+/* ====== APP (SPA engine + views + router) ====== */
+/* ============================================================
+   REEDBI — single-file SPA engine (hash router)
+   Reuses global PRODUCTS / Store / INR from data.js + store.js
+============================================================ */
+const ICONS = {
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21S4 14.5 4 9a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 5.5-8 12-8 12Z"/></svg>',
+  bag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 7h12l1 13H5L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>',
+  menu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 13 4 4 10-10"/></svg>',
+  truck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7h12v9H2z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="6.5" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 5 6v6c0 4 3 7 7 9 4-2 7-5 7-9V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>',
+  refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 7"/><path d="M21 3v4h-4"/><path d="M21 12a9 9 0 0 1-15 6.7L3 17"/><path d="M3 21v-4h4"/></svg>',
+  headset:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="2.5" y="13" width="4" height="6" rx="1.5"/><rect x="17.5" y="13" width="4" height="6" rx="1.5"/><path d="M20 19a4 4 0 0 1-4 3h-2"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6Z"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8 12 3l9 5v8l-9 5-9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6 7-11a7 7 0 1 0-14 0c0 5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>',
+  store:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9 5 4h14l1 5M4 9h16M4 9v11h16V9M9 20v-6h6v6"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-    const targetQty = item.qty + delta;
-    if (targetQty <= 0) {
-      this.removeFromCart(productId, size);
-      return;
-    }
-    if (targetQty > product.stock) {
-      this.showToast(`Cannot exceed available stock limit (${product.stock}).`);
-      return;
-    }
-    item.qty = targetQty;
-    this.save();
-    this.render();
-  },
+/* ---------- hash router ---------- */
+function parseHash() {
+  let h = location.hash.replace(/^#\/?/, "");          // e.g. "shop?q=watch"  or "product/3"
+  const [path, query] = h.split("?");
+  const seg = path.split("/").filter(Boolean);          // ["product","3"]
+  const params = new URLSearchParams(query || "");
+  return { name: seg[0] || "home", arg: seg[1], params };
+}
+function go(hash) { location.hash = hash; }
 
-  removeFromCart(productId, size) {
-    this.cart = this.cart.filter(item => !(item.id === productId && item.selectedSize === size));
-    this.save();
-    this.showToast("Removed from Cart.");
-    this.render();
-  },
-
-  toggleWishlist(productId) {
-    const index = this.wishlist.indexOf(productId);
-    if (index > -1) {
-      this.wishlist.splice(index, 1);
-      this.showToast("Removed from Wishlist.");
-    } else {
-      this.wishlist.push(productId);
-      this.showToast("Added to Wishlist!");
-    }
-    this.save();
-    this.render();
-  },
-
-  /* ====== CHECKOUT CALCULATOR ENGINE ====== */
-  calculateTotals() {
-    let subtotal = 0;
-    let originalMrpTotal = 0;
-
-    this.cart.forEach(item => {
-      const prod = PRODUCTS.find(p => p.id === item.id);
-      if (prod) {
-        subtotal += prod.price * item.qty;
-        originalMrpTotal += (prod.mrp || prod.price) * item.qty;
-      }
-    });
-
-    let retailDiscount = originalMrpTotal - subtotal;
-    let couponDiscount = 0;
-
-    if (this.checkout.couponCode && COUPONS[this.checkout.couponCode]) {
-      const promo = COUPONS[this.checkout.couponCode];
-      if (promo.type === 'pct') {
-        couponDiscount = Math.round(subtotal * promo.v);
-      } else if (promo.type === 'flat') {
-        couponDiscount = Math.min(subtotal, promo.v);
-      }
-    }
-
-    const deliveryCharges = subtotal > 1500 || subtotal === 0 ? 0 : 150;
-    const finalTotal = Math.max(0, subtotal - couponDiscount + deliveryCharges);
-
-    return {
-      mrpTotal: originalMrpTotal,
-      retailDiscount: retailDiscount,
-      subtotal: subtotal,
-      couponDiscount: couponDiscount,
-      delivery: deliveryCharges,
-      total: finalTotal
-    };
-  },
-
-  applyCoupon(code) {
-    const sanitizedCode = code.trim().toUpperCase();
-    if (COUPONS[sanitizedCode]) {
-      this.checkout.couponCode = sanitizedCode;
-      this.showToast("Coupon applied successfully!");
-      this.render();
-    } else {
-      this.showToast("Invalid coupon code.");
-    }
-  },
-
-  removeCoupon() {
-    this.checkout.couponCode = '';
-    this.showToast("Coupon removed.");
-    this.render();
-  },
-
-  /* ====== INTERACTIVE COMPONENT SYNC ====== */
-  updateGlobalBadges() {
-    const cartCount = this.cart.reduce((sum, item) => sum + item.qty, 0);
-    const wishCount = this.wishlist.length;
-
-    // Direct interface injection across layout boundaries
-    document.querySelectorAll('.icons .icon-btn').forEach(btn => {
-      const href = btn.getAttribute('href') || '';
-      if (href.includes('cart') || btn.innerHTML.includes('shopping-bag')) {
-        let badge = btn.querySelector('.badge');
-        if (cartCount > 0) {
-          if (!badge) {
-            badge = document.createElement('span');
-            badge.className = 'badge';
-            btn.appendChild(badge);
-          }
-          badge.textContent = cartCount;
-        } else if (badge) {
-          badge.remove();
-        }
-      }
-      if (href.includes('wishlist') || btn.innerHTML.includes('heart')) {
-        let badge = btn.querySelector('.badge');
-        if (wishCount > 0) {
-          if (!badge) {
-            badge = document.createElement('span');
-            badge.className = 'badge';
-            btn.appendChild(badge);
-          }
-          badge.textContent = wishCount;
-        } else if (badge) {
-          badge.remove();
-        }
-      }
-    });
-  },
-
-  showToast(message) {
-    let container = document.getElementById('toast-box');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'toast-box';
-      container.className = 'toast';
-      container.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        <span class="toast-msg"></span>
-      `;
-      document.body.appendChild(container);
-    }
-    container.querySelector('.toast-msg').textContent = message;
-    container.classList.add('show');
-    
-    clearTimeout(this.toastTimeout);
-    this.toastTimeout = setTimeout(() => {
-      container.classList.remove('show');
-    }, 2800);
-  },
-
-  /* ====== ROUTING ENGINE & CONTROLLER ====== */
-  navigate(targetTab, params = null) {
-    this.currentTab = targetTab;
-    if (targetTab === 'product' && params) {
-      this.selectedProduct = params;
-    }
-    if (targetTab !== 'cart') {
-      // Clear transactional checkout paths on navigation exit
-      this.checkout.step = 1;
-    }
-    
-    // Update navbar indicators
-    document.querySelectorAll('.nav a').forEach(link => {
-      const action = link.getAttribute('onclick') || '';
-      if (action.includes(`'${targetTab}'`)) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
-    });
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    this.render();
-  },
-
-  /* ====== TEMPLATE INJECTION ARCHITECTURE ====== */
-  render() {
-    const appEl = document.getElementById('app');
-    if (!appEl) return;
-
-    // Intercept Global Header Search Elements
-    const searchInput = document.querySelector('.search input');
-    if (searchInput && !searchInput.dataset.listening) {
-      searchInput.addEventListener('input', (e) => {
-        this.searchQuery = e.target.value.trim();
-        if (this.currentTab !== 'shop') {
-          this.currentTab = 'shop';
-        }
-        this.render();
-      });
-      searchInput.dataset.listening = "true";
-    }
-
-    // Dynamic Render Execution Router
-    switch (this.currentTab) {
-      case 'home':
-        appEl.innerHTML = this.viewHome();
-        break;
-      case 'shop':
-        appEl.innerHTML = this.viewShop();
-        break;
-      case 'product':
-        appEl.innerHTML = this.viewProductDetail();
-        break;
-      case 'cart':
-        appEl.innerHTML = this.viewCart();
-        break;
-      case 'wishlist':
-        appEl.innerHTML = this.viewWishlist();
-        break;
-      case 'account':
-        appEl.innerHTML = this.viewAccount();
-        break;
-      default:
-        appEl.innerHTML = this.viewHome();
-    }
-    this.updateGlobalBadges();
-  },
-
-  /* ====== RENDERING VIEWS ====== */
-  viewHome() {
-    const featured = PRODUCTS.slice(0, 4);
-    return `
-      <section class="hero container reveal in">
-        <div class="hero-inner">
-          <div>
-            <span class="hero-eyebrow">Premium OT & IT Gear</span>
-            <h1>Discover Next-Gen <em>Performance</em></h1>
-            <p>Upgrade your industrial interfaces and premium tech gear. Engineered for operational resilience and absolute precision.</p>
-            <div class="hero-cta">
-              <button class="btn btn-primary" onclick="State.activeCategory='All'; State.navigate('shop');">Explore Shop</button>
-              <button class="btn btn-ghost" onclick="State.activeCategory='Electronics'; State.navigate('shop');">Browse Systems</button>
-            </div>
-          </div>
-          <div class="hero-art">
-            <img src="${PRODUCTS[0].image}" alt="Featured Item">
-            <div class="hero-float tl"><div class="pill">⚡</div> High Efficiency</div>
-          </div>
-        </div>
-      </section>
-      <div class="cat-strip">
-        <div class="container">
-          ${CATEGORIES.map(cat => `
-            <button class="chip ${this.activeCategory === cat ? 'active' : ''}" 
-              onclick="State.activeCategory='${cat}'; State.navigate('shop');">${cat}</button>
-          `).join('')}
-        </div>
+/* ---------- chrome ---------- */
+function buildChrome() {
+  $("#site-header").innerHTML = `
+    <div class="announce">Free shipping on orders over <b>\u20b9500</b> &nbsp;\u00b7&nbsp; Use code <b>REEDBI10</b> for 10% off</div>
+    <header class="site-header"><div class="header-row">
+      <button class="icon-btn burger" id="burger" aria-label="Menu">${ICONS.menu}</button>
+      <a href="#/" class="brand">reed<span class="dot">bi</span>.</a>
+      <nav class="nav" id="nav">
+        <a href="#/" data-r="home">Home</a>
+        <a href="#/shop" data-r="shop">Shop</a>
+        <a href="#/shop?category=Electronics">Electronics</a>
+        <a href="#/shop?category=Fashion">Fashion</a>
+      </nav>
+      <form class="search" id="searchForm">
+        <input id="searchIn" name="q" placeholder="Search products, brands\u2026">
+        <button type="submit" aria-label="Search">${ICONS.search}</button>
+      </form>
+      <div class="icons">
+        <a href="#/account" class="icon-btn" aria-label="Account">${ICONS.user}</a>
+        <a href="#/wishlist" class="icon-btn" aria-label="Wishlist">${ICONS.heart}<span class="badge" id="wishBadge"></span></a>
+        <a href="#/cart" class="icon-btn" aria-label="Cart">${ICONS.bag}<span class="badge" id="cartBadge"></span></a>
       </div>
-      <section class="container section">
-        <div class="sec-head">
-          <div><h2>Trending Arrivals</h2><p>Top structural collections evaluated for peak performance parameters.</p></div>
-          <a href="#" class="link-arrow" onclick="State.navigate('shop'); return false;">View All</a>
+    </div></header>
+    <div class="mobile-menu" id="mobileMenu"><div class="mobile-panel">
+      <a href="#/" class="brand" style="margin-bottom:18px">reed<span class="dot">bi</span>.</a>
+      <a href="#/">Home</a><a href="#/shop">Shop All</a>
+      <a href="#/shop?category=Electronics">Electronics</a><a href="#/shop?category=Fashion">Fashion</a>
+      <a href="#/shop?category=Footwear">Footwear</a>
+      <a href="#/account">My Account</a><a href="#/wishlist">Wishlist</a><a href="#/cart">Cart</a>
+    </div></div>`;
+
+  const trust = [
+    [ICONS.refresh,"14-Day Returns","Easy & free"],
+    [ICONS.truck,"Free Delivery","On orders \u20b9500+"],
+    [ICONS.shield,"Secure Payments","100% protected"],
+    [ICONS.headset,"24/7 Support","Always here"],
+  ].map(([i,t,d]) => `<div class="trust"><div class="ic">${i}</div><div><div class="t">${t}</div><div class="d">${d}</div></div></div>`).join("");
+  const col = (h, items) => `<div class="foot-col"><h4>${h}</h4>${items.map((x)=>`<a href="#/shop">${x}</a>`).join("")}</div>`;
+  $("#site-footer").innerHTML = `
+    <footer class="site-footer">
+      <div class="foot-trust"><div class="container">${trust}</div></div>
+      <div class="foot-main">
+        <div><div class="brand">reed<span class="dot">bi</span>.</div>
+          <p>Your one-stop marketplace for online shopping & jobs. Shop millions of products from trusted sellers.</p></div>
+        ${col("Shop",["New Arrivals","Best Sellers","Fashion","Electronics","Footwear"])}
+        ${col("Help",["Track Order","Returns","Shipping","Contact Us","FAQ"])}
+        ${col("Company",["About","Become a Seller","Careers","Privacy","Terms"])}
+      </div>
+      <div class="foot-bottom">\u00a9 ${new Date().getFullYear()} REEDBI \u2014 Demo store \u00b7 single-file app.</div>
+    </footer>`;
+
+  $("#burger").onclick = () => $("#mobileMenu").classList.add("open");
+  $("#mobileMenu").onclick = (e) => { if (e.target.id === "mobileMenu" || e.target.closest("a")) e.currentTarget.classList.remove("open"); };
+  $("#searchForm").onsubmit = (e) => { e.preventDefault(); go("#/shop?q=" + encodeURIComponent($("#searchIn").value.trim())); };
+  refreshBadges();
+  Store.on(refreshBadges);
+}
+function refreshBadges() {
+  const c = Store.count(), w = Store.wishCount();
+  const cb = $("#cartBadge"), wb = $("#wishBadge");
+  if (cb) { cb.textContent = c; cb.style.display = c ? "grid" : "none"; }
+  if (wb) { wb.textContent = w; wb.style.display = w ? "grid" : "none"; }
+}
+function setActiveNav(name) { $$("#nav a[data-r]").forEach((a)=>a.classList.toggle("active", a.dataset.r === name)); }
+
+/* ---------- toast ---------- */
+let toastEl;
+function toast(msg) {
+  if (!toastEl) { toastEl = document.createElement("div"); toastEl.className = "toast"; document.body.appendChild(toastEl); }
+  toastEl.innerHTML = ICONS.check + "<span>" + msg + "</span>";
+  toastEl.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => toastEl.classList.remove("show"), 2000);
+}
+
+/* ---------- product card ---------- */
+function cardHTML(p) {
+  return `<article class="card reveal">
+    <div class="card-media ${p.oos ? "oos" : ""}">
+      <a href="#/product/${p.id}"><img src="${p.image}" alt="${p.name}" loading="lazy"></a>
+      ${p.tag ? `<span class="tag ${p.tag}">${p.tag}</span>` : ""}
+      <button class="wish ${Store.inWish(p.id) ? "on" : ""}" data-wish="${p.id}" aria-label="Wishlist">${ICONS.heart}</button>
+      ${p.oos ? `<span class="oos-flag">OUT OF STOCK</span>` : ""}
+    </div>
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="card-brand">${p.brand}</span><span class="rating">${p.rating} ${ICONS.spark}</span>
+      </div>
+      <a href="#/product/${p.id}" class="card-name">${p.name}</a>
+      <div class="price"><span class="now">${INR(p.price)}</span><span class="was">${INR(p.mrp)}</span><span class="off">${p.off}% off</span></div>
+      ${p.oos ? "" : `<button class="btn btn-ghost btn-sm" data-add="${p.id}">Add to Bag</button>`}
+    </div></article>`;
+}
+function wireCards(scope = document) {
+  $$("[data-add]", scope).forEach((b) => b.onclick = () => { Store.add(+b.dataset.add); toast("Added to bag"); });
+  $$("[data-wish]", scope).forEach((b) => b.onclick = () => {
+    const on = Store.toggleWish(+b.dataset.wish); b.classList.toggle("on", on);
+    toast(on ? "Saved to wishlist" : "Removed from wishlist");
+  });
+  observeReveal(scope);
+}
+function observeReveal(scope = document) {
+  if (!("IntersectionObserver" in window)) { $$(".reveal", scope).forEach((el)=>el.classList.add("in")); return; }
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .08 });
+  $$(".reveal", scope).forEach((el) => io.observe(el));
+}
+
+/* ============================================================
+   VIEWS
+============================================================ */
+const VIEWS = {
+  home() {
+    const deals = PRODUCTS.filter((p) => p.tag === "SALE").slice(0, 4);
+    const trending = PRODUCTS.filter((p) => p.tag === "TRENDING" || p.rating >= 4.5).slice(0, 4);
+    const app = $("#app");
+    app.innerHTML = `
+      <section class="hero"><div class="hero-inner">
+        <div class="reveal in">
+          <span class="hero-eyebrow">${ICONS.spark} New season drop</span>
+          <h1 class="display">Shop the<br>things you <em>love</em>.</h1>
+          <p>From everyday essentials to standout pieces \u2014 thousands of products from trusted sellers, delivered fast.</p>
+          <div class="hero-cta"><a href="#/shop" class="btn btn-primary">Shop Now ${ICONS.arrow}</a>
+            <a href="#/shop?category=Electronics" class="btn btn-ghost">Explore Electronics</a></div>
+          <div class="hero-stats">
+            <div><div class="n">12k+</div><div class="l">Products</div></div>
+            <div><div class="n">4.8\u2605</div><div class="l">Avg. rating</div></div>
+            <div><div class="n">45k+</div><div class="l">Happy buyers</div></div></div>
         </div>
-        <div class="grid">
-          ${featured.map(p => this.compProductCard(p)).join('')}
-        </div>
-      </section>
-    `;
+        <div class="hero-art reveal in"><img src="${IMG("photo-1483985988355-763728e1935b",900)}" alt="Shopping">
+          <div class="hero-float tl"><span class="pill">${ICONS.truck}</span>Free & fast delivery</div>
+          <div class="hero-float br"><span class="pill">${ICONS.spark}</span>Up to 70% off</div></div>
+      </div></section>
+      <div class="cat-strip"><div class="container">${CATEGORIES.map((c)=>`<a class="chip" href="#/shop${c==="All"?"":"?category="+encodeURIComponent(c)}">${c}</a>`).join("")}</div></div>
+      <section class="section"><div class="container">
+        <div class="sec-head"><div><h2 class="display">Deals of the day</h2><p>Best prices, limited time only.</p></div>
+          <a href="#/shop" class="link-arrow">View all ${ICONS.arrow}</a></div>
+        <div class="grid">${deals.map(cardHTML).join("")}</div></div></section>
+      <section class="section" style="padding-top:0"><div class="container">
+        <div class="sec-head"><div><h2 class="display">Trending now</h2><p>What everyone\u2019s adding to their bag.</p></div>
+          <a href="#/shop" class="link-arrow">View all ${ICONS.arrow}</a></div>
+        <div class="grid">${trending.map(cardHTML).join("")}</div></div></section>`;
+    wireCards(app);
   },
 
-  viewShop() {
-    // Pipeline: Filter & Sort Catalog Processing Engine
-    let dataset = PRODUCTS.filter(p => {
-      const matchCat = this.activeCategory === 'All' || p.category === this.activeCategory;
-      const matchSearch = p.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
-                          p.brand.toLowerCase().includes(this.searchQuery.toLowerCase());
-      return matchCat && matchSearch;
-    });
-
-    // Apply Sorting Parameters
-    if (this.filters.sort === 'priceLow') dataset.sort((a, b) => a.price - b.price);
-    else if (this.filters.sort === 'priceHigh') dataset.sort((a, b) => b.price - a.price);
-    else if (this.filters.sort === 'discount') dataset.sort((a, b) => b.off - a.off);
-    else if (this.filters.sort === 'rating') dataset.sort((a, b) => b.rating - a.rating);
-
-    return `
-      <div class="container page-head">
-        <div class="crumb"><a href="#" onclick="State.navigate('home'); return false;">Home</a> / Shop</div>
-        <h1>Catalog Directory</h1>
-      </div>
-      <div class="container shop">
-        <aside class="filters" style="display:block;">
-          <h3>Filter Options</h3>
-          <div class="f-row"><span>Sorting Order</span></div>
-          <select class="select" onchange="State.filters.sort=this.value; State.render();">
-            ${SORTS.map(s => `<option value="${s.v}" ${this.filters.sort === s.v ? 'selected' : ''}>${s.l}</option>`).join('')}
-          </select>
-          <h3>Operational Categories</h3>
-          ${CATEGORIES.map(cat => `
-            <label class="check" style="display:flex;">
-              <input type="radio" name="cat_filter" ${this.activeCategory === cat ? 'checked' : ''} 
-                onchange="State.activeCategory='${cat}'; State.render();"> ${cat}
-            </label>
-          `).join('')}
-        </aside>
-        <div>
-          <div class="shop-bar">
-            <span class="count">Showing ${dataset.length} items verified</span>
-          </div>
-          ${dataset.length === 0 ? `
-            <div class="empty">
-              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              <p>No products match your explicit filtering conditions.</p>
-            </div>
-          ` : `
-            <div class="grid cols-3">${dataset.map(p => this.compProductCard(p)).join('')}</div>
-          `}
-        </div>
-      </div>
-    `;
+  shop(_, params) {
+    const app = $("#app");
+    app.innerHTML = `<div class="container">
+      <div class="page-head"><div class="crumb"><a href="#/">Home</a> / Shop</div><h1 class="display" id="title">All Products</h1></div>
+      <div class="shop">
+        <aside class="filters" id="filters"></aside>
+        <div><div class="shop-bar"><span class="count" id="count"></span><select class="select" id="sort"></select></div>
+          <div class="grid cols-3" id="grid"></div></div>
+      </div></div>`;
+    const state = { q:(params.get("q")||"").toLowerCase(), category:params.get("category")||"All", brands:[], price:null, sort:"popular" };
+    $("#sort").innerHTML = SORTS.map((s)=>`<option value="${s.v}">${s.l}</option>`).join("");
+    $("#filters").innerHTML = `
+      <div class="f-row"><strong style="font-size:14px;text-transform:uppercase;letter-spacing:.06em">Filters</strong>
+        <button id="clear" style="font-size:12px;font-weight:700;color:var(--pink)">Clear</button></div>
+      <h3>Category</h3><div id="fCat"></div>
+      <h3>Brand</h3><div id="fBrand" style="max-height:180px;overflow:auto"></div>
+      <h3>Price</h3><div id="fPrice"></div>`;
+    $("#fCat").innerHTML = CATEGORIES.map((c)=>`<label class="check"><input type="radio" name="cat" value="${c}" ${c===state.category?"checked":""}> ${c}</label>`).join("");
+    $("#fBrand").innerHTML = BRANDS.map((b)=>`<label class="check"><input type="checkbox" value="${b}"> ${b}</label>`).join("");
+    $("#fPrice").innerHTML = PRICE_RANGES.map((r,i)=>`<label class="check"><input type="radio" name="price" value="${i}"> ${r.l}</label>`).join("");
+    if (state.q) $("#searchIn").value = params.get("q");
+    function apply() {
+      let list = PRODUCTS.slice();
+      if (state.q) list = list.filter((p)=>(p.name+p.brand+p.category).toLowerCase().includes(state.q));
+      if (state.category !== "All") list = list.filter((p)=>p.category===state.category);
+      if (state.brands.length) list = list.filter((p)=>state.brands.includes(p.brand));
+      if (state.price!==null){ const r=PRICE_RANGES[state.price]; list=list.filter((p)=>p.price>=r.min&&p.price<=r.max); }
+      const by = { priceLow:(a,b)=>a.price-b.price, priceHigh:(a,b)=>b.price-a.price, discount:(a,b)=>b.off-a.off, rating:(a,b)=>b.rating-a.rating, popular:(a,b)=>b.reviews-a.reviews }[state.sort];
+      list.sort(by);
+      $("#title").textContent = state.q ? `Results for \u201c${state.q}\u201d` : (state.category==="All"?"All Products":state.category);
+      $("#count").textContent = `${list.length} product${list.length!==1?"s":""}`;
+      $("#grid").innerHTML = list.length ? list.map(cardHTML).join("") : `<div class="empty" style="grid-column:1/-1">${ICONS.box}<p>No products match your filters.</p></div>`;
+      wireCards($("#grid"));
+    }
+    $("#sort").onchange = (e)=>{ state.sort=e.target.value; apply(); };
+    $$('input[name="cat"]').forEach((i)=>i.onchange=()=>{ state.category=i.value; apply(); });
+    $$('#fBrand input').forEach((i)=>i.onchange=()=>{ state.brands=$$('#fBrand input:checked').map((x)=>x.value); apply(); });
+    $$('input[name="price"]').forEach((i)=>i.onchange=()=>{ state.price=+i.value; apply(); });
+    $("#clear").onclick=()=>{ state.brands=[];state.price=null;state.category="All";
+      $$('#fBrand input').forEach((x)=>x.checked=false);$$('input[name="price"]').forEach((x)=>x.checked=false);
+      $('input[name="cat"][value="All"]').checked=true; apply(); };
+    apply();
   },
 
-  viewProductDetail() {
-    const p = this.selectedProduct;
-    if (!p) return `<div class="container section">Product profile initialization loop failure.</div>`;
-    const isWished = this.wishlist.includes(p.id);
-
-    return `
-      <div class="container page-head">
-        <div class="crumb"><a href="#" onclick="State.navigate('home'); return false;">Home</a> / <a href="#" onclick="State.navigate('shop'); return false;">${p.category}</a> / ${p.brand}</div>
-      </div>
-      <div class="container pdp">
+  product(id) {
+    const pid = +id || PRODUCTS[0].id;
+    const p = PRODUCTS.find((x)=>x.id===pid) || PRODUCTS[0];
+    let size = p.sizes ? p.sizes[0] : null;
+    const related = PRODUCTS.filter((x)=>x.category===p.category && x.id!==p.id).slice(0,4);
+    const app = $("#app");
+    app.innerHTML = `<div class="container">
+      <div class="page-head"><div class="crumb"><a href="#/">Home</a> / <a href="#/shop?category=${encodeURIComponent(p.category)}">${p.category}</a> / ${p.brand}</div></div>
+      <div class="pdp">
         <div class="gallery">
-          <div class="thumbs">
-            ${(p.images || [p.image]).map(img => `<img src="${img}" class="active" onclick="document.getElementById('pdp-stage-img').src='${img}'">`).join('')}
-          </div>
-          <div class="stage">
-            <img id="pdp-stage-img" src="${p.image}" alt="${p.name}">
-          </div>
+          <div class="thumbs" id="thumbs">${p.images.map((im,i)=>`<img src="${im}" class="${i===0?"active":""}" data-i="${i}">`).join("")}</div>
+          <div class="stage">${p.tag?`<span class="tag ${p.tag}" style="top:16px;left:16px">${p.tag}</span>`:""}<img id="stage" src="${p.images[0]}" alt="${p.name}"></div>
         </div>
-        <div class="pdp-info">
-          <div class="pdp-brand">${p.brand}</div>
-          <div class="pdp-name">${p.name}</div>
-          <div class="rating-lg">★ ${p.rating}</div>
-          <div class="pdp-price">
-            <span class="now">₹${p.price}</span>
-            ${p.mrp ? `<span class="was">₹${p.mrp}</span><span class="off">(${p.off}% OFF)</span>` : ''}
-          </div>
-          <p class="muted">${p.desc}</p>
-          
-          ${p.sizes ? `
-            <h4 style="margin-top:20px; font-size:13px; text-transform:uppercase;">Select Physical Variant Scale</h4>
-            <div class="sizes" id="pdp-size-container">
-              ${p.sizes.map((s, idx) => `
-                <button class="size ${idx === 0 ? 'sel' : ''}" data-size="${s}" onclick="
-                  document.querySelectorAll('#pdp-size-container .size').forEach(b => b.classList.remove('sel'));
-                  this.classList.add('sel');
-                ">${s}</button>
-              `).join('')}
-            </div>
-          ` : ''}
-
+        <div>
+          <div class="pdp-brand">${p.brand}</div><div class="pdp-name">${p.name}</div>
+          <span class="rating-lg">${p.rating} ${ICONS.spark} &nbsp;\u00b7&nbsp; ${p.reviews.toLocaleString()} ratings</span>
+          <div class="pdp-price"><span class="now">${INR(p.price)}</span><span class="was">${INR(p.mrp)}</span><span class="off">${p.off}% OFF</span></div>
+          <div class="tax">inclusive of all taxes</div>
+          ${p.sizes?`<div style="margin-top:20px"><div style="font-weight:700;text-transform:uppercase;font-size:13px;letter-spacing:.05em;margin-bottom:10px">Select size</div>
+            <div class="sizes" id="sizes">${p.sizes.map((s,i)=>`<button class="size ${i===0?"sel":""}" data-size="${s}">${s}</button>`).join("")}</div></div>`:""}
           <div class="pdp-actions">
-            <button class="btn btn-dark" style="flex:1;" onclick="
-              const selectedBtn = document.querySelector('#pdp-size-container .size.sel');
-              const size = selectedBtn ? selectedBtn.dataset.size : null;
-              State.addToCart(${p.id}, size);
-            ">Add To Shopping Bag</button>
-            <button class="btn btn-ghost wish ${isWished ? 'on' : ''}" style="position:static; border-radius:50%; width:48px; height:48px;" onclick="State.toggleWishlist(${p.id})">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path></svg>
-            </button>
+            ${p.oos?`<button class="btn btn-ghost btn-block" disabled style="opacity:.6">Out of Stock</button>`
+              :`<button class="btn btn-primary" style="flex:1" id="addBtn">${ICONS.bag} Add to Bag</button>
+                <button class="btn btn-dark" style="flex:1" id="buyBtn">Buy Now</button>`}
+            <button class="btn btn-ghost" id="wishBtn" style="padding:13px 16px">${ICONS.heart}</button>
           </div>
+          <div class="perks"><div class="perk">${ICONS.truck} Free delivery on orders over \u20b9500</div>
+            <div class="perk">${ICONS.refresh} 14-day easy returns</div>
+            <div class="perk" style="color:var(--pink)">${ICONS.store} Sold by ${p.seller}</div></div>
+          <div class="specs"><h4>Product details</h4>
+            <p style="font-size:14.5px;color:var(--ink-soft);margin-bottom:12px">${p.desc}</p>
+            ${Object.entries(p.specs).map(([k,v])=>`<div class="spec-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}</div>
         </div>
       </div>
-    `;
+      <section class="section" style="padding-top:10px"><div class="sec-head"><h2 class="display">Reviews</h2></div>
+        <div class="grid cols-3">${REVIEWS.map((r)=>`<div class="panel reveal" style="margin:0">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span class="rating-lg" style="margin:0">${r.rating} ${ICONS.spark}</span>
+            ${r.verified?`<span style="font-size:12px;color:var(--accent);font-weight:700">Verified</span>`:""}</div>
+          <strong style="display:block;margin:10px 0 4px">${r.title}</strong>
+          <p style="font-size:14px;color:var(--ink-soft)">${r.text}</p>
+          <div class="muted" style="font-size:12.5px;margin-top:8px">${r.user} \u00b7 ${r.date}</div></div>`).join("")}</div></section>
+      ${related.length?`<section class="section" style="padding-top:0"><div class="sec-head"><h2 class="display">You may also like</h2></div>
+        <div class="grid">${related.map(cardHTML).join("")}</div></section>`:""}
+    </div>`;
+    $("#thumbs").onclick = (e)=>{ const t=e.target.closest("[data-i]"); if(!t)return;
+      $("#stage").src=p.images[+t.dataset.i]; $$("#thumbs img").forEach((im,i)=>im.classList.toggle("active",i===+t.dataset.i)); };
+    if (p.sizes) $("#sizes").onclick=(e)=>{ const b=e.target.closest("[data-size]"); if(!b)return;
+      size=b.dataset.size; $$("#sizes .size").forEach((x)=>x.classList.remove("sel")); b.classList.add("sel"); };
+    $("#addBtn") && ($("#addBtn").onclick=()=>{ Store.add(p.id,size); toast("Added to bag"); });
+    $("#buyBtn") && ($("#buyBtn").onclick=()=>{ Store.add(p.id,size); go("#/cart"); });
+    const wb=$("#wishBtn"); if(Store.inWish(p.id)) wb.classList.add("on");
+    wb.onclick=()=>{ const on=Store.toggleWish(p.id); wb.classList.toggle("on",on); toast(on?"Saved to wishlist":"Removed from wishlist"); };
+    wireCards(app);
   },
 
-  viewCart() {
-    if (this.cart.length === 0 && this.checkout.step !== 3) {
-      return `
-        <div class="container state">
-          <div class="ico"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"></path></svg></div>
-          <h2>Your Cart is Unoccupied</h2>
-          <p>Deploy elements into your selection loop to initiate transactional checkout.</p>
-          <button class="btn btn-primary" onclick="State.navigate('shop')">Continue Exploring</button>
-        </div>
-      `;
-    }
+  cart() { renderCart(); },
 
-    const totals = this.calculateTotals();
-
-    return `
-      <div class="container page-head">
-        <div class="steps">
-          <div class="step ${this.checkout.step >= 1 ? 'on' : ''}"><span class="n">1</span> Review Bag</div>
-          <div class="step-line"></div>
-          <div class="step ${this.checkout.step >= 2 ? 'on' : ''}"><span class="n">2</span> Delivery</div>
-          <div class="step-line"></div>
-          <div class="step ${this.checkout.step >= 3 ? 'on' : ''}"><span class="n">3</span> Status</div>
-        </div>
-      </div>
-      <div class="container">
-        ${this.checkout.step === 1 ? this.subviewCartStep1(totals) : ''}
-        ${this.checkout.step === 2 ? this.subviewCartStep2(totals) : ''}
-        ${this.checkout.step === 3 ? this.subviewCartStep3() : ''}
-      </div>
-    `;
+  wishlist() {
+    const app = $("#app");
+    const render = () => {
+      const items = Store.wish.map((id)=>PRODUCTS.find((p)=>p.id===id)).filter(Boolean);
+      app.innerHTML = `<div class="container">
+        <div class="page-head"><div class="crumb"><a href="#/">Home</a> / Wishlist</div>
+          <h1 class="display">My Wishlist <span class="muted" style="font-weight:400">(${items.length})</span></h1></div>
+        ${items.length?`<div class="grid" style="padding-bottom:64px" id="wl">${items.map(cardHTML).join("")}</div>`
+          :`<div class="state"><div class="ico">${ICONS.heart}</div><h2 class="display">Your wishlist is empty</h2>
+            <p>Tap the heart on any product to save it here.</p><a href="#/shop" class="btn btn-primary">Explore Products</a></div>`}</div>`;
+      if (items.length) { wireCards($("#wl")); $$("[data-wish]").forEach((b)=>b.addEventListener("click",()=>setTimeout(render,10))); }
+    };
+    render();
   },
 
-  subviewCartStep1(totals) {
-    return `
-      <div class="cart-wrap">
-        <div>
-          ${this.cart.map(item => {
-            const p = PRODUCTS.find(prod => prod.id === item.id);
-            if (!p) return '';
-            return `
-              <div class="cart-item">
-                <img src="${p.image}" alt="${p.name}">
-                <div class="ci-body">
-                  <div class="ci-top">
-                    <div>
-                      <div class="card-brand">${p.brand}</div>
-                      <div class="card-name">${p.name}</div>
-                      ${item.selectedSize ? `<div class="ci-meta">Variant: <b>${item.selectedSize}</b></div>` : ''}
-                    </div>
-                    <button class="x-btn" onclick="State.removeFromCart(${p.id}, '${item.selectedSize}')">✕</button>
-                  </div>
-                  <div class="ci-bottom">
-                    <div class="qty">
-                      <button onclick="State.updateCartQty(${p.id}, '${item.selectedSize}', -1)">−</button>
-                      <span>${item.qty}</span>
-                      <button onclick="State.updateCartQty(${p.id}, '${item.selectedSize}', 1)">+</button>
-                    </div>
-                    <div class="price"><span class="now">₹${p.price * item.qty}</span></div>
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-        ${this.compSummaryPanel(totals, "Proceed to Shipping Address", () => { this.checkout.step = 2; this.render(); })}
-      </div>
-    `;
+  account(_, params) {
+    const tab = params.get("tab") || "overview";
+    const app = $("#app");
+    const menu = [["overview","Overview",ICONS.spark],["orders","My Orders",ICONS.box],["addresses","Addresses",ICONS.pin],["settings","Settings",ICONS.gear]];
+    const panels = {
+      overview:`<div class="panel welcome"><div class="muted" style="color:rgba(255,255,255,.7)">Welcome back,</div>
+          <h2 class="display">${USER.name}</h2><div style="color:rgba(255,255,255,.6);font-size:13px;margin-top:4px">${USER.member}</div></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n">${ORDERS.length}</div><div class="l">Orders</div></div>
+          <div class="stat"><div class="n">${Store.wishCount()}</div><div class="l">Wishlist</div></div>
+          <div class="stat"><div class="n">${ADDRESSES.length}</div><div class="l">Addresses</div></div>
+          <div class="stat"><div class="n">3</div><div class="l">Coupons</div></div></div>`,
+      orders:ORDERS.map((o)=>`<div class="order"><div class="order-top"><span>${o.id} \u00b7 ${o.date}</span>
+          <span class="order-status ${o.status==="Delivered"?"ok":"transit"}">${o.status}</span></div>
+          ${o.items.map((it)=>`<div class="order-line"><img src="${it.image}"><div style="flex:1"><strong style="font-size:14px">${it.name}</strong>
+            <div class="muted" style="font-size:12.5px">Qty ${it.qty} \u00b7 ${it.sub}</div></div><strong>${INR(it.price)}</strong></div>`).join("")}</div>`).join(""),
+      addresses:ADDRESSES.map((a)=>`<div class="addr"><span class="type">${a.type}</span>${a.def?`<span class="def">Default</span>`:""}
+          <div style="font-weight:700;margin-top:8px">${a.name}</div><div class="muted" style="font-size:14px">${a.line}</div>
+          <div class="muted" style="font-size:14px;margin-top:2px">Mobile: ${a.phone}</div></div>`).join(""),
+      settings:`<div class="panel"><h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px">Profile</h3>
+          ${[["Full Name",USER.name],["Email",USER.email],["Phone",USER.phone]].map(([k,v])=>`<div class="spec-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}</div>`,
+    };
+    app.innerHTML = `<div class="container"><div class="page-head"><h1 class="display">My Account</h1></div>
+      <div class="acct">
+        <aside class="acct-card"><div class="acct-profile"><div class="avatar">${ICONS.user}</div>
+          <strong>${USER.name}</strong><div class="muted" style="font-size:12.5px">${USER.email}</div></div>
+          <nav class="acct-menu">${menu.map(([k,l,ic])=>`<a href="#/account?tab=${k}" class="${tab===k?"active":""}">${ic} ${l}</a>`).join("")}
+          <a href="#/" style="color:var(--pink)">${ICONS.arrow} Logout</a></nav></aside>
+        <div>${panels[tab]||panels.overview}</div></div></div>`;
   },
-
-  subviewCartStep2(totals) {
-    return `
-      <div class="cart-wrap">
-        <div>
-          <h3 style="margin-bottom:14px; font-size:16px;">Select Deployment Hub (Address)</h3>
-          ${ADDRESSES.map((addr, idx) => `
-            <div class="addr" style="cursor:pointer; border-color:${this.checkout.selectedAddressIndex === idx ? 'var(--pink)' : 'var(--line)'};"
-              onclick="State.checkout.selectedAddressIndex=${idx}; State.render();">
-              <div style="display:flex; justify-content:between; align-items:center;">
-                <span class="type">${addr.type}</span>
-                ${addr.def ? `<span class="def">Default</span>` : ''}
-              </div>
-              <div style="font-weight:700; margin-top:8px;">${addr.name}</div>
-              <div class="muted" style="font-size:13.5px; margin:4px 0;">${addr.line}</div>
-              <div style="font-size:12.5px;">Terminal Contact: ${addr.phone}</div>
-            </div>
-          `).join('')}
-          <button class="btn btn-ghost btn-sm" onclick="State.checkout.step=1; State.render();">← Return to Bag View</button>
-        </div>
-        ${this.compSummaryPanel(totals, "Authorize Checkout & Execute", () => {
-          this.cart = [];
-          this.checkout.step = 3;
-          this.checkout.couponCode = '';
-          this.save();
-        })}
-      </div>
-    `;
-  },
-
-  subviewCartStep3() {
-    return `
-      <div class="state">
-        <div class="ico" style="border-color:var(--accent); color:var(--accent);">
-          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </div>
-        <h2>Transaction Authorized Successfully</h2>
-        <p>Order processing core has successfully assigned transaction matrix routing IDs to production parameters.</p>
-        <button class="btn btn-dark" onclick="State.navigate('account')">Track Dispatches</button>
-      </div>
-    `;
-  },
-
-  viewWishlist() {
-    if (this.wishlist.length === 0) {
-      return `
-        <div class="container state">
-          <div class="ico"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"></path></svg></div>
-          <h2>Wishlist Storage Is Empty</h2>
-          <p>Tag active target architectures to store item profiles inside your local system buffer cache.</p>
-          <button class="btn btn-primary" onclick="State.navigate('shop')">Explore Catalog</button>
-        </div>
-      `;
-    }
-    const wishedProducts = PRODUCTS.filter(p => this.wishlist.includes(p.id));
-    return `
-      <div class="container page-head"><h1>Saved Profiles</h1></div>
-      <div class="container section"><div class="grid">${wishedProducts.map(p => this.compProductCard(p)).join('')}</div></div>
-    `;
-  },
-
-  viewAccount() {
-    return `
-      <div class="container page-head">
-        <h1>User Control Terminal</h1>
-        <p class="muted">${USER.member}</p>
-      </div>
-      <div class="container acct">
-        <aside class="acct-card">
-          <div class="acct-profile">
-            <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
-            <div style="font-weight:700;">${USER.name}</div>
-            <div class="muted" style="font-size:12px;">${USER.email}</div>
-          </div>
-          <nav class="acct-menu">
-            <a href="#" class="active" onclick="return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg> Control Dashboard</a>
-          </nav>
-        </aside>
-        <div>
-          <div class="panel welcome">
-            <h2>Welcome Back, Engineer</h2>
-            <p>Firmware systems operating nominally. Security telemetry pipelines functional.</p>
-          </div>
-          <h3 style="margin:24px 0 12px; font-size:16px;">Historical Fulfillment Matrices (Orders)</h3>
-          ${ORDERS.map(o => `
-            <div class="order">
-              <div class="order-top"><span>ID Matrix: <b>${o.id}</b></span><span class="order-status ${o.status === 'Delivered' ? 'ok' : 'transit'}">● ${o.status}</span></div>
-              ${o.items.map(i => `
-                <div class="order-line">
-                  <img src="${i.image}" alt="">
-                  <div>
-                    <div style="font-weight:700; font-size:14px;">${i.name}</div>
-                    <div class="muted" style="font-size:12.5px;">Quantity Ordered: ${i.qty} — Paid Price Value: ₹${i.price}</div>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  },
-
-  /* ====== ATOMIC REUSABLE INTERFACE COMPONENTS ====== */
-  compProductCard(p) {
-    const isWished = this.wishlist.includes(p.id);
-    return `
-      <div class="card">
-        <div class="card-media ${p.oos ? 'oos' : ''}">
-          ${p.tag ? `<span class="tag ${p.tag}">${p.tag}</span>` : ''}
-          <button class="wish ${isWished ? 'on' : ''}" onclick="event.stopPropagation(); State.toggleWishlist(${p.id});">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path></svg>
-          </button>
-          <img src="${p.image}" alt="${p.name}" onclick="State.navigate('product', ${JSON.stringify(p).replace(/"/g, '&quot;')})">
-          ${p.oos ? `<div class="oos-flag">DEPLETED STOCK OUT</div>` : ''}
-        </div>
-        <div class="card-body">
-          <div class="card-brand">${p.brand}</div>
-          <div class="card-name">${p.name}</div>
-          <div class="rating">★ ${p.rating} <span class="muted">(${p.reviews})</span></div>
-          <div class="price">
-            <span class="now">₹${p.price}</span>
-            ${p.mrp ? `<span class="was">₹${p.mrp}</span><span class="off">${p.off}% OFF</span>` : ''}
-          </div>
-          ${p.oos ? `
-            <button class="btn btn-ghost btn-sm btn-block" style="margin-top:10px;" disabled>Unavailable</button>
-          ` : `
-            <button class="btn btn-primary btn-sm btn-block" style="margin-top:10px;" onclick="State.addToCart(${p.id}, ${p.sizes ? `'${p.sizes[0]}'` : 'null'})">Quick Deploy</button>
-          `}
-        </div>
-      </div>
-    `;
-  },
-
-  compSummaryPanel(totals, ctaLabel, ctaAction) {
-    return `
-      <aside class="summary">
-        <h3>Invoice Ledger Summary</h3>
-        <div class="sum-row"><span>Total Market MRP Value</span><span>₹${totals.mrpTotal}</span></div>
-        <div class="sum-row"><span class="g">Retail Discount</span><span class="g">- ₹${totals.retailDiscount}</span></div>
-        <div class="sum-row"><span>Subtotal Value</span><span>₹${totals.subtotal}</span></div>
-        ${totals.couponDiscount > 0 ? `<div class="sum-row"><span class="g">Coupon Discount</span><span class="g">- ₹${totals.couponDiscount}</span></div>` : ''}
-        <div class="sum-row"><span>Estimated Logistics/Freight</span><span>${totals.delivery === 0 ? '<span class="g">FREE</span>' : `₹${totals.delivery}`}</span></div>
-        <div class="sum-total"><span>Net Payable Value</span><span>₹${totals.total}</span></div>
-        
-        ${this.checkout.step === 1 ? `
-          <div class="coupon" style="margin-top:12px;">
-            <input type="text" id="coupon-field" placeholder="PROMO CODE" value="${this.checkout.couponCode}" ${this.checkout.couponCode ? 'disabled' : ''}>
-            ${this.checkout.couponCode ? `
-              <button class="btn btn-dark btn-sm" onclick="State.removeCoupon()">Clear</button>
-            ` : `
-              <button class="btn btn-dark btn-sm" onclick="State.applyCoupon(document.getElementById('coupon-field').value)">Apply</button>
-            `}
-          </div>
-        ` : ''}
-
-        <button class="btn btn-primary btn-block" style="margin-top:14px;" id="summary-cta-btn">
-          ${ctaLabel}
-        </button>
-      </aside>
-    `;
-  }
 };
 
-/* ====== RUNTIME ENGINE INITIALIZATION LOOP ====== */
-document.addEventListener('DOMContentLoaded', () => {
-  // Global View-Port Structural Setup
-  document.getElementById('site-header').innerHTML = `
-    <header class="site-header">
-      <div class="header-row">
-        <button class="burger icon-btn" onclick="document.getElementById('mob-menu').classList.toggle('open')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
-        <a href="#" class="brand" onclick="State.navigate('home'); return false;">REEDBI<span class="dot">.</span></a>
-        <nav class="nav">
-          <a href="#" onclick="State.navigate('home'); return false;">Home</a>
-          <a href="#" onclick="State.navigate('shop'); return false;">Catalog Matrix</a>
-          <a href="#" onclick="State.navigate('wishlist'); return false;">Saved Profiles</a>
-          <a href="#" onclick="State.navigate('account'); return false;">Control Hub</a>
-        </nav>
-        <div class="search"><input type="text" placeholder="Search catalog structures..."></div>
-        <div class="icons">
-          <button class="icon-btn" onclick="State.navigate('wishlist')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path></svg>
-          </button>
-          <button class="icon-btn" onclick="State.navigate('cart')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 01-8 0"></path></svg>
-          </button>
-        </div>
-      </div>
-    </header>
-    <div class="mobile-menu" id="mob-menu" onclick="this.classList.remove('open')">
-      <div class="mobile-panel" onclick="event.stopPropagation()">
-        <a href="#" onclick="State.navigate('home'); document.getElementById('mob-menu').classList.remove('open'); return false;">Home</a>
-        <a href="#" onclick="State.navigate('shop'); document.getElementById('mob-menu').classList.remove('open'); return false;">Catalog Matrix</a>
-        <a href="#" onclick="State.navigate('wishlist'); document.getElementById('mob-menu').classList.remove('open'); return false;">Saved Profiles</a>
-        <a href="#" onclick="State.navigate('account'); document.getElementById('mob-menu').classList.remove('open'); return false;">Control Hub</a>
-      </div>
-    </div>
-  `;
+function renderCart() {
+  const app = $("#app");
+  const rows = Store.detail(), t = Store.totals();
+  if (!rows.length) {
+    app.innerHTML = `<div class="container"><div class="state"><div class="ico">${ICONS.bag}</div>
+      <h2 class="display">Your bag is empty</h2><p>Looks like you haven\u2019t added anything yet.</p>
+      <a href="#/shop" class="btn btn-primary">Continue Shopping</a></div></div>`; return;
+  }
+  const steps = ["Bag","Address","Payment"].map((s,i)=>`<div class="step ${i===0?"on":""}"><span class="n">${i+1}</span>${s}</div>${i<2?'<span class="step-line"></span>':""}`).join("");
+  app.innerHTML = `<div class="container"><div class="page-head"><h1 class="display">Shopping Bag</h1></div>
+    <div class="steps">${steps}</div>
+    <div class="cart-wrap">
+      <div id="items">${rows.map(cartRow).join("")}</div>
+      <aside class="summary">
+        <h3>Coupons</h3>
+        ${t.couponDiscount||Store.coupon?`<div class="coupon-on"><span>${ICONS.spark} ${Store.coupon} applied</span><button id="rmCoupon" style="color:var(--pink);font-weight:700">Remove</button></div>`
+          :`<div class="coupon"><input id="couponIn" placeholder="Enter code"><button class="btn btn-dark btn-sm" id="applyCoupon">Apply</button></div>`}
+        <div class="muted" style="font-size:12px;margin-bottom:18px">Try: REEDBI10 \u00b7 FIRST50 \u00b7 SAVE200</div>
+        <h3>Price Details (${t.items} item${t.items!==1?"s":""})</h3>
+        <div class="sum-row"><span class="muted">Total MRP</span><span>${INR(t.totalMrp)}</span></div>
+        <div class="sum-row"><span class="muted">Bag discount</span><span class="g">\u2212 ${INR(t.bagDiscount)}</span></div>
+        ${t.couponDiscount?`<div class="sum-row"><span class="muted">Coupon discount</span><span class="g">\u2212 ${INR(t.couponDiscount)}</span></div>`:""}
+        <div class="sum-row"><span class="muted">Shipping</span><span class="${t.shipping===0?"g":""}">${t.shipping===0?"FREE":INR(t.shipping)}</span></div>
+        <label class="sum-row" style="cursor:pointer"><span class="muted">${ICONS.spark} Gift wrap (+${INR(25)})</span>
+          <input type="checkbox" id="giftChk" ${Store.gift?"checked":""} style="accent-color:var(--pink);width:17px;height:17px"></label>
+        <div class="sum-total"><span>Total</span><span>${INR(t.total)}</span></div>
+        <button class="btn btn-primary btn-block" id="placeOrder" style="margin-top:8px">Place Order</button>
+        <div class="muted" style="text-align:center;font-size:12.5px;margin-top:10px">${ICONS.shield} 100% secure payments</div>
+      </aside></div></div>`;
+  $("#items").onclick = (e) => {
+    const dec=e.target.closest("[data-dec]"),inc=e.target.closest("[data-inc]"),rm=e.target.closest("[data-rm]"),wl=e.target.closest("[data-wl]");
+    const parse=(el,a)=>[+el.dataset[a].split("|")[0], el.dataset[a].split("|")[1]||null];
+    if(dec){const[id,s]=parse(dec,"dec");Store.setQty(id,s,-1);renderCart();}
+    else if(inc){const[id,s]=parse(inc,"inc");Store.setQty(id,s,1);renderCart();}
+    else if(rm){const[id,s]=parse(rm,"rm");Store.remove(id,s);toast("Removed from bag");renderCart();}
+    else if(wl){const[id,s]=parse(wl,"wl");Store.toggleWish(id);Store.remove(id,s);toast("Moved to wishlist");renderCart();}
+  };
+  $("#applyCoupon") && ($("#applyCoupon").onclick=()=>{ if(Store.applyCoupon($("#couponIn").value)){toast("Coupon applied");renderCart();}else toast("Invalid coupon"); });
+  $("#rmCoupon") && ($("#rmCoupon").onclick=()=>{ Store.removeCoupon(); renderCart(); });
+  $("#giftChk") && ($("#giftChk").onchange=()=>{ Store.toggleGift(); renderCart(); });
+  $("#placeOrder").onclick=()=>{ Store.clear(); toast("Order placed \u2014 thank you!"); setTimeout(()=>go("#/"),900); };
+}
+function cartRow(it) {
+  const key = `${it.id}|${it.size||""}`;
+  return `<div class="cart-item ${it.oos?"oos":""}"><img src="${it.image}" alt="${it.name}">
+    <div class="ci-body"><div class="ci-top"><div>
+      <strong>${it.brand}</strong><div class="muted" style="font-size:13px">${it.name}</div>
+      <div class="ci-meta">${it.size?`<span>Size: <b>${it.size}</b></span>`:""}<span>Color: <b>${it.color}</b></span><span>Sold by ${it.seller}</span></div></div>
+      <button class="x-btn" data-rm="${key}" aria-label="Remove">\u2715</button></div>
+      ${it.oos?`<span style="margin-top:8px;color:var(--pink);font-weight:700;font-size:13px">Out of stock</span>`:`
+      <div class="ci-bottom"><div style="display:flex;align-items:center;gap:14px">
+        <div class="qty"><button data-dec="${key}" ${it.qty<=1?"disabled":""}>\u2212</button><span>${it.qty}</span><button data-inc="${key}" ${it.qty>=it.stock?"disabled":""}>+</button></div>
+        <button data-wl="${key}" class="muted" style="font-size:12.5px;font-weight:700">Move to wishlist</button></div>
+        <div style="text-align:right"><strong>${INR(it.lineTotal)}</strong><div class="muted" style="font-size:12px;text-decoration:line-through">${INR(it.lineMrp)}</div></div></div>`}
+    </div></div>`;
+}
 
-  // Bind Checkout Dynamic CTA Actions directly inside DOM context safely
-  document.addEventListener('click', (e) => {
-    if (e.target && e.target.id === 'summary-cta-btn') {
-      const currentTotals = State.calculateTotals();
-      if (State.checkout.step === 1) {
-        State.checkout.step = 2;
-      } else if (State.checkout.step === 2) {
-        State.cart = [];
-        State.checkout.step = 3;
-        State.checkout.couponCode = '';
-        State.save();
-      }
-      State.render();
-    }
-  });
-
-  // Ignite Default Matrix Execution View
-  State.navigate('home');
-});
+/* ---------- router boot ---------- */
+function route() {
+  const { name, arg, params } = parseHash();
+  const view = VIEWS[name] || VIEWS.home;
+  setActiveNav(VIEWS[name] ? name : "home");
+  view(arg, params);
+  observeReveal();
+  window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+}
+window.addEventListener("hashchange", route);
+document.addEventListener("DOMContentLoaded", () => { buildChrome(); route(); });
 </script>
 </body>
 </html>
