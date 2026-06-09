@@ -53,7 +53,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .uchip:hover{background:#e8eef3}
 .uchip-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
 .uchip-nm{font-size:11px;font-weight:500;color:var(--mt2);max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hacts{display:flex;gap:2px}
+.hacts{display:flex;gap:3px;overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x;max-width:100%;scrollbar-width:none}
+.hacts::-webkit-scrollbar{display:none}
+.hacts .ib{flex-shrink:0}
+.ib-activity{background:var(--g)!important;color:#fff!important;width:auto!important;padding:0 10px;gap:5px;font-weight:700}
+.ib-activity::after{content:"Activity";font-size:11px}
 .ib{width:34px;height:34px;border-radius:8px;border:none;background:transparent;cursor:pointer;color:var(--mt);display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .15s;touch-action:manipulation}
 .ib:hover{background:var(--card2);color:var(--g)}
 .ib:active{background:#e8eef3}
@@ -233,7 +237,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sndbtn{width:44px;height:44px;border-radius:50%;border:none;background:var(--g);cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;touch-action:manipulation;box-shadow:0 2px 6px rgba(10,102,194,.35)}
 .sndbtn:active{transform:scale(.93)}
 .sndbtn:active{transform:scale(.93)}
-.ib-activity{background:var(--g)!important;color:#fff!important}
 .admin-tabs{display:flex;gap:5px;margin-bottom:11px;flex-wrap:wrap}
 .admin-tabs .seller-tab{flex:1;min-width:70px;font-size:11px;padding:7px 4px}
 .otp-box{background:rgba(10,102,194,.1);border:1px dashed var(--g);border-radius:8px;padding:8px;margin-top:6px;font-size:12px;color:var(--g);font-weight:600}
@@ -532,7 +535,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v71</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v73</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -768,6 +771,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <div id="lp-photo-hint" style="font-size:10px;color:var(--mt2);margin:4px 0 10px">Add at least 5 photos (0/5)</div>
     <input type="file" id="lp-photo-file" accept="image/*" multiple style="display:none" onchange="listPhotoSel(this)">
     <div class="fg"><label>Product title</label><input type="text" id="lp-title" placeholder="e.g. iPhone 14 Pro 256GB"></div>
+    <div class="fg" style="margin-top:8px"><label>Location (country / emirate / city)</label><input type="text" id="lp-location" placeholder="e.g. UAE, Dubai, Deira"></div>
     <div class="fg" style="margin-top:8px"><label>Category</label><input type="text" id="lp-category" list="cat-list" placeholder="e.g. Eggs, Electronics, Grocery"><datalist id="cat-list"><option>Grocery</option><option>Electronics</option><option>Clothing</option><option>Eggs</option><option>Dairy</option><option>Vegetables</option><option>Fruits</option><option>Meat</option><option>Household</option><option>Other</option></datalist></div>
     <div class="fg" style="margin-top:8px"><label>Description</label><textarea id="lp-desc" rows="2" placeholder="Condition, specs, details..."></textarea></div>
     <div style="display:flex;gap:8px;margin-top:8px">
@@ -944,6 +948,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="overlay" id="cart-ovl"><div class="modal" style="max-width:440px">
   <div class="mhd"><h3><i class="ti ti-shopping-bag" style="font-size:13px"></i> My Bag</h3><button class="ib" onclick="closeOvl('cart-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="cart-body"></div>
+</div></div>
+<!-- LICENSE VALIDATION -->
+<div class="overlay" id="license-ovl"><div class="modal" style="max-width:400px">
+  <div class="mhd"><h3><i class="ti ti-license" style="font-size:13px"></i> ReadBi Seller License</h3><button class="ib" onclick="closeOvl('license-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="license-body"></div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -3909,7 +3918,7 @@ function ensureReadBiStorefront(uid,name){
 // is a product visible in the PUBLIC marketplace? (licensed sellers only)
 function productInMarketplace(p){
   if(!p||p.withdrawn)return false;
-  return userLicensed(p.sellerUid);
+  return licenseValid(p.sellerUid);
 }
 function createPage(){
   var name=document.getElementById('pg-name').value.trim();
@@ -3965,7 +3974,45 @@ function setAppStatus(appId,status){
   if(FB.ready){FB.db.collection('applications').doc(appId).set(a,{merge:true}).catch(function(){});}
   bcSend({type:'app_status',appId:appId,status:status});
 }
-/* ============================================================
+
+/* ===== License key validation system =====
+   Admin issues keys; users validate a key to unlock ReadBi (storefront + marketplace). */
+function getLicenseKeys(){return LS.get('rb_lickeys',{})||{};} // {KEY:{used:bool,uid,name,ts,expiry}}
+function saveLicenseKeys(k){LS.set('rb_lickeys',k);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('lickeys').set(k,{merge:true}).catch(function(){});}catch(e){}}}
+function genLicenseKey(months){
+  var seg=function(){return Math.random().toString(36).toUpperCase().slice(2,6);};
+  var key='RB-'+seg()+'-'+seg()+'-'+seg();
+  var keys=getLicenseKeys();
+  keys[key]={used:false,issuedTs:Date.now(),months:months||12};
+  saveLicenseKeys(keys);
+  return key;
+}
+// a user submits a key to validate their license
+function validateLicenseKey(key){
+  key=(key||'').trim().toUpperCase();
+  if(!key)return {ok:false,msg:'Enter a license key'};
+  var keys=getLicenseKeys();
+  var rec=keys[key];
+  if(!rec)return {ok:false,msg:'Invalid license key. Check with the Reedbi admin.'};
+  if(rec.used&&rec.uid&&CU&&rec.uid!==CU.uid)return {ok:false,msg:'This key is already in use by another account.'};
+  // mark used + bind to this user
+  var months=rec.months||12;
+  var expiry=Date.now()+months*30*86400000;
+  rec.used=true;rec.uid=CU?CU.uid:'';rec.name=CU?CU.name:'';rec.activatedTs=Date.now();rec.expiry=expiry;
+  keys[key]=rec;saveLicenseKeys(keys);
+  // grant the license (creates storefront)
+  setUserLicensed(CU.uid,true,CU.name);
+  // store expiry on the license record
+  var lic=LS.get('rb_licenses',{})||{};if(lic[CU.uid]){lic[CU.uid].expiry=expiry;lic[CU.uid].key=key;LS.set('rb_licenses',lic);}
+  return {ok:true,msg:'License validated! Your ReadBi storefront is now active.',expiry:expiry};
+}
+function licenseExpiry(uid){var lic=LS.get('rb_licenses',{})||{};return lic[uid]&&lic[uid].expiry;}
+function licenseValid(uid){
+  if(!userLicensed(uid))return false;
+  var exp=licenseExpiry(uid);
+  if(exp&&Date.now()>exp)return false; // expired
+  return true;
+}/* ============================================================
    LEFT PANEL
 ============================================================ */
 function renderTagList(filter){
@@ -4852,7 +4899,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v71 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v73 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -4922,7 +4969,7 @@ var listPhotos=[]; // base64 photos for the product being listed
 function openListProduct(){
   if(!requireAuth('list a product'))return;
   listPhotos=[];
-  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category','lp-location'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   var cs=document.getElementById('lp-cur');if(cs&&!cs.options.length){CURRENCIES.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o);});}
   renderListPhotos();
   document.getElementById('list-prod-ovl').classList.add('open');
@@ -4975,7 +5022,8 @@ function submitProduct(){
   var offer=(document.getElementById('lp-offer')||{}).value||'';
   var expiry=(document.getElementById('lp-expiry')||{}).value||'';
   var category=(document.getElementById('lp-category')||{}).value||'Other';
-  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:CU.name,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,
+  var location=(document.getElementById('lp-location')||{}).value||'';
+  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:CU.name,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
     batches:[{batchCode:'B-'+Date.now().toString(36).toUpperCase().slice(-4),qty:qty,cost:cost,vendor:'',vendorPhone:'',brand:'',date:Date.now()}],interest:0,interestLog:[],
     photos:listPhotos.slice(),addr:addr,phone:phone,map:map,ts:Date.now()};
   var prods=getProducts();prods.unshift(prod);saveProducts(prods);
@@ -5040,7 +5088,7 @@ function showMyProducts(tab){
     var amLic=userLicensed(CU.uid);
     var licBanner=amLic
       ? '<div style="font-size:11px;background:rgba(26,143,60,.1);border:1px solid #1a8f3c;border-radius:9px;padding:9px 11px;margin-bottom:10px;color:#1a8f3c"><i class="ti ti-license"></i> <b>ReadBi licensed seller.</b> Your products appear in the public marketplace and you have a storefront.</div>'
-      : '<div style="font-size:11px;background:rgba(195,125,22,.1);border:1px solid var(--gold);border-radius:9px;padding:9px 11px;margin-bottom:10px;color:var(--gold)"><i class="ti ti-info-circle"></i> <b>Tag Talk seller.</b> Your products show inside Tag Talk only. Get a ReadBi license to appear in the public marketplace with your own storefront.</div>';
+      : '<div style="font-size:11px;background:rgba(195,125,22,.1);border:1px solid var(--gold);border-radius:9px;padding:9px 11px;margin-bottom:10px;color:var(--gold)"><i class="ti ti-info-circle"></i> <b>Tag Talk seller.</b> Your products show inside Tag Talk only. Validate a ReadBi license to appear in the public marketplace with your own storefront.<button class="btn" style="width:100%;margin-top:8px;background:var(--gold);color:#000;border:none;border-radius:7px;padding:8px;font-weight:700" onclick="closeOvl(\'seller-ovl\');openLicensePanel()"><i class="ti ti-license"></i> Validate License</button></div>';
     var qrP=prods.filter(function(p){return p.qrPrinted;}).length;
     var qrB=prods.length-qrP;
     var qrSummary=licBanner+(prods.length?'<button class="btn" style="width:100%;margin-bottom:9px;border-radius:9px;border:1px solid var(--gold);background:rgba(195,125,22,.08);color:var(--gold)" onclick="closeOvl(\'seller-ovl\');showOffersManager()"><i class="ti ti-discount-2"></i> Offers &amp; Expiring-Soon Manager</button><div class="dispatch-row"><div class="disp-box disp-done"><b>'+qrP+'</b><small>QR printed</small></div><div class="disp-box disp-pend"><b>'+qrB+'</b><small>QR to print</small></div><div class="disp-box disp-ship"><b>'+prods.length+'</b><small>Total listed</small></div></div>':'');
@@ -5563,6 +5611,7 @@ function runProductSearch(q){
       +'<div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
       +'<div style="font-size:13px">'+priceHtml(p)+'</div>'
       +'<div style="font-size:10px;color:var(--mt2)">by '+esc(p.sellerName)+(p.category?' · '+esc(p.category):'')+'</div>'
+      +(p.location?'<div style="font-size:10px;color:var(--g)"><i class="ti ti-map-pin"></i> '+esc(p.location)+'</div>':'')
       +(mine?'<button class="ps-btn" style="background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="closeOvl(\'prodsearch-ovl\');showMyProducts(\'listings\')"><i class="ti ti-building-store"></i> Manage</button>'
             :(avail?'<button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button>'
                    :'<button class="ps-btn" style="background:var(--card2);color:var(--gold);border:1px solid var(--gold)" onclick="expressInterest(\''+p.id+'\')"><i class="ti ti-heart"></i> Notify me</button>'))
@@ -5796,6 +5845,41 @@ function expressInterest(pid){
 }
 // is a product available to buyers?
 function productAvailable(p){return !p.withdrawn && remainingStock(p)>0;}
+
+/* ===== User-facing license validation panel ===== */
+function openLicensePanel(){
+  if(!requireAuth('manage your license'))return;
+  var body=document.getElementById('license-body');
+  var valid=licenseValid(CU.uid);
+  var exp=licenseExpiry(CU.uid);
+  if(valid){
+    var daysLeft=exp?Math.max(0,Math.ceil((exp-Date.now())/86400000)):null;
+    body.innerHTML='<div style="text-align:center;padding:10px 0">'
+      +'<div style="font-size:40px;color:#1a8f3c"><i class="ti ti-rosette-discount-check"></i></div>'
+      +'<div style="font-weight:800;font-size:15px;margin-top:6px">License Active</div>'
+      +'<div style="font-size:12px;color:var(--mt);margin-top:4px">Your ReadBi storefront is live and your products appear in the public marketplace.</div>'
+      +(daysLeft!==null?'<div style="font-size:11px;color:'+(daysLeft<15?'var(--gold)':'#1a8f3c')+';margin-top:8px;font-weight:600">'+(daysLeft>0?daysLeft+' days remaining':'Expired — renew below')+'</div>':'')
+      +'</div>';
+    if(daysLeft!==null&&daysLeft<30){
+      body.innerHTML+='<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px"><div style="font-size:11px;font-weight:700;margin-bottom:6px">Renew with a new key</div>'
+        +'<input type="text" id="lic-key" placeholder="RB-XXXX-XXXX-XXXX" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:10px;color:var(--tx);font-family:var(--fn);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">'
+        +'<button class="btn btnok" style="width:100%" onclick="submitLicenseKey()"><i class="ti ti-check"></i> Validate &amp; Renew</button></div>';
+    }
+  }else{
+    body.innerHTML='<div style="background:rgba(195,125,22,.1);border:1px solid var(--gold);border-radius:10px;padding:11px;font-size:12px;color:var(--gold);margin-bottom:12px"><i class="ti ti-info-circle"></i> You are a <b>Tag Talk</b> seller. Your products show only inside Tag Talk. Validate a ReadBi license to open your own storefront and sell in the public marketplace.</div>'
+      +'<div style="font-size:11px;font-weight:700;margin-bottom:6px">Enter your license key</div>'
+      +'<input type="text" id="lic-key" placeholder="RB-XXXX-XXXX-XXXX" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:11px;color:var(--tx);font-family:var(--fn);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">'
+      +'<button class="btn btnok" style="width:100%;padding:12px" onclick="submitLicenseKey()"><i class="ti ti-license"></i> Validate License</button>'
+      +'<div style="font-size:10px;color:var(--mt2);text-align:center;margin-top:10px">Don\'t have a key? Contact the Reedbi admin to purchase a ReadBi seller license.</div>';
+  }
+  document.getElementById('license-ovl').classList.add('open');
+}
+function submitLicenseKey(){
+  var key=(document.getElementById('lic-key')||{}).value||'';
+  var res=validateLicenseKey(key);
+  toast(res.msg,res.ok?'ok':'err');
+  if(res.ok){closeOvl('license-ovl');if(typeof showMyProducts==='function'&&document.getElementById('seller-ovl').classList.contains('open'))showMyProducts('listings');}
+}
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
    ============================================================ */
@@ -6193,6 +6277,10 @@ function adminTab(t){
       +'<input type="text" id="adm-name" placeholder="Display name" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
       +'<select id="adm-role" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:8px"><option value="viewer">Viewer (read)</option><option value="moderator">Moderator (read+delete content)</option><option value="manager">Manager (read+write+post+delete)</option><option value="superadmin">Super Admin (full)</option></select>'
       +'<button class="btn btnok" style="width:100%" onclick="adminAddTeam()"><i class="ti ti-user-plus"></i> Add to Admin Team</button></div>'
+      +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px"><div style="font-size:11px;font-weight:700;margin-bottom:6px">Issue a ReadBi license key</div>'
+      +'<select id="lk-months" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px"><option value="1">1 month</option><option value="6">6 months</option><option value="12" selected>12 months</option><option value="24">24 months</option></select>'
+      +'<button class="btn btnok" style="width:100%" onclick="adminIssueLicenseKey()"><i class="ti ti-key"></i> Generate License Key</button>'
+      +'<div id="lk-result"></div></div>'
       +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px"><div style="font-size:11px;font-weight:700;margin-bottom:6px">Change admin password</div>'
       +'<input type="password" id="adm-newpwd" placeholder="New admin password" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
       +'<button class="btn" style="width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="adminChangePwd()">Update password</button></div>';
@@ -6209,20 +6297,55 @@ function adminTab(t){
         +'</div>';
     }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No user directory data. Users appear here once profiles sync via cloud.</p>';
   }else if(t==='content'){
+    // TAG MANAGER: owner can remove unwanted main tags
+    var SEED=['jobs','tech','ai','insurance','sell','remote'];
+    var tagMgr='<div style="font-size:11px;font-weight:700;margin-bottom:6px"><i class="ti ti-hash"></i> Main Tags — remove unwanted ones</div>'
+      +tags.map(function(tg){
+        var isSeed=SEED.indexOf(tg.id)>=0;
+        return '<div class="act-row"><div><b>'+esc(tg.name)+'</b><small>'+(tg.posts?tg.posts.length:0)+' posts'+(isSeed?' · core tag':'')+'</small></div>'
+          +(isSeed?'<span style="font-size:10px;color:var(--mt2)">protected</span>':'<button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="adminRemoveTag(\''+escJS(tg.id)+'\')"><i class="ti ti-trash"></i> Remove</button>')
+          +'</div>';
+      }).join('')
+      +'<div style="border-top:1px solid var(--b);margin:10px 0;padding-top:10px"><div style="font-size:11px;font-weight:700;margin-bottom:6px"><i class="ti ti-message"></i> Recent posts — moderate</div></div>';
     // moderation: list recent posts across tags with delete
     var rows=[];
     tags.forEach(function(tg){(tg.posts||[]).forEach(function(p){rows.push({tag:tg,post:p});});});
     rows.sort(function(a,b){return (b.post.ts||0)-(a.post.ts||0);});
     rows=rows.slice(0,80);
-    tb.innerHTML=rows.length?rows.map(function(r){
+    tb.innerHTML=tagMgr+(rows.length?rows.map(function(r){
       return '<div class="appl-card"><div style="font-size:12px"><b>'+esc(r.post.user||'?')+'</b> <span style="color:var(--mt2)">in #'+esc(r.tag.name)+'</span></div>'
         +'<div style="font-size:12px;color:var(--tx);margin:3px 0">'+esc((r.post.title||r.post.body||'').substring(0,140))+'</div>'
         +'<button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="adminDeletePost(\''+escJS(r.tag.id)+'\','+r.post.id+')"><i class="ti ti-trash"></i> Delete</button></div>';
-    }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No posts.</p>';
+    }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No posts.</p>');
   }
   // highlight active tab
   var btns=document.querySelectorAll('.admin-tabs .seller-tab');
   for(var i=0;i<btns.length;i++){btns[i].className='seller-tab'+(btns[i].textContent.toLowerCase().indexOf(t)>=0?' on':'');}
+}
+function adminIssueLicenseKey(){
+  var months=parseInt((document.getElementById('lk-months')||{}).value,10)||12;
+  var key=genLicenseKey(months);
+  var box=document.getElementById('lk-result');
+  if(box)box.innerHTML='<div style="background:rgba(26,143,60,.1);border:1px dashed #1a8f3c;border-radius:8px;padding:10px;margin-top:8px;text-align:center"><div style="font-size:9px;color:var(--mt2)">Give this key to a seller</div><div style="font-size:16px;font-weight:800;letter-spacing:2px;color:#1a8f3c;margin-top:3px">'+esc(key)+'</div><div style="font-size:9px;color:var(--mt2);margin-top:3px">'+months+'-month license</div></div>';
+  toast('License key generated','ok');
+}
+function adminRemoveTag(tagId){
+  var SEED=['jobs','tech','ai','insurance','sell','remote'];
+  if(SEED.indexOf(tagId)>=0){toast('Core tags cannot be removed','err');return;}
+  if(!confirm('Remove this main tag and all its posts permanently?'))return;
+  // remove from in-memory tags
+  var idx=tags.findIndex(function(t){return t.id===tagId;});
+  if(idx>=0)tags.splice(idx,1);
+  // remove from custom tags store
+  var custom=(LS.get('rb_custom_tags',[])||[]).filter(function(ct){return ct.id!==tagId;});
+  LS.set('rb_custom_tags',custom);
+  // clear its posts + followers
+  LS.del('rb_posts_'+tagId);
+  var ft=(LS.get('rb_ftags',[])||[]).filter(function(x){return x!==tagId;});LS.set('rb_ftags',ft);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('tags').doc(tagId).delete().catch(function(){});}catch(e){}}
+  if(activeTagId===tagId){activeTagId=null;goHome();}
+  if(typeof renderTagList==='function')renderTagList();
+  adminTab('content');toast('Main tag removed','info');
 }
 function adminToggleLicense(uid,name,on){
   setUserLicensed(uid,on,name);
