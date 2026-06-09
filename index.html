@@ -404,6 +404,13 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .cart-trust{display:flex;justify-content:space-between;margin-top:11px;font-size:9px;color:var(--mt2);gap:4px}
 .cart-trust span{display:flex;align-items:center;gap:3px}
 .cart-trust i{color:#1a8f3c;font-size:13px}
+.acct-item{display:flex;align-items:center;gap:11px;width:100%;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:13px 14px;margin-bottom:7px;font-size:13px;font-weight:600;color:var(--tx);cursor:pointer;font-family:var(--fn);text-align:left;touch-action:manipulation;transition:background .15s}
+.acct-item:hover{background:var(--b)}
+.acct-item i{font-size:18px;flex-shrink:0}
+.acct-item small{display:block;font-size:10px;color:var(--mt2);font-weight:400;margin-top:1px}
+.acct-item small{margin-left:0}
+.acct-item{flex-wrap:wrap}
+.acct-item small{flex-basis:100%;padding-left:29px}
 .ps-cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:9px;margin-bottom:9px;-webkit-overflow-scrolling:touch;touch-action:pan-x;border-bottom:1px solid var(--b)}
 .cat-chip{flex-shrink:0;background:var(--card2);border:1px solid var(--b);border-radius:16px;padding:6px 13px;font-size:11px;font-weight:600;color:var(--mt);cursor:pointer;font-family:var(--fn);white-space:nowrap;touch-action:manipulation;transition:all .15s}
 .cat-chip.on{background:var(--g);color:#fff;border-color:var(--g)}
@@ -519,6 +526,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       <div id="sform" style="display:none">
         <div class="frow" style="margin-bottom:0">
           <div class="afg"><label>Name</label><input type="text" id="sn" placeholder="Your name"></div>
+          <div class="afg"><label>Account type</label><select id="su-acctype" style="width:100%"><option value="user">Normal user (jobs + social)</option><option value="business">Business owner (will request seller license)</option><option value="license">Licensed seller (have a license key)</option></select></div>
           <div class="afg"><label>Company (select existing page)</label><select id="sc" style="width:100%"><option value="">— None / Independent —</option></select></div>
         </div>
         <div class="afg"><label>Email</label><input type="email" id="se" placeholder="you@email.com"></div>
@@ -535,7 +543,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v73</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v75</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -953,6 +961,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="overlay" id="license-ovl"><div class="modal" style="max-width:400px">
   <div class="mhd"><h3><i class="ti ti-license" style="font-size:13px"></i> ReadBi Seller License</h3><button class="ib" onclick="closeOvl('license-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="license-body"></div>
+</div></div>
+<!-- ACCOUNT MENU -->
+<div class="overlay" id="acctmenu-ovl"><div class="modal" style="max-width:400px">
+  <div class="mhd"><h3><i class="ti ti-user-circle" style="font-size:13px"></i> My Account</h3><button class="ib" onclick="closeOvl('acctmenu-ovl')"><i class="ti ti-x"></i></button></div>
+  <div class="mbd" id="acctmenu-body"></div>
 </div></div>
 <input type="file" id="req-doc-file" style="display:none">
 
@@ -3661,30 +3674,35 @@ function localLogin(e,p){
 }
 function doSignup(){
   var n=document.getElementById('sn').value.trim(),co=document.getElementById('sc').value.trim(),e=document.getElementById('se').value.trim().toLowerCase(),p=document.getElementById('sp').value;
+  var acctype=(document.getElementById('su-acctype')||{}).value||'user';
   if(!n||!e||!p){setErr('Fill all fields');return;}
   if(p.length<6){setErr('Password 6+ chars');return;}
   var avIdx=Math.floor(Math.random()*7);
   if(FB.ready){
     FB.auth.createUserWithEmailAndPassword(e,p).then(function(cred){
-      var prof={uid:cred.user.uid,name:n,email:e,co:co||'',avIdx:avIdx};
-      try{FB.db.collection('users').doc(cred.user.uid).set({name:n,co:co||'',email:e,avIdx:avIdx,createdAt:Date.now()}).catch(function(){});}catch(e2){}
-      CU=prof;LS.set('rb_user',CU);enterApp();
+      var prof={uid:cred.user.uid,name:n,email:e,co:co||'',avIdx:avIdx,acctype:acctype};
+      try{FB.db.collection('users').doc(cred.user.uid).set({name:n,co:co||'',email:e,avIdx:avIdx,acctype:acctype,createdAt:Date.now()}).catch(function(){});}catch(e2){}
+      CU=prof;LS.set('rb_user',CU);afterSignupAccountType(acctype,n);enterApp();
     }).catch(function(err){
       var c=(err&&err.code)||'';
       if(c.indexOf('configuration-not-found')>=0||c.indexOf('operation-not-allowed')>=0||c.indexOf('unauthorized-domain')>=0||c.indexOf('network-request-failed')>=0||c.indexOf('api-key')>=0){
-        localSignup(n,co,e,p,avIdx);
+        localSignup(n,co,e,p,avIdx,acctype);
       }else{setErr(fbErr(err));}
     });
     return;
   }
-  localSignup(n,co,e,p,avIdx);
+  localSignup(n,co,e,p,avIdx,acctype);
 }
-function localSignup(n,co,e,p,avIdx){
+function localSignup(n,co,e,p,avIdx,acctype){
   var accs=LS.get('rb_accs',[])||[];
   if(accs.find(function(a){return a.email===e;})){setErr('Email already registered. Please sign in.');return;}
   var uid='u'+Date.now();
-  accs.push({uid:uid,name:n,co:co||'',email:e,pass:btoa(p),avIdx:avIdx});LS.set('rb_accs',accs);
-  CU={uid:uid,name:n,email:e,co:co||'',avIdx:avIdx};LS.set('rb_user',CU);enterApp();
+  accs.push({uid:uid,name:n,co:co||'',email:e,pass:btoa(p),avIdx:avIdx,acctype:acctype||'user'});LS.set('rb_accs',accs);
+  CU={uid:uid,name:n,email:e,co:co||'',avIdx:avIdx,acctype:acctype||'user'};LS.set('rb_user',CU);afterSignupAccountType(acctype||'user',n);enterApp();
+}
+// after signup: if business owner, auto-create a license request for the owner to approve
+function afterSignupAccountType(acctype,name){
+  if(acctype==='business'){requestSellerLicense(true);}
 }
 function fbLoadProfile(uid,email){
   // Persist the session immediately so a Firestore permission error
@@ -4012,7 +4030,40 @@ function licenseValid(uid){
   var exp=licenseExpiry(uid);
   if(exp&&Date.now()>exp)return false; // expired
   return true;
-}/* ============================================================
+}
+/* ===== License request & approval workflow ===== */
+function getLicenseRequests(){return LS.get('rb_licreqs',[])||[];}
+function saveLicenseRequests(r){LS.set('rb_licreqs',r);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('licreqs').set({list:r},{merge:true}).catch(function(){});}catch(e){}}}
+function requestSellerLicense(silent){
+  if(!CU)return;
+  var reqs=getLicenseRequests();
+  if(reqs.find(function(r){return r.uid===CU.uid&&r.status==='pending';})){if(!silent)toast('You already have a pending request','info');return;}
+  if(licenseValid(CU.uid)){if(!silent)toast('You are already a licensed seller','info');return;}
+  reqs.push({id:'req'+Date.now(),uid:CU.uid,name:CU.name,email:CU.email||'',co:CU.co||'',phone:CU.phone||'',status:'pending',ts:Date.now()});
+  saveLicenseRequests(reqs);
+  if(!silent)toast('License request submitted! The Reedbi owner will review it.','ok');
+}
+// owner/team approves or rejects
+function approveLicenseRequest(reqId,months){
+  var reqs=getLicenseRequests();var r=reqs.find(function(x){return x.id===reqId;});if(!r)return;
+  r.status='approved';r.decidedTs=Date.now();r.decidedBy=CU?CU.name:'';
+  saveLicenseRequests(reqs);
+  // grant license with expiry
+  setUserLicensed(r.uid,true,r.name);
+  var lic=LS.get('rb_licenses',{})||{};if(lic[r.uid]){lic[r.uid].expiry=Date.now()+(months||12)*30*86400000;LS.set('rb_licenses',lic);}
+}
+function rejectLicenseRequest(reqId){
+  var reqs=getLicenseRequests();var r=reqs.find(function(x){return x.id===reqId;});if(!r)return;
+  r.status='rejected';r.decidedTs=Date.now();r.decidedBy=CU?CU.name:'';saveLicenseRequests(reqs);
+}
+// can the current user manage license requests? (owner unlocked OR admin-team member with license role)
+function canManageLicenses(){
+  if(typeof adminUnlocked!=='undefined'&&adminUnlocked)return true;
+  var cfg=(typeof getAdminConfig==='function')?getAdminConfig():{admins:[]};
+  var m=(cfg.admins||[]).find(function(a){return CU&&a.uid===CU.uid;});
+  return !!(m&&(m.role==='superadmin'||m.role==='manager'||m.role==='license'));
+}
+/* ============================================================
    LEFT PANEL
 ============================================================ */
 function renderTagList(filter){
@@ -4840,9 +4891,32 @@ function openProfile(user,co,tagName,avIdx){
   document.getElementById('pmb').classList.add('open');
 }
 function showMyProfile(){
-  // profile only meaningful after posting; guests prompted to sign in
-  if(CU&&CU.guest){toast('Sign in to get your profile page','info');return;}
-  openProfile(CU?CU.name:'Guest',CU?CU.co:'','',CU?CU.avIdx:0);
+  if(CU&&CU.guest){toast('Sign in to get your account','info');return;}
+  openAccountMenu();
+}
+function openAccountMenu(){
+  if(!CU){toast('Sign in first','info');return;}
+  var body=document.getElementById('acctmenu-body');
+  var lic=(typeof licenseValid==='function')&&licenseValid(CU.uid);
+  var isOwner=(typeof adminUnlocked!=='undefined'&&adminUnlocked)||(typeof canManageLicenses==='function'&&canManageLicenses());
+  var h='<div style="text-align:center;padding:6px 0 12px">'
+    +'<div class="uchip-av av'+(CU.avIdx||0)+'" style="width:56px;height:56px;font-size:20px;margin:0 auto 8px">'+esc((CU.name||'?').substring(0,2).toUpperCase())+'</div>'
+    +'<div style="font-weight:800;font-size:15px">'+esc(CU.name||'You')+'</div>'
+    +(CU.email?'<div style="font-size:11px;color:var(--mt)">'+esc(CU.email)+'</div>':'')
+    +(lic?'<span class="pay-badge pay-online-b" style="margin-top:6px;display:inline-block">ReadBi Licensed ✓</span>':'<span class="pay-badge" style="margin-top:6px;display:inline-block;background:rgba(195,125,22,.12);color:var(--gold)">Tag Talk seller</span>')
+    +'</div>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyActivity()"><i class="ti ti-layout-dashboard" style="color:var(--g)"></i> My Activity <small>jobs, orders, shop, license — all in one place</small></button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openLicensePanel()"><i class="ti ti-license" style="color:var(--gold)"></i> ReadBi Seller License <small>'+(lic?'manage / renew':'request or validate')+'</small></button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyProducts()"><i class="ti ti-building-store"></i> My Shop</button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyOrders()"><i class="ti ti-package"></i> My Orders</button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyApps()"><i class="ti ti-briefcase"></i> My Job Applications</button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openProfile(CU.name,CU.co||\'\',\'\',CU.avIdx||0)"><i class="ti ti-user"></i> View Public Profile</button>';
+  // ADMIN / OWNER control — always shown; gated by password/claim inside openAdminPanel
+  h+='<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:8px"></div>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openAdminPanel()"><i class="ti ti-shield-lock" style="color:var(--red)"></i> Admin Control Panel <small>owner: approve licenses, remove content, manage users &amp; team</small></button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');doSignOut()"><i class="ti ti-logout"></i> Sign Out</button>';
+  body.innerHTML=h;
+  document.getElementById('acctmenu-ovl').classList.add('open');
 }
 function closePM(){document.getElementById('pmb').classList.remove('open');}
 function followUser(){if(!curProfileUser)return;var n=curProfileUser.user;if(followedUsers.has(n)){followedUsers.delete(n);toast('Unfollowed '+n,'info');}else{followedUsers.add(n);toast('Following '+n,'ok');}LS.set('rb_fusers',Array.from(followedUsers));var fb=document.getElementById('pm-fol-btn');if(fb)fb.innerHTML=followedUsers.has(n)?'<i class="ti ti-user-check"></i> Following':'<i class="ti ti-user-plus"></i> Follow';}
@@ -4899,7 +4973,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v73 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v75 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5413,6 +5487,19 @@ function showMyActivity(){
   var ownedPages=getPages().filter(function(p){return p.ownerUid===uid;});
   var body=document.getElementById('activity-body');
   var h='';
+  // License / seller status — all in one place
+  var lic=(typeof licenseValid==='function')&&licenseValid(uid);
+  var exp=(typeof licenseExpiry==='function')&&licenseExpiry(uid);
+  var reqs=(typeof getLicenseRequests==='function')?getLicenseRequests():[];
+  var myPending=reqs.find(function(r){return r.uid===uid&&r.status==='pending';});
+  if(lic){
+    var dleft=exp?Math.max(0,Math.ceil((exp-Date.now())/86400000)):null;
+    h+='<div class="act-sec"><div class="act-row" style="background:rgba(26,143,60,.08);border-radius:9px"><div><b style="color:#1a8f3c"><i class="ti ti-rosette-discount-check"></i> ReadBi Licensed Seller</b><small>Storefront live · in marketplace'+(dleft!==null?' · '+dleft+' days left':'')+'</small></div><button class="act-mini" onclick="closeOvl(\'activity-ovl\');openLicensePanel()">License →</button></div></div>';
+  }else if(myPending){
+    h+='<div class="act-sec"><div class="act-row" style="background:rgba(10,102,194,.06);border-radius:9px"><div><b style="color:var(--g)"><i class="ti ti-clock"></i> License Request Pending</b><small>Awaiting owner approval</small></div></div></div>';
+  }else{
+    h+='<div class="act-sec"><div class="act-row" style="background:rgba(195,125,22,.08);border-radius:9px"><div><b style="color:var(--gold)"><i class="ti ti-info-circle"></i> Tag Talk Seller</b><small>Products show in Tag Talk only</small></div><button class="act-mini" onclick="closeOvl(\'activity-ovl\');openLicensePanel()">Get License →</button></div></div>';
+  }
   // Job applications
   h+='<div class="act-sec"><div class="act-h"><i class="ti ti-briefcase"></i> My Job Applications <b>('+myApps.length+')</b></div>';
   if(myApps.length){h+=myApps.map(function(a){var so=statusObj(a.status);return '<div class="act-row"><div><b>'+esc(a.postTitle||'Job')+'</b><small>'+esc(a.company||'')+'</small></div><span class="stat-badge '+so.cls+'">'+so.label+'</span></div>';}).join('');}
@@ -5866,11 +5953,17 @@ function openLicensePanel(){
         +'<button class="btn btnok" style="width:100%" onclick="submitLicenseKey()"><i class="ti ti-check"></i> Validate &amp; Renew</button></div>';
     }
   }else{
-    body.innerHTML='<div style="background:rgba(195,125,22,.1);border:1px solid var(--gold);border-radius:10px;padding:11px;font-size:12px;color:var(--gold);margin-bottom:12px"><i class="ti ti-info-circle"></i> You are a <b>Tag Talk</b> seller. Your products show only inside Tag Talk. Validate a ReadBi license to open your own storefront and sell in the public marketplace.</div>'
-      +'<div style="font-size:11px;font-weight:700;margin-bottom:6px">Enter your license key</div>'
+    var reqs=(typeof getLicenseRequests==='function')?getLicenseRequests():[];
+    var myReq=reqs.find(function(r){return r.uid===CU.uid&&r.status==='pending';});
+    var myRejected=reqs.filter(function(r){return r.uid===CU.uid&&r.status==='rejected';}).slice(-1)[0];
+    body.innerHTML='<div style="background:rgba(195,125,22,.1);border:1px solid var(--gold);border-radius:10px;padding:11px;font-size:12px;color:var(--gold);margin-bottom:12px"><i class="ti ti-info-circle"></i> You are a <b>Tag Talk</b> seller. Your products show only inside Tag Talk. Become a licensed ReadBi seller to open your own storefront and sell in the public marketplace.</div>'
+      +(myReq?'<div style="background:rgba(10,102,194,.08);border:1px solid var(--g);border-radius:10px;padding:11px;font-size:12px;color:var(--g);margin-bottom:12px"><i class="ti ti-clock"></i> <b>Request pending.</b> The Reedbi owner is reviewing your license request. You\'ll get access once approved.</div>'
+        :'<button class="btn btnok" style="width:100%;padding:12px;margin-bottom:10px" onclick="requestSellerLicense();openLicensePanel()"><i class="ti ti-send"></i> Request License Approval from Owner</button>')
+      +(myRejected?'<div style="font-size:10px;color:var(--red);text-align:center;margin-bottom:8px">A previous request was not approved. You may request again.</div>':'')
+      +'<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:12px"></div>'
+      +'<div style="font-size:11px;font-weight:700;margin-bottom:6px">Or enter a license key directly</div>'
       +'<input type="text" id="lic-key" placeholder="RB-XXXX-XXXX-XXXX" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:11px;color:var(--tx);font-family:var(--fn);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">'
-      +'<button class="btn btnok" style="width:100%;padding:12px" onclick="submitLicenseKey()"><i class="ti ti-license"></i> Validate License</button>'
-      +'<div style="font-size:10px;color:var(--mt2);text-align:center;margin-top:10px">Don\'t have a key? Contact the Reedbi admin to purchase a ReadBi seller license.</div>';
+      +'<button class="btn" style="width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="submitLicenseKey()"><i class="ti ti-license"></i> Validate Key</button>';
   }
   document.getElementById('license-ovl').classList.add('open');
 }
@@ -6249,6 +6342,7 @@ function renderAdminPanel(){
     +'<button class="seller-tab on" onclick="adminTab(\'overview\')">Overview</button>'
     +'<button class="seller-tab" onclick="adminTab(\'team\')">Admin Team</button>'
     +'<button class="seller-tab" onclick="adminTab(\'users\')">Users</button>'
+    +'<button class="seller-tab" onclick="adminTab(\'licenses\')">Licenses</button>'
     +'<button class="seller-tab" onclick="adminTab(\'content\')">Content</button>'
     +'</div><div id="admin-tabbody"></div>';
   body.innerHTML=h;
@@ -6275,7 +6369,7 @@ function adminTab(t){
       +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px">'
       +'<input type="text" id="adm-uid" placeholder="User ID or email" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
       +'<input type="text" id="adm-name" placeholder="Display name" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
-      +'<select id="adm-role" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:8px"><option value="viewer">Viewer (read)</option><option value="moderator">Moderator (read+delete content)</option><option value="manager">Manager (read+write+post+delete)</option><option value="superadmin">Super Admin (full)</option></select>'
+      +'<select id="adm-role" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:8px"><option value="viewer">Viewer (read)</option><option value="moderator">Moderator (read+delete content)</option><option value="license">License Manager (approve seller licenses)</option><option value="manager">Manager (read+write+post+delete)</option><option value="superadmin">Super Admin (full)</option></select>'
       +'<button class="btn btnok" style="width:100%" onclick="adminAddTeam()"><i class="ti ti-user-plus"></i> Add to Admin Team</button></div>'
       +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px"><div style="font-size:11px;font-weight:700;margin-bottom:6px">Issue a ReadBi license key</div>'
       +'<select id="lk-months" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px"><option value="1">1 month</option><option value="6">6 months</option><option value="12" selected>12 months</option><option value="24">24 months</option></select>'
@@ -6296,6 +6390,27 @@ function adminTab(t){
         +'<button class="lbl-mini" style="margin-top:7px;'+(lic?'color:var(--red);border-color:var(--red)':'color:var(--g);border-color:var(--g)')+'" onclick="adminToggleLicense(\''+escJS(u.uid)+'\',\''+escJS(u.name||'')+'\','+(lic?'false':'true')+')">'+(lic?'<i class="ti ti-x"></i> Revoke ReadBi license':'<i class="ti ti-license"></i> Grant ReadBi license')+'</button>'
         +'</div>';
     }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No user directory data. Users appear here once profiles sync via cloud.</p>';
+  }else if(t==='licenses'){
+    var reqs=getLicenseRequests();
+    var pending=reqs.filter(function(r){return r.status==='pending';});
+    var decided=reqs.filter(function(r){return r.status!=='pending';});
+    var h='<div style="font-size:11px;color:var(--mt);margin-bottom:8px"><i class="ti ti-license"></i> Approve or reject ReadBi seller licenses. Approved sellers get a storefront and appear in the marketplace.</div>';
+    h+='<div style="font-size:11px;font-weight:700;margin:8px 0 6px">Pending requests ('+pending.length+')</div>';
+    h+=pending.length?pending.map(function(r){
+      return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(r.name)+'</div>'
+        +(r.email?'<div style="font-size:11px;color:var(--mt)">'+esc(r.email)+'</div>':'')
+        +(r.co?'<div style="font-size:11px;color:var(--mt2)">Company: '+esc(r.co)+'</div>':'')
+        +(r.phone?'<div style="font-size:11px;color:var(--g)"><a href="https://wa.me/'+esc((r.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)"><i class="ti ti-brand-whatsapp"></i> '+esc(r.phone)+'</a></div>':'')
+        +'<div style="font-size:10px;color:var(--mt2);margin-top:3px">Requested '+new Date(r.ts).toLocaleDateString()+'</div>'
+        +'<div style="display:flex;gap:6px;margin-top:8px"><select id="lr-m-'+r.id+'" style="background:var(--card);border:1px solid var(--b);border-radius:7px;padding:6px;color:var(--tx);font-family:var(--fn);font-size:11px"><option value="1">1mo</option><option value="6">6mo</option><option value="12" selected>12mo</option><option value="24">24mo</option></select>'
+        +'<button class="lbl-mini" style="flex:1;color:#1a8f3c;border-color:#1a8f3c" onclick="adminApproveLicense(\''+escJS(r.id)+'\')"><i class="ti ti-check"></i> Approve</button>'
+        +'<button class="lbl-mini" style="flex:1;color:var(--red);border-color:var(--red)" onclick="adminRejectLicense(\''+escJS(r.id)+'\')"><i class="ti ti-x"></i> Reject</button></div></div>';
+    }).join(''):'<div class="act-empty" style="font-size:11px;color:var(--mt2);padding:8px">No pending requests.</div>';
+    if(decided.length){
+      h+='<div style="font-size:11px;font-weight:700;margin:12px 0 6px">Decided ('+decided.length+')</div>';
+      h+=decided.slice(-20).reverse().map(function(r){return '<div class="act-row"><div><b>'+esc(r.name)+'</b><small>'+esc(r.status)+(r.decidedBy?' by '+esc(r.decidedBy):'')+'</small></div><span class="pay-badge '+(r.status==='approved'?'pay-online-b':'pay-cod-b')+'">'+esc(r.status)+'</span></div>';}).join('');
+    }
+    tb.innerHTML=h;
   }else if(t==='content'){
     // TAG MANAGER: owner can remove unwanted main tags
     var SEED=['jobs','tech','ai','insurance','sell','remote'];
@@ -6346,6 +6461,15 @@ function adminRemoveTag(tagId){
   if(activeTagId===tagId){activeTagId=null;goHome();}
   if(typeof renderTagList==='function')renderTagList();
   adminTab('content');toast('Main tag removed','info');
+}
+function adminApproveLicense(reqId){
+  var months=parseInt((document.getElementById('lr-m-'+reqId)||{}).value,10)||12;
+  approveLicenseRequest(reqId,months);
+  adminTab('licenses');toast('License approved — seller storefront created','ok');
+}
+function adminRejectLicense(reqId){
+  if(!confirm('Reject this license request?'))return;
+  rejectLicenseRequest(reqId);adminTab('licenses');toast('Request rejected','info');
 }
 function adminToggleLicense(uid,name,on){
   setUserLicensed(uid,on,name);
