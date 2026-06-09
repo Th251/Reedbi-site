@@ -1,68 +1,1067 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>REEDBI — Complete E-commerce App</title>
-<meta name="description" content="REEDBI — a complete single-file e-commerce app (home, shop, product, cart, wishlist, account).">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
-<style>
-/* ============================================================
-   REEDBI — e-commerce website styles
-   Custom design system, no framework.
-============================================================ */
-:root{
-  --pink:#ff3f6c; --pink-dark:#e02e58; --accent:#0a8f6e;
-  --ink:#1a1a1f; --ink-soft:#3a3a44; --muted:#8a8a93;
-  --bg:#faf8f5; --surface:#ffffff; --line:#ece8e2; --line-2:#f4f1ec;
-  --gold:#c79a3a; --radius:14px; --radius-sm:10px;
-  --shadow:0 1px 2px rgba(26,26,31,.04),0 8px 24px rgba(26,26,31,.06);
-  --shadow-lg:0 12px 40px rgba(26,26,31,.12);
-  --maxw:1280px;
-  --display:"Bricolage Grotesque","Plus Jakarta Sans",system-ui,sans-serif;
-  --body:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif;
+"""
+REEDBI - Online Shopping & Jobs  (Python / Flask edition, v2)
+=============================================================
+An upgraded single-file Flask port of the REEDBI marketplace. Each page is
+brought up to parity with the richer front-end:
+
+  Home            - category circles, featured, promo banners, trending offers,
+                    category grid w/ counts, jobs, latest news, newsletter, brands
+  Products        - search + brand/price filters + sort, grid view
+  Product detail  - gallery, offers, pincode delivery check, share, sizes,
+                    reviews, similar products
+  Cart            - qty, coupons, gift wrap, totals (session based)
+  Wishlist        - saved items
+  Account         - overview / orders / addresses / settings
+  Seller          - Products / Categories / Jobs / About tabs, fact sheet,
+                    contact form, connect card, location map, follow
+  Jobs            - listings
+
+Run:
+    pip install flask
+    python app.py            # http://127.0.0.1:5000
+"""
+from datetime import date, timedelta
+from flask import (Flask, session, redirect, url_for, request,
+                   render_template_string, flash)
+from jinja2 import DictLoader
+
+app = Flask(__name__)
+app.secret_key = "reedbi-demo-secret-change-me"
+
+# ===================================================================
+# DATA  (edit this block to change catalogue / content)
+# ===================================================================
+def _img(pid, s=600):
+    return f"https://images.unsplash.com/{pid}?w={s}&h={s}&fit=crop"
+
+def _imgs(ids):
+    return [_img(i) for i in ids]
+
+MEGA_MENU = {
+    "Grocery": ["Fresh to Home", "Fish", "Milk", "Meat", "Fruits", "Vegetables"],
+    "Fashion": ["Men", "Women", "Kids", "Accessories", "Footwear", "Watches"],
+    "Electronics": ["Mobiles", "Laptops", "TV", "Audio", "Cameras"],
+    "Infant & Kids": ["Toys", "Clothing", "Feeding", "Diapers"],
+    "Industrial": ["Tools", "Safety", "Machinery", "Electrical"],
+    "Jobs": ["Sales", "BPO", "Driver", "Office Assistant"],
+    "More": ["Beauty", "Sports", "Books", "Pharmacy"],
 }
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}
-img{display:block;max-width:100%}
-button{font-family:inherit;cursor:pointer;border:none;background:none}
-.container{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-.display{font-family:var(--display);font-weight:700;letter-spacing:-.02em;line-height:1.05}
-.muted{color:var(--muted)}
-.hide{display:none!important}
 
-/* ---------- announcement bar ---------- */
-.announce{background:var(--ink);color:#fff;text-align:center;font-size:12.5px;letter-spacing:.04em;padding:8px 16px;font-weight:500}
-.announce b{color:var(--pink)}
+# circular category row on the home page
+CATEGORY_CIRCLES = [
+    {"name": "Grocery", "img": _img("photo-1542838132-92c53300491e", 120)},
+    {"name": "Fashion", "img": _img("photo-1445205170230-053b83016050", 120)},
+    {"name": "Electronics", "img": _img("photo-1498049794561-7780e7231661", 120)},
+    {"name": "Infant & Kids", "img": _img("photo-1503944168849-7b6c4f99c81a", 120)},
+    {"name": "Footwear", "img": _img("photo-1549298916-b41d501d3772", 120)},
+    {"name": "Watches", "img": _img("photo-1524805444758-089113d48a6d", 120)},
+    {"name": "Industrial", "img": _img("photo-1581092160562-40aa08e78837", 120)},
+    {"name": "Jobs", "img": _img("photo-1521737604893-d14cc237f11d", 120)},
+]
 
-/* ---------- header ---------- */
-.site-header{position:sticky;top:0;z-index:100;background:rgba(250,248,245,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.header-row{display:flex;align-items:center;gap:28px;padding:16px 24px;max-width:var(--maxw);margin:0 auto}
-.brand{font-family:var(--display);font-weight:800;font-size:25px;letter-spacing:-.04em;display:flex;align-items:center;gap:2px}
-.brand .dot{color:var(--pink)}
-.nav{display:flex;gap:26px;margin-left:8px}
-.nav a{font-size:14px;font-weight:600;color:var(--ink-soft);position:relative;padding:6px 0;transition:color .2s}
-.nav a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--pink);transition:right .25s ease}
-.nav a:hover{color:var(--ink)}.nav a:hover::after,.nav a.active::after{right:0}
-.nav a.active{color:var(--ink)}
-.search{flex:1;max-width:420px;margin-left:auto;position:relative}
-.search input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:11px 44px 11px 18px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
-.search input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,63,108,.12)}
-.search button{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
-.icons{display:flex;align-items:center;gap:6px}
-.icon-btn{position:relative;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:var(--ink);transition:background .2s}
-.icon-btn:hover{background:var(--line-2)}
-.icon-btn svg{width:21px;height:21px}
-.badge{position:absolute;top:4px;right:4px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:var(--pink);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
-.burger{display:none}
+PRODUCTS = [
+    {"id": 1, "brand": "Levi's", "name": "Sports Shoe For Men", "price": 1299, "originalPrice": 1850, "discount": 30,
+     "image": _img("photo-1542291026-7eec264c27ff"),
+     "images": _imgs(["photo-1542291026-7eec264c27ff", "photo-1606107557195-0e29a4b5b4aa", "photo-1608231387042-66d1773070a5", "photo-1595950653106-6c9ebd614d3a"]),
+     "rating": 4.2, "reviews": 128, "sizes": ["7", "8", "9", "10", "11"], "badge": "SALE", "category": "Fashion",
+     "color": "Black", "seller": "Aventura Outfitters", "stock": 8,
+     "description": "High-performance sports shoes with a cushioned sole and breathable mesh upper. Built for running and training.",
+     "details": {"Material": "Mesh & Synthetic Leather", "Sole": "EVA Cushion", "Closure": "Lace-up", "Warranty": "6 Months"}},
+    {"id": 2, "brand": "Sheen", "name": "Women Analog Watch", "price": 1299, "originalPrice": 1850, "discount": 30,
+     "image": _img("photo-1524592094714-0f0654e20314"),
+     "images": _imgs(["photo-1524592094714-0f0654e20314", "photo-1523275335684-37898b6baf30", "photo-1434056886845-dac89ffe9b56", "photo-1547996160-81dfa63595aa"]),
+     "rating": 4.5, "reviews": 89, "sizes": None, "badge": "NEW", "category": "Fashion", "color": "Rose Gold",
+     "seller": "Aventura Outfitters", "stock": 5,
+     "description": "Elegant rose-gold chronograph with a stainless steel strap and water resistance up to 30m.",
+     "details": {"Dial Shape": "Round", "Strap": "Stainless Steel", "Water Resistance": "30m", "Warranty": "2 Years"}},
+    {"id": 3, "brand": "Lee", "name": "100% Cotton Jacket", "price": 1299, "originalPrice": 1850, "discount": 30,
+     "image": _img("photo-1551028719-00167b16eac5"),
+     "images": _imgs(["photo-1551028719-00167b16eac5", "photo-1591047139829-d91aecb6caea", "photo-1576871337622-98d48d1cf531", "photo-1544022613-e87ca75a784a"]),
+     "rating": 4.0, "reviews": 45, "sizes": ["S", "M", "L", "XL", "XXL"], "badge": "NEW", "category": "Fashion",
+     "color": "Blue", "seller": "Madura Lifestyle", "stock": 0, "outOfStock": True,
+     "description": "Classic denim jacket in 100% cotton with a regular fit and timeless wash.",
+     "details": {"Material": "100% Cotton", "Fit": "Regular", "Pattern": "Solid", "Care": "Machine Wash"}},
+    {"id": 4, "brand": "GUCCI", "name": "Women Leather Bag", "price": 3599, "originalPrice": 4560, "discount": 21,
+     "image": _img("photo-1548036328-c9fa89d128fa"),
+     "images": _imgs(["photo-1548036328-c9fa89d128fa", "photo-1584917865442-de89df76afd3", "photo-1591561954557-26941169b49e", "photo-1566150905458-1bf1fc113f0d"]),
+     "rating": 4.8, "reviews": 210, "sizes": None, "badge": None, "category": "Fashion", "color": "Brown",
+     "seller": "Madura Lifestyle", "stock": 7,
+     "description": "Premium genuine-leather crossbody bag with gold-tone hardware and an adjustable strap.",
+     "details": {"Material": "Genuine Leather", "Compartments": "2", "Closure": "Zip", "Warranty": "1 Year"}},
+    {"id": 5, "brand": "ASUS", "name": "VivoBook Ultra Laptop", "price": 45999, "originalPrice": 52999, "discount": 13,
+     "image": _img("photo-1496181133206-80ce9b88a853"),
+     "images": _imgs(["photo-1496181133206-80ce9b88a853", "photo-1525547719571-a2d4ac8945e2", "photo-1517336714731-489689fd1ca8", "photo-1593642702821-c8da6771f0c6"]),
+     "rating": 4.3, "reviews": 342, "sizes": None, "badge": "SALE", "category": "Electronics", "color": "Silver",
+     "seller": "TechBazaar", "stock": 3,
+     "description": '14" thin-and-light laptop with Intel Core i5, 16GB RAM and a 512GB SSD.',
+     "details": {"Processor": "Intel Core i5", "RAM": "16GB", "Storage": "512GB SSD", "Display": '14" FHD'}},
+    {"id": 6, "brand": "Apple", "name": "iPhone 15 Pro Max", "price": 149900, "originalPrice": 159900, "discount": 6,
+     "image": _img("photo-1592750475338-74b7b21085ab"),
+     "images": _imgs(["photo-1592750475338-74b7b21085ab", "photo-1511707171634-5f897ff02aa9", "photo-1510557880182-3d4d3cba35a5", "photo-1556656793-08538906a9f8"]),
+     "rating": 4.9, "reviews": 892, "sizes": None, "badge": "NEW", "category": "Electronics", "color": "Natural Titanium",
+     "seller": "TechBazaar", "stock": 12,
+     "description": "Titanium design, A17 Pro chip, and a pro camera system with 5x telephoto zoom.",
+     "details": {"Chip": "A17 Pro", "Storage": "256GB", "Display": '6.7" Super Retina XDR', "Camera": "48MP Pro"}},
+    {"id": 7, "brand": "Nike", "name": "Air Jordan 1 Retro", "price": 8999, "originalPrice": 12999, "discount": 31,
+     "image": _img("photo-1556906781-9a412961c28c"),
+     "images": _imgs(["photo-1556906781-9a412961c28c", "photo-1597045566677-8cf032ed6634", "photo-1600269452121-4f2416e55c28", "photo-1605348532760-6753d2c43329"]),
+     "rating": 4.7, "reviews": 567, "sizes": ["7", "8", "9", "10", "11"], "badge": "SALE", "category": "Fashion",
+     "color": "Red", "seller": "Aventura Outfitters", "stock": 20,
+     "description": "Iconic high-top sneakers with premium leather and Air cushioning.",
+     "details": {"Material": "Premium Leather", "Sole": "Rubber", "Style": "High-Top", "Cushioning": "Nike Air"}},
+    {"id": 8, "brand": "Sony", "name": "WH-1000XM5 Headphones", "price": 29990, "originalPrice": 34990, "discount": 14,
+     "image": _img("photo-1505740420928-5e560c06d30e"),
+     "images": _imgs(["photo-1505740420928-5e560c06d30e", "photo-1546435770-a3e426bf472b", "photo-1484704849700-f032a568e944", "photo-1583394838336-acd977736f90"]),
+     "rating": 4.6, "reviews": 342, "sizes": None, "badge": "SALE", "category": "Electronics", "color": "Black",
+     "seller": "TechBazaar", "stock": 9,
+     "description": "Industry-leading noise cancellation with up to 30 hours of battery life.",
+     "details": {"Type": "Over-Ear", "Battery Life": "30 Hours", "Connectivity": "Bluetooth 5.2", "ANC": "Yes"}},
+    {"id": 9, "brand": "Boat", "name": "Wireless Bluetooth Earbuds", "price": 1299, "originalPrice": 2999, "discount": 57,
+     "image": _img("photo-1590658268037-6bf12165a8df"),
+     "images": _imgs(["photo-1590658268037-6bf12165a8df", "photo-1606220588913-b3aacb4d2f46", "photo-1572569511254-d8f925fe2cbb", "photo-1610438235354-a6ae5528385c"]),
+     "rating": 4.0, "reviews": 12345, "sizes": None, "badge": "TRENDING", "category": "Electronics", "color": "Black",
+     "seller": "TechBazaar", "stock": 25,
+     "description": "True-wireless earbuds with deep bass, IPX5 splash resistance and a charging case.",
+     "details": {"Driver": "10mm", "Battery Life": "24 Hours", "Water Resistance": "IPX5", "Mic": "Yes"}},
+    {"id": 10, "brand": "Mango", "name": "Women Red A-Line Dress", "price": 1299, "originalPrice": 2599, "discount": 50,
+     "image": _img("photo-1572804013309-59a88b7e92f1"),
+     "images": _imgs(["photo-1572804013309-59a88b7e92f1", "photo-1595777457583-95e059d581b8", "photo-1566174053879-31528523f8ae", "photo-1539008835657-9e8e9680c956"]),
+     "rating": 4.4, "reviews": 1234, "sizes": ["XS", "S", "M", "L"], "badge": "NEW", "category": "Fashion", "color": "Red",
+     "seller": "Madura Lifestyle", "stock": 15,
+     "description": "Flowy A-line midi dress in a vibrant red, perfect for occasions.",
+     "details": {"Material": "Polyester Blend", "Length": "Midi", "Pattern": "Solid", "Fit": "A-Line"}},
+]
 
-/* ---------- buttons ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14px;border-radius:999px;padding:13px 26px;transition:transform .15s,box-shadow .2s,background .2s;white-space:nowrap}
-.btn:active{transform:translateY(1px)}
+REVIEWS = [
+    {"user": "Tejas Redkar", "rating": 4.3, "title": "Excellent product, must buy", "date": "4 days ago", "verified": True, "likes": 12,
+     "content": "The quality is amazing for this price point. Fits perfectly and the material feels premium."},
+    {"user": "Priya Sharma", "rating": 5, "title": "Best purchase ever", "date": "1 week ago", "verified": True, "likes": 8,
+     "content": "Absolutely love it. The colour is exactly as shown in the pictures and delivery was fast."},
+    {"user": "Rahul Verma", "rating": 3.5, "title": "Good but sizing runs small", "date": "2 weeks ago", "verified": False, "likes": 3,
+     "content": "Good quality overall but the size runs a bit small. Order one size up to be safe."},
+]
+
+OFFERS = [
+    {"title": "Bank Offer", "desc": "10% off on HDFC Bank Credit Cards, up to \u20b9750", "code": "HDFC10"},
+    {"title": "No Cost EMI", "desc": "Avail No Cost EMI on select cards", "code": None},
+    {"title": "Partner Offer", "desc": "Get GST invoice & save up to 18% on business purchases", "code": None},
+]
+
+SELLER = {
+    "name": "Aventura Outfitters", "verified": True, "location": "C Scheme, Jaipur, Rajasthan",
+    "followers": "1.2k", "rating": 4.3, "totalProducts": 1575, "totalCategories": 27, "totalJobs": 12, "joined": "2020",
+    "tagline": "We would love to hear from you! Reach out through any of the modes below, and we'll respond at the earliest.",
+    "contact": {"email": "support@aventura.com", "phone": "+91 141 123 4567", "tel": "+91 80 123 456 00"},
+    "address": {"person": "Aventura Outfitters", "line1": "711-2880 Nulla St.", "line2": "C Scheme, Jaipur, Rajasthan 302001", "phone": "(257) 563-7401"},
+    "about": 'We manufacture our own brands "Aventura Outfitters" and "American Crew" in-house and maintain the highest quality across footwear, apparel and accessories. Every product ships with a quality guarantee and easy returns.',
+    "factSheet": {"Name Of Business": "Aventura Outfitters Pvt. Ltd.", "Company CEO": "A. Mehta",
+                  "Total Employees": "11 to 25 people", "Year Established": "2020", "Legal Status": "Private Limited",
+                  "GST No.": "08AABCA1234X1Z5", "CIN No.": "U18101RJ2020PTC012345"},
+    "banner": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1400&h=320&fit=crop",
+    "logo": _img("photo-1560179707-f14e90ef3623", 200),
+}
+
+SELLER_CATEGORIES = [
+    {"name": "Footwear", "items": "9,746", "image": _img("photo-1549298916-b41d501d3772", 400), "badge": "SALE"},
+    {"name": "Watches", "items": "3,200", "image": _img("photo-1524805444758-089113d48a6d", 400), "badge": "NEW"},
+    {"name": "Bags", "items": "3,400", "image": _img("photo-1548036328-c9fa89d128fa", 400), "badge": None},
+    {"name": "Men", "items": "978", "image": _img("photo-1490578474895-699cd4e2cf59", 400), "badge": "SALE"},
+    {"name": "Women", "items": "1,367", "image": _img("photo-1483985988355-763728e1935b", 400), "badge": None},
+    {"name": "Kids", "items": "6,978", "image": _img("photo-1503944168849-7b6c4f99c81a", 400), "badge": "SALE"},
+    {"name": "Sunglasses", "items": "512", "image": _img("photo-1572635196237-14b3f281503f", 400), "badge": None},
+    {"name": "Accessories", "items": "2,140", "image": _img("photo-1611591437281-460bfbe1220a", 400), "badge": "NEW"},
+]
+
+SELLER_JOBS = [
+    {"title": "UI/UX Designer", "sponsored": True, "salary": "\u20b910,000 - 45,000", "period": "Monthly", "role": "Office Assistant", "vacancies": 145, "location": "Jaipur, RJ", "posted": "Today", "image": _img("photo-1561070791-2526d30994b5", 300)},
+    {"title": "Heavy Driver", "sponsored": True, "salary": "\u20b915,000 - 25,000", "period": "Monthly", "role": "Driver", "vacancies": 78, "location": "Jaipur, RJ", "posted": "Today", "image": _img("photo-1449965408869-eaa3f722e40d", 300)},
+    {"title": "Field Mobilizer \u2014 DDU-GKY", "sponsored": False, "salary": "\u20b96,000 - 8,500", "period": "Monthly", "role": "Office Assistant", "vacancies": 16, "location": "Jaipur, RJ", "posted": "Dec 18", "image": _img("photo-1454165804606-c3d57bc86b40", 300)},
+    {"title": "Delivery Partner", "sponsored": False, "salary": "\u20b912,000 - 18,500", "period": "Monthly", "role": "Delivery", "vacancies": 69, "location": "Bangalore, KA", "posted": "Dec 18", "image": _img("photo-1556742049-0cfed4f6a45d", 300)},
+]
+
+# home page content
+TRENDING_OFFERS = [
+    {"title": "Captoe Dress Shoe", "tag": "Extra 10% off", "cta": "HURRY", "img": _img("photo-1549298916-b41d501d3772", 160)},
+    {"title": "Women Watches", "tag": "Up to 30% off", "cta": "GRAB NOW", "img": _img("photo-1524805444758-089113d48a6d", 160)},
+    {"title": "Sheen Casio Watches", "tag": "Up to 25% off", "cta": "DISCOVER", "img": _img("photo-1434056886845-dac89ffe9b56", 160)},
+    {"title": "Lee Jacket", "tag": "Up to 60% off", "cta": "BUY NOW", "img": _img("photo-1551028719-00167b16eac5", 160)},
+    {"title": "LP T-Shirt", "tag": "Up to 45% off", "cta": "EXPLORE", "img": _img("photo-1521572163474-6864f9cf17ab", 160)},
+    {"title": "Leather Bag", "tag": "Up to 85% off", "cta": "HURRY", "img": _img("photo-1548036328-c9fa89d128fa", 160)},
+]
+
+CATEGORY_GRID = [
+    {"name": "Shoe", "items": "1,630", "off": "10%", "img": _img("photo-1549298916-b41d501d3772", 300)},
+    {"name": "Watches", "items": "3,468", "off": "33%", "img": _img("photo-1524805444758-089113d48a6d", 300)},
+    {"name": "Jacket", "items": "5,687", "off": "6%", "img": _img("photo-1551028719-00167b16eac5", 300)},
+    {"name": "T-Shirt", "items": "5,687", "off": "6%", "img": _img("photo-1521572163474-6864f9cf17ab", 300)},
+    {"name": "Bags", "items": "5,687", "off": "6%", "img": _img("photo-1548036328-c9fa89d128fa", 300)},
+    {"name": "Computer", "items": "68,746", "off": "15%", "img": _img("photo-1496181133206-80ce9b88a853", 300)},
+    {"name": "Mobile", "items": "3,497", "off": "40%", "img": _img("photo-1511707171634-5f897ff02aa9", 300)},
+]
+
+HOME_JOBS = [
+    {"role": "Office Assistant", "vac": 145, "salary": "\u20b912,500 - 22,500", "period": "Weekly", "title": "Mobilizer required for DDU-GKY project", "loc": "Kulathakadai, Kuhalur", "date": "Today", "sponsored": False, "img": _img("photo-1454165804606-c3d57bc86b40", 200)},
+    {"role": "Office Assistant", "vac": 789, "salary": "\u20b910,000 - 45,000", "period": "Monthly", "title": "Airline all-India vacancy opened", "loc": "C Scheme, Jaipur", "date": "Dec 10", "sponsored": True, "img": _img("photo-1521737604893-d14cc237f11d", 200)},
+    {"role": "Office Assistant", "vac": 68, "salary": "\u20b96,000 - 8,000", "period": "Monthly", "title": "Field mobilizer for skilling project", "loc": "Kulathakadai, Kuhalur", "date": "1 Week", "sponsored": False, "img": _img("photo-1556761175-5973dc0f32e7", 200)},
+    {"role": "Delivery", "vac": 697, "salary": "\u20b912,000 - 22,000", "period": "Weekly", "title": "Delivery Partner", "loc": "Carthero, Delhi", "date": "Jan 24", "sponsored": True, "img": _img("photo-1556742049-0cfed4f6a45d", 200)},
+]
+
+NEWS = [
+    {"date": "AUG 15", "title": "This label is not known for denim \u2014 but it should be", "img": _img("photo-1441984904996-e0b6ba687e04", 600)},
+    {"date": "APR 23", "title": "Collaborators look back on a breakout runway show", "img": _img("photo-1445205170230-053b83016050", 600)},
+    {"date": "MAR 08", "title": "Seven wardrobe staples that never go out of style", "img": _img("photo-1490481651871-ab68de25d43d", 600)},
+]
+
+BRANDS = ["adidas", "FILA", "Ray-Ban", "SAMSUNG", "GUCCI", "TOMMY", "CAT"]
+
+HERO_SLIDES = [
+    {"bg": _img("photo-1483985988355-763728e1935b", 1400), "t": "SALEBRATION", "s": "Up to 70% off on Fashion & Electronics"},
+    {"bg": _img("photo-1441986300917-64674bd600d8", 1400), "t": "New Season Drops", "s": "Fresh styles from top brands"},
+    {"bg": _img("photo-1498049794561-7780e7231661", 1400), "t": "Best Deals on Laptops", "s": "Power up for less"},
+]
+
+ORDERS = [
+    {"orderId": "OD123456789", "date": "Placed on 12 Jan 2025", "status": "Delivered", "total": 1172,
+     "items": [{"name": "Levi's Sports Shoe For Men", "image": PRODUCTS[0]["image"], "price": 1172, "qty": 1, "status": "Delivered on 16 Jan"}]},
+    {"orderId": "OD987654321", "date": "Placed on 28 Dec 2024", "status": "Delivered", "total": 1299,
+     "items": [{"name": "Sheen Women Analog Watch", "image": PRODUCTS[1]["image"], "price": 1299, "qty": 1, "status": "Delivered on 02 Jan"}]},
+    {"orderId": "OD555444333", "date": "Placed on 05 Feb 2025", "status": "In Transit", "total": 8999,
+     "items": [{"name": "Nike Air Jordan 1 Retro", "image": PRODUCTS[6]["image"], "price": 8999, "qty": 1, "status": "Arriving 09 Feb"}]},
+]
+
+ADDRESSES = [
+    {"id": 1, "name": "Alex Johnson", "type": "HOME", "default": True, "line": "24 Marina Residences, Dubai Marina, Dubai, AE - 00000", "phone": "+971 50 123 4567"},
+    {"id": 2, "name": "Alex Johnson", "type": "WORK", "default": False, "line": "Office 1402, Boulevard Plaza, Downtown Dubai, AE - 00000", "phone": "+971 50 765 4321"},
+]
+
+USER = {"name": "Alex Johnson", "email": "alex.johnson@example.com", "phone": "+971 50 123 4567", "member": "Member since 2021"}
+
+FILTERS = {
+    "brands": ["Levi's", "Sheen", "Lee", "GUCCI", "ASUS", "Apple", "Nike", "Sony", "Boat", "Mango"],
+    "priceRanges": [
+        {"label": "Under \u20b9500", "min": 0, "max": 500},
+        {"label": "\u20b9500 - \u20b91,000", "min": 500, "max": 1000},
+        {"label": "\u20b91,000 - \u20b95,000", "min": 1000, "max": 5000},
+        {"label": "\u20b95,000 - \u20b910,000", "min": 5000, "max": 10000},
+        {"label": "Over \u20b910,000", "min": 10000, "max": float("inf")},
+    ],
+}
+
+SORT_OPTIONS = [
+    {"value": "popularity", "label": "Popularity"},
+    {"value": "priceLow", "label": "Price: Low to High"},
+    {"value": "priceHigh", "label": "Price: High to Low"},
+    {"value": "discount", "label": "Better Discount"},
+    {"value": "rating", "label": "Customer Rating"},
+]
+
+COUPONS = {"REEDBI10": 0.10, "FIRST50": 0.50, "SAVE200": 200}
+
+JOBS = [
+    {"id": 1, "title": "Sales Executive", "company": "REEDBI Retail", "location": "Dubai, UAE", "type": "Full-time", "salary": "\u20b925k\u2013\u20b940k", "tag": "Sales"},
+    {"id": 2, "title": "BPO Customer Support", "company": "CallHub", "location": "Remote", "type": "Full-time", "salary": "\u20b918k\u2013\u20b928k", "tag": "BPO"},
+    {"id": 3, "title": "Delivery Driver", "company": "REEDBI Logistics", "location": "Sharjah, UAE", "type": "Part-time", "salary": "\u20b920k\u2013\u20b930k", "tag": "Driver"},
+    {"id": 4, "title": "Office Assistant", "company": "Aventura Outfitters", "location": "Jaipur, IN", "type": "Full-time", "salary": "\u20b915k\u2013\u20b922k", "tag": "Office Assistant"},
+]
+
+
+# ===================================================================
+# HELPERS
+# ===================================================================
+def inr(n):
+    return "\u20b9" + format(int(round(n)), ",d")
+
+def get_product(pid):
+    return next((p for p in PRODUCTS if p["id"] == pid), None)
+
+def get_cart():
+    return session.setdefault("cart", [])
+
+def get_wishlist():
+    return session.setdefault("wishlist", [])
+
+def cart_count():
+    return sum(i["qty"] for i in session.get("cart", []))
+
+def cart_detail():
+    rows = []
+    for e in session.get("cart", []):
+        p = get_product(e["id"])
+        if not p:
+            continue
+        rows.append({**p, "qty": e["qty"], "size": e.get("size"),
+                     "lineTotal": p["price"] * e["qty"], "lineMRP": p["originalPrice"] * e["qty"]})
+    return rows
+
+def cart_totals():
+    rows = [r for r in cart_detail() if not r.get("outOfStock")]
+    total_mrp = sum(r["lineMRP"] for r in rows)
+    subtotal = sum(r["lineTotal"] for r in rows)
+    bag_discount = total_mrp - subtotal
+    coupon = session.get("coupon")
+    coupon_discount = 0
+    if coupon and coupon in COUPONS:
+        v = COUPONS[coupon]
+        coupon_discount = round(subtotal * v) if v < 1 else v
+    gift = session.get("gift", False)
+    gift_price = 25 if gift else 0
+    shipping = 0 if subtotal > 500 else (49 if subtotal > 0 else 0)
+    total = max(0, subtotal - coupon_discount + shipping + gift_price)
+    return {"total_mrp": total_mrp, "subtotal": subtotal, "bag_discount": bag_discount,
+            "coupon": coupon, "coupon_discount": coupon_discount, "gift": gift,
+            "gift_price": gift_price, "shipping": shipping, "total": total,
+            "item_qty": sum(r["qty"] for r in rows)}
+
+
+@app.context_processor
+def inject_globals():
+    return {"inr": inr, "MEGA_MENU": MEGA_MENU, "cart_count": cart_count(),
+            "wishlist_count": len(session.get("wishlist", [])),
+            "wishlist_ids": [w["id"] if isinstance(w, dict) else w for w in session.get("wishlist", [])],
+            "request": request, "year": date.today().year}
+
+
+# ===================================================================
+# TEMPLATES
+# ===================================================================
+BASE = r"""
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REEDBI - {{ title or 'Online Shopping & Jobs' }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{
+ colors:{brand:{DEFAULT:'#ff3f6c',dark:'#e02e58'},accent:'#03a685',ink:'#282c3f',muted:'#7e818c'},
+ fontFamily:{sans:['Inter','sans-serif'],display:['Sora','Inter','sans-serif']},
+ boxShadow:{soft:'0 2px 16px 0 rgba(0,0,0,0.08)'}}}}</script>
+<style>body{font-family:'Inter',sans-serif}.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{scrollbar-width:none}</style>
+</head><body class="bg-[#f5f5f6] text-ink">
+
+<header class="sticky top-0 z-50 bg-white shadow-sm">
+  <div class="mx-auto flex max-w-[1400px] items-center gap-4 px-4 py-3 md:gap-8 md:px-6">
+    <a href="{{ url_for('home') }}" class="font-display text-2xl font-extrabold tracking-tight">REED<span class="text-brand">BI</span></a>
+    <form action="{{ url_for('products') }}" method="get" class="relative hidden flex-1 md:block">
+      <input name="q" value="{{ request.args.get('q','') }}" placeholder="Search for products, brands and more..."
+        class="w-full rounded-md border border-gray-200 bg-[#f5f5f6] py-2.5 pl-4 pr-11 text-sm outline-none focus:border-brand focus:bg-white">
+      <button class="absolute right-3 top-1/2 -translate-y-1/2 text-muted">&#128269;</button>
+    </form>
+    <nav class="ml-auto flex items-center gap-5 md:gap-7 text-[11px] font-medium">
+      <a href="{{ url_for('account') }}" class="flex flex-col items-center hover:text-brand"><span class="text-xl">&#128100;</span>Account</a>
+      <a href="{{ url_for('wishlist') }}" class="relative flex flex-col items-center hover:text-brand"><span class="text-xl">&#9825;</span>Wishlist
+        {% if wishlist_count %}<span class="absolute -right-2 -top-1 grid h-4 w-4 place-items-center rounded-full bg-brand text-[9px] font-bold text-white">{{ wishlist_count }}</span>{% endif %}</a>
+      <a href="{{ url_for('cart') }}" class="relative flex flex-col items-center hover:text-brand"><span class="text-xl">&#128717;</span>Bag
+        {% if cart_count %}<span class="absolute -right-2 -top-1 grid h-4 w-4 place-items-center rounded-full bg-brand text-[9px] font-bold text-white">{{ cart_count }}</span>{% endif %}</a>
+    </nav>
+  </div>
+  <div class="hidden border-t border-gray-100 md:block"><div class="mx-auto flex max-w-[1400px] gap-8 px-6">
+    {% for tab in MEGA_MENU.keys() %}
+    <a href="{% if tab=='Jobs' %}{{ url_for('jobs') }}{% else %}{{ url_for('products', category=tab) }}{% endif %}"
+       class="border-b-[3px] py-3.5 text-sm font-semibold transition {% if request.args.get('category')==tab %}border-brand text-brand{% else %}border-transparent hover:border-brand hover:text-brand{% endif %}">{{ tab }}</a>
+    {% endfor %}
+  </div></div>
+  <form action="{{ url_for('products') }}" method="get" class="px-4 pb-3 md:hidden">
+    <input name="q" value="{{ request.args.get('q','') }}" placeholder="Search products & brands..."
+      class="w-full rounded-md border border-gray-200 bg-[#f5f5f6] py-2.5 px-4 text-sm outline-none focus:border-brand focus:bg-white">
+  </form>
+</header>
+
+{% with msgs = get_flashed_messages() %}{% if msgs %}
+<div class="mx-auto max-w-[1400px] px-4 pt-3 md:px-6">
+  {% for m in msgs %}<div class="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white">{{ m }}</div>{% endfor %}
+</div>{% endif %}{% endwith %}
+
+<main class="min-h-[60vh]">{% block body %}{% endblock %}</main>
+
+<footer class="mt-16 bg-white">
+  <div class="mx-auto grid max-w-[1400px] grid-cols-2 gap-6 border-b border-gray-100 px-6 py-8 sm:grid-cols-4 text-sm">
+    {% for t,d in [('100% ORIGINAL','guarantee for all products'),('Return within 30 days','of receiving your order'),('FREE shipping','all over the country'),('24/7 Support','always here to help')] %}
+    <div class="flex items-center gap-3"><div class="grid h-11 w-11 place-items-center rounded-full bg-[#f5f5f6] text-brand text-lg">&#10003;</div>
+      <div><p class="font-bold">{{ t }}</p><p class="text-muted text-xs">{{ d }}</p></div></div>{% endfor %}
+  </div>
+  <div class="mx-auto grid max-w-[1400px] gap-8 px-6 py-10 md:grid-cols-4">
+    <div><p class="font-display text-2xl font-extrabold">REED<span class="text-brand">BI</span></p>
+      <p class="mt-3 max-w-xs text-sm text-muted">Your one-stop marketplace for online shopping and jobs. Discover millions of products from trusted sellers across the country.</p></div>
+    <div><p class="mb-3 text-xs font-bold uppercase tracking-wide text-muted">Categories</p>
+      {% for c in ['Footwear (8.1k)','Sunglass (512)','T-Shirt (7.6k)','Watches (3.2k)','Bags (3.4k)'] %}<a href="{{ url_for('products') }}" class="block py-1 text-sm text-ink/80 hover:text-brand">{{ c }}</a>{% endfor %}</div>
+    <div><p class="mb-3 text-xs font-bold uppercase tracking-wide text-muted">Let's Help You</p>
+      {% for c in ['Customer Care','Returns and Refunds','Privacy Policy','Terms of Use','FAQ','Contact Us'] %}<a href="{{ url_for('products') }}" class="block py-1 text-sm text-ink/80 hover:text-brand">{{ c }}</a>{% endfor %}</div>
+    <div><p class="mb-3 text-xs font-bold uppercase tracking-wide text-muted">Office Address</p>
+      <p class="text-sm text-ink/80">Headquarter<br>9876 Design Blvd, Suite 543,<br>Beverly Hills, CA 90212</p>
+      <p class="mt-3 text-sm text-muted">support@reedbi.com</p></div>
+  </div>
+  <div class="border-t border-gray-100 py-5 text-center text-xs text-muted">&copy; {{ year }} REEDBI.com \u2014 Demo marketplace built with Python &amp; Flask.</div>
+</footer>
+</body></html>
+"""
+
+CARD = r"""
+{% macro card(p) %}
+<div class="group overflow-hidden rounded-xl bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-lg">
+  <a href="{{ url_for('product', pid=p.id) }}" class="relative block aspect-[4/5] overflow-hidden bg-gray-100">
+    <img src="{{ p.image }}" alt="{{ p.name }}" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105 {% if p.outOfStock %}opacity-60 grayscale{% endif %}">
+    {% if p.badge %}<span class="absolute left-2 top-2 rounded px-2 py-0.5 text-[10px] font-bold uppercase text-white {% if p.badge=='SALE' %}bg-brand{% elif p.badge=='NEW' %}bg-accent{% else %}bg-ink{% endif %}">{{ p.badge }}</span>{% endif %}
+    {% if p.outOfStock %}<span class="absolute inset-x-0 bottom-0 bg-black/70 py-1.5 text-center text-[11px] font-semibold text-white">OUT OF STOCK</span>{% endif %}
+  </a>
+  <div class="p-3">
+    <div class="flex items-start justify-between gap-2"><p class="text-sm font-bold">{{ p.brand }}</p>
+      <span class="rounded bg-[#f5f5f6] px-1.5 py-0.5 text-[11px] font-semibold text-accent">{{ p.rating }} &#9733;</span></div>
+    <p class="mt-0.5 truncate text-[13px] text-muted">{{ p.name }}</p>
+    <div class="mt-1.5 flex items-center gap-1.5"><span class="text-[15px] font-bold">{{ inr(p.price) }}</span>
+      <span class="text-xs text-muted line-through">{{ inr(p.originalPrice) }}</span><span class="text-xs font-semibold text-brand">{{ p.discount }}% off</span></div>
+    <div class="mt-2.5 flex gap-2">
+      {% if not p.outOfStock %}<form action="{{ url_for('cart_add', pid=p.id) }}" method="post" class="flex-1">
+        <button class="w-full rounded-md border border-brand py-1.5 text-xs font-bold uppercase text-brand transition hover:bg-brand hover:text-white">Add to Bag</button></form>{% endif %}
+      <form action="{{ url_for('wishlist_toggle', pid=p.id) }}" method="post"><input type="hidden" name="next" value="{{ request.full_path }}">
+        <button class="grid h-8 w-9 place-items-center rounded-md border {% if p.id in wishlist_ids %}border-brand text-brand{% else %}border-gray-200{% endif %} transition hover:border-brand">&#9825;</button></form>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+{% macro section(title, subtitle) %}
+<section class="py-6"><div class="mb-4 flex items-end justify-between">
+  <div><h3 class="font-display text-xl font-extrabold">{{ title }}</h3>{% if subtitle %}<p class="text-sm text-muted">{{ subtitle }}</p>{% endif %}</div>
+  <a href="{{ url_for('products') }}" class="text-sm font-semibold text-brand">View All &rsaquo;</a></div>
+{% endmacro %}
+"""
+
+HOME = CARD + r"""
+{% extends 'base' %}{% block body %}
+<div class="relative h-[260px] overflow-hidden bg-ink md:h-[400px]">
+  <img src="{{ slides[0].bg }}" class="h-full w-full object-cover opacity-80">
+  <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
+  <div class="absolute bottom-8 left-6 max-w-md md:bottom-12 md:left-12">
+    <h2 class="font-display text-3xl font-extrabold text-white drop-shadow md:text-5xl">{{ slides[0].t }}</h2>
+    <p class="mt-2 text-sm text-white/90 md:text-lg">{{ slides[0].s }}</p>
+    <a href="{{ url_for('products') }}" class="mt-4 inline-block rounded-md bg-brand px-7 py-2.5 text-xs font-bold uppercase text-white hover:bg-brand-dark">Shop Now</a>
+  </div>
+</div>
+
+<div class="mx-auto max-w-[1400px] px-4 py-5 md:px-6">
+  <div class="flex gap-4 overflow-x-auto no-scrollbar md:grid md:grid-cols-8 md:gap-3">
+    {% for c in circles %}
+    <a href="{% if c.name=='Jobs' %}{{ url_for('jobs') }}{% else %}{{ url_for('products', category=c.name) }}{% endif %}" class="group flex w-16 flex-shrink-0 flex-col items-center gap-2 md:w-auto">
+      <span class="grid h-16 w-16 place-items-center overflow-hidden rounded-full border-2 border-transparent bg-white shadow-soft transition group-hover:border-brand">
+        <img src="{{ c.img }}" class="h-full w-full rounded-full object-cover" alt="{{ c.name }}"></span>
+      <span class="text-center text-[11px] font-semibold leading-tight">{{ c.name }}</span></a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="mx-auto max-w-[1400px] px-4 md:px-6">
+  {{ section('Featured','Based on your activity') }}
+  <div class="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">{% for p in featured %}{{ card(p) }}{% endfor %}</div></section>
+
+  <div class="grid gap-4 py-4 md:grid-cols-2">
+    {% for b in [{'t':'Min 50% Off','s':'Season Sale \u2014 Fashion','i':slides[0].bg},{'t':'Top Electronics','s':'Up to 40% off','i':slides[2].bg}] %}
+    <a href="{{ url_for('products') }}" class="group relative block h-36 overflow-hidden rounded-2xl md:h-44">
+      <img src="{{ b.i }}" class="h-full w-full object-cover transition group-hover:scale-105">
+      <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
+      <div class="absolute left-6 top-1/2 -translate-y-1/2"><p class="font-display text-2xl font-extrabold text-white">{{ b.t }}</p>
+        <p class="text-sm text-white/85">{{ b.s }}</p><span class="mt-2 inline-block rounded bg-white px-3 py-1 text-xs font-bold text-ink">SHOP NOW</span></div></a>
+    {% endfor %}
+  </div>
+
+  {{ section('You May Like','Picked for you') }}
+  <div class="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">{% for p in liked %}{{ card(p) }}{% endfor %}</div></section>
+
+  {{ section('Trending Offers','Latest offers for you') }}
+  <div class="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+    {% for o in trending %}
+    <a href="{{ url_for('products') }}" class="flex w-56 flex-shrink-0 items-center gap-3 rounded-xl bg-white p-3 shadow-soft">
+      <img src="{{ o.img }}" class="h-16 w-16 rounded-lg object-cover">
+      <div><p class="text-sm font-bold">{{ o.title }}</p><p class="text-sm font-extrabold text-brand">{{ o.tag }}</p>
+        <span class="text-[11px] font-bold uppercase text-accent">{{ o.cta }} &rarr;</span></div></a>
+    {% endfor %}
+  </div></section>
+
+  {{ section('Categories','Easy to choose your favourites') }}
+  <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+    {% for c in cat_grid %}
+    <a href="{{ url_for('products', category=c.name) }}" class="group overflow-hidden rounded-xl bg-white text-center shadow-soft transition hover:-translate-y-1">
+      <div class="aspect-square overflow-hidden"><img src="{{ c.img }}" class="h-full w-full object-cover transition group-hover:scale-110"></div>
+      <div class="p-2.5"><p class="text-sm font-bold uppercase">{{ c.name }}</p><p class="text-[11px] text-muted">{{ c.items }} items</p>
+        <p class="text-[11px] font-bold text-brand">Extra {{ c.off }} off</p></div></a>
+    {% endfor %}
+  </div>
+
+  <section class="py-6"><div class="mb-4 flex items-end justify-between">
+    <div><h3 class="font-display text-xl font-extrabold">Jobs</h3><p class="text-sm text-muted">Featured openings near you</p></div>
+    <a href="{{ url_for('jobs') }}" class="text-sm font-semibold text-brand">Find Out More &rsaquo;</a></div>
+    <div class="grid gap-3 md:grid-cols-2">
+    {% for j in home_jobs %}
+      <div class="flex gap-3 rounded-xl bg-white p-4 shadow-soft"><img src="{{ j.img }}" class="h-16 w-16 flex-shrink-0 rounded-lg object-cover">
+        <div class="flex-1"><div class="flex items-center justify-between"><span class="text-xs font-semibold text-muted">{{ j.role }} &middot; {{ j.vac }} vacancies</span>
+          {% if j.sponsored %}<span class="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-600">Sponsored</span>{% endif %}</div>
+          <p class="text-sm font-semibold text-accent">{{ j.salary }} <span class="font-normal text-muted">| {{ j.period }}</span></p>
+          <a href="{{ url_for('jobs') }}" class="mt-0.5 block text-sm font-bold hover:text-brand">{{ j.title }}</a>
+          <div class="mt-1 flex gap-3 text-xs text-muted"><span>&#128205; {{ j.loc }}</span><span>&#128338; {{ j.date }}</span></div></div></div>
+    {% endfor %}
+    </div></section>
+
+  {{ section('Latest News','Stories, trends & guides') }}
+  <div class="grid gap-4 md:grid-cols-3">
+    {% for n in news %}
+    <div class="group overflow-hidden rounded-xl bg-white shadow-soft"><div class="aspect-[16/9] overflow-hidden"><img src="{{ n.img }}" class="h-full w-full object-cover transition group-hover:scale-105"></div>
+      <div class="p-4"><span class="text-[11px] font-bold uppercase text-brand">{{ n.date }}</span>
+        <p class="mt-1 text-sm font-semibold leading-snug">{{ n.title }}</p>
+        <span class="mt-2 inline-block text-xs font-semibold text-accent">Read more &rarr;</span></div></div>
+    {% endfor %}
+  </div></section>
+
+  <div class="my-8 overflow-hidden rounded-2xl bg-gradient-to-r from-ink to-[#3a3f55] p-7 md:p-10">
+    <div class="flex flex-col items-center gap-5 text-center md:flex-row md:justify-between md:text-left">
+      <div><h3 class="font-display text-2xl font-extrabold text-white">Subscribe for discount coupons & new offers</h3>
+        <p class="mt-1 text-sm text-white/70"><b class="text-white">12K</b> subscribers already enjoy member-only deals</p></div>
+      <form action="{{ url_for('subscribe') }}" method="post" class="flex w-full max-w-md gap-2">
+        <input name="email" type="email" placeholder="Enter your email" class="flex-1 rounded-md px-4 py-3 text-sm outline-none">
+        <button class="rounded-md bg-brand px-6 py-3 text-sm font-bold text-white hover:bg-brand-dark">Subscribe</button></form>
+    </div>
+  </div>
+
+  <div class="pb-10"><h3 class="mb-4 text-center text-xs font-bold uppercase tracking-widest text-muted">Top Brands</h3>
+    <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+      {% for b in brands %}<span class="font-display text-xl font-extrabold tracking-tight text-gray-400 hover:text-ink">{{ b }}</span>{% endfor %}
+    </div></div>
+</div>
+{% endblock %}
+"""
+
+PRODUCTS_TPL = CARD + r"""
+{% extends 'base' %}{% block body %}
+<div class="mx-auto max-w-[1400px] px-4 py-6 md:px-6">
+  <div class="mb-4 flex items-center justify-between gap-3">
+    <div><h1 class="font-display text-xl font-extrabold">{{ heading }}</h1><p class="text-sm text-muted">{{ items|length }} items</p></div>
+    <form method="get" class="flex items-center gap-2">
+      {% for k,v in carry.items() %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+      <select name="sort" onchange="this.form.submit()" class="rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-semibold outline-none">
+        {% for o in sort_options %}<option value="{{ o.value }}" {% if o.value==sort %}selected{% endif %}>{{ o.label }}</option>{% endfor %}</select>
+    </form>
+  </div>
+  <div class="grid gap-5 md:grid-cols-[240px_1fr]">
+    <aside class="hidden md:block">
+      <form method="get" class="space-y-5 rounded-xl bg-white p-5 shadow-soft">
+        {% if carry.q %}<input type="hidden" name="q" value="{{ carry.q }}">{% endif %}
+        {% if carry.category %}<input type="hidden" name="category" value="{{ carry.category }}">{% endif %}
+        <input type="hidden" name="sort" value="{{ sort }}">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3"><span class="text-sm font-bold uppercase">Filters</span>
+          <a href="{{ url_for('products') }}" class="text-xs font-semibold text-brand">Clear</a></div>
+        <div><p class="mb-2 text-xs font-bold uppercase text-muted">Brand</p>
+          <div class="space-y-1.5 max-h-44 overflow-y-auto no-scrollbar">
+          {% for b in filters.brands %}<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="brand" value="{{ b }}" class="accent-brand" {% if b in sel_brands %}checked{% endif %}> {{ b }}</label>{% endfor %}
+          </div></div>
+        <div><p class="mb-2 text-xs font-bold uppercase text-muted">Price</p>
+          <div class="space-y-1.5">{% for i in range(filters.priceRanges|length) %}<label class="flex items-center gap-2 text-sm"><input type="radio" name="price" value="{{ i }}" class="accent-brand" {% if sel_price==i %}checked{% endif %}> {{ filters.priceRanges[i].label }}</label>{% endfor %}</div></div>
+        <button class="w-full rounded-md bg-ink py-2 text-sm font-bold text-white">Apply Filters</button>
+      </form></aside>
+    <div>{% if items %}<div class="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">{% for p in items %}{{ card(p) }}{% endfor %}</div>
+      {% else %}<div class="grid place-items-center rounded-xl bg-white py-24 text-center shadow-soft"><p class="font-semibold">No products found</p><p class="text-sm text-muted">Try adjusting your filters or search.</p></div>{% endif %}</div>
+  </div>
+</div>
+{% endblock %}
+"""
+
+DETAIL = CARD + r"""
+{% extends 'base' %}{% block body %}
+<div class="mx-auto max-w-[1400px] px-4 py-5 md:px-6">
+  <nav class="mb-3 flex items-center gap-1.5 text-xs text-muted">
+    <a href="{{ url_for('home') }}" class="hover:text-brand">Home</a> &rsaquo;
+    <a href="{{ url_for('products', category=p.category) }}" class="hover:text-brand">{{ p.category }}</a> &rsaquo;
+    <span class="text-ink">{{ p.name }}</span></nav>
+  <div class="grid gap-8 md:grid-cols-2">
+    <div class="flex gap-3">
+      <div class="flex flex-col gap-2">{% for im in p.images %}<img src="{{ im }}" class="h-16 w-14 cursor-pointer rounded-lg border-2 border-transparent object-cover hover:border-brand"
+        onclick="document.getElementById('stage').src=this.src">{% endfor %}</div>
+      <div class="relative flex-1 overflow-hidden rounded-2xl bg-white shadow-soft"><img id="stage" src="{{ p.images[0] }}" class="aspect-square w-full object-cover">
+        {% if p.badge %}<span class="absolute left-4 top-4 rounded bg-brand px-2.5 py-1 text-[11px] font-bold uppercase text-white">{{ p.badge }}</span>{% endif %}</div>
+    </div>
+    <div>
+      <div class="flex items-start justify-between gap-3">
+        <div><p class="text-lg font-extrabold">{{ p.brand }}</p><h1 class="text-xl text-muted">{{ p.name }}</h1></div>
+        <button onclick="sharePDP()" title="Share" class="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full border border-gray-200 hover:border-brand hover:text-brand">&#8599;</button>
+      </div>
+      <div class="mt-2 flex items-center gap-3"><span class="rounded bg-accent px-2 py-0.5 text-xs font-bold text-white">{{ p.rating }} &#9733;</span>
+        <span class="text-sm text-muted">{{ "{:,}".format(p.reviews) }} ratings</span></div>
+      <div class="my-4 h-px bg-gray-100"></div>
+      <div class="flex items-center gap-3"><span class="text-3xl font-extrabold">{{ inr(p.price) }}</span>
+        <span class="text-lg text-muted line-through">{{ inr(p.originalPrice) }}</span><span class="text-lg font-bold text-brand">{{ p.discount }}% OFF</span></div>
+      <p class="mt-1 text-sm font-semibold text-accent">inclusive of all taxes</p>
+
+      <div class="mt-5 rounded-xl border border-gray-100 p-4">
+        <p class="mb-2 text-sm font-bold uppercase">&#127991; Available Offers</p>
+        <div class="space-y-2">{% for o in offers %}<div class="flex items-start gap-2 text-sm"><span class="mt-0.5 text-accent">&#10003;</span>
+          <p class="text-ink/80"><b class="text-ink">{{ o.title }}:</b> {{ o.desc }}{% if o.code %}<span class="ml-1 rounded bg-accent/10 px-1.5 py-0.5 text-xs font-bold text-accent">{{ o.code }}</span>{% endif %}</p></div>{% endfor %}</div>
+      </div>
+
+      <form action="{{ url_for('product', pid=p.id) }}" method="get" class="mt-4">
+        {% if size %}<input type="hidden" name="size" value="{{ size }}">{% endif %}
+        <p class="mb-2 text-sm font-bold uppercase">&#128666; Check Delivery</p>
+        <div class="flex gap-2">
+          <input name="pincode" value="{{ pincode or '' }}" maxlength="6" placeholder="Enter pincode" class="w-40 rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand">
+          <button class="rounded-md border border-ink px-4 text-sm font-bold hover:bg-ink hover:text-white">Check</button>
+        </div>
+        {% if delivery %}<p class="mt-2 flex items-center gap-1.5 text-sm font-semibold {{ 'text-accent' if delivery.ok else 'text-red-500' }}">{{ '&#128666;'|safe if delivery.ok else '&#10007;'|safe }} {{ delivery.msg }}</p>{% endif %}
+      </form>
+
+      <form action="{{ url_for('cart_add', pid=p.id) }}" method="post" class="mt-5">
+        <input type="hidden" name="next" value="{{ request.full_path }}">
+        {% if p.sizes %}<p class="mb-2 text-sm font-bold uppercase">Select Size</p>
+        <div class="flex flex-wrap gap-2">{% for s in p.sizes %}
+          <label class="cursor-pointer"><input type="radio" name="size" value="{{ s }}" class="peer hidden" {% if (size and size==s) or (not size and loop.first) %}checked{% endif %}>
+            <span class="grid h-11 min-w-[44px] place-items-center rounded-full border-2 border-gray-200 px-3 text-sm font-semibold peer-checked:border-brand peer-checked:text-brand">{{ s }}</span></label>{% endfor %}</div>{% endif %}
+        <div class="mt-6 flex gap-3">
+          {% if p.outOfStock %}<span class="flex-1 rounded-md bg-gray-200 py-3.5 text-center text-sm font-bold uppercase text-muted">Out of Stock</span>
+          {% else %}<button name="action" value="add" class="flex-1 rounded-md bg-brand py-3.5 text-sm font-bold uppercase text-white hover:bg-brand-dark">&#128717; Add to Bag</button>
+          <button name="action" value="buy" class="flex-1 rounded-md bg-ink py-3.5 text-sm font-bold uppercase text-white hover:opacity-90">&#9889; Buy Now</button>{% endif %}
+        </div>
+      </form>
+      <form action="{{ url_for('wishlist_toggle', pid=p.id) }}" method="post" class="mt-2"><input type="hidden" name="next" value="{{ request.full_path }}">
+        <button class="text-sm font-semibold {% if p.id in wishlist_ids %}text-brand{% else %}text-muted{% endif %} hover:text-brand">&#9825; {{ 'Saved to wishlist' if p.id in wishlist_ids else 'Add to wishlist' }}</button></form>
+
+      <div class="mt-6 space-y-2 rounded-xl border border-gray-100 p-4 text-sm">
+        <p>&#128666; Free delivery on orders over &#8377;500</p><p>&#8635; 14-day easy returns</p>
+        <a href="{{ url_for('seller') }}" class="block text-brand">&#127978; Sold by {{ p.seller }} &rsaquo;</a></div>
+    </div>
+  </div>
+
+  <div class="mt-10 rounded-2xl bg-white p-5 shadow-soft md:p-7">
+    <h3 class="border-b border-gray-100 pb-3 text-sm font-bold uppercase text-brand">Product Details</h3>
+    <p class="mt-4 text-sm leading-relaxed text-ink/80">{{ p.description }}</p>
+    <div class="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2">{% for k,v in p.details.items() %}
+      <div class="flex justify-between border-b border-dashed border-gray-100 py-1.5 text-sm"><span class="text-muted">{{ k }}</span><span class="font-semibold">{{ v }}</span></div>{% endfor %}</div>
+    <h3 class="mt-8 border-b border-gray-100 pb-3 text-sm font-bold uppercase text-brand">Reviews ({{ reviews|length }})</h3>
+    <div class="mt-4 space-y-4">{% for r in reviews %}
+      <div class="rounded-xl border border-gray-100 p-4"><div class="flex items-center justify-between">
+        <p class="text-sm font-bold"><span class="rounded bg-accent px-1.5 py-0.5 text-xs text-white">{{ r.rating }} &#9733;</span> {{ r.title }}</p>
+        {% if r.verified %}<span class="text-xs text-accent">&#10003; Verified</span>{% endif %}</div>
+        <p class="mt-2 text-sm text-ink/80">{{ r.content }}</p>
+        <p class="mt-2 text-xs text-muted">{{ r.user }} &bull; {{ r.date }} &bull; &#128077; {{ r.likes }}</p></div>{% endfor %}</div>
+  </div>
+
+  {% if related %}<div class="mt-10"><h3 class="mb-4 font-display text-xl font-extrabold">Similar Products</h3>
+    <div class="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">{% for r in related %}{{ card(r) }}{% endfor %}</div></div>{% endif %}
+</div>
+<script>function sharePDP(){var u=location.href;if(navigator.share){navigator.share({title:document.title,url:u}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(u);alert('Link copied');}else{alert(u);}}</script>
+{% endblock %}
+"""
+
+CART_TPL = r"""
+{% extends 'base' %}{% block body %}
+<div class="mx-auto max-w-[1100px] px-4 py-6 md:px-6">
+{% if not rows %}
+  <div class="mx-auto max-w-md py-24 text-center"><div class="mx-auto grid h-24 w-24 place-items-center rounded-full bg-white text-4xl shadow-soft">&#128717;</div>
+    <h2 class="mt-5 font-display text-2xl font-extrabold">Your bag is empty</h2><p class="mt-1 text-sm text-muted">Looks like you haven't added anything yet.</p>
+    <a href="{{ url_for('products') }}" class="mt-5 inline-block rounded-md bg-brand px-8 py-3 text-sm font-bold uppercase text-white">Continue Shopping</a></div>
+{% else %}
+  <div class="mx-auto mb-6 flex max-w-md items-center justify-center gap-2 text-sm font-semibold">
+    {% for s in ['Bag','Address','Payment'] %}<span class="flex items-center gap-1.5 {% if loop.first %}text-brand{% else %}text-muted{% endif %}">
+      <span class="grid h-6 w-6 place-items-center rounded-full text-xs {% if loop.first %}bg-brand text-white{% else %}bg-gray-200{% endif %}">{{ loop.index }}</span>{{ s }}</span>
+      {% if not loop.last %}<span class="h-px w-8 bg-gray-200"></span>{% endif %}{% endfor %}</div>
+  <div class="grid gap-5 md:grid-cols-[1fr_360px]">
+    <div class="space-y-3"><div class="rounded-xl bg-white p-4 text-sm font-bold shadow-soft">{{ t.item_qty }} item(s) in your bag</div>
+      {% for it in rows %}
+      <div class="flex gap-4 rounded-xl bg-white p-4 shadow-soft {% if it.outOfStock %}opacity-70{% endif %}"><img src="{{ it.image }}" class="h-28 w-24 flex-shrink-0 rounded-lg object-cover">
+        <div class="flex flex-1 flex-col"><div class="flex items-start justify-between"><div>
+          <p class="text-sm font-bold">{{ it.brand }}</p><p class="text-[13px] text-muted">{{ it.name }}</p>
+          <p class="mt-1 text-xs text-muted">Sold by: {{ it.seller }}</p>
+          <div class="mt-1.5 flex gap-3 text-xs text-muted">{% if it.size %}<span>Size: <b class="text-ink">{{ it.size }}</b></span>{% endif %}{% if it.color %}<span>Color: <b class="text-ink">{{ it.color }}</b></span>{% endif %}</div></div>
+          <form action="{{ url_for('cart_remove', pid=it.id) }}" method="post"><input type="hidden" name="size" value="{{ it.size or '' }}"><button class="text-muted hover:text-brand">&#10005;</button></form></div>
+          {% if it.outOfStock %}<span class="mt-2 w-fit rounded bg-red-50 px-2 py-1 text-xs font-semibold text-red-500">Out of stock</span>
+          {% else %}<div class="mt-auto flex items-center justify-between pt-2">
+            <div class="flex items-center rounded-full border border-gray-200">
+              <form action="{{ url_for('cart_update', pid=it.id) }}" method="post"><input type="hidden" name="size" value="{{ it.size or '' }}"><input type="hidden" name="delta" value="-1"><button class="grid h-8 w-8 place-items-center" {% if it.qty<=1 %}disabled{% endif %}>&minus;</button></form>
+              <span class="w-6 text-center text-sm font-semibold">{{ it.qty }}</span>
+              <form action="{{ url_for('cart_update', pid=it.id) }}" method="post"><input type="hidden" name="size" value="{{ it.size or '' }}"><input type="hidden" name="delta" value="1"><button class="grid h-8 w-8 place-items-center" {% if it.qty>=it.stock %}disabled{% endif %}>+</button></form></div>
+            <div class="text-right"><p class="text-sm font-bold">{{ inr(it.lineTotal) }}</p><p class="text-xs text-muted line-through">{{ inr(it.lineMRP) }}</p></div></div>{% endif %}
+        </div></div>{% endfor %}
+    </div>
+    <div class="space-y-3">
+      <div class="rounded-xl bg-white p-5 shadow-soft"><p class="mb-3 text-xs font-bold uppercase text-muted">Coupons</p>
+        {% if t.coupon %}<div class="flex items-center justify-between rounded-lg bg-accent/10 p-3"><span class="text-sm font-semibold text-accent">&#127991; {{ t.coupon }} applied</span>
+          <form action="{{ url_for('coupon_remove') }}" method="post"><button class="text-xs font-semibold text-brand">Remove</button></form></div>
+        {% else %}<form action="{{ url_for('coupon_apply') }}" method="post" class="flex gap-2"><input name="code" placeholder="Enter coupon code" class="flex-1 rounded-md border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand">
+          <button class="rounded-md bg-ink px-4 text-sm font-bold text-white">Apply</button></form>{% endif %}
+        <p class="mt-2 text-xs text-muted">Try: REEDBI10 &middot; FIRST50 &middot; SAVE200</p></div>
+      <div class="rounded-xl bg-white p-5 shadow-soft text-sm"><p class="mb-3 text-xs font-bold uppercase text-muted">Price Details</p>
+        <div class="flex justify-between py-1.5"><span class="text-muted">Total MRP</span><span class="font-semibold">{{ inr(t.total_mrp) }}</span></div>
+        <div class="flex justify-between py-1.5"><span class="text-muted">Bag Discount</span><span class="font-semibold text-accent">- {{ inr(t.bag_discount) }}</span></div>
+        {% if t.coupon_discount %}<div class="flex justify-between py-1.5"><span class="text-muted">Coupon Discount</span><span class="font-semibold text-accent">- {{ inr(t.coupon_discount) }}</span></div>{% endif %}
+        <div class="flex justify-between py-1.5"><span class="text-muted">Shipping</span><span class="font-semibold {% if t.shipping==0 %}text-accent{% endif %}">{% if t.shipping==0 %}FREE{% else %}{{ inr(t.shipping) }}{% endif %}</span></div>
+        <form action="{{ url_for('toggle_gift') }}" method="post" class="flex items-center justify-between border-t border-gray-100 py-2.5"><span>&#127873; Gift wrap (+{{ inr(25) }})</span>
+          <button class="rounded px-2 py-1 text-xs font-semibold {% if t.gift %}bg-accent text-white{% else %}bg-gray-100{% endif %}">{% if t.gift %}Added{% else %}Add{% endif %}</button></form>
+        <div class="my-1 h-px bg-gray-100"></div>
+        <div class="flex justify-between py-2 text-base font-extrabold"><span>Total Amount</span><span>{{ inr(t.total) }}</span></div>
+        <form action="{{ url_for('place_order') }}" method="post"><button class="mt-2 w-full rounded-md bg-brand py-3.5 text-sm font-bold uppercase text-white hover:bg-brand-dark">Place Order</button></form>
+        <p class="mt-2 text-center text-xs text-muted">&#128274; 100% secure payments</p></div>
+    </div>
+  </div>
+{% endif %}
+</div>
+{% endblock %}
+"""
+
+WISHLIST_TPL = CARD + r"""
+{% extends 'base' %}{% block body %}
+<div class="mx-auto max-w-[1400px] px-4 py-6 md:px-6">
+{% if not items %}<div class="mx-auto max-w-md py-24 text-center"><div class="mx-auto grid h-24 w-24 place-items-center rounded-full bg-white text-4xl shadow-soft">&#9825;</div>
+  <h2 class="mt-5 font-display text-2xl font-extrabold">Your wishlist is empty</h2><p class="mt-1 text-sm text-muted">Tap the heart on any product to save it here.</p>
+  <a href="{{ url_for('products') }}" class="mt-5 inline-block rounded-md bg-brand px-8 py-3 text-sm font-bold uppercase text-white">Explore Products</a></div>
+{% else %}<h1 class="mb-4 font-display text-xl font-extrabold">My Wishlist <span class="text-muted">({{ items|length }})</span></h1>
+  <div class="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">{% for p in items %}{{ card(p) }}{% endfor %}</div>{% endif %}
+</div>
+{% endblock %}
+"""
+
+ACCOUNT_TPL = r"""
+{% extends 'base' %}{% block body %}
+<div class="mx-auto max-w-[1100px] px-4 py-6 md:px-6"><div class="grid gap-5 md:grid-cols-[260px_1fr]">
+  <aside class="space-y-3"><div class="rounded-xl bg-white p-5 text-center shadow-soft">
+    <div class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-brand/10 text-2xl text-brand">&#128100;</div>
+    <p class="mt-3 font-bold">{{ user.name }}</p><p class="text-xs text-muted">{{ user.email }}</p></div>
+    <div class="overflow-hidden rounded-xl bg-white shadow-soft">
+      {% for k,label in [('overview','Overview'),('orders','My Orders'),('addresses','Addresses'),('settings','Settings')] %}
+      <a href="{{ url_for('account', tab=k) }}" class="block border-b border-gray-50 px-4 py-3 text-sm font-semibold last:border-0 {% if tab==k %}bg-brand/5 text-brand{% else %}hover:bg-gray-50{% endif %}">{{ label }}</a>{% endfor %}
+      <a href="{{ url_for('home') }}" class="block px-4 py-3 text-sm font-semibold text-red-500 hover:bg-red-50">Logout</a></div></aside>
+  <div class="space-y-4">
+  {% if tab=='overview' %}
+    <div class="rounded-xl bg-gradient-to-r from-ink to-[#3a3f55] p-6 text-white shadow-soft"><p class="text-sm text-white/70">Welcome back,</p>
+      <h2 class="font-display text-2xl font-extrabold">{{ user.name }}</h2><p class="mt-1 text-xs text-white/60">{{ user.member }}</p></div>
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">{% for label,val in [('Orders',orders|length),('Wishlist',wishlist_count),('Addresses',addresses|length),('Coupons',3)] %}
+      <div class="rounded-xl bg-white p-4 shadow-soft"><p class="text-xl font-extrabold">{{ val }}</p><p class="text-xs text-muted">{{ label }}</p></div>{% endfor %}</div>
+  {% elif tab=='orders' %}
+    <h2 class="font-display text-xl font-extrabold">My Orders</h2>
+    {% for o in orders %}<div class="rounded-xl bg-white p-5 shadow-soft"><div class="mb-3 flex items-center justify-between text-xs">
+      <span class="text-muted">{{ o.orderId }} &middot; {{ o.date }}</span><span class="font-semibold {% if o.status=='Delivered' %}text-accent{% else %}text-amber-600{% endif %}">{{ o.status }}</span></div>
+      {% for it in o['items'] %}<div class="flex items-center gap-3"><img src="{{ it.image }}" class="h-14 w-12 rounded-lg object-cover">
+        <div class="flex-1"><p class="text-sm font-semibold">{{ it.name }}</p><p class="text-xs text-muted">Qty {{ it.qty }} &middot; {{ it.status }}</p></div><p class="text-sm font-bold">{{ inr(it.price) }}</p></div>{% endfor %}</div>{% endfor %}
+  {% elif tab=='addresses' %}
+    <h2 class="font-display text-xl font-extrabold">Saved Addresses</h2>
+    {% for a in addresses %}<div class="rounded-xl bg-white p-5 shadow-soft"><div class="flex items-center gap-2">
+      <span class="rounded bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase text-muted">{{ a.type }}</span>{% if a.default %}<span class="rounded bg-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase text-accent">Default</span>{% endif %}</div>
+      <p class="mt-2 text-sm font-bold">{{ a.name }}</p><p class="text-sm text-muted">{{ a.line }}</p><p class="mt-1 text-sm text-muted">Mobile: {{ a.phone }}</p></div>{% endfor %}
+  {% else %}
+    <h2 class="font-display text-xl font-extrabold">Settings</h2>
+    <div class="rounded-xl bg-white p-5 shadow-soft text-sm"><h3 class="mb-2 text-xs font-bold uppercase text-muted">Profile</h3>
+      {% for k,v in [('Full Name',user.name),('Email',user.email),('Phone',user.phone)] %}<div class="flex justify-between border-b border-gray-50 py-2.5 last:border-0"><span class="text-muted">{{ k }}</span><span class="font-semibold">{{ v }}</span></div>{% endfor %}</div>
+  {% endif %}
+  </div>
+</div></div>
+{% endblock %}
+"""
+
+SELLER_TPL = CARD + r"""
+{% extends 'base' %}{% block body %}
+<div class="relative h-40 overflow-hidden bg-ink md:h-56"><img src="{{ s.banner }}" class="h-full w-full object-cover opacity-70">
+  <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div></div>
+<div class="mx-auto max-w-[1100px] px-4 md:px-6">
+  <nav class="flex items-center gap-1.5 py-3 text-xs text-muted"><a href="{{ url_for('home') }}" class="hover:text-brand">Home</a> &rsaquo; <span class="text-ink">Seller</span></nav>
+  <div class="-mt-2 rounded-2xl bg-white p-5 shadow-soft md:p-6"><div class="flex flex-col gap-4 md:flex-row md:items-center">
+    <img src="{{ s.logo }}" class="h-20 w-20 rounded-2xl border border-gray-100 object-cover md:h-24 md:w-24">
+    <div class="flex-1"><div class="flex flex-wrap items-center gap-2"><h1 class="font-display text-2xl font-extrabold">{{ s.name }}</h1>
+      {% if s.verified %}<span class="flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-xs font-bold text-accent">&#10003; Verified</span>{% endif %}</div>
+      <p class="mt-1 max-w-xl text-sm text-muted">{{ s.tagline }}</p>
+      <p class="mt-1.5 flex items-center gap-1 text-sm text-ink/70">&#128205; {{ s.location }}</p></div>
+    <div class="flex items-center gap-4"><div class="text-center"><p class="text-lg font-extrabold">{{ s.followers }}</p><p class="text-[11px] text-muted">Followers</p></div>
+      <form action="{{ url_for('seller_follow') }}" method="post"><button class="rounded-md px-6 py-2.5 text-sm font-bold transition {% if following %}border border-gray-300 text-ink{% else %}bg-brand text-white hover:bg-brand-dark{% endif %}">{% if following %}Following{% else %}+ Follow{% endif %}</button></form></div>
+  </div></div>
+
+  <div class="mt-5 flex gap-6 overflow-x-auto border-b border-gray-200 no-scrollbar">
+    {% for k,label in [('products','Products ('~ s.totalProducts ~')'),('categories','Categories ('~ s.totalCategories ~')'),('jobs','Jobs ('~ s.totalJobs ~')'),('about','About Us')] %}
+    <a href="{{ url_for('seller', tab=k) }}" class="-mb-px whitespace-nowrap border-b-2 pb-3 text-sm font-bold {% if tab==k %}border-brand text-brand{% else %}border-transparent text-muted hover:text-ink{% endif %}">{{ label }}</a>{% endfor %}
+  </div>
+
+  <div class="py-6">
+  {% if tab=='products' %}
+    <p class="mb-4 text-sm text-muted">Showing the seller's latest listings</p>
+    {% if seller_products %}<div class="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">{% for p in seller_products %}{{ card(p) }}{% endfor %}</div>
+    {% else %}<p class="text-sm text-muted">No products listed.</p>{% endif %}
+  {% elif tab=='categories' %}
+    <p class="mb-4 text-sm text-muted">Browse {{ s.totalCategories }} categories from this seller</p>
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">{% for c in seller_categories %}
+      <a href="{{ url_for('products', category=c.name) }}" class="group overflow-hidden rounded-xl bg-white text-left shadow-soft transition hover:-translate-y-1">
+        <div class="relative aspect-[4/3] overflow-hidden"><img src="{{ c.image }}" class="h-full w-full object-cover transition group-hover:scale-105">
+          {% if c.badge %}<span class="absolute left-2 top-2 rounded px-1.5 py-0.5 text-[10px] font-bold text-white {% if c.badge=='SALE' %}bg-brand{% else %}bg-accent{% endif %}">{{ c.badge }}</span>{% endif %}</div>
+        <div class="p-3"><p class="text-sm font-bold">{{ c.name }}</p><p class="text-xs text-muted">{{ c.items }} items found</p></div></a>{% endfor %}</div>
+  {% elif tab=='jobs' %}
+    <p class="mb-4 text-sm text-muted">Open roles posted by this seller</p>
+    <div class="space-y-3">{% for j in seller_jobs %}
+      <div class="flex flex-col gap-3 rounded-xl bg-white p-4 shadow-soft sm:flex-row sm:items-center"><img src="{{ j.image }}" class="h-16 w-16 flex-shrink-0 rounded-lg object-cover">
+        <div class="flex-1"><div class="flex items-center gap-2">{% if j.sponsored %}<span class="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-600">Sponsored</span>{% endif %}<p class="font-bold">{{ j.title }}</p></div>
+          <p class="mt-0.5 text-sm font-semibold text-accent">{{ j.salary }} <span class="font-normal text-muted">| {{ j.period }}</span></p>
+          <div class="mt-1 flex flex-wrap gap-3 text-xs text-muted"><span>&#128188; {{ j.role }} &middot; {{ j.vacancies }} vacancies</span><span>&#128205; {{ j.location }}</span><span>&#128338; {{ j.posted }}</span></div></div>
+        <a href="{{ url_for('jobs') }}" class="rounded-md border border-brand px-5 py-2 text-sm font-bold text-brand transition hover:bg-brand hover:text-white">View</a></div>{% endfor %}</div>
+  {% else %}
+    <div class="grid gap-5 md:grid-cols-[1fr_320px]">
+      <div class="space-y-5">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="rounded-xl bg-white p-5 shadow-soft"><h3 class="mb-2 text-sm font-bold uppercase text-muted">Company Address</h3>
+            <p class="text-sm font-semibold">{{ s.address.person }}</p><p class="text-sm text-muted">{{ s.address.line1 }}</p>
+            <p class="text-sm text-muted">{{ s.address.line2 }}</p><p class="mt-1 text-sm text-muted">{{ s.address.phone }}</p></div>
+          <div class="rounded-xl bg-white p-5 shadow-soft"><h3 class="mb-2 text-sm font-bold uppercase text-muted">Connect Us</h3>
+            <p class="flex items-center gap-2 text-sm">&#9742; {{ s.contact.phone }}</p><p class="mt-1.5 flex items-center gap-2 text-sm">&#9993; {{ s.contact.email }}</p></div>
+        </div>
+        <div class="rounded-xl bg-white p-5 shadow-soft"><h3 class="text-sm font-bold uppercase text-muted">Contact {{ s.name }}</h3>
+          <p class="mt-1 text-xs text-muted">Tell us more about your issue</p>
+          <form action="{{ url_for('seller_contact') }}" method="post" class="mt-3 space-y-3">
+            <div class="flex flex-wrap gap-2">{% for t in ['Product Details','Delivery','Returns & Refunds','Customise a product'] %}
+              <label class="cursor-pointer"><input type="radio" name="topic" value="{{ t }}" class="peer hidden" {% if loop.first %}checked{% endif %}>
+                <span class="block rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-muted peer-checked:border-brand peer-checked:bg-brand/5 peer-checked:text-brand">{{ t }}</span></label>{% endfor %}</div>
+            <textarea name="message" rows="4" maxlength="4000" placeholder="Your note" class="w-full resize-none rounded-md border border-gray-200 p-3 text-sm outline-none focus:border-brand"></textarea>
+            <button class="rounded-md bg-brand px-6 py-2.5 text-sm font-bold text-white hover:bg-brand-dark">Send</button></form>
+          <p class="mt-3 text-[11px] leading-relaxed text-muted">When you submit this form, REEDBI replaces your email with one provided by REEDBI to protect your identity and forwards the message on your behalf.</p></div>
+        <div class="rounded-xl bg-white p-5 shadow-soft"><h3 class="mb-2 text-sm font-bold uppercase text-muted">About Company</h3>
+          <p class="text-sm leading-relaxed text-ink/80">{{ s.about }}</p></div>
+        <div class="overflow-hidden rounded-xl bg-white shadow-soft"><h3 class="p-5 pb-2 text-sm font-bold uppercase text-muted">Location</h3>
+          <iframe title="Seller location" loading="lazy" class="h-56 w-full border-0" src="https://www.openstreetmap.org/export/embed.html?bbox=75.7%2C26.8%2C75.9%2C26.95&layer=mapnik&marker=26.9124%2C75.7873"></iframe></div>
+      </div>
+      <aside>
+        <div class="rounded-xl bg-white p-5 shadow-soft"><h3 class="mb-3 text-sm font-bold uppercase text-muted">Fact Sheet</h3>
+          <div>{% for k,v in s.factSheet.items() %}<div class="flex justify-between gap-3 border-b border-dashed border-gray-100 py-2 text-sm last:border-0"><span class="text-muted">{{ k }}</span><span class="text-right font-semibold">{{ v }}</span></div>{% endfor %}</div></div>
+        <div class="mt-4 rounded-xl bg-gradient-to-br from-ink to-[#3a3f55] p-5 text-white shadow-soft"><p class="text-sm font-bold">Need help?</p>
+          <p class="mt-1 text-xs text-white/70">Call the seller directly</p><p class="mt-3 flex items-center gap-2 text-sm font-bold">&#9742; {{ s.contact.tel }}</p></div>
+      </aside>
+    </div>
+  {% endif %}
+  </div>
+</div>
+{% endblock %}
+"""
+
+JOBS_TPL = r"""
+{% extends 'base' %}{% block body %}
+<div class="mx-auto max-w-[1000px] px-4 py-6 md:px-6">
+  <div class="mb-6 rounded-2xl bg-gradient-to-r from-ink to-[#3a3f55] p-7 text-white">
+    <span class="inline-block rounded-full bg-brand/20 px-3 py-1 text-xs font-bold text-brand">CAREERS</span>
+    <h1 class="mt-3 font-display text-3xl font-extrabold">Jobs on REEDBI</h1><p class="mt-1 text-sm text-white/70">{{ jobs|length }} openings near you</p></div>
+  <div class="space-y-3">{% for j in jobs %}
+    <div class="flex flex-col gap-3 rounded-xl bg-white p-5 shadow-soft sm:flex-row sm:items-center">
+      <div class="grid h-12 w-12 place-items-center rounded-lg bg-brand/10 text-xl text-brand">&#128188;</div>
+      <div class="flex-1"><p class="font-bold">{{ j.title }}</p><p class="text-sm text-muted">{{ j.company }}</p>
+        <div class="mt-1.5 flex flex-wrap gap-3 text-xs text-muted"><span>&#128205; {{ j.location }}</span><span>&#128338; {{ j.type }}</span><span>&#128176; {{ j.salary }}</span></div></div>
+      <button class="rounded-md bg-brand px-6 py-2.5 text-sm font-bold text-white">Apply</button></div>{% endfor %}</div>
+</div>
+{% endblock %}
+"""
+
+TEMPLATES = {"base": BASE}
+app.jinja_loader = DictLoader(TEMPLATES)
+
+def render(tpl, **ctx):
+    return render_template_string(tpl, **ctx)
+
+
+# ===================================================================
+# ROUTES
+# ===================================================================
+@app.route("/")
+def home():
+    return render(HOME, title="Online Shopping & Jobs", slides=HERO_SLIDES, circles=CATEGORY_CIRCLES,
+                  featured=[p for p in PRODUCTS if p.get("badge") == "SALE"][:4], liked=PRODUCTS[3:7],
+                  trending=TRENDING_OFFERS, cat_grid=CATEGORY_GRID, home_jobs=HOME_JOBS, news=NEWS, brands=BRANDS)
+
+
+@app.route("/products")
+def products():
+    q = request.args.get("q", "").strip().lower()
+    category = request.args.get("category")
+    sel_brands = request.args.getlist("brand")
+    sort = request.args.get("sort", "popularity")
+    price_idx = request.args.get("price")
+    sel_price = int(price_idx) if (price_idx not in (None, "")) else None
+
+    items = list(PRODUCTS)
+    if q:
+        items = [p for p in items if q in (p["name"] + p["brand"] + p["category"]).lower()]
+    if category and category in MEGA_MENU:
+        items = [p for p in items if p["category"] == category or category == "More"]
+    elif category:
+        items = [p for p in items if p["category"] == category]
+    if sel_brands:
+        items = [p for p in items if p["brand"] in sel_brands]
+    if sel_price is not None:
+        rng = FILTERS["priceRanges"][sel_price]
+        items = [p for p in items if rng["min"] <= p["price"] <= rng["max"]]
+    if sort == "priceLow":
+        items.sort(key=lambda p: p["price"])
+    elif sort == "priceHigh":
+        items.sort(key=lambda p: -p["price"])
+    elif sort == "discount":
+        items.sort(key=lambda p: -p["discount"])
+    elif sort == "rating":
+        items.sort(key=lambda p: -p["rating"])
+    else:
+        items.sort(key=lambda p: -p["reviews"])
+
+    heading = category or (f'Results for "{q}"' if q else "All Products")
+    carry = {k: v for k, v in {"q": q, "category": category}.items() if v}
+    return render(PRODUCTS_TPL, title=heading, items=items, heading=heading, filters=FILTERS,
+                  sort_options=SORT_OPTIONS, sort=sort, sel_brands=sel_brands, sel_price=sel_price, carry=carry)
+
+
+@app.route("/product/<int:pid>")
+def product(pid):
+    p = get_product(pid) or PRODUCTS[0]
+    related = [x for x in PRODUCTS if x["category"] == p["category"] and x["id"] != p["id"]][:4]
+    size = request.args.get("size")
+    pincode = request.args.get("pincode")
+    delivery = None
+    if pincode is not None:
+        if pincode.isdigit() and 5 <= len(pincode) <= 6:
+            d = (date.today() + timedelta(days=3)).strftime("%a, %d %b")
+            delivery = {"ok": True, "msg": f"Delivery by {d} \u00b7 Free shipping"}
+        else:
+            delivery = {"ok": False, "msg": "Enter a valid 5\u20136 digit pincode"}
+    return render(DETAIL, title=p["name"], p=p, reviews=REVIEWS, related=related,
+                  offers=OFFERS, size=size, pincode=pincode, delivery=delivery)
+
+
+@app.route("/cart")
+def cart():
+    return render(CART_TPL, title="Shopping Bag", rows=cart_detail(), t=cart_totals())
+
+
+@app.route("/cart/add/<int:pid>", methods=["POST"])
+def cart_add(pid):
+    p = get_product(pid)
+    nxt = request.form.get("next") or url_for("products")
+    if not p or p.get("outOfStock"):
+        flash("Item unavailable")
+        return redirect(nxt)
+    size = request.form.get("size") or (p["sizes"][0] if p["sizes"] else None)
+    cart = get_cart()
+    for e in cart:
+        if e["id"] == pid and e.get("size") == size:
+            e["qty"] = min(e["qty"] + 1, p["stock"])
+            break
+    else:
+        cart.append({"id": pid, "qty": 1, "size": size})
+    session.modified = True
+    flash("Added to bag")
+    if request.form.get("action") == "buy":
+        return redirect(url_for("cart"))
+    return redirect(nxt)
+
+
+@app.route("/cart/update/<int:pid>", methods=["POST"])
+def cart_update(pid):
+    size = request.form.get("size") or None
+    delta = int(request.form.get("delta", 0))
+    p = get_product(pid)
+    for e in get_cart():
+        if e["id"] == pid and e.get("size") == size:
+            e["qty"] = max(1, min(e["qty"] + delta, p["stock"] if p else 10))
+            break
+    session.modified = True
+    return redirect(url_for("cart"))
+
+
+@app.route("/cart/remove/<int:pid>", methods=["POST"])
+def cart_remove(pid):
+    size = request.form.get("size") or None
+    session["cart"] = [e for e in get_cart() if not (e["id"] == pid and e.get("size") == size)]
+    flash("Removed from bag")
+    return redirect(url_for("cart"))
+
+
+@app.route("/coupon/apply", methods=["POST"])
+def coupon_apply():
+    code = request.form.get("code", "").strip().upper()
+    flash(f"Coupon {code} applied" if code in COUPONS else "Invalid coupon. Try REEDBI10, FIRST50 or SAVE200")
+    if code in COUPONS:
+        session["coupon"] = code
+    return redirect(url_for("cart"))
+
+
+@app.route("/coupon/remove", methods=["POST"])
+def coupon_remove():
+    session.pop("coupon", None)
+    return redirect(url_for("cart"))
+
+
+@app.route("/cart/gift", methods=["POST"])
+def toggle_gift():
+    session["gift"] = not session.get("gift", False)
+    session.modified = True
+    return redirect(url_for("cart"))
+
+
+@app.route("/cart/order", methods=["POST"])
+def place_order():
+    session["cart"] = []
+    session.pop("coupon", None)
+    session["gift"] = False
+    flash("Order placed! (demo) \U0001F389")
+    return redirect(url_for("home"))
+
+
+@app.route("/wishlist")
+def wishlist():
+    ids = [w["id"] if isinstance(w, dict) else w for w in get_wishlist()]
+    items = [get_product(i) for i in ids if get_product(i)]
+    return render(WISHLIST_TPL, title="My Wishlist", items=items)
+
+
+@app.route("/wishlist/toggle/<int:pid>", methods=["POST"])
+def wishlist_toggle(pid):
+    wl = get_wishlist()
+    ids = [w["id"] if isinstance(w, dict) else w for w in wl]
+    nxt = request.form.get("next") or url_for("products")
+    if pid in ids:
+        session["wishlist"] = [w for w in wl if (w["id"] if isinstance(w, dict) else w) != pid]
+        flash("Removed from wishlist")
+    else:
+        wl.append(pid)
+        flash("Saved to wishlist")
+    session.modified = True
+    return redirect(nxt)
+
+
+@app.route("/account")
+@app.route("/account/<tab>")
+def account(tab="overview"):
+    if tab not in ("overview", "orders", "addresses", "settings"):
+        tab = "overview"
+    return render(ACCOUNT_TPL, title="My Account", tab=tab, user=USER, orders=ORDERS, addresses=ADDRESSES)
+
+
+@app.route("/seller")
+@app.route("/seller/<tab>")
+def seller(tab="products"):
+    if tab not in ("products", "categories", "jobs", "about"):
+        tab = "products"
+    sp = [p for p in PRODUCTS if p["seller"] == SELLER["name"]]
+    return render(SELLER_TPL, title=SELLER["name"], s=SELLER, tab=tab, seller_products=sp,
+                  seller_categories=SELLER_CATEGORIES, seller_jobs=SELLER_JOBS,
+                  following=session.get("following", False))
+
+
+@app.route("/seller/follow", methods=["POST"])
+def seller_follow():
+    session["following"] = not session.get("following", False)
+    flash("Following seller" if session["following"] else "Unfollowed")
+    return redirect(url_for("seller", tab="products"))
+
+
+@app.route("/seller/contact", methods=["POST"])
+def seller_contact():
+    msg = request.form.get("message", "").strip()
+    flash("Message sent to seller" if msg else "Please write a message")
+    return redirect(url_for("seller", tab="about"))
+
+
+@app.route("/jobs")
+def jobs():
+    return render(JOBS_TPL, title="Jobs", jobs=JOBS)
+
+
+@app.route("/subscribe", methods=["POST"])
+def subscribe():
+    email = request.form.get("email", "")
+    flash("Subscribed! Check your inbox" if "@" in email else "Enter a valid email")
+    return redirect(url_for("home"))
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000).btn:active{transform:translateY(1px)}
 .btn-primary{background:var(--pink);color:#fff}.btn-primary:hover{background:var(--pink-dark);box-shadow:0 8px 20px rgba(255,63,108,.3)}
 .btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{background:#000}
 .btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}.btn-ghost:hover{border-color:var(--ink)}
