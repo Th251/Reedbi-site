@@ -543,7 +543,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="lp">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v75</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v76</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4911,9 +4911,12 @@ function openAccountMenu(){
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyOrders()"><i class="ti ti-package"></i> My Orders</button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyApps()"><i class="ti ti-briefcase"></i> My Job Applications</button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openProfile(CU.name,CU.co||\'\',\'\',CU.avIdx||0)"><i class="ti ti-user"></i> View Public Profile</button>';
-  // ADMIN / OWNER control — always shown; gated by password/claim inside openAdminPanel
+  // ADMIN / OWNER control — only visible to authorized owner emails
+  if(typeof isOwnerEmail==='function'&&isOwnerEmail(CU.email)){
+    h+='<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:8px"></div>';
+    h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openAdminPanel()"><i class="ti ti-shield-lock" style="color:var(--red)"></i> Admin Control Panel <small>owner: approve licenses, remove content, manage users &amp; team</small></button>';
+  }
   h+='<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:8px"></div>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openAdminPanel()"><i class="ti ti-shield-lock" style="color:var(--red)"></i> Admin Control Panel <small>owner: approve licenses, remove content, manage users &amp; team</small></button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');doSignOut()"><i class="ti ti-logout"></i> Sign Out</button>';
   body.innerHTML=h;
   document.getElementById('acctmenu-ovl').classList.add('open');
@@ -4950,6 +4953,11 @@ function openCreateModal(){
 }
 function openCreateModalWithName(name){openPostChooser();}
 function createTag(){
+  // Main tags are fixed and are never created by users — only sub-tags form from posts.
+  toast('Main tags are fixed. Just post under Sell, Jobs, etc. — sub-tags form automatically.','info');
+  openPostChooser();
+}
+function createTag_DISABLED(){
   var name=document.getElementById('mn').value.trim().toLowerCase(),cat=document.getElementById('mc').value,desc=document.getElementById('md').value.trim()||'Community tag';
   if(!name){toast('Enter a tag name','err');return;}
   if(!/^[a-z0-9\-_]+$/.test(name)){toast('Letters numbers hyphens only','err');return;}
@@ -4973,7 +4981,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v75 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v76 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6305,27 +6313,39 @@ function adminHash(s){var x=5381;for(var i=0;i<s.length;i++){x=((x<<5)+x)+s.char
 function getAdminConfig(){return LS.get('rb_admin',{hash:'5c2744fd',admins:[]});} // default pwd set by owner; change it
 function saveAdminConfig(c){LS.set('rb_admin',c);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('admin').set(c,{merge:true}).catch(function(){});}catch(e){}}}
 var adminUnlocked=false;
+var OWNER_EMAILS=['ajmal.aue@gmail.com','testing.thahir@gmail.com'];
+var OWNER_OTP_PHONE='+919847131871';
+var adminPendingOtp=null;
+function isOwnerEmail(email){if(!email)return false;return OWNER_EMAILS.indexOf((''+email).trim().toLowerCase())>=0;}
 function openAdminPanel(){
   if(adminUnlocked){renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');return;}
-  // PREFERRED: server-enforced admin via Firebase custom claim (cannot be faked for real data actions)
+  if(!CU||!isOwnerEmail(CU.email)){toast('Admin access is restricted to the Reedbi owner.','err');return;}
   if(FB.ready&&FB.auth&&FB.auth.currentUser){
     FB.auth.currentUser.getIdTokenResult().then(function(r){
-      if(r&&r.claims&&r.claims.admin===true){
-        adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');
-      }else{
-        adminPasswordGate();
-      }
+      if(r&&r.claims&&r.claims.admin===true){adminStartOtp();}
+      else{adminPasswordGate();}
     }).catch(function(){adminPasswordGate();});
     return;
   }
   adminPasswordGate();
 }
 function adminPasswordGate(){
-  var pwd=prompt('Admin password:\n(Note: real protection requires the backend setup — this gate is for convenience only.)');
+  var pwd=prompt('Admin password (owner only):');
   if(pwd===null)return;
   var cfg=getAdminConfig();
-  if(adminHash(pwd)===cfg.hash){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');}
+  if(adminHash(pwd)===cfg.hash){adminStartOtp();}
   else toast('Incorrect admin password','err');
+}
+function adminStartOtp(){
+  var otp=(''+Math.floor(100000+Math.random()*900000));
+  adminPendingOtp=otp;
+  var entered=prompt('2-step verification\nA 6-digit code was generated for the owner ('+OWNER_OTP_PHONE+').\n\n[No backend to send SMS in this build - your code is: '+otp+']\n\nEnter the code to continue:');
+  if(entered===null){adminPendingOtp=null;return;}
+  if(entered.trim()===adminPendingOtp){
+    adminUnlocked=true;adminPendingOtp=null;
+    renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');
+    toast('Owner verified - admin unlocked','ok');
+  }else{toast('Incorrect verification code','err');}
 }
 function adminCanManage(){
   // owner (unlocked) OR a user listed as admin-team member with manage rights
