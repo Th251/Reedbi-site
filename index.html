@@ -77,7 +77,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .tnr1{display:flex;align-items:center;gap:4px;margin-bottom:2px}
 .tnm{font-size:14px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tbadge{font-size:9px;font-weight:600;padding:1px 5px;border-radius:7px;background:rgba(37,211,102,.15);color:var(--g)}
-.tprev{font-size:11px;color:var(--mt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tprev{font-size:13px;color:var(--mt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tmeta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
 .ttime{font-size:10px;color:var(--mt2)}
 .ubadge{background:var(--g);color:#fff;border-radius:10px;font-size:9px;font-weight:700;padding:1px 5px;min-width:16px;text-align:center}
@@ -170,7 +170,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .ptrow i{font-size:11px;color:var(--g);margin-top:1px;flex-shrink:0}
 .pttxt{font-size:12px;font-weight:700;color:var(--tx);line-height:1.3}
 .bub.out .pttxt{color:var(--bot)}
-.pbody{font-size:12px;line-height:1.5;color:var(--tx)}
+.pbody{font-size:14px;line-height:1.5;color:var(--tx)}
 .bub.out .pbody{color:var(--bot)}
 .atrow{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
 .at{display:inline-flex;align-items:center;gap:2px;font-size:10px;padding:2px 5px;border-radius:8px;cursor:pointer;border:1px solid var(--b);background:rgba(255,255,255,.03);color:var(--mt2)}
@@ -404,6 +404,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .cart-trust{display:flex;justify-content:space-between;margin-top:11px;font-size:9px;color:var(--mt2);gap:4px}
 .cart-trust span{display:flex;align-items:center;gap:3px}
 .cart-trust i{color:#1a8f3c;font-size:13px}
+.bub-media{width:100%;max-width:240px;max-height:240px;object-fit:cover;border-radius:10px;display:block}
 .acct-item{display:flex;align-items:center;gap:11px;width:100%;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:13px 14px;margin-bottom:7px;font-size:13px;font-weight:600;color:var(--tx);cursor:pointer;font-family:var(--fn);text-align:left;touch-action:manipulation;transition:background .15s}
 .acct-item:hover{background:var(--b)}
 .acct-item i{font-size:18px;flex-shrink:0}
@@ -541,9 +542,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 </div>
 
 <div class="shell" id="app" style="display:flex">
-  <div class="left" id="lp">
+  <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v76</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v80</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -3606,9 +3607,17 @@ function openCVData(d,name){
     if(isViewable){
       var w=window.open();
       if(w){
-        if(d.indexOf('application/pdf')>=0){w.document.write('<iframe src="'+d+'" style="width:100%;height:100%;border:0"></iframe>');}
-        else{w.document.write('<img src="'+d+'" style="max-width:100%">');}
-        w.document.title=name||'CV';
+        // Build the viewer via DOM (no string concat into document.write) so a crafted
+        // data URI cannot break out of the src attribute. Type is restricted above.
+        try{
+          w.document.title=name||'CV';
+          var el=w.document.createElement(d.indexOf('application/pdf')>=0?'iframe':'img');
+          el.setAttribute('src',d);
+          if(el.tagName==='IFRAME'){el.style.width='100%';el.style.height='100%';el.style.border='0';}
+          else{el.style.maxWidth='100%';}
+          w.document.body.style.margin='0';
+          w.document.body.appendChild(el);
+        }catch(e){var a=w.document.createElement('a');a.href=d;a.textContent='Open CV';w.document.body.appendChild(a);}
       }else{ // popup blocked -> download
         var a=document.createElement('a');a.href=d;a.download=name||'cv';a.click();
       }
@@ -4142,7 +4151,7 @@ function openTag(id){
   document.getElementById('tis').style.display='none';document.getElementById('isrch').value='';
   renderComposerState();
   renderMsgs(t);renderTagList(document.getElementById('tsr').value);trackScroll();
-  if(window.innerWidth<=700)document.getElementById('lp').classList.add('hidden');
+  if(window.innerWidth<=700)document.getElementById('leftpanel').classList.add('hidden');
   startLive(id);startPoll(id);
   fbListenTag(id);
   var fab=document.getElementById('fab');if(fab)fab.style.display='none';
@@ -4279,7 +4288,7 @@ function buildBubble(t,p,isMine){
     +(p.title?'<div class="ptrow"><i class="ti ti-pencil"></i><span class="pttxt">'+esc(p.title)+'</span></div>':'')
     +'<div class="prow"><span class="pnm" onclick="openProfile(\''+escJS(p.user)+'\',\''+escJS(p.co||'')+'\',\''+escJS(t.name)+'\','+p.avIdx+')">'+esc(p.user)+'</span>'+coLink+'</div>'
     +(p.body?'<div class="pbody">'+esc(p.body)+'</div>':'')
-    +(p.img?(p.mediaType==='video'?'<video src="'+p.img+'" controls style="max-width:100%;border-radius:10px;margin-top:5px"></video>':'<img src="'+p.img+'" style="max-width:100%;border-radius:10px;margin-top:5px;cursor:pointer" onclick="window.open(this.src)">'):'')
+    +(p.img?(p.mediaType==='video'?'<video src="'+p.img+'" controls class="bub-media" style="margin-top:6px"></video>':'<img src="'+p.img+'" class="bub-media" style="margin-top:6px;cursor:pointer" onclick="window.open(this.src)" title="Tap to view full size">'):'')
     +(p.region?'<div class="rchip'+(actRegion===p.region?' selr':'')+'" onclick="setRegion(\''+escJS(p.region)+'\')"><i class="ti ti-map-pin" style="font-size:8px"></i>'+esc(p.region)+'</div>':'')
     +atsHtml
     +'<div class="pts"><i class="ti ti-clock" style="font-size:8px"></i>'+fmtT(p.ts)+' '+fmtC(p.ts)+'</div>'
@@ -4972,8 +4981,8 @@ function createTag_DISABLED(){
 /* MISC */
 function autoResize(ta){if(!ta)return;ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,80)+'px';}
 function onKey(e){if(e.key==='Enter'&&!e.shiftKey&&window.innerWidth>700){e.preventDefault();sendPost();}}
-function goBack(){stopLive();stopPoll();var _f=document.getElementById('fab');if(_f)_f.style.display='';document.getElementById('lp').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';activeTagId=null;pendingPosts=[];renderTagList(document.getElementById('tsr').value);}
-function goHome(){stopLive();stopPoll();var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('lp').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;}
+function goBack(){stopLive();stopPoll();var _f=document.getElementById('fab');if(_f)_f.style.display='';document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';activeTagId=null;pendingPosts=[];renderTagList(document.getElementById('tsr').value);}
+function goHome(){stopLive();stopPoll();var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;}
 ['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('open');});});
 document.getElementById('pmb').addEventListener('click',function(e){if(e.target===document.getElementById('pmb'))closePM();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('open');});closePM();}});
@@ -4981,7 +4990,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v76 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v80 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5070,11 +5079,11 @@ function listPhotoSel(inp){
 function removeListPhoto(i){listPhotos.splice(i,1);renderListPhotos();}
 function renderListPhotos(){
   var box=document.getElementById('lp-photos');if(!box)return;
-  var html=listPhotos.map(function(p,i){return '<div class="lp-thumb"><img src="'+p+'"><button onclick="removeListPhoto('+i+')"><i class="ti ti-x"></i></button></div>';}).join('');
+  var html=listPhotos.map(function(p,i){return '<div class="lp-thumb"><img src="'+esc(p)+'"><button onclick="removeListPhoto('+i+')"><i class="ti ti-x"></i></button></div>';}).join('');
   html+='<button class="lp-add" onclick="document.getElementById(\'lp-photo-file\').click()"><i class="ti ti-camera-plus"></i><span>'+listPhotos.length+'/10</span></button>';
   box.innerHTML=html;
   var hint=document.getElementById('lp-photo-hint');
-  if(hint)hint.textContent=listPhotos.length<5?('Add at least 5 photos ('+listPhotos.length+'/5)'):('✓ '+listPhotos.length+' photos added');
+  if(hint)hint.textContent=listPhotos.length<1?('Add at least 1 photo (more is better)'):('✓ '+listPhotos.length+' photo'+(listPhotos.length!==1?'s':'')+' added');
 }
 function detectMyLocation(){
   if(!navigator.geolocation){toast('Location not supported','err');return;}
@@ -5096,7 +5105,7 @@ function submitProduct(){
   var phone=document.getElementById('lp-phone').value.trim();
   var map=document.getElementById('lp-map').value.trim();
   if(!title){toast('Enter a product title','err');return;}
-  if(listPhotos.length<5){toast('Add at least 5 photos of the product','err');return;}
+  if(listPhotos.length<1){toast('Add at least 1 product photo before posting','err');return;}
   if(!price){toast('Enter a price','err');return;}
   if(!addr||!phone){toast('Add your address and phone number','err');return;}
   var serialNo='PRD-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
@@ -5227,7 +5236,7 @@ function productCardSeller(p){
       var soon=diff<3*86400000;
       expStr='<span class="exp-badge '+(soon?'exp-soon':'exp-ok')+'"><i class="ti ti-clock"></i> Expires in '+ed+' day'+(ed!==1?'s':'')+' '+eh+' hour'+(eh!==1?'s':'')+(soon?' — SOON!':'')+'</span>';}
   }
-  return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+(p.photos[0]||'')+'" style="width:54px;height:54px;border-radius:8px;object-fit:cover">'
+  return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+esc(p.photos[0]||'')+'" style="width:54px;height:54px;border-radius:8px;object-fit:cover">'
     +'<div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
     +(p.serialNo?'<div class="order-no">'+esc(p.serialNo)+'</div>':'')
     +'<div style="font-size:12px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+(p.offer?' <span style="color:var(--gold);font-size:11px">offer '+esc(p.offer)+'</span>':'')+'</div>'
@@ -5360,7 +5369,7 @@ function showCart(){
     var orig=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||price;
     var off=orig>price?Math.round((orig-price)/orig*100):0;
     return '<div class="cart-item'+(avail?'':' cart-oos')+'">'
-      +'<img src="'+(p.photos&&p.photos[0]||'')+'" class="cart-img">'
+      +'<img src="'+esc(p.photos&&p.photos[0]||'')+'" class="cart-img">'
       +'<div style="flex:1;min-width:0">'
       +'<div style="font-weight:600;font-size:13px;line-height:1.3">'+esc(p.title)+'</div>'
       +'<div style="font-size:10px;color:var(--mt2)">Sold by: '+esc(p.sellerName)+'</div>'
@@ -5396,7 +5405,7 @@ function buyProduct(productId){
   curBuyProduct=p;
   var gallery='';
   if(p.photos&&p.photos.length){
-    gallery='<div class="buy-gallery">'+p.photos.map(function(ph,i){return '<img src="'+ph+'" class="buy-gimg" alt="photo '+(i+1)+'">';}).join('')+'</div>'
+    gallery='<div class="buy-gallery">'+p.photos.map(function(ph,i){return '<img src="'+esc(ph)+'" class="buy-gimg" alt="photo '+(i+1)+'">';}).join('')+'</div>'
       +(p.photos.length>1?'<div style="font-size:10px;color:var(--mt2);text-align:center;margin-top:3px">← swipe to see all '+p.photos.length+' photos →</div>':'');
   }
   document.getElementById('buy-info').innerHTML=gallery+'<div style="font-weight:700;margin-top:8px">'+esc(p.title)+'</div><div style="color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+(p.offer?' <span style="color:var(--gold);font-size:12px">offer '+esc(p.offer)+'</span>':'')+'</div>'+(p.desc?'<div style="font-size:12px;color:var(--mt);margin-top:4px">'+esc(p.desc)+'</div>':'');
@@ -5701,7 +5710,7 @@ function runProductSearch(q){
     var mine=CU&&p.sellerUid===CU.uid;
     var avail=productAvailable(p);
     return '<div class="ps-card">'+shopRibbon(p)
-      +'<img src="'+(p.photos&&p.photos[0]||'')+'" class="ps-img">'
+      +'<img src="'+esc(p.photos&&p.photos[0]||'')+'" class="ps-img">'
       +'<div style="flex:1;min-width:0">'
       +'<div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
       +'<div style="font-size:13px">'+priceHtml(p)+'</div>'
@@ -5822,7 +5831,7 @@ function showOffersManager(){
     +'<div class="disp-box disp-done"><b>'+esc(offerCur)+' '+offerRevenue.toLocaleString()+'</b><small>Offer revenue</small></div>'
     +'</div></div>';
   function offerRow(p,tagHtml){
-    return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+(p.photos&&p.photos[0]||'')+'" style="width:46px;height:46px;border-radius:7px;object-fit:cover">'
+    return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+esc(p.photos&&p.photos[0]||'')+'" style="width:46px;height:46px;border-radius:7px;object-fit:cover">'
       +'<div style="flex:1"><div style="font-weight:700;font-size:12px">'+esc(p.title)+'</div>'
       +'<div style="font-size:11px;color:var(--g)">'+esc(p.currency)+' '+esc(p.price)+(p.offer?' → <span style="color:var(--gold);font-weight:700">offer '+esc(p.offer)+'</span>':'')+'</div>'
       +tagHtml+'</div></div>'
@@ -6309,43 +6318,26 @@ function agentConfirmDelivery(orderId){
    NOTE: A single HTML file cannot truly hide a password. This hash
    only keeps casual users out; real security requires a backend.
    ============================================================ */
-function adminHash(s){var x=5381;for(var i=0;i<s.length;i++){x=((x<<5)+x)+s.charCodeAt(i);x=x&0xffffffff;}return (x>>>0).toString(16);}
-function getAdminConfig(){return LS.get('rb_admin',{hash:'5c2744fd',admins:[]});} // default pwd set by owner; change it
+function getAdminConfig(){return LS.get('rb_admin',{admins:[]});}
 function saveAdminConfig(c){LS.set('rb_admin',c);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('admin').set(c,{merge:true}).catch(function(){});}catch(e){}}}
 var adminUnlocked=false;
-var OWNER_EMAILS=['ajmal.aue@gmail.com','testing.thahir@gmail.com'];
-var OWNER_OTP_PHONE='+919847131871';
-var adminPendingOtp=null;
-function isOwnerEmail(email){if(!email)return false;return OWNER_EMAILS.indexOf((''+email).trim().toLowerCase())>=0;}
+function isOwnerEmail(email){return false;}
 function openAdminPanel(){
   if(adminUnlocked){renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');return;}
-  if(!CU||!isOwnerEmail(CU.email)){toast('Admin access is restricted to the Reedbi owner.','err');return;}
+  // Admin access is granted ONLY by the backend (Firebase custom claim set via Cloud Function).
+  // No admin emails, phone, or password exist in this file.
   if(FB.ready&&FB.auth&&FB.auth.currentUser){
     FB.auth.currentUser.getIdTokenResult().then(function(r){
-      if(r&&r.claims&&r.claims.admin===true){adminStartOtp();}
-      else{adminPasswordGate();}
-    }).catch(function(){adminPasswordGate();});
+      if(r&&r.claims&&r.claims.admin===true){
+        adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');
+        toast('Owner verified by server','ok');
+      }else{
+        toast('Admin access requires server verification. Set up the backend (custom-claim admin) to enable it.','err');
+      }
+    }).catch(function(){toast('Could not verify admin with the server.','err');});
     return;
   }
-  adminPasswordGate();
-}
-function adminPasswordGate(){
-  var pwd=prompt('Admin password (owner only):');
-  if(pwd===null)return;
-  var cfg=getAdminConfig();
-  if(adminHash(pwd)===cfg.hash){adminStartOtp();}
-  else toast('Incorrect admin password','err');
-}
-function adminStartOtp(){
-  var otp=(''+Math.floor(100000+Math.random()*900000));
-  adminPendingOtp=otp;
-  var entered=prompt('2-step verification\nA 6-digit code was generated for the owner ('+OWNER_OTP_PHONE+').\n\n[No backend to send SMS in this build - your code is: '+otp+']\n\nEnter the code to continue:');
-  if(entered===null){adminPendingOtp=null;return;}
-  if(entered.trim()===adminPendingOtp){
-    adminUnlocked=true;adminPendingOtp=null;
-    renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');
-    toast('Owner verified - admin unlocked','ok');
-  }else{toast('Incorrect verification code','err');}
+  toast('Admin access needs the backend connected. Until then the panel is locked for everyone, by design.','info');
 }
 function adminCanManage(){
   // owner (unlocked) OR a user listed as admin-team member with manage rights
@@ -6395,9 +6387,7 @@ function adminTab(t){
       +'<select id="lk-months" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px"><option value="1">1 month</option><option value="6">6 months</option><option value="12" selected>12 months</option><option value="24">24 months</option></select>'
       +'<button class="btn btnok" style="width:100%" onclick="adminIssueLicenseKey()"><i class="ti ti-key"></i> Generate License Key</button>'
       +'<div id="lk-result"></div></div>'
-      +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px"><div style="font-size:11px;font-weight:700;margin-bottom:6px">Change admin password</div>'
-      +'<input type="password" id="adm-newpwd" placeholder="New admin password" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
-      +'<button class="btn" style="width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="adminChangePwd()">Update password</button></div>';
+      +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px;font-size:10px;color:var(--mt2)"><i class="ti ti-shield-lock"></i> Admin access is controlled entirely by the backend (Firebase custom claim). No admin password or owner email is stored in this app.</div>';
   }else if(t==='users'){
     tb.innerHTML=users.length?users.map(function(u){
       var lic=userLicensed(u.uid);
@@ -6510,7 +6500,6 @@ function adminAddTeam(){
   cfg.admins.push({uid:uid,name:name,role:role,ts:Date.now()});saveAdminConfig(cfg);adminTab('team');toast(name+' added as '+role,'ok');
 }
 function adminRemoveTeam(uid){var cfg=getAdminConfig();cfg.admins=(cfg.admins||[]).filter(function(a){return a.uid!==uid;});saveAdminConfig(cfg);adminTab('team');toast('Removed','info');}
-function adminChangePwd(){var v=document.getElementById('adm-newpwd').value;if(!v||v.length<6){toast('Min 6 characters','err');return;}var cfg=getAdminConfig();cfg.hash=adminHash(v);saveAdminConfig(cfg);document.getElementById('adm-newpwd').value='';toast('Admin password updated','ok');}
 function adminDeletePost(tagId,postId){
   if(!confirm('Delete this post permanently?'))return;
   var tg=tags.find(function(x){return x.id===tagId;});if(!tg)return;
