@@ -405,6 +405,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .cart-trust span{display:flex;align-items:center;gap:3px}
 .cart-trust i{color:#1a8f3c;font-size:13px}
 .bub-media{width:100%;max-width:240px;max-height:240px;object-fit:cover;border-radius:10px;display:block}
+.user-ad{position:relative;background:linear-gradient(135deg,rgba(10,102,194,.06),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:10px;padding:10px 11px;margin:8px 10px 0;font-size:12px}
+.ad-tag{position:absolute;top:7px;right:9px;font-size:8px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.5px}
 .acct-item{display:flex;align-items:center;gap:11px;width:100%;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:13px 14px;margin-bottom:7px;font-size:13px;font-weight:600;color:var(--tx);cursor:pointer;font-family:var(--fn);text-align:left;touch-action:manipulation;transition:background .15s}
 .acct-item:hover{background:var(--b)}
 .acct-item i{font-size:18px;flex-shrink:0}
@@ -531,6 +533,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
           <div class="afg"><label>Company (select existing page)</label><select id="sc" style="width:100%"><option value="">— None / Independent —</option></select></div>
         </div>
         <div class="afg"><label>Email</label><input type="email" id="se" placeholder="you@email.com"></div>
+        <div class="frow" style="margin-bottom:0">
+          <div class="afg"><label>WhatsApp number</label><input type="tel" id="sw" placeholder="+971 50 123 4567"></div>
+          <div class="afg"><label>Contact number</label><input type="tel" id="scn" placeholder="+971 4 123 4567"></div>
+        </div>
+        <div class="afg"><label>Location (country, city, area)</label><input type="text" id="sloc" placeholder="UAE, Dubai, Discovery Gardens"></div>
+        <div class="afg"><label>Interests (what products interest you?)</label><input type="text" id="sint" placeholder="electronics, groceries, fashion..."></div>
         <div class="afg"><label>Password</label><input type="password" id="sp" placeholder="Min 6 chars"></div>
         <button class="auth-btn" onclick="doSignup()"><i class="ti ti-user-plus"></i> Create Account</button>
       </div>
@@ -544,7 +552,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v80</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v81</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -562,6 +570,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       </div>
     </div>
     <div class="tsrch"><div class="sw"><i class="ti ti-search"></i><input type="text" id="tsr" placeholder="Search tags..." oninput="filterTags(this.value)" autocomplete="off"></div><button class="ib" onclick="cleanupTags()" title="Remove broken/old tags"><i class="ti ti-trash"></i></button></div>
+    <div id="user-ads" style="display:none"></div>
     <div class="tlist" id="tlist"></div>
   </div>
   <div class="right">
@@ -3681,33 +3690,51 @@ function localLogin(e,p){
   if(a.pass!==btoa(p)){setErr('Incorrect password.');return;}
   CU={uid:a.uid,name:a.name,email:a.email,co:a.co,avIdx:a.avIdx};LS.set('rb_user',CU);enterApp();
 }
+function readSignupExtras(){
+  return {
+    phone:(document.getElementById('sw')||{value:''}).value.trim(),
+    contact:(document.getElementById('scn')||{value:''}).value.trim(),
+    location:(document.getElementById('sloc')||{value:''}).value.trim(),
+    interests:(document.getElementById('sint')||{value:''}).value.trim()
+  };
+}
+function indexUserForAdmin(prof){
+  // keep a local users index so the owner directory works; syncs to cloud when Firestore is on
+  var idx=LS.get('rb_fusers',[])||[];
+  var i=idx.findIndex(function(u){return u.uid===prof.uid;});
+  var rec={uid:prof.uid,name:prof.name,email:prof.email||'',phone:prof.phone||'',contact:prof.contact||'',location:prof.location||'',interests:prof.interests||'',co:prof.co||'',acctype:prof.acctype||'user',ts:Date.now()};
+  if(i>=0)idx[i]=rec;else idx.push(rec);
+  LS.set('rb_fusers',idx);
+}
 function doSignup(){
   var n=document.getElementById('sn').value.trim(),co=document.getElementById('sc').value.trim(),e=document.getElementById('se').value.trim().toLowerCase(),p=document.getElementById('sp').value;
   var acctype=(document.getElementById('su-acctype')||{}).value||'user';
+  var ex=readSignupExtras();
   if(!n||!e||!p){setErr('Fill all fields');return;}
   if(p.length<6){setErr('Password 6+ chars');return;}
   var avIdx=Math.floor(Math.random()*7);
   if(FB.ready){
     FB.auth.createUserWithEmailAndPassword(e,p).then(function(cred){
-      var prof={uid:cred.user.uid,name:n,email:e,co:co||'',avIdx:avIdx,acctype:acctype};
-      try{FB.db.collection('users').doc(cred.user.uid).set({name:n,co:co||'',email:e,avIdx:avIdx,acctype:acctype,createdAt:Date.now()}).catch(function(){});}catch(e2){}
-      CU=prof;LS.set('rb_user',CU);afterSignupAccountType(acctype,n);enterApp();
+      var prof={uid:cred.user.uid,name:n,email:e,co:co||'',avIdx:avIdx,acctype:acctype,phone:ex.phone,contact:ex.contact,location:ex.location,interests:ex.interests};
+      try{FB.db.collection('users').doc(cred.user.uid).set({name:n,co:co||'',email:e,avIdx:avIdx,acctype:acctype,phone:ex.phone,contact:ex.contact,location:ex.location,interests:ex.interests,createdAt:Date.now()}).catch(function(){});}catch(e2){}
+      CU=prof;LS.set('rb_user',CU);indexUserForAdmin(prof);afterSignupAccountType(acctype,n);enterApp();
     }).catch(function(err){
       var c=(err&&err.code)||'';
       if(c.indexOf('configuration-not-found')>=0||c.indexOf('operation-not-allowed')>=0||c.indexOf('unauthorized-domain')>=0||c.indexOf('network-request-failed')>=0||c.indexOf('api-key')>=0){
-        localSignup(n,co,e,p,avIdx,acctype);
+        localSignup(n,co,e,p,avIdx,acctype,ex);
       }else{setErr(fbErr(err));}
     });
     return;
   }
-  localSignup(n,co,e,p,avIdx,acctype);
+  localSignup(n,co,e,p,avIdx,acctype,ex);
 }
-function localSignup(n,co,e,p,avIdx,acctype){
+function localSignup(n,co,e,p,avIdx,acctype,ex){
+  ex=ex||{phone:'',contact:'',location:'',interests:''};
   var accs=LS.get('rb_accs',[])||[];
   if(accs.find(function(a){return a.email===e;})){setErr('Email already registered. Please sign in.');return;}
   var uid='u'+Date.now();
-  accs.push({uid:uid,name:n,co:co||'',email:e,pass:btoa(p),avIdx:avIdx,acctype:acctype||'user'});LS.set('rb_accs',accs);
-  CU={uid:uid,name:n,email:e,co:co||'',avIdx:avIdx,acctype:acctype||'user'};LS.set('rb_user',CU);afterSignupAccountType(acctype||'user',n);enterApp();
+  accs.push({uid:uid,name:n,co:co||'',email:e,pass:btoa(p),avIdx:avIdx,acctype:acctype||'user',phone:ex.phone,contact:ex.contact,location:ex.location,interests:ex.interests});LS.set('rb_accs',accs);
+  CU={uid:uid,name:n,email:e,co:co||'',avIdx:avIdx,acctype:acctype||'user',phone:ex.phone,contact:ex.contact,location:ex.location,interests:ex.interests};LS.set('rb_user',CU);indexUserForAdmin(CU);afterSignupAccountType(acctype||'user',n);enterApp();
 }
 // after signup: if business owner, auto-create a license request for the owner to approve
 function afterSignupAccountType(acctype,name){
@@ -3731,6 +3758,7 @@ function doSignOut(){if(FB.ready&&FB.auth)FB.auth.signOut();LS.del('rb_user');CU
 function enterApp(){
   document.getElementById('auth-scr').classList.remove('show');
   document.getElementById('app').style.display='flex';
+  try{if(typeof renderUserAds==='function')renderUserAds();}catch(e){}
   document.getElementById('uc-nm').textContent=CU.name;
   document.getElementById('uc-av').textContent=ini(CU.name);
   document.getElementById('uc-av').className='uchip-av '+avC(CU.avIdx);
@@ -4990,7 +5018,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v80 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v81 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6355,6 +6383,7 @@ function renderAdminPanel(){
     +'<button class="seller-tab" onclick="adminTab(\'team\')">Admin Team</button>'
     +'<button class="seller-tab" onclick="adminTab(\'users\')">Users</button>'
     +'<button class="seller-tab" onclick="adminTab(\'licenses\')">Licenses</button>'
+    +'<button class="seller-tab" onclick="adminTab(\'ads\')">Ads</button>'
     +'<button class="seller-tab" onclick="adminTab(\'content\')">Content</button>'
     +'</div><div id="admin-tabbody"></div>';
   body.innerHTML=h;
@@ -6389,17 +6418,29 @@ function adminTab(t){
       +'<div id="lk-result"></div></div>'
       +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px;font-size:10px;color:var(--mt2)"><i class="ti ti-shield-lock"></i> Admin access is controlled entirely by the backend (Firebase custom claim). No admin password or owner email is stored in this app.</div>';
   }else if(t==='users'){
-    tb.innerHTML=users.length?users.map(function(u){
+    var fl=(adminUserFilter.loc||'').toLowerCase(),fi=(adminUserFilter.int||'').toLowerCase();
+    var shown=users.filter(function(u){
+      if(fl&&((u.location||'').toLowerCase().indexOf(fl)<0))return false;
+      if(fi&&((u.interests||'').toLowerCase().indexOf(fi)<0))return false;
+      return true;
+    });
+    tb.innerHTML='<div style="display:flex;gap:6px;margin-bottom:8px">'
+      +'<input type="text" id="auf-loc" placeholder="Filter location (e.g. Discovery Gardens)" value="'+esc(adminUserFilter.loc||'')+'" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn);font-size:11px">'
+      +'<input type="text" id="auf-int" placeholder="Filter interest" value="'+esc(adminUserFilter.int||'')+'" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn);font-size:11px">'
+      +'<button class="lbl-mini" onclick="adminApplyUserFilter()"><i class="ti ti-filter"></i></button></div>'
+      +'<div style="font-size:11px;color:var(--mt);margin-bottom:8px"><b>'+shown.length+'</b> user'+(shown.length!==1?'s':'')+' match'+((fl||fi)?' (filtered)':'')+' · <a href="#" onclick="adminExportUsers();return false" style="color:var(--g)"><i class="ti ti-download"></i> Export list (CSV)</a></div>'
+      +(shown.length?shown.map(function(u){
       var lic=userLicensed(u.uid);
       return '<div class="appl-card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-weight:700;font-size:13px">'+esc(u.name||'User')+(lic?' <span class="pay-badge pay-online-b" style="font-size:9px">ReadBi ✓</span>':'')+'</div></div>'
         +(u.email?'<div style="font-size:11px;color:var(--mt)">'+esc(u.email)+'</div>':'')
         +(u.phone?'<div style="font-size:11px;color:var(--g)"><a href="https://wa.me/'+esc((u.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)"><i class="ti ti-brand-whatsapp"></i> '+esc(u.phone)+'</a></div>':'')
+        +(u.contact?'<div style="font-size:11px;color:var(--mt2)"><i class="ti ti-phone"></i> '+esc(u.contact)+'</div>':'')
         +(u.interests?'<div style="font-size:11px;color:var(--mt2)">Interests: '+esc(u.interests)+'</div>':'')
         +(u.location?'<div style="font-size:11px;color:var(--mt2)"><i class="ti ti-map-pin"></i> '+esc(u.location)+'</div>':'')
         +(u.co?'<div style="font-size:11px;color:var(--mt2)">Company: '+esc(u.co)+'</div>':'')
         +'<button class="lbl-mini" style="margin-top:7px;'+(lic?'color:var(--red);border-color:var(--red)':'color:var(--g);border-color:var(--g)')+'" onclick="adminToggleLicense(\''+escJS(u.uid)+'\',\''+escJS(u.name||'')+'\','+(lic?'false':'true')+')">'+(lic?'<i class="ti ti-x"></i> Revoke ReadBi license':'<i class="ti ti-license"></i> Grant ReadBi license')+'</button>'
         +'</div>';
-    }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No user directory data. Users appear here once profiles sync via cloud.</p>';
+    }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No users match. Users appear here as they register'+((fl||fi)?' — try clearing the filters':'')+'.</p>');
   }else if(t==='licenses'){
     var reqs=getLicenseRequests();
     var pending=reqs.filter(function(r){return r.status==='pending';});
@@ -6421,6 +6462,25 @@ function adminTab(t){
       h+=decided.slice(-20).reverse().map(function(r){return '<div class="act-row"><div><b>'+esc(r.name)+'</b><small>'+esc(r.status)+(r.decidedBy?' by '+esc(r.decidedBy):'')+'</small></div><span class="pay-badge '+(r.status==='approved'?'pay-online-b':'pay-cod-b')+'">'+esc(r.status)+'</span></div>';}).join('');
     }
     tb.innerHTML=h;
+  }else if(t==='ads'){
+    var ads=getAds();var now=Date.now();
+    var h2='<div style="font-size:11px;color:var(--mt);margin-bottom:8px"><i class="ti ti-speakerphone"></i> Create a location + interest targeted advertisement. It appears inside Reedbi/Tag Talk for every matching user (e.g. all users in Discovery Gardens interested in electronics).</div>'
+      +'<input type="text" id="ad-title" placeholder="Ad title (e.g. 50% off Electronics this week!)" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
+      +'<textarea id="ad-text" rows="2" placeholder="Ad text / offer details" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px"></textarea>'
+      +'<div style="display:flex;gap:6px;margin-bottom:6px">'
+      +'<input type="text" id="ad-loc" placeholder="Target location (e.g. Dubai Discovery Gardens)" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);font-size:11px">'
+      +'<input type="text" id="ad-int" placeholder="Target interest (e.g. electronics)" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);font-size:11px">'
+      +'</div>'
+      +'<div style="display:flex;gap:6px;margin-bottom:8px"><select id="ad-days" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn)"><option value="7">Run 7 days</option><option value="14">Run 14 days</option><option value="30">Run 30 days</option></select>'
+      +'<button class="btn btnok" style="flex:1" onclick="adminCreateAd()"><i class="ti ti-send"></i> Publish Ad</button></div>';
+    h2+='<div style="font-size:11px;font-weight:700;margin:10px 0 6px">Active ads ('+ads.filter(function(a){return !a.expiry||now<a.expiry;}).length+')</div>';
+    h2+=ads.length?ads.slice().reverse().map(function(a){
+      var live=!a.expiry||now<a.expiry;
+      return '<div class="appl-card"><b style="font-size:12px">'+esc(a.title)+'</b><div style="font-size:11px;color:var(--mt)">'+esc(a.text)+'</div>'
+        +'<div style="font-size:10px;color:var(--mt2);margin-top:3px">'+(a.targetLoc?'📍 '+esc(a.targetLoc)+' · ':'')+(a.targetInt?'❤️ '+esc(a.targetInt)+' · ':'')+(live?'live until '+new Date(a.expiry).toLocaleDateString():'expired')+'</div>'
+        +'<button class="lbl-mini" style="margin-top:6px;color:var(--red);border-color:var(--red)" onclick="adminDeleteAd(\''+escJS(a.id)+'\')"><i class="ti ti-trash"></i> Remove</button></div>';
+    }).join(''):'<div class="act-empty" style="font-size:11px;color:var(--mt2)">No ads yet.</div>';
+    tb.innerHTML=h2;
   }else if(t==='content'){
     // TAG MANAGER: owner can remove unwanted main tags
     var SEED=['jobs','tech','ai','insurance','sell','remote'];
@@ -6508,5 +6568,67 @@ function adminDeletePost(tagId,postId){
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('tags').doc(tagId).collection('posts').doc(String(postId)).delete().catch(function(){});}catch(e){}}
   if(activeTagId===tagId)renderMsgs(tg);
   adminTab('content');toast('Post deleted','info');
+}
+
+/* ===== Admin: user filters + CSV export ===== */
+var adminUserFilter={loc:'',int:''};
+function adminApplyUserFilter(){
+  adminUserFilter.loc=(document.getElementById('auf-loc')||{value:''}).value.trim();
+  adminUserFilter.int=(document.getElementById('auf-int')||{value:''}).value.trim();
+  adminTab('users');
+}
+function adminExportUsers(){
+  var users=getAllUsersIndex();
+  var fl=(adminUserFilter.loc||'').toLowerCase(),fi=(adminUserFilter.int||'').toLowerCase();
+  var rows=users.filter(function(u){
+    if(fl&&((u.location||'').toLowerCase().indexOf(fl)<0))return false;
+    if(fi&&((u.interests||'').toLowerCase().indexOf(fi)<0))return false;
+    return true;
+  });
+  var csv='Name,Email,WhatsApp,Contact,Location,Interests,Company\n'+rows.map(function(u){
+    function q(s){return '"'+String(s||'').replace(/"/g,'""')+'"';}
+    return [q(u.name),q(u.email),q(u.phone),q(u.contact),q(u.location),q(u.interests),q(u.co)].join(',');
+  }).join('\n');
+  var blob=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='reedbi-users-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  toast('User list exported ('+rows.length+' users)','ok');
+}
+
+/* ===== Targeted ads: location + interest based, shown in-app ===== */
+function getAds(){return LS.get('rb_ads',[])||[];}
+function saveAds(a){LS.set('rb_ads',a);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('ads').set({list:a},{merge:true}).catch(function(){});}catch(e){}}}
+function adminCreateAd(){
+  var title=(document.getElementById('ad-title')||{value:''}).value.trim();
+  var text=(document.getElementById('ad-text')||{value:''}).value.trim();
+  var loc=(document.getElementById('ad-loc')||{value:''}).value.trim();
+  var intr=(document.getElementById('ad-int')||{value:''}).value.trim();
+  var days=parseInt((document.getElementById('ad-days')||{value:'7'}).value,10)||7;
+  if(!title||!text){toast('Enter ad title and text','err');return;}
+  var ads=getAds();
+  ads.push({id:'ad'+Date.now(),title:title,text:text,targetLoc:loc,targetInt:intr,ts:Date.now(),expiry:Date.now()+days*86400000,by:CU?CU.name:'admin'});
+  saveAds(ads);
+  adminTab('ads');toast('Advertisement published — users matching the location/interest will see it','ok');
+}
+function adminDeleteAd(id){saveAds(getAds().filter(function(a){return a.id!==id;}));adminTab('ads');toast('Ad removed','info');}
+// which ads should THIS user see?
+function adsForCurrentUser(){
+  if(!CU)return [];
+  var now=Date.now();
+  var myLoc=(CU.location||'').toLowerCase(),myInt=(CU.interests||'').toLowerCase();
+  return getAds().filter(function(a){
+    if(a.expiry&&now>a.expiry)return false;
+    if(a.targetLoc){var tl=a.targetLoc.toLowerCase();var locWords=tl.split(/[\s,]+/).filter(Boolean);var locHit=locWords.some(function(w){return myLoc.indexOf(w)>=0;});if(!locHit)return false;}
+    if(a.targetInt){var ti2=a.targetInt.toLowerCase();var intWords=ti2.split(/[\s,]+/).filter(Boolean);var intHit=intWords.some(function(w){return myInt.indexOf(w)>=0;});if(!intHit)return false;}
+    return true;
+  });
+}
+function renderUserAds(){
+  var box=document.getElementById('user-ads');if(!box)return;
+  var ads=adsForCurrentUser();
+  if(!ads.length){box.innerHTML='';box.style.display='none';return;}
+  box.style.display='block';
+  box.innerHTML=ads.slice(-2).map(function(a){
+    return '<div class="user-ad"><span class="ad-tag">Sponsored</span><b>'+esc(a.title)+'</b><div style="font-size:11px;color:var(--mt)">'+esc(a.text)+'</div></div>';
+  }).join('');
 }
 </script></body></html>
