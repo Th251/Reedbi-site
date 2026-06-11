@@ -552,10 +552,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v88</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v90</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
+          <button class="ib" id="cloudchip" onclick="showCloudStatus()" title="Cloud sync status" style="font-size:10px;font-weight:700;width:auto;padding:0 8px;border-radius:12px;background:rgba(204,16,22,.1);color:#cc1016"><i class="ti ti-cloud-off"></i> OFF</button>
           <button class="ib" onclick="openCreateModal()"><i class="ti ti-square-plus"></i></button>
           <button class="ib" onclick="showCart()" title="My Bag" style="position:relative"><i class="ti ti-shopping-bag"></i><span id="cart-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#cc1016;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px">0</span></button>
           <button class="ib" onclick="openProductSearch()" title="Search products to buy"><i class="ti ti-search"></i></button>
@@ -1036,8 +1037,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="tstack" id="tstack"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 //---------------------------------------------------------------------
 //
@@ -5110,7 +5111,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v88 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v90 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5187,6 +5188,97 @@ try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setD
     }catch(e){}
   });
 })();
+
+/* ===== Cloud status indicator: shows whether cross-device sync is ON ===== */
+function updateCloudChip(state,msg){
+  var c=document.getElementById('cloudchip');if(!c)return;
+  if(state==='live'){c.style.background='rgba(26,143,60,.12)';c.style.color='#1a8f3c';c.innerHTML='<i class="ti ti-cloud-check"></i> LIVE';}
+  else if(state==='blocked'){c.style.background='rgba(195,125,22,.12)';c.style.color='#c37d16';c.innerHTML='<i class="ti ti-cloud-lock"></i> RULES';}
+  else{c.style.background='rgba(204,16,22,.1)';c.style.color='#cc1016';c.innerHTML='<i class="ti ti-cloud-off"></i> OFF';}
+  c.setAttribute('data-state',state);c.setAttribute('data-msg',msg||'');
+}
+function checkCloudStatus(){
+  if(!FB.ready||!FB.db||FB_CLOUD_DISABLED){updateCloudChip('off','Firebase not connected');return;}
+  try{
+    FB.db.collection('config').doc('ping').get().then(function(){
+      updateCloudChip('live','Cloud database connected — orders, posts and approvals sync to every device.');
+      try{cloudMigrateLocal(false);}catch(e1){}
+      try{fbListenAllApps();}catch(e2){}
+    }).catch(function(err){
+      var m=(err&&err.code)||'';
+      if(m.indexOf('permission-denied')>=0)updateCloudChip('blocked','Database exists but rules block this read — check Layer 2 rules.');
+      else updateCloudChip('off','Cloud database not reachable: '+m);
+    });
+  }catch(e){updateCloudChip('off','');}
+}
+function showCloudStatus(){
+  var c=document.getElementById('cloudchip');
+  var st=c?c.getAttribute('data-state'):'off';
+  var msg=c?c.getAttribute('data-msg'):'';
+  var body='';
+  if(st==='live'){
+    body='<div style="font-size:13px;color:#1a8f3c;font-weight:700"><i class="ti ti-cloud-check"></i> Cloud sync is LIVE</div>'
+      +'<p style="font-size:12px;color:var(--mt)">Orders, products, posts, comments, applications and approvals now sync to every device signed in with the same email. Your PC and mobile will show the same shop.</p>'
+      +'<button class="btn btnok" style="width:100%;margin-top:6px" onclick="cloudMigrateLocal(true)"><i class="ti ti-cloud-upload"></i> Sync now — upload everything on this device</button>'
+      +'<p style="font-size:10px;color:var(--mt2);margin-top:5px">Use this once on the device that has your old orders (your PC with the 8 orders) — they upload to the cloud and appear on all devices.</p>';
+  }else{
+    body='<div style="font-size:13px;color:#cc1016;font-weight:700"><i class="ti ti-cloud-off"></i> Cloud sync is OFF</div>'
+      +'<p style="font-size:12px;color:var(--mt)">This is why orders placed on PC do not appear on mobile: each device keeps its own local data until the cloud database exists.</p>'
+      +(msg?'<p style="font-size:11px;color:var(--mt2)">Status: '+esc(msg)+'</p>':'')
+      +'<div style="font-size:12px;font-weight:700;margin-top:10px">Turn it ON (15 min, free, owner only):</div>'
+      +'<ol style="font-size:12px;color:var(--mt);padding-left:18px;line-height:1.7">'
+      +'<li>Open <b>console.firebase.google.com</b></li>'
+      +'<li>Project <b>reedbi-36a08</b></li>'
+      +'<li>Build → <b>Firestore Database</b> → <b>Create database</b></li>'
+      +'<li><b>Production mode</b> → choose region → Enable</li>'
+      +'<li><b>Rules</b> tab → paste the Layer 2 rules from the spec doc → <b>Publish</b></li>'
+      +'<li>Build → <b>Authentication</b> → enable <b>Email/Password</b>; add your domain under Authorized domains</li>'
+      +'<li>Reload this app — this chip turns <b style="color:#1a8f3c">LIVE</b></li></ol>';
+  }
+  var ovl=document.getElementById('cloud-ovl');
+  if(!ovl){
+    ovl=document.createElement('div');ovl.id='cloud-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:430px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:14px"><i class="ti ti-cloud"></i> Cloud Sync</b><button class="modal-x" onclick="closeOvl(\'cloud-ovl\')"><i class="ti ti-x"></i></button></div><div id="cloud-body"></div></div>';
+    document.body.appendChild(ovl);
+    ovl.addEventListener('click',function(e){if(e.target===ovl)ovl.classList.remove('open');});
+  }
+  document.getElementById('cloud-body').innerHTML=body;
+  ovl.classList.add('open');
+}
+try{setTimeout(checkCloudStatus,2500);}catch(e){}
+
+/* ===== One-time cloud migration: push ALL local data up when cloud goes live ===== */
+function cloudMigrateLocal(force){
+  if(!FB.ready||!FB.db||FB_CLOUD_DISABLED){toast('Cloud not connected yet','err');return;}
+  if(!force&&LS.get('rb_migrated_v90',false)){return;}
+  var counts={orders:0,products:0,pages:0,apps:0,users:0};
+  try{
+    (getOrders()||[]).forEach(function(o){if(o&&o.id){FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});counts.orders++;}});
+    (getProducts()||[]).forEach(function(p){if(p&&p.id){FB.db.collection('products').doc(p.id).set(p,{merge:true}).catch(function(){});counts.products++;}});
+    (getPages()||[]).forEach(function(pg){if(pg&&pg.name){FB.db.collection('pages').doc(pg.name.toLowerCase()).set(pg,{merge:true}).catch(function(){});counts.pages++;}});
+    (getAllApps()||[]).forEach(function(a){if(a&&a.id){FB.db.collection('applications').doc(a.id).set(a,{merge:true}).catch(function(){});counts.apps++;}});
+    ((LS.get('rb_fusers',[])||[])).forEach(function(u){if(u&&u.uid){FB.db.collection('users').doc(u.uid).set(u,{merge:true}).catch(function(){});counts.users++;}});
+    var cfgPairs=[['rb_licenses','licenses',null],['rb_lickeys','lickeys',null],['rb_licreqs','licreqs','list'],['rb_pagereqs','pagereqs','list'],['rb_ads','ads','list'],['rb_agents','agents','list'],['rb_admin','admin',null]];
+    cfgPairs.forEach(function(pr){
+      var v=LS.get(pr[0],null);if(v===null)return;
+      var payload=pr[2]?{ }:v; if(pr[2]){payload={};payload[pr[2]]=v;}
+      try{FB.db.collection('config').doc(pr[1]).set(payload,{merge:true}).catch(function(){});}catch(e){}
+    });
+    LS.set('rb_migrated_v90',Date.now());
+    toast('Local data uploaded to cloud: '+counts.orders+' orders, '+counts.products+' products, '+counts.apps+' applications. Other devices will receive them now.','ok');
+  }catch(e){toast('Migration error: '+e.message,'err');}
+}
+/* listen to ALL applications so sellers receive applications on every device */
+function fbListenAllApps(){
+  if(!FB.ready||FB_CLOUD_DISABLED||!FB.db||FB_LISTENERS['apps_all'])return;
+  try{
+    FB_LISTENERS['apps_all']=FB.db.collection('applications').onSnapshot(function(snap){
+      var local=getAllApps();var map={};local.forEach(function(a){map[a.id]=a;});
+      snap.forEach(function(doc){var d=doc.data();d.id=d.id||doc.id;map[d.id]=Object.assign(map[d.id]||{},d);});
+      saveAllApps(Object.keys(map).map(function(k){return map[k];}));
+    },function(err){if(fbIsPermErr(err))fbStopListener('apps_all','perm');});
+  }catch(e){}
+}
 /* ============================================================
    MARKETPLACE — product listing, photos, orders, shipping status
    ============================================================ */
