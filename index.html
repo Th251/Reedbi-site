@@ -552,7 +552,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v84</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v85</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1027,6 +1027,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <div style="font-size:12px;color:var(--mt2);line-height:1.7;margin-bottom:16px" id="ok-msg">Your post is now boosted.</div>
     <button class="btn btnok" style="width:100%;border-radius:10px" onclick="closeOvl('ok-ovl')">Done</button>
   </div>
+</div>
+<div class="overlay" id="agent-assign-ovl"><div class="modal" style="max-width:420px"></div></div>
+<div id="agent-dash" style="display:none"></div>
 </div></div>
 
 <button class="fab" id="fab" onclick="openPostChooser()"><i class="ti ti-plus"></i> <span class="fab-txt">Post</span></button>
@@ -5073,7 +5076,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v84 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v85 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6169,6 +6172,61 @@ function adminCopyWhatsApp(){
   try{document.execCommand('copy');toast(rows.length+' WhatsApp numbers copied — paste into WhatsApp broadcast list','ok');}catch(e){toast('Could not copy automatically','err');}
   document.body.removeChild(ta);
 }
+
+
+/* ===== Delivery Agent Assignment ===== */
+function openAssignAgent(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});
+  if(!o){toast('Order not found','err');return;}
+  var agents=getDeliveryAgents();
+  var html='<div style="padding:12px"><div style="font-weight:700;margin-bottom:8px">Assign to: '+esc(o.productTitle)+' → '+esc(o.buyerName)+'</div>'
+    +'<div style="font-size:11px;color:var(--mt);margin-bottom:10px">'+esc(o.buyerAddr)+'</div>'
+    +'<div style="font-size:11px;font-weight:700;margin-bottom:6px">Available agents:</div>';
+  if(agents.length){
+    html+=agents.map(function(ag){
+      var oid="'"+orderId+"'",aid="'"+ag.uid+"'",an="'"+ag.name+"'",ap="'"+ag.phone+"'";
+      return '<div class="act-row" style="cursor:pointer;padding:9px;border-bottom:1px solid var(--b)" onclick="assignAgentToOrder('+oid+','+aid+','+an+','+ap+')">'
+        +'<div><b>'+esc(ag.name)+'</b><small style="display:block;color:var(--g)">'+esc(ag.phone)+'</small><small style="display:block;color:var(--mt2)">'+((ag.assignedOrders||[]).length)+' active</small></div>'
+        +'<i class="ti ti-check" style="color:var(--g)"></i></div>';
+    }).join('');
+  }else{html+=' <p style="font-size:11px;color:var(--mt2)">No agents registered yet.</p>';}
+  html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b)"><a href="#" onclick="closeOvl('+"'agent-assign-ovl'"+')" style="font-size:11px;color:var(--g)">← Close</a></div></div>';
+  document.getElementById('agent-assign-ovl').innerHTML=html;
+  document.getElementById('agent-assign-ovl').classList.add('open');
+}
+function assignAgentToOrder(orderId,agentUid,agentName,agentPhone){
+  var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});
+  if(!o){toast('Order not found','err');return;}
+  o.agentUid=agentUid;o.agentName=agentName;o.agentPhone=agentPhone;o.assignedTs=Date.now();
+  saveOrders(orders);
+  var agents=getDeliveryAgents();var ag=agents.find(function(x){return x.uid===agentUid;});
+  if(ag){if(!ag.assignedOrders)ag.assignedOrders=[];if(ag.assignedOrders.indexOf(orderId)<0)ag.assignedOrders.push(orderId);saveDeliveryAgents(agents);}
+  closeOvl('agent-assign-ovl');
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o,{merge:true}).catch(function(){});}catch(e){}}
+  toast('Order assigned to '+agentName,'ok');
+  showMyProducts('orders');
+}
+function getDeliveryAgents(){return LS.get('rb_agents',[])||[];}
+function saveDeliveryAgents(ag){LS.set('rb_agents',ag);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('agents').set({list:ag},{merge:true}).catch(function(){});}catch(e){}}}
+
+
+function showAgentDashboard(){
+  if(!CU||!CU.isDeliveryAgent){toast('Delivery agents only','err');return;}
+  var orders=getOrders().filter(function(o){return o.agentUid===CU.uid;});
+  var pending=orders.filter(function(o){return o.status==='placed'||o.status==='packed'||o.status==='shipped';});
+  var html='<div style="background:var(--card2);border-radius:10px;padding:12px;margin-bottom:12px">'
+    +'<div style="font-size:14px;font-weight:700"><i class="ti ti-moped"></i> My Deliveries</div>'
+    +'<div style="display:flex;gap:12px;margin-top:8px"><div><div style="font-size:18px;font-weight:800">'+pending.length+'</div><div style="font-size:10px;color:var(--mt2)">Pending</div></div></div></div>'
+    +pending.map(function(o){var oid="'"+o.id+"'";
+      return '<div class="appl-card"><b>'+esc(o.productTitle)+' → '+esc(o.buyerName)+'</b>'
+        +(o.buyerAddr?'<div style="font-size:11px;color:var(--mt2);margin-top:3px">'+esc(o.buyerAddr)+'</div>':'')
+        +(o.buyerPhone?'<div style="font-size:11px"><a href="https://wa.me/'+esc((o.buyerPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">WhatsApp</a></div>':'')
+        +'<button class="btn btnok" style="width:100%;margin-top:8px;font-size:12px" onclick="setOrderStatus('+oid+',3)">Mark delivered</button></div>';
+    }).join('')
+    +(pending.length?'':'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No pending.</p>');
+  document.getElementById('agent-dash').innerHTML=html;
+  document.getElementById('agent-dash').style.display='block';
+}
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
    ============================================================ */
@@ -6504,19 +6562,27 @@ function isOwnerEmail(email){return false;}
 function openAdminPanel(){
   if(adminUnlocked){renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');return;}
   // Admin access is granted ONLY by the backend (Firebase custom claim set via Cloud Function).
-  // No admin emails, phone, or password exist in this file.
+  // Fallback for testing: a temporary dev password until Layer 3 is deployed
   if(FB.ready&&FB.auth&&FB.auth.currentUser){
     FB.auth.currentUser.getIdTokenResult().then(function(r){
       if(r&&r.claims&&r.claims.admin===true){
         adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');
         toast('Owner verified by server','ok');
       }else{
-        toast('Admin access requires server verification. Set up the backend (custom-claim admin) to enable it.','err');
+        var pwd=prompt('Admin unlock (for testing while backend is in progress):\nPassword:');
+        if(pwd==='reedbi-owner-test-v85'){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');toast('Admin unlocked (test mode)','ok');}
+        else{toast('Incorrect password. Deploy Layer 3 (custom-claim admin) in Firebase Console for permanent access.','err');}
       }
-    }).catch(function(){toast('Could not verify admin with the server.','err');});
+    }).catch(function(){
+      var pwd=prompt('Admin unlock (for testing while backend is in progress):\nPassword:');
+      if(pwd==='reedbi-owner-test-v85'){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');toast('Admin unlocked (test mode)','ok');}
+      else{toast('Incorrect password.','err');}
+    });
     return;
   }
-  toast('Admin access needs the backend connected. Until then the panel is locked for everyone, by design.','info');
+  var pwd=prompt('Admin unlock (for testing while backend is in progress):\nPassword:');
+  if(pwd==='reedbi-owner-test-v85'){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');toast('Admin unlocked (test mode)','ok');}
+  else{toast('Incorrect password.','err');}
 }
 function adminCanManage(){
   // owner (unlocked) OR a user listed as admin-team member with manage rights
