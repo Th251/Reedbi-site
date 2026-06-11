@@ -552,7 +552,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v87</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v88</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -3507,6 +3507,31 @@ function fbListenMarketData(){
         savePages(merged);
       },function(err){if(fbIsPermErr(err))fbStopListener('pages','perm');});
     }
+    if(!FB_LISTENERS['config']){
+      FB_LISTENERS['config']=FB.db.collection('config').onSnapshot(function(snap){
+        snap.forEach(function(doc){
+          try{
+            var d=doc.data()||{};
+            if(doc.id==='licenses'){var cur=LS.get('rb_licenses',{})||{};LS.set('rb_licenses',Object.assign(cur,d));}
+            else if(doc.id==='lickeys'){var ck=LS.get('rb_lickeys',{})||{};LS.set('rb_lickeys',Object.assign(ck,d));}
+            else if(doc.id==='licreqs'&&d.list){LS.set('rb_licreqs',d.list);}
+            else if(doc.id==='pagereqs'&&d.list){LS.set('rb_pagereqs',d.list);}
+            else if(doc.id==='ads'&&d.list){LS.set('rb_ads',d.list);if(typeof renderUserAds==='function')try{renderUserAds();}catch(e2){}}
+            else if(doc.id==='agents'&&d.list){LS.set('rb_agents',d.list);}
+            else if(doc.id==='admin'){LS.set('rb_admin',d);}
+          }catch(e3){}
+        });
+        try{var ao=document.getElementById('admin-ovl');if(ao&&ao.classList.contains('open')&&typeof adminTab==='function'&&typeof curAdminTab!=='undefined')adminTab(curAdminTab);}catch(e4){}
+      },function(err){if(fbIsPermErr(err))fbStopListener('config','perm');});
+    }
+    if(!FB_LISTENERS['users']){
+      FB_LISTENERS['users']=FB.db.collection('users').onSnapshot(function(snap){
+        var idx=LS.get('rb_fusers',[])||{};if(!Array.isArray(idx))idx=[];
+        var map={};idx.forEach(function(u){map[u.uid]=u;});
+        snap.forEach(function(doc){var d=doc.data()||{};d.uid=d.uid||doc.id;map[d.uid]=Object.assign(map[d.uid]||{},d);});
+        LS.set('rb_fusers',Object.keys(map).map(function(k){return map[k];}));
+      },function(err){if(fbIsPermErr(err))fbStopListener('users','perm');});
+    }
   }catch(e){console.warn('market listeners',e);}
 }
 function fbListenCompanyApps(company){
@@ -3897,7 +3922,7 @@ function orderStatusIndex(id){for(var i=0;i<ORDER_STATUS.length;i++){if(ORDER_ST
 var CURRENCIES=['USD $','EUR €','GBP £','AED د.إ','INR ₹','SAR ﷼','PKR ₨','PHP ₱','SGD S$','CAD C$','AUD A$','JPY ¥','CNY ¥','BRL R$','NGN ₦','ZAR R','MYR RM','IDR Rp','THB ฿','TRY ₺','RUB ₽','KRW ₩','HKD HK$','CHF Fr','SEK kr','MXN $','EGP £','BDT ৳','LKR Rs','KWD د.ك','QAR ﷼','OMR ﷼','BHD .د.ب'];
 /* ===== Products store ===== */
 function getProducts(){return LS.get('rb_products',[])||[];}
-function saveProducts(p){LS.set('rb_products',p);}
+function saveProducts(p){LS.set('rb_products',p);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{p.forEach(function(x){if(x&&x.id)FB.db.collection('products').doc(x.id).set(x,{merge:true}).catch(function(){});});}catch(e){}}}
 function getMyProducts(){
   var uid=CU?CU.uid:'';
   return getProducts().filter(function(x){
@@ -3908,7 +3933,7 @@ function getMyProducts(){
   });
 }
 function getOrders(){return LS.get('rb_orders',[])||[];}
-function saveOrders(o){LS.set('rb_orders',o);}
+function saveOrders(o){LS.set('rb_orders',o);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{o.forEach(function(x){if(x&&x.id)FB.db.collection('orders').doc(x.id).set(x,{merge:true}).catch(function(){});});}catch(e){}}}
 
 var activeTagId=null,actRegion=null,actUser=null,actAutoTag=null,sortMode='latest';
 var showFolOnly=false,pidCtr=Date.now();
@@ -3946,7 +3971,7 @@ function extractAT(title,body){
    PAGES (company pages owned by users)
 ============================================================ */
 function getPages(){return LS.get('rb_pages',[])||[];}
-function savePages(p){LS.set('rb_pages',p);}
+function savePages(p){LS.set('rb_pages',p);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{p.forEach(function(x){if(x&&x.name)FB.db.collection('pages').doc(x.name.toLowerCase()).set(x,{merge:true}).catch(function(){});});}catch(e){}}}
 function getPageByName(name){return getPages().find(function(p){return p.name.toLowerCase()===String(name).toLowerCase();});}
 function getMyPages(){var uid=CU?CU.uid:'';return getPages().filter(function(p){return p.ownerUid===uid;});}
 function userOwnsPage(name){var p=getPageByName(name);if(!p||!CU)return false;if(p.ownerUid===CU.uid)return true;var m=(p.members||[]).find(function(x){return x.uid===CU.uid;});return !!(m&&(m.role==='admin'||m.role==='editor'||m.role==='packer'));}
@@ -5085,7 +5110,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v87 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v88 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
