@@ -552,7 +552,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v81</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v84</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -778,6 +778,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       <button class="pc-opt" onclick="startPostType('hire')"><i class="ti ti-user-search" style="color:var(--cyan)"></i><div><b>Find Work</b><small>Share your skills / CV</small></div></button>
       <button class="pc-opt" onclick="closeOvl('post-chooser-ovl');openProductSearch()"><i class="ti ti-search" style="color:var(--blue)"></i><div><b>Search Products</b><small>Find items to buy</small></div></button>
       <button class="pc-opt" onclick="startPostType('share')"><i class="ti ti-message-circle" style="color:var(--purple)"></i><div><b>Share / Ask</b><small>Post an update or question</small></div></button>
+      <button class="pc-opt" onclick="closeOvl('post-chooser-ovl');openCreatePageFlow()"><i class="ti ti-flag" style="color:var(--orange,#c37d16)"></i><div><b>Create a Page</b><small>Your brand page — one per account</small></div></button>
     </div>
   </div>
 </div></div>
@@ -789,6 +790,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <div id="lp-photo-hint" style="font-size:10px;color:var(--mt2);margin:4px 0 10px">Add at least 5 photos (0/5)</div>
     <input type="file" id="lp-photo-file" accept="image/*" multiple style="display:none" onchange="listPhotoSel(this)">
     <div class="fg"><label>Product title</label><input type="text" id="lp-title" placeholder="e.g. iPhone 14 Pro 256GB"></div>
+    <div class="fg" style="margin-top:8px"><label>Sell as (your name or your page)</label><select id="lp-as" style="width:100%"><option value="">My own name</option></select></div>
     <div class="fg" style="margin-top:8px"><label>Location (country / emirate / city)</label><input type="text" id="lp-location" placeholder="e.g. UAE, Dubai, Deira"></div>
     <div class="fg" style="margin-top:8px"><label>Category</label><input type="text" id="lp-category" list="cat-list" placeholder="e.g. Eggs, Electronics, Grocery"><datalist id="cat-list"><option>Grocery</option><option>Electronics</option><option>Clothing</option><option>Eggs</option><option>Dairy</option><option>Vegetables</option><option>Fruits</option><option>Meat</option><option>Household</option><option>Other</option></datalist></div>
     <div class="fg" style="margin-top:8px"><label>Description</label><textarea id="lp-desc" rows="2" placeholder="Condition, specs, details..."></textarea></div>
@@ -3971,14 +3973,44 @@ function ensureReadBiStorefront(uid,name){
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(pg.name.toLowerCase()).set(pg,{merge:true}).catch(function(){});}catch(e){}}
 }
 // is a product visible in the PUBLIC marketplace? (licensed sellers only)
+function pageLicenseValid(pageName){
+  if(!pageName)return false;
+  var pg=getPageByName(pageName);if(!pg||!pg.licensed)return false;
+  if(pg.licExpiry&&Date.now()>pg.licExpiry)return false;
+  return true;
+}
 function productInMarketplace(p){
+  // ReadBi e-commerce approval is PER PAGE only: a product appears in the
+  // marketplace only when it is listed under a page approved by the owner.
   if(!p||p.withdrawn)return false;
-  return licenseValid(p.sellerUid);
+  return !!(p.pageName&&pageLicenseValid(p.pageName));
+}
+function myOwnedPage(){if(!CU)return null;return getPages().find(function(p){return p.ownerUid===CU.uid&&!p.isStore;})||null;}
+function pageAllowance(){var al=LS.get('rb_pageallow',{})||{};return CU?(al[CU.uid]||0):0;}
+function consumePageAllowance(){var al=LS.get('rb_pageallow',{})||{};if(CU&&al[CU.uid]>0){al[CU.uid]--;LS.set('rb_pageallow',al);return true;}return false;}
+function openCreatePageFlow(){
+  if(!CU){toast('Sign in to create a page','err');return;}
+  var mine=myOwnedPage();
+  if(mine&&pageAllowance()>0){document.getElementById('mkpg-ovl').classList.add('open');toast('The owner approved an additional page for you — create it now','ok');return;}
+  if(mine){
+    // one page per account for life — additional pages need owner approval
+    var reqs=LS.get('rb_pagereqs',[])||[];
+    if(reqs.find(function(r){return r.uid===CU.uid&&r.status==='pending';})){toast('You already have a pending request for an additional page. The Reedbi owner will review it.','info');return;}
+    if(confirm('You already have your page "'+mine.name+'" — every account gets one page for life.\n\nRequest an ADDITIONAL page from the Reedbi owner?')){
+      reqs.push({id:'pgr'+Date.now(),uid:CU.uid,name:CU.name,email:CU.email||'',existing:mine.name,status:'pending',ts:Date.now()});
+      LS.set('rb_pagereqs',reqs);
+      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('pagereqs').set({list:reqs},{merge:true}).catch(function(){});}catch(e){}}
+      toast('Request sent to the Reedbi owner for an additional page','ok');
+    }
+    return;
+  }
+  document.getElementById('mkpg-ovl').classList.add('open');
 }
 function createPage(){
   var name=document.getElementById('pg-name').value.trim();
   var about=document.getElementById('pg-about').value.trim();
   if(!name){toast('Enter a page name','err');return;}
+  if(myOwnedPage()&&!consumePageAllowance()){toast('You already have your one page. Request an additional page from the owner.','err');return;}
   var pages=getPages();
   if(getPageByName(name)){toast('“'+name+'” is already taken. Page names are unique worldwide — choose another.','err');return;}
   var pg={id:'pg'+Date.now(),name:name,about:about,ownerUid:CU.uid,ownerName:CU.name,members:[],ts:Date.now()};
@@ -4080,11 +4112,30 @@ function requestSellerLicense(silent){
   saveLicenseRequests(reqs);
   if(!silent)toast('License request submitted! The Reedbi owner will review it.','ok');
 }
+// approval requested in the name of a PAGE (page becomes the ReadBi seller)
+function requestPageApproval(pageName){
+  if(!CU)return;
+  var p=getPageByName(pageName);if(!p){toast('Page not found','err');return;}
+  if(p.ownerUid!==CU.uid&&!canEditPage(pageName)){toast('Only the page owner or page admin can request approval','err');return;}
+  if(p.licensed){toast('“'+p.name+'” is already an approved ReadBi seller','info');return;}
+  var reqs=getLicenseRequests();
+  if(reqs.find(function(r){return r.pageName===p.name&&r.status==='pending';})){toast('This page already has a pending request','info');return;}
+  reqs.push({id:'req'+Date.now(),uid:CU.uid,name:CU.name,email:CU.email||'',pageName:p.name,status:'pending',ts:Date.now()});
+  saveLicenseRequests(reqs);
+  toast('Approval request for page “'+p.name+'” sent to the Reedbi owner','ok');
+}
 // owner/team approves or rejects
 function approveLicenseRequest(reqId,months){
   var reqs=getLicenseRequests();var r=reqs.find(function(x){return x.id===reqId;});if(!r)return;
   r.status='approved';r.decidedTs=Date.now();r.decidedBy=CU?CU.name:'';
   saveLicenseRequests(reqs);
+  if(r.pageName){
+    // approve the PAGE as the ReadBi seller
+    var pgs=getPages();var pg=pgs.find(function(x){return x.name===r.pageName;});
+    if(pg){pg.licensed=true;pg.licExpiry=Date.now()+(months||12)*30*86400000;savePages(pgs);
+      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(pg.name.toLowerCase()).set(pg,{merge:true}).catch(function(){});}catch(e){}}}
+    return;
+  }
   // grant license with expiry
   setUserLicensed(r.uid,true,r.name);
   var lic=LS.get('rb_licenses',{})||{};if(lic[r.uid]){lic[r.uid].expiry=Date.now()+(months||12)*30*86400000;LS.set('rb_licenses',lic);}
@@ -4285,10 +4336,14 @@ function buildBubble(t,p,isMine){
     var prod=getProducts().find(function(x){return x.id===p.productId;});
     if(prod){
       var isSeller=CU&&prod.sellerUid===CU.uid;
+      var inRB=(typeof productInMarketplace==='function')&&productInMarketplace(prod);
+      var rbBtn=inRB?'<button class="abtn" onclick="viewInReadBi(\''+escJS(prod.id)+'\')" style="background:linear-gradient(135deg,var(--g),#0a8f5c);color:#fff;margin-top:5px"><i class="ti ti-building-store"></i> View in ReadBi store · '+esc(prod.pageName||'')+'</button>':'';
+      var movBtn=(isSeller&&!prod.pageName&&typeof myOwnedPage==='function'&&myOwnedPage())?'<button class="abtn" onclick="assignProductToPage(\''+escJS(prod.id)+'\')" style="background:var(--card2);color:var(--gold);border:1px solid var(--gold);margin-top:5px"><i class="ti ti-flag"></i> Move under my page</button>':'';
       applyHtml=isSeller
         ? '<button class="abtn" onclick="showMyProducts()" style="background:var(--card2);color:var(--g);border:1px solid var(--g)"><i class="ti ti-building-store"></i> Manage Listing</button>'
+          +movBtn+rbBtn
           +'<button class="abtn" onclick="openBoost(\''+escJS(t.id)+'\','+pid+')" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:5px"><i class="ti ti-speakerphone"></i> Advertise this Product</button>'
-        : (typeof productAvailable==='function'&&!productAvailable(prod)
+        : rbBtn+(typeof productAvailable==='function'&&!productAvailable(prod)
             ? '<button class="abtn" onclick="expressInterest(\''+prod.id+'\')" style="background:var(--card2);color:var(--gold);border:1px solid var(--gold)"><i class="ti ti-heart"></i> Out of stock — Notify me when available</button>'
             : '<button class="abtn" onclick="buyProduct(\''+prod.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now · '+esc(prod.currency)+' '+esc(prod.offer||prod.price)+'</button><button class="abtn" onclick="addToCart(\''+prod.id+'\')" style="background:var(--card2);color:var(--g);border:1px solid var(--g);margin-top:5px"><i class="ti ti-shopping-bag"></i> Add to Bag</button>');
     }
@@ -5018,7 +5073,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v81 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v84 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5090,6 +5145,16 @@ function openListProduct(){
   listPhotos=[];
   ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category','lp-location'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   var cs=document.getElementById('lp-cur');if(cs&&!cs.options.length){CURRENCIES.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o);});}
+  // sell-as: my name or any page I own/admin
+  var sa=document.getElementById('lp-as');
+  if(sa){sa.innerHTML='<option value="">My own name ('+esc(CU?CU.name:'')+')</option>';
+    getPages().forEach(function(pg){
+      if(pg.isStore)return;
+      var r=pageRole(pg.name);
+      if(r==='owner'||r==='admin'||r==='editor'){
+        var o=document.createElement('option');o.value=pg.name;o.textContent='Page: '+pg.name+(pg.licensed?' ✓ ReadBi approved':' (Tag Talk only)');sa.appendChild(o);
+      }
+    });}
   renderListPhotos();
   document.getElementById('list-prod-ovl').classList.add('open');
 }
@@ -5142,7 +5207,8 @@ function submitProduct(){
   var expiry=(document.getElementById('lp-expiry')||{}).value||'';
   var category=(document.getElementById('lp-category')||{}).value||'Other';
   var location=(document.getElementById('lp-location')||{}).value||'';
-  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:CU.name,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
+  var sellAs=(document.getElementById('lp-as')||{}).value||'';
+  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
     batches:[{batchCode:'B-'+Date.now().toString(36).toUpperCase().slice(-4),qty:qty,cost:cost,vendor:'',vendorPhone:'',brand:'',date:Date.now()}],interest:0,interestLog:[],
     photos:listPhotos.slice(),addr:addr,phone:phone,map:map,ts:Date.now()};
   var prods=getProducts();prods.unshift(prod);saveProducts(prods);
@@ -5734,21 +5800,7 @@ function runProductSearch(q){
   var box=document.getElementById('ps-results');if(!box)return;
   if(!prods.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products listed yet.</p>';return;}
   if(!matches.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products match “'+esc(q)+'”.</p>';return;}
-  box.innerHTML='<div style="font-size:10px;color:var(--mt2);margin-bottom:6px">'+matches.length+' product'+(matches.length!==1?'s':'')+'</div>'+matches.map(function(p){
-    var mine=CU&&p.sellerUid===CU.uid;
-    var avail=productAvailable(p);
-    return '<div class="ps-card">'+shopRibbon(p)
-      +'<img src="'+esc(p.photos&&p.photos[0]||'')+'" class="ps-img">'
-      +'<div style="flex:1;min-width:0">'
-      +'<div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
-      +'<div style="font-size:13px">'+priceHtml(p)+'</div>'
-      +'<div style="font-size:10px;color:var(--mt2)">by '+esc(p.sellerName)+(p.category?' · '+esc(p.category):'')+'</div>'
-      +(p.location?'<div style="font-size:10px;color:var(--g)"><i class="ti ti-map-pin"></i> '+esc(p.location)+'</div>':'')
-      +(mine?'<button class="ps-btn" style="background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="closeOvl(\'prodsearch-ovl\');showMyProducts(\'listings\')"><i class="ti ti-building-store"></i> Manage</button>'
-            :(avail?'<button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button>'
-                   :'<button class="ps-btn" style="background:var(--card2);color:var(--gold);border:1px solid var(--gold)" onclick="expressInterest(\''+p.id+'\')"><i class="ti ti-heart"></i> Notify me</button>'))
-      +'</div></div>';
-  }).join('');
+  box.innerHTML='<div style="font-size:10px;color:var(--mt2);margin-bottom:6px">'+matches.length+' product'+(matches.length!==1?'s':'')+'</div>'+matches.map(psCard).join('');
 }
 
 /* ===== Bulk label printing with printed/balance tracking ===== */
@@ -6001,14 +6053,25 @@ function openLicensePanel(){
     var reqs=(typeof getLicenseRequests==='function')?getLicenseRequests():[];
     var myReq=reqs.find(function(r){return r.uid===CU.uid&&r.status==='pending';});
     var myRejected=reqs.filter(function(r){return r.uid===CU.uid&&r.status==='rejected';}).slice(-1)[0];
-    body.innerHTML='<div style="background:rgba(195,125,22,.1);border:1px solid var(--gold);border-radius:10px;padding:11px;font-size:12px;color:var(--gold);margin-bottom:12px"><i class="ti ti-info-circle"></i> You are a <b>Tag Talk</b> seller. Your products show only inside Tag Talk. Become a licensed ReadBi seller to open your own storefront and sell in the public marketplace.</div>'
-      +(myReq?'<div style="background:rgba(10,102,194,.08);border:1px solid var(--g);border-radius:10px;padding:11px;font-size:12px;color:var(--g);margin-bottom:12px"><i class="ti ti-clock"></i> <b>Request pending.</b> The Reedbi owner is reviewing your license request. You\'ll get access once approved.</div>'
-        :'<button class="btn btnok" style="width:100%;padding:12px;margin-bottom:10px" onclick="requestSellerLicense();openLicensePanel()"><i class="ti ti-send"></i> Request License Approval from Owner</button>')
+    body.innerHTML='<div style="background:rgba(195,125,22,.1);border:1px solid var(--gold);border-radius:10px;padding:11px;font-size:12px;color:var(--gold);margin-bottom:12px"><i class="ti ti-info-circle"></i> You are a <b>Tag Talk</b> seller. Your products show only inside Tag Talk. <b>ReadBi e-commerce approval is given to PAGES, not individuals</b> — create your page, list products under it, and request page approval below to appear in the ReadBi store.</div>'
+      +(myReq?'<div style="background:rgba(10,102,194,.08);border:1px solid var(--g);border-radius:10px;padding:11px;font-size:12px;color:var(--g);margin-bottom:12px"><i class="ti ti-clock"></i> <b>Request pending.</b> The Reedbi owner is reviewing your request. You\'ll get access once approved.</div>'
+        :'<button class="btn btnok" style="width:100%;padding:12px;margin-bottom:10px" onclick="closeOvl(\'license-ovl\');openCreatePageFlow()"><i class="ti ti-flag"></i> Create my Page (then request approval)</button>')
       +(myRejected?'<div style="font-size:10px;color:var(--red);text-align:center;margin-bottom:8px">A previous request was not approved. You may request again.</div>':'')
       +'<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:12px"></div>'
       +'<div style="font-size:11px;font-weight:700;margin-bottom:6px">Or enter a license key directly</div>'
       +'<input type="text" id="lic-key" placeholder="RB-XXXX-XXXX-XXXX" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:11px;color:var(--tx);font-family:var(--fn);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">'
       +'<button class="btn" style="width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="submitLicenseKey()"><i class="ti ti-license"></i> Validate Key</button>';
+  }
+    // page approval: pages I own/admin can request ReadBi approval
+  var myPgs=getPages().filter(function(pg){if(pg.isStore)return false;var r=pageRole(pg.name);return r==='owner'||r==='admin';});
+  if(myPgs.length){
+    body.innerHTML+='<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px"><div style="font-size:11px;font-weight:700;margin-bottom:6px">Your pages</div>'
+      +myPgs.map(function(pg){
+        var pv=pageLicenseValid(pg.name);
+        var pendingPg=getLicenseRequests().find(function(r){return r.pageName===pg.name&&r.status==='pending';});
+        return '<div class="act-row"><div><b>'+esc(pg.name)+'</b><small>'+(pv?'✓ Approved ReadBi seller page':(pendingPg?'Approval pending with owner':'Tag Talk only'))+'</small></div>'
+          +(pv||pendingPg?'':'<button class="lbl-mini" style="color:var(--g);border-color:var(--g)" onclick="requestPageApproval(\''+escJS(pg.name)+'\');openLicensePanel()">Request approval</button>')+'</div>';
+      }).join('')+'</div>';
   }
   document.getElementById('license-ovl').classList.add('open');
 }
@@ -6017,6 +6080,94 @@ function submitLicenseKey(){
   var res=validateLicenseKey(key);
   toast(res.msg,res.ok?'ok':'err');
   if(res.ok){closeOvl('license-ovl');if(typeof showMyProducts==='function'&&document.getElementById('seller-ovl').classList.contains('open'))showMyProducts('listings');}
+}
+
+/* ===== Page-product linking + ReadBi jump ===== */
+function assignProductToPage(prodId){
+  var pg=myOwnedPage&&myOwnedPage();
+  if(!pg){toast('Create your page first (one per account)','err');return;}
+  var prods=getProducts();var p=prods.find(function(x){return x.id===prodId;});
+  if(!p){toast('Product not found','err');return;}
+  if(p.sellerUid!==CU.uid){toast('Only the seller can move this product','err');return;}
+  p.pageName=pg.name;p.sellerName=pg.name;
+  saveProducts(prods);
+  var ok=pageLicenseValid(pg.name);
+  toast('“'+p.title+'” is now listed under your page '+pg.name+(ok?' — live in the ReadBi store!':' — it will appear in ReadBi once your page is approved'),'ok');
+  if(typeof renderSlideRows==='function')try{renderSlideRows();}catch(e){}
+  try{if(typeof activeTagId!=='undefined'&&activeTagId)openTag(activeTagId);}catch(e){}
+}
+function viewInReadBi(prodId){
+  var p=getProducts().find(function(x){return x.id===prodId;});
+  if(!p||!productInMarketplace(p)){toast('This product is not in the ReadBi store yet','info');return;}
+  openProductSearch();
+  var inp=document.getElementById('ps-q');
+  if(inp){inp.value=p.title;}
+  runProductSearch(p.title);
+  // related products from the same category
+  var rel=getProducts().filter(function(x){return x.id!==p.id&&productInMarketplace(x)&&(x.category||'Other')===(p.category||'Other');}).slice(0,6);
+  if(rel.length){
+    var box=document.getElementById('ps-results');
+    box.innerHTML+='<div style="font-size:11px;font-weight:700;margin:12px 0 6px"><i class="ti ti-sparkles"></i> Related products in '+esc(p.category||'Other')+'</div>'+rel.map(psCard).join('');
+  }
+}
+
+/* reusable marketplace card */
+function psCard(p){
+  var mine=CU&&p.sellerUid===CU.uid;
+  var avail=productAvailable(p);
+  var sellerLink=p.pageName
+    ? '<a href="#" onclick="viewSellerStore(\''+escJS(p.pageName)+'\');return false" style="color:var(--g);font-weight:600">'+esc(p.sellerName)+' <i class="ti ti-chevron-right" style="font-size:9px"></i></a>'
+    : esc(p.sellerName);
+  return '<div class="ps-card">'+shopRibbon(p)
+    +'<img src="'+esc(p.photos&&p.photos[0]||'')+'" class="ps-img">'
+    +'<div style="flex:1;min-width:0">'
+    +'<div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
+    +'<div style="font-size:13px">'+priceHtml(p)+'</div>'
+    +'<div style="font-size:10px;color:var(--mt2)">by '+sellerLink+(p.category?' · '+esc(p.category):'')+'</div>'
+    +(p.location?'<div style="font-size:10px;color:var(--g)"><i class="ti ti-map-pin"></i> '+esc(p.location)+'</div>':'')
+    +(mine?'<button class="ps-btn" style="background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="closeOvl(\'prodsearch-ovl\');showMyProducts(\'listings\')"><i class="ti ti-building-store"></i> Manage</button>'
+          :(avail?'<button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button>'
+                 :'<button class="ps-btn" style="background:var(--card2);color:var(--gold);border:1px solid var(--gold)" onclick="expressInterest(\''+p.id+'\')"><i class="ti ti-heart"></i> Notify me</button>'))
+    +'</div></div>';
+}
+/* seller PAGE storefront inside the e-commerce site */
+function viewSellerStore(pageName){
+  var pg=getPageByName(pageName);
+  openProductSearch();
+  var box=document.getElementById('ps-results');var q=document.getElementById('ps-q');if(q)q.value='';
+  var prods=getProducts().filter(function(p){return p.pageName===pageName&&productInMarketplace(p);});
+  var hdr='<div style="background:linear-gradient(135deg,rgba(10,102,194,.08),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:12px;padding:12px;margin-bottom:10px">'
+    +'<div style="font-weight:800;font-size:15px"><i class="ti ti-building-store" style="color:var(--g)"></i> '+esc(pageName)+' <span class="pay-badge pay-online-b" style="font-size:9px">ReadBi approved seller</span></div>'
+    +(pg&&pg.about?'<div style="font-size:11px;color:var(--mt);margin-top:3px">'+esc(pg.about)+'</div>':'')
+    +(pg&&pg.ownerName?'<div style="font-size:10px;color:var(--mt2);margin-top:3px">Owner: '+esc(pg.ownerName)+'</div>':'')
+    +'<div style="font-size:10px;color:var(--mt2);margin-top:3px">'+prods.length+' product'+(prods.length!==1?'s':'')+' listed</div>'
+    +'<a href="#" onclick="openProductSearch();return false" style="font-size:10px;color:var(--g)">&larr; All products</a></div>';
+  box.innerHTML=hdr+(prods.length?prods.map(psCard).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No live products from this seller yet.</p>');
+}
+/* admin one-click communications */
+function adminFilteredUsers(){
+  var users=getAllUsersIndex();
+  var fl=(adminUserFilter.loc||'').toLowerCase(),fi=(adminUserFilter.int||'').toLowerCase();
+  return users.filter(function(u){
+    if(fl&&((u.location||'').toLowerCase().indexOf(fl)<0))return false;
+    if(fi&&((u.interests||'').toLowerCase().indexOf(fi)<0))return false;
+    return true;
+  });
+}
+function adminEmailAll(){
+  var rows=adminFilteredUsers().filter(function(u){return u.email;});
+  if(!rows.length){toast('No users with email match the filter','err');return;}
+  var bcc=rows.map(function(u){return u.email;}).join(',');
+  window.open('mailto:?bcc='+encodeURIComponent(bcc)+'&subject='+encodeURIComponent('Reedbi update'),'_blank');
+  toast('Opening your mail app with '+rows.length+' recipients (BCC)','ok');
+}
+function adminCopyWhatsApp(){
+  var rows=adminFilteredUsers().filter(function(u){return u.phone;});
+  if(!rows.length){toast('No users with WhatsApp numbers match the filter','err');return;}
+  var txt=rows.map(function(u){return u.name+': '+u.phone;}).join('\n');
+  var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast(rows.length+' WhatsApp numbers copied — paste into WhatsApp broadcast list','ok');}catch(e){toast('Could not copy automatically','err');}
+  document.body.removeChild(ta);
 }
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
@@ -6428,7 +6579,11 @@ function adminTab(t){
       +'<input type="text" id="auf-loc" placeholder="Filter location (e.g. Discovery Gardens)" value="'+esc(adminUserFilter.loc||'')+'" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn);font-size:11px">'
       +'<input type="text" id="auf-int" placeholder="Filter interest" value="'+esc(adminUserFilter.int||'')+'" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn);font-size:11px">'
       +'<button class="lbl-mini" onclick="adminApplyUserFilter()"><i class="ti ti-filter"></i></button></div>'
-      +'<div style="font-size:11px;color:var(--mt);margin-bottom:8px"><b>'+shown.length+'</b> user'+(shown.length!==1?'s':'')+' match'+((fl||fi)?' (filtered)':'')+' · <a href="#" onclick="adminExportUsers();return false" style="color:var(--g)"><i class="ti ti-download"></i> Export list (CSV)</a></div>'
+      +'<div style="font-size:11px;color:var(--mt);margin-bottom:8px"><b>'+shown.length+'</b> user'+(shown.length!==1?'s':'')+' match'+((fl||fi)?' (filtered)':'')+'</div>'
+      +'<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">'
+      +'<button class="lbl-mini" style="color:var(--g);border-color:var(--g)" onclick="adminExportUsers()"><i class="ti ti-download"></i> Save list (CSV)</button>'
+      +'<button class="lbl-mini" style="color:var(--g);border-color:var(--g)" onclick="adminEmailAll()"><i class="ti ti-mail"></i> Email all</button>'
+      +'<button class="lbl-mini" style="color:#1a8f3c;border-color:#1a8f3c" onclick="adminCopyWhatsApp()"><i class="ti ti-brand-whatsapp"></i> Copy WhatsApp list</button></div>'
       +(shown.length?shown.map(function(u){
       var lic=userLicensed(u.uid);
       return '<div class="appl-card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-weight:700;font-size:13px">'+esc(u.name||'User')+(lic?' <span class="pay-badge pay-online-b" style="font-size:9px">ReadBi ✓</span>':'')+'</div></div>'
@@ -6445,10 +6600,11 @@ function adminTab(t){
     var reqs=getLicenseRequests();
     var pending=reqs.filter(function(r){return r.status==='pending';});
     var decided=reqs.filter(function(r){return r.status!=='pending';});
+    var pgreqs=LS.get('rb_pagereqs',[])||[];var pgPending=pgreqs.filter(function(r){return r.status==='pending';});
     var h='<div style="font-size:11px;color:var(--mt);margin-bottom:8px"><i class="ti ti-license"></i> Approve or reject ReadBi seller licenses. Approved sellers get a storefront and appear in the marketplace.</div>';
     h+='<div style="font-size:11px;font-weight:700;margin:8px 0 6px">Pending requests ('+pending.length+')</div>';
     h+=pending.length?pending.map(function(r){
-      return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(r.name)+'</div>'
+      return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(r.name)+(r.pageName?' <span class="pay-badge" style="font-size:9px;background:rgba(195,125,22,.12);color:#c37d16">PAGE: '+esc(r.pageName)+'</span>':'')+'</div>'
         +(r.email?'<div style="font-size:11px;color:var(--mt)">'+esc(r.email)+'</div>':'')
         +(r.co?'<div style="font-size:11px;color:var(--mt2)">Company: '+esc(r.co)+'</div>':'')
         +(r.phone?'<div style="font-size:11px;color:var(--g)"><a href="https://wa.me/'+esc((r.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)"><i class="ti ti-brand-whatsapp"></i> '+esc(r.phone)+'</a></div>':'')
@@ -6457,6 +6613,16 @@ function adminTab(t){
         +'<button class="lbl-mini" style="flex:1;color:#1a8f3c;border-color:#1a8f3c" onclick="adminApproveLicense(\''+escJS(r.id)+'\')"><i class="ti ti-check"></i> Approve</button>'
         +'<button class="lbl-mini" style="flex:1;color:var(--red);border-color:var(--red)" onclick="adminRejectLicense(\''+escJS(r.id)+'\')"><i class="ti ti-x"></i> Reject</button></div></div>';
     }).join(''):'<div class="act-empty" style="font-size:11px;color:var(--mt2);padding:8px">No pending requests.</div>';
+    if(pgPending.length){
+      h+='<div style="font-size:11px;font-weight:700;margin:12px 0 6px">Additional page requests ('+pgPending.length+')</div>';
+      h+=pgPending.map(function(r){
+        return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(r.name)+'</div>'
+          +(r.email?'<div style="font-size:11px;color:var(--mt)">'+esc(r.email)+'</div>':'')
+          +'<div style="font-size:11px;color:var(--mt2)">Has page: '+esc(r.existing||'')+' — wants an additional page</div>'
+          +'<div style="display:flex;gap:6px;margin-top:8px"><button class="lbl-mini" style="flex:1;color:#1a8f3c;border-color:#1a8f3c" onclick="adminDecidePageReq(\''+escJS(r.id)+'\',true)"><i class="ti ti-check"></i> Allow</button>'
+          +'<button class="lbl-mini" style="flex:1;color:var(--red);border-color:var(--red)" onclick="adminDecidePageReq(\''+escJS(r.id)+'\',false)"><i class="ti ti-x"></i> Reject</button></div></div>';
+      }).join('');
+    }
     if(decided.length){
       h+='<div style="font-size:11px;font-weight:700;margin:12px 0 6px">Decided ('+decided.length+')</div>';
       h+=decided.slice(-20).reverse().map(function(r){return '<div class="act-row"><div><b>'+esc(r.name)+'</b><small>'+esc(r.status)+(r.decidedBy?' by '+esc(r.decidedBy):'')+'</small></div><span class="pay-badge '+(r.status==='approved'?'pay-online-b':'pay-cod-b')+'">'+esc(r.status)+'</span></div>';}).join('');
@@ -6630,5 +6796,14 @@ function renderUserAds(){
   box.innerHTML=ads.slice(-2).map(function(a){
     return '<div class="user-ad"><span class="ad-tag">Sponsored</span><b>'+esc(a.title)+'</b><div style="font-size:11px;color:var(--mt)">'+esc(a.text)+'</div></div>';
   }).join('');
+}
+
+function adminDecidePageReq(id,allow){
+  var reqs=LS.get('rb_pagereqs',[])||[];var r=reqs.find(function(x){return x.id===id;});if(!r)return;
+  r.status=allow?'approved':'rejected';r.decidedTs=Date.now();
+  LS.set('rb_pagereqs',reqs);
+  if(allow){var al=LS.get('rb_pageallow',{})||{};al[r.uid]=(al[r.uid]||0)+1;LS.set('rb_pageallow',al);}
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('pagereqs').set({list:reqs},{merge:true}).catch(function(){});}catch(e){}}
+  adminTab('licenses');toast(allow?'Additional page allowed for '+r.name:'Request rejected','info');
 }
 </script></body></html>
