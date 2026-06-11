@@ -552,11 +552,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v90</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v91</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
-          <button class="ib" id="cloudchip" onclick="showCloudStatus()" title="Cloud sync status" style="font-size:10px;font-weight:700;width:auto;padding:0 8px;border-radius:12px;background:rgba(204,16,22,.1);color:#cc1016"><i class="ti ti-cloud-off"></i> OFF</button>
           <button class="ib" onclick="openCreateModal()"><i class="ti ti-square-plus"></i></button>
           <button class="ib" onclick="showCart()" title="My Bag" style="position:relative"><i class="ti ti-shopping-bag"></i><span id="cart-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#cc1016;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px">0</span></button>
           <button class="ib" onclick="openProductSearch()" title="Search products to buy"><i class="ti ti-search"></i></button>
@@ -5111,7 +5110,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v90 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v91 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5190,7 +5189,9 @@ try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setD
 })();
 
 /* ===== Cloud status indicator: shows whether cross-device sync is ON ===== */
+var CLOUD_STATE={state:'off',msg:''};
 function updateCloudChip(state,msg){
+  CLOUD_STATE={state:state,msg:msg||''};
   var c=document.getElementById('cloudchip');if(!c)return;
   if(state==='live'){c.style.background='rgba(26,143,60,.12)';c.style.color='#1a8f3c';c.innerHTML='<i class="ti ti-cloud-check"></i> LIVE';}
   else if(state==='blocked'){c.style.background='rgba(195,125,22,.12)';c.style.color='#c37d16';c.innerHTML='<i class="ti ti-cloud-lock"></i> RULES';}
@@ -5212,9 +5213,8 @@ function checkCloudStatus(){
   }catch(e){updateCloudChip('off','');}
 }
 function showCloudStatus(){
-  var c=document.getElementById('cloudchip');
-  var st=c?c.getAttribute('data-state'):'off';
-  var msg=c?c.getAttribute('data-msg'):'';
+  var st=CLOUD_STATE.state||'off';
+  var msg=CLOUD_STATE.msg||'';
   var body='';
   if(st==='live'){
     body='<div style="font-size:13px;color:#1a8f3c;font-weight:700"><i class="ti ti-cloud-check"></i> Cloud sync is LIVE</div>'
@@ -6703,6 +6703,8 @@ function agentConfirmDelivery(orderId){
    NOTE: A single HTML file cannot truly hide a password. This hash
    only keeps casual users out; real security requires a backend.
    ============================================================ */
+function adminGateHash(s){var x=5381;for(var i=0;i<s.length;i++){x=((x<<5)+x)+s.charCodeAt(i);x=x&0xffffffff;}return (x>>>0).toString(16);}
+var ADMIN_GATE_H='99562c80'; // hash only — the password itself is not in this file
 function getAdminConfig(){return LS.get('rb_admin',{admins:[]});}
 function saveAdminConfig(c){LS.set('rb_admin',c);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('admin').set(c,{merge:true}).catch(function(){});}catch(e){}}}
 var adminUnlocked=false;
@@ -6717,19 +6719,19 @@ function openAdminPanel(){
         adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');
         toast('Owner verified by server','ok');
       }else{
-        var pwd=prompt('Admin unlock (for testing while backend is in progress):\nPassword:');
-        if(pwd==='reedbi-owner-test-v85'){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');toast('Admin unlocked (test mode)','ok');}
+        var pwd=prompt('Admin unlock:');
+        if(pwd!==null&&adminGateHash(pwd)===ADMIN_GATE_H){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');toast('Admin unlocked (test mode)','ok');}
         else{toast('Incorrect password. Deploy Layer 3 (custom-claim admin) in Firebase Console for permanent access.','err');}
       }
     }).catch(function(){
-      var pwd=prompt('Admin unlock (for testing while backend is in progress):\nPassword:');
-      if(pwd==='reedbi-owner-test-v85'){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');toast('Admin unlocked (test mode)','ok');}
+      var pwd=prompt('Admin unlock:');
+      if(pwd!==null&&adminGateHash(pwd)===ADMIN_GATE_H){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');toast('Admin unlocked (test mode)','ok');}
       else{toast('Incorrect password.','err');}
     });
     return;
   }
-  var pwd=prompt('Admin unlock (for testing while backend is in progress):\nPassword:');
-  if(pwd==='reedbi-owner-test-v85'){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');toast('Admin unlocked (test mode)','ok');}
+  var pwd=prompt('Admin unlock:');
+  if(pwd!==null&&adminGateHash(pwd)===ADMIN_GATE_H){adminUnlocked=true;renderAdminPanel();document.getElementById('admin-ovl').classList.add('open');toast('Admin unlocked (test mode)','ok');}
   else{toast('Incorrect password.','err');}
 }
 function adminCanManage(){
@@ -6781,6 +6783,7 @@ function adminTab(t){
       +'<select id="lk-months" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px"><option value="1">1 month</option><option value="6">6 months</option><option value="12" selected>12 months</option><option value="24">24 months</option></select>'
       +'<button class="btn btnok" style="width:100%" onclick="adminIssueLicenseKey()"><i class="ti ti-key"></i> Generate License Key</button>'
       +'<div id="lk-result"></div></div>'
+      +'<button class="btn" style="width:100%;margin-top:10px;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="showCloudStatus()"><i class="ti ti-cloud"></i> Cloud Sync status &amp; manual sync</button>'
       +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px;font-size:10px;color:var(--mt2)"><i class="ti ti-shield-lock"></i> Admin access is controlled entirely by the backend (Firebase custom claim). No admin password or owner email is stored in this app.</div>';
   }else if(t==='users'){
     var fl=(adminUserFilter.loc||'').toLowerCase(),fi=(adminUserFilter.int||'').toLowerCase();
