@@ -552,7 +552,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v85</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v86</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -3979,6 +3979,7 @@ function ensureReadBiStorefront(uid,name){
 function pageLicenseValid(pageName){
   if(!pageName)return false;
   var pg=getPageByName(pageName);if(!pg||!pg.licensed)return false;
+  if(pg.suspendedUntil&&Date.now()<pg.suspendedUntil)return false; // admin 1-week revoke
   if(pg.licExpiry&&Date.now()>pg.licExpiry)return false;
   return true;
 }
@@ -5076,7 +5077,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v85 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v86 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5536,7 +5537,7 @@ function placeOrder(){
   if(!addr||!phone){toast('Enter delivery address and WhatsApp number','err');return;}
   var orderNo='RB-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
   var o={id:'ord'+Date.now(),orderNo:orderNo,productId:curBuyProduct.id,productTitle:curBuyProduct.title,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
-    sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,buyerUid:CU.uid,buyerName:CU.name,buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:map,
+    sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,buyerUid:CU.uid,buyerEmail:(CU.email||'').toLowerCase(),buyerName:CU.name,buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:map,
     payMethod:selPayMethod,status:'placed',storeMap:(curBuyProduct.map||curBuyProduct.geo||''),storeAddr:(curBuyProduct.addr||''),ts:Date.now()};
   var orders=getOrders();orders.unshift(o);saveOrders(orders);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o).catch(function(){});}catch(e){}}
@@ -5594,8 +5595,9 @@ function showMyOrders(){
 function showMyActivity(){
   if(!requireAuth('view your activity'))return;
   var uid=CU.uid;
-  var myApps=getAllApps().filter(function(a){return a.uid===uid;});
-  var myOrders=getOrders().filter(function(o){return o.buyerUid===uid;});
+  var myEmail=(CU.email||'').toLowerCase();
+  var myApps=getAllApps().filter(function(a){return a.uid===uid||(myEmail&&(a.email||'').toLowerCase()===myEmail);});
+  var myOrders=getOrders().filter(function(o){return o.buyerUid===uid||(myEmail&&(o.buyerEmail||'').toLowerCase()===myEmail);});
   var myProducts=getMyProducts();
   var incomingOrders=getOrders().filter(function(o){return o.sellerUid===uid;});
   var ownedPages=getPages().filter(function(p){return p.ownerUid===uid;});
@@ -6714,6 +6716,28 @@ function adminTab(t){
     }).join(''):'<div class="act-empty" style="font-size:11px;color:var(--mt2)">No ads yet.</div>';
     tb.innerHTML=h2;
   }else if(t==='content'){
+    // PAGES CONTROL: every page created by every user, grouped by owner
+    var allPgs=getPages().filter(function(p){return !p.isStore;});
+    var byOwner={};allPgs.forEach(function(p){var k=p.ownerUid||'?';if(!byOwner[k])byOwner[k]=[];byOwner[k].push(p);});
+    var pgHtml='<div style="font-size:11px;font-weight:700;margin-bottom:6px"><i class="ti ti-flag"></i> Pages control — every user page ('+allPgs.length+')</div>';
+    if(allPgs.length){
+      Object.keys(byOwner).forEach(function(ouid){
+        var lst=byOwner[ouid];var multi=lst.length>1;
+        pgHtml+='<div style="font-size:10px;color:'+(multi?'var(--red)':'var(--mt2)')+';margin:6px 0 3px;font-weight:700">'+esc(lst[0].ownerName||'User')+(multi?' ⚠ has '+lst.length+' pages (limit is 1)':'')+'</div>';
+        pgHtml+=lst.map(function(pg){
+          var susp=pg.suspendedUntil&&Date.now()<pg.suspendedUntil;
+          var lic=pg.licensed?(susp?'suspended':'approved'):'tag talk';
+          var nm="'"+pg.name.replace(/'/g,"\\'")+"'";
+          return '<div class="act-row"><div><b>'+esc(pg.name)+'</b><small>'+lic+(susp?' until '+new Date(pg.suspendedUntil).toLocaleDateString():'')+' · '+(getProducts().filter(function(x){return x.pageName===pg.name;}).length)+' products</small></div>'
+            +'<div style="display:flex;gap:4px">'
+            +(susp?'<button class="lbl-mini" style="color:#1a8f3c;border-color:#1a8f3c" onclick="adminUnsuspendPage('+nm+')"><i class="ti ti-lock-open"></i> Lift</button>'
+                  :'<button class="lbl-mini" style="color:var(--gold);border-color:var(--gold)" onclick="adminSuspendPage('+nm+')"><i class="ti ti-clock-pause"></i> Revoke 1wk</button>')
+            +'<button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="adminDeletePage('+nm+')"><i class="ti ti-trash"></i> Delete</button>'
+            +'</div></div>';
+        }).join('');
+      });
+    }else pgHtml+='<div class="act-empty" style="font-size:11px;color:var(--mt2)">No user pages yet.</div>';
+    pgHtml+='<div style="border-top:1px solid var(--b);margin:12px 0"></div>';
     // TAG MANAGER: owner can remove unwanted main tags
     var SEED=['jobs','tech','ai','insurance','sell','remote'];
     var tagMgr='<div style="font-size:11px;font-weight:700;margin-bottom:6px"><i class="ti ti-hash"></i> Main Tags — remove unwanted ones</div>'
@@ -6729,7 +6753,7 @@ function adminTab(t){
     tags.forEach(function(tg){(tg.posts||[]).forEach(function(p){rows.push({tag:tg,post:p});});});
     rows.sort(function(a,b){return (b.post.ts||0)-(a.post.ts||0);});
     rows=rows.slice(0,80);
-    tb.innerHTML=tagMgr+(rows.length?rows.map(function(r){
+    tb.innerHTML=pgHtml+tagMgr+(rows.length?rows.map(function(r){
       return '<div class="appl-card"><div style="font-size:12px"><b>'+esc(r.post.user||'?')+'</b> <span style="color:var(--mt2)">in #'+esc(r.tag.name)+'</span></div>'
         +'<div style="font-size:12px;color:var(--tx);margin:3px 0">'+esc((r.post.title||r.post.body||'').substring(0,140))+'</div>'
         +'<button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="adminDeletePost(\''+escJS(r.tag.id)+'\','+r.post.id+')"><i class="ti ti-trash"></i> Delete</button></div>';
@@ -6871,5 +6895,24 @@ function adminDecidePageReq(id,allow){
   if(allow){var al=LS.get('rb_pageallow',{})||{};al[r.uid]=(al[r.uid]||0)+1;LS.set('rb_pageallow',al);}
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('pagereqs').set({list:reqs},{merge:true}).catch(function(){});}catch(e){}}
   adminTab('licenses');toast(allow?'Additional page allowed for '+r.name:'Request rejected','info');
+}
+
+function adminSuspendPage(name){
+  var pgs=getPages();var pg=pgs.find(function(x){return x.name===name;});if(!pg)return;
+  pg.suspendedUntil=Date.now()+7*86400000;savePages(pgs);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(name.toLowerCase()).set(pg,{merge:true}).catch(function(){});}catch(e){}}
+  adminTab('content');toast('“'+name+'” revoked for 1 week — its products are hidden from ReadBi until then','info');
+}
+function adminUnsuspendPage(name){
+  var pgs=getPages();var pg=pgs.find(function(x){return x.name===name;});if(!pg)return;
+  pg.suspendedUntil=0;savePages(pgs);
+  adminTab('content');toast('Suspension lifted for “'+name+'”','ok');
+}
+function adminDeletePage(name){
+  if(!confirm('Delete page “'+name+'” permanently? Its products will leave the ReadBi marketplace.'))return;
+  var pgs=getPages().filter(function(x){return x.name!==name;});savePages(pgs);
+  var prods=getProducts();prods.forEach(function(p){if(p.pageName===name){p.pageName='';}});saveProducts(prods);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(name.toLowerCase()).delete().catch(function(){});}catch(e){}}
+  adminTab('content');toast('Page “'+name+'” deleted','info');
 }
 </script></body></html>
