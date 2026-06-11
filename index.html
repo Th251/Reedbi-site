@@ -552,7 +552,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v86</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v87</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -3898,7 +3898,15 @@ var CURRENCIES=['USD $','EUR €','GBP £','AED د.إ','INR ₹','SAR ﷼','PKR 
 /* ===== Products store ===== */
 function getProducts(){return LS.get('rb_products',[])||[];}
 function saveProducts(p){LS.set('rb_products',p);}
-function getMyProducts(){var uid=CU?CU.uid:'';return getProducts().filter(function(x){return x.sellerUid===uid;});}
+function getMyProducts(){
+  var uid=CU?CU.uid:'';
+  return getProducts().filter(function(x){
+    if(x.sellerUid===uid)return true;
+    // products sold under a page I own or admin also belong in my shop
+    if(x.pageName){var r=pageRole(x.pageName);if(r==='owner'||r==='admin')return true;}
+    return false;
+  });
+}
 function getOrders(){return LS.get('rb_orders',[])||[];}
 function saveOrders(o){LS.set('rb_orders',o);}
 
@@ -5077,7 +5085,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v86 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v87 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5139,6 +5147,20 @@ try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setD
       if((e.ctrlKey||e.metaKey)&&(k==='S'||k==='s')){e.preventDefault();return false;}
     });
   }catch(e){}
+})();
+
+/* ===== Universal Back: phone/browser back closes the top layer instead of leaving ===== */
+(function(){
+  try{history.pushState({rb:1},'');}catch(e){}
+  window.addEventListener('popstate',function(){
+    try{
+      var ovls=document.querySelectorAll('.overlay.open');
+      if(ovls.length){ovls[ovls.length-1].classList.remove('open');history.pushState({rb:1},'');return;}
+      var cv=document.getElementById('cv-view');
+      var lp2=document.getElementById('leftpanel');if(cv&&cv.style.display==='flex'&&(window.innerWidth<=700||(lp2&&lp2.classList.contains('hidden')))){goHome();history.pushState({rb:1},'');return;}
+      // nothing open: allow one more back to actually leave
+    }catch(e){}
+  });
 })();
 /* ============================================================
    MARKETPLACE — product listing, photos, orders, shipping status
@@ -5232,7 +5254,14 @@ var sellerTab='orders';
 function showMyProducts(tab){
   if(!requireAuth('view your products'))return;
   if(tab)sellerTab=tab;
-  var prods=getMyProducts();var orders=getOrders().filter(function(o){return o.sellerUid===CU.uid;});
+  var prods=getMyProducts();
+  var orders=getOrders().filter(function(o){
+    if(o.sellerUid===CU.uid)return true;
+    if(o.pageName){var r=pageRole(o.pageName);if(r==='owner'||r==='admin')return true;}
+    // legacy orders without pageName: match via product
+    if(!o.pageName&&o.productId){var pr=getProducts().find(function(x){return x.id===o.productId;});if(pr&&pr.pageName){var r2=pageRole(pr.pageName);if(r2==='owner'||r2==='admin')return true;}}
+    return false;
+  });
   // aggregate stats
   var totalUnits=0,revenue=0,dispatched=0,pending=0,delivered=0;
   var perProduct={};
@@ -5537,7 +5566,7 @@ function placeOrder(){
   if(!addr||!phone){toast('Enter delivery address and WhatsApp number','err');return;}
   var orderNo='RB-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
   var o={id:'ord'+Date.now(),orderNo:orderNo,productId:curBuyProduct.id,productTitle:curBuyProduct.title,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
-    sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,buyerUid:CU.uid,buyerEmail:(CU.email||'').toLowerCase(),buyerName:CU.name,buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:map,
+    sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,pageName:(curBuyProduct.pageName||''),buyerUid:CU.uid,buyerEmail:(CU.email||'').toLowerCase(),buyerName:CU.name,buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:map,
     payMethod:selPayMethod,status:'placed',storeMap:(curBuyProduct.map||curBuyProduct.geo||''),storeAddr:(curBuyProduct.addr||''),ts:Date.now()};
   var orders=getOrders();orders.unshift(o);saveOrders(orders);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o).catch(function(){});}catch(e){}}
