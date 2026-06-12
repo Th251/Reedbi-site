@@ -581,7 +581,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v105</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v106</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1072,6 +1072,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 //---------------------------------------------------------------------
 //
@@ -5168,7 +5169,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v105 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v106 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -7001,7 +7002,61 @@ function openMyStorefront(name){
 
 /* ===== 3D product viewer (CSS 3D — drag to rotate, no libraries) ===== */
 var __p3dRX=-8,__p3dRY=18,__p3dDrag=null;
+var __t3={};
+function open3DThree(p){
+  try{
+    if(!window.THREE)return false;
+    var ovl=document.getElementById('p3dw-ovl');
+    if(!ovl){
+      ovl=document.createElement('div');ovl.id='p3dw-ovl';ovl.className='p3d-ovl';
+      ovl.innerHTML='<button class="modal-x" style="position:absolute;top:16px;right:16px;color:#fff;z-index:2" onclick="document.getElementById(\'p3dw-ovl\').classList.remove(\'open\')"><i class="ti ti-x"></i></button>'
+        +'<div id="t3-stage" style="width:min(92vw,560px);height:min(64vh,460px)"></div>'
+        +'<div class="p3d-hint"><i class="ti ti-hand-move"></i> Drag to orbit · scroll/pinch to zoom · double-tap reset</div>'
+        +'<div id="t3-title" style="color:#fff;font-weight:700;margin-top:8px;font-size:14px"></div>';
+      document.body.appendChild(ovl);
+      var st=ovl.querySelector('#t3-stage');
+      var T=window.THREE;
+      __t3.scene=new T.Scene();
+      __t3.cam=new T.PerspectiveCamera(45,st.clientWidth/Math.max(st.clientHeight,1),0.1,100);
+      __t3.cam.position.set(0,0.4,3.2);
+      __t3.ren=new T.WebGLRenderer({antialias:true,alpha:true});
+      __t3.ren.setSize(st.clientWidth,st.clientHeight);
+      __t3.ren.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+      st.appendChild(__t3.ren.domElement);
+      __t3.scene.add(new T.AmbientLight(0xffffff,0.75));
+      var dl=new T.DirectionalLight(0xffffff,1.1);dl.position.set(4,5,5);__t3.scene.add(dl);
+      var pl=new T.PointLight(0x0a66c2,1.4,8);pl.position.set(0,-1.4,0);__t3.scene.add(pl);
+      var geo=new T.BoxGeometry(1.7,1.7,0.12);
+      __t3.mesh=new T.Mesh(geo,new T.MeshStandardMaterial({color:0x222222,roughness:0.35,metalness:0.15}));
+      __t3.scene.add(__t3.mesh);
+      __t3.rx=-0.12;__t3.ry=0.35;__t3.zoom=3.2;var drag=null;
+      function loop(){requestAnimationFrame(loop);if(!drag){__t3.ry+=0.003;}__t3.mesh.rotation.x=__t3.rx;__t3.mesh.rotation.y=__t3.ry;__t3.cam.position.z=__t3.zoom;__t3.ren.render(__t3.scene,__t3.cam);}
+      loop();
+      function dn(x,y){drag={x:x,y:y,rx:__t3.rx,ry:__t3.ry};}
+      function mv(x,y){if(!drag)return;__t3.ry=drag.ry+(x-drag.x)*0.008;__t3.rx=Math.max(-1.1,Math.min(1.1,drag.rx+(y-drag.y)*0.008));}
+      st.addEventListener('mousedown',function(e){dn(e.clientX,e.clientY);});
+      window.addEventListener('mousemove',function(e){mv(e.clientX,e.clientY);});
+      window.addEventListener('mouseup',function(){drag=null;});
+      st.addEventListener('touchstart',function(e){var t=e.touches[0];dn(t.clientX,t.clientY);},{passive:true});
+      st.addEventListener('touchmove',function(e){var t=e.touches[0];mv(t.clientX,t.clientY);},{passive:true});
+      st.addEventListener('touchend',function(){drag=null;});
+      st.addEventListener('wheel',function(e){__t3.zoom=Math.max(1.6,Math.min(6,__t3.zoom+(e.deltaY>0?0.25:-0.25)));},{passive:true});
+      ovl.addEventListener('dblclick',function(){__t3.rx=-0.12;__t3.ry=0.35;__t3.zoom=3.2;});
+    }
+    var T2=window.THREE;
+    new T2.TextureLoader().load(p.photos[0],function(tex){
+      var dark=new T2.MeshStandardMaterial({color:0x1b1b1b,roughness:0.4});
+      var face=new T2.MeshStandardMaterial({map:tex,roughness:0.3});
+      __t3.mesh.material=[dark,dark,dark,dark,face,face];
+    });
+    document.getElementById('t3-title').textContent=p.title;
+    ovl.classList.add('open');
+    return true;
+  }catch(e){return false;}
+}
 function open3DView(prodId){
+  var __p=getProducts().find(function(x){return x.id===prodId;});
+  if(__p&&__p.photos&&__p.photos[0]&&open3DThree(__p))return;
   var p=getProducts().find(function(x){return x.id===prodId;});if(!p||!(p.photos&&p.photos[0]))return;
   var ovl=document.getElementById('p3d-ovl');
   if(!ovl){
