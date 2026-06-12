@@ -552,14 +552,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v98</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v99</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
+          <button class="ib" onclick="showCart()" title="My Bag" style="position:relative"><i class="ti ti-shopping-bag"></i><span id="cart-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#cc1016;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px">0</span></button>
           <button class="ib" onclick="openCreateModal()"><i class="ti ti-square-plus"></i></button>
           <button class="ib" onclick="openAiSearch()" title="AI Search"><i class="ti ti-sparkles"></i></button>
           <button class="ib" onclick="openInbox()" title="Messages" style="position:relative"><i class="ti ti-message"></i><span id="dm-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#cc1016;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px">0</span></button>
-          <button class="ib" onclick="showCart()" title="My Bag" style="position:relative"><i class="ti ti-shopping-bag"></i><span id="cart-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#cc1016;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px">0</span></button>
           <button class="ib" onclick="openProductSearch()" title="Search products to buy"><i class="ti ti-search"></i></button>
           <button class="ib" onclick="showAgentDashboard()" title="Delivery Agent"><i class="ti ti-moped"></i></button>
           <button class="ib ib-activity" onclick="showMyActivity()" title="My Activity — all in one place"><i class="ti ti-layout-dashboard"></i></button>
@@ -794,6 +794,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <div class="fg"><label>Product title</label><input type="text" id="lp-title" placeholder="e.g. iPhone 14 Pro 256GB"></div>
     <div class="fg" style="margin-top:8px"><label>Sell as (your name or your page)</label><select id="lp-as" style="width:100%"><option value="">My own name</option></select></div>
     <div class="fg" style="margin-top:8px"><label>Location (country / emirate / city)</label><input type="text" id="lp-location" placeholder="e.g. UAE, Dubai, Deira"></div>
+    <div class="fg" style="margin-top:8px"><label>Accepted payment</label><select id="lp-pay"><option value="both">Online + Cash on Delivery</option><option value="cod">Cash on Delivery only</option><option value="online">Online only</option></select></div>
+    <div class="fg" style="margin-top:8px"><label>Brand (optional)</label><input type="text" id="lp-brand" placeholder="e.g. Samsung, Nike, Al Ain"></div>
     <div class="fg" style="margin-top:8px"><label>Category</label><input type="text" id="lp-category" list="cat-list" placeholder="e.g. Eggs, Electronics, Grocery"><datalist id="cat-list"><option>Grocery</option><option>Electronics</option><option>Clothing</option><option>Eggs</option><option>Dairy</option><option>Vegetables</option><option>Fruits</option><option>Meat</option><option>Household</option><option>Other</option></datalist></div>
     <div class="fg" style="margin-top:8px"><label>Description</label><textarea id="lp-desc" rows="2" placeholder="Condition, specs, details..."></textarea></div>
     <div style="display:flex;gap:8px;margin-top:8px">
@@ -3977,7 +3979,8 @@ function extractAT(title,body){
 /* ============================================================
    PAGES (company pages owned by users)
 ============================================================ */
-function getPages(){return LS.get('rb_pages',[])||[];}
+function getPages(){return (LS.get('rb_pages',[])||[]).filter(function(p){return !p.deleted;});}
+function getAllPagesRaw(){return LS.get('rb_pages',[])||[];}
 function savePages(p){LS.set('rb_pages',p);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{p.forEach(function(x){if(x&&x.name)FB.db.collection('pages').doc(x.name.toLowerCase()).set(x,{merge:true}).catch(function(){});});}catch(e){}}}
 function getPageByName(name){return getPages().find(function(p){return p.name.toLowerCase()===String(name).toLowerCase();});}
 function getMyPages(){var uid=CU?CU.uid:'';return getPages().filter(function(p){return p.ownerUid===uid;});}
@@ -5124,7 +5127,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v98 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v99 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5567,7 +5570,7 @@ var listPhotos=[]; // base64 photos for the product being listed
 function openListProduct(){
   if(!requireAuth('list a product'))return;
   listPhotos=[];
-  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category','lp-location'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category','lp-location','lp-brand'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   var cs=document.getElementById('lp-cur');if(cs&&!cs.options.length){CURRENCIES.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o);});}
   // sell-as: my name or any page I own/admin
   var sa=document.getElementById('lp-as');
@@ -5632,7 +5635,10 @@ function submitProduct(){
   var category=(document.getElementById('lp-category')||{}).value||'Other';
   var location=(document.getElementById('lp-location')||{}).value||'';
   var sellAs=(document.getElementById('lp-as')||{}).value||'';
-  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
+  var brand=(document.getElementById('lp-brand')||{}).value||'';
+  var payOpts=(document.getElementById('lp-pay')||{}).value||'both';
+  var vatPct=(function(L){L=L.toLowerCase();if(L.indexOf('uae')>=0||L.indexOf('dubai')>=0||L.indexOf('emirates')>=0)return 5;if(L.indexOf('saudi')>=0||L.indexOf('ksa')>=0)return 15;if(L.indexOf('india')>=0)return 18;if(L.indexOf('uk')>=0||L.indexOf('united kingdom')>=0)return 20;if(L.indexOf('bahrain')>=0||L.indexOf('oman')>=0)return 10;return 0;})(location||'');
+  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',brand:brand,payOpts:payOpts,vatPct:vatPct,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
     batches:[{batchCode:'B-'+Date.now().toString(36).toUpperCase().slice(-4),qty:qty,cost:cost,vendor:'',vendorPhone:'',brand:'',date:Date.now()}],interest:0,interestLog:[],
     photos:listPhotos.slice(),addr:addr,phone:phone,map:map,ts:Date.now()};
   var prods=getProducts();prods.unshift(prod);saveProducts(prods);
@@ -5685,7 +5691,7 @@ function showMyProducts(tab){
     +'</div>'
     +'<button class="btn btnok" style="margin-top:11px;border-radius:18px;width:100%" onclick="closeOvl(\'seller-ovl\');openListProduct()"><i class="ti ti-plus"></i> List a New Product</button>'
     +'<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid var(--gold);background:var(--card2);color:var(--gold)" onclick="openDelivSettings()"><i class="ti ti-truck-delivery"></i> Delivery fees &amp; commission (geo-based)</button>'
-    +(function(){var pg=(typeof myOwnedPage==='function')&&myOwnedPage();if(!pg)return '';return '<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="closeOvl(\'seller-ovl\');openCompanyPage(\''+escJS(pg.name)+'\')"><i class="ti ti-users"></i> '+esc(pg.name)+' — manage page team (assign staff for listings)</button>';})()
+    +(function(){var pg=(typeof myOwnedPage==='function')&&myOwnedPage();if(!pg)return '';return '<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="closeOvl(\'seller-ovl\');openPageTeam(\''+escJS(pg.name)+'\')"><i class="ti ti-users"></i> '+esc(pg.name)+' — manage page team (assign staff for listings)</button>';})()
     +'</div>';
   head+='<div class="seller-tabs">'
     +'<button class="seller-tab'+(sellerTab==='orders'?' on':'')+'" onclick="showMyProducts(\'orders\')"><i class="ti ti-package"></i> Orders</button>'
@@ -5705,10 +5711,17 @@ function showMyProducts(tab){
     // full status breakdown so the shop knows exactly where every order stands
     var stC={};orders.forEach(function(o){stC[o.status||'placed']=(stC[o.status||'placed']||0)+1;});
     var needAgent=orders.filter(function(o){return o.status!=='delivered'&&o.status!=='returned'&&!o.agentUid;}).length;
+    var codPend=orders.filter(function(o){return o.payMethod==='cod'&&!o.codCollectedTs&&o.status!=='returned';}).length;
+    var SF=window.__stFilter||'';
+    function chip(id,label,n,col){return '<span onclick="window.__stFilter=window.__stFilter===\''+id+'\'?\'\':\''+id+'\';showMyProducts(\'orders\')" style="cursor:pointer;background:'+(SF===id?'var(--g)':'var(--card2)')+';color:'+(SF===id?'#fff':(col||'var(--tx)'))+';border:1px solid '+(col||'var(--b)')+';border-radius:10px;padding:3px 8px">'+label+': <b>'+n+'</b></span>';}
     content+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;font-size:10px">'
-      +ORDER_STATUS.map(function(s){return '<span style="background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:3px 8px">'+s.label+': <b>'+(stC[s.id]||0)+'</b></span>';}).join('')
-      +'<span style="background:rgba(195,125,22,.12);border:1px solid var(--gold);color:var(--gold);border-radius:10px;padding:3px 8px">Need agent: <b>'+needAgent+'</b></span></div>';
+      +ORDER_STATUS.filter(function(s){return (stC[s.id]||0)>0||s.id==='placed';}).map(function(s){return chip(s.id,s.label,stC[s.id]||0);}).join('')
+      +chip('__needagent','Need agent',needAgent,'var(--gold)')
+      +chip('__codpend','💵 COD to collect',codPend,'var(--gold)')+'</div>';
     var activeOrders=orders.filter(function(o){return o.status!=='delivered'&&o.status!=='returned';});
+    if(SF==='__needagent')activeOrders=activeOrders.filter(function(o){return !o.agentUid;});
+    else if(SF==='__codpend')activeOrders=orders.filter(function(o){return o.payMethod==='cod'&&!o.codCollectedTs&&o.status!=='returned';});
+    else if(SF)activeOrders=orders.filter(function(o){return (o.status||'placed')===SF;});
     var doneOrders=orders.filter(function(o){return o.status==='delivered'||o.status==='returned';});
     content+=activeOrders.length?activeOrders.map(function(o){return orderCardSeller(o);}).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:18px"><i class="ti ti-package" style="font-size:30px;color:var(--b2);display:block;margin-bottom:6px"></i>No active orders.</p>';
     if(doneOrders.length){
@@ -5719,7 +5732,8 @@ function showMyProducts(tab){
   }else if(sellerTab==='listings'){
     var amLic=userLicensed(CU.uid);
     var licBanner=amLic
-      ? '<div style="font-size:11px;background:rgba(26,143,60,.1);border:1px solid #1a8f3c;border-radius:9px;padding:9px 11px;margin-bottom:10px;color:#1a8f3c"><i class="ti ti-license"></i> <b>ReadBi licensed seller.</b> Your products appear in the public marketplace and you have a storefront.</div>'
+      ? '<div style="font-size:11px;background:rgba(26,143,60,.1);border:1px solid #1a8f3c;border-radius:9px;padding:9px 11px;margin-bottom:10px;color:#1a8f3c"><i class="ti ti-license"></i> <b>Reedbi Ecommerce ✓</b> Your products appear in the public marketplace and you have a storefront.'
+        +(function(){var pg=(typeof myOwnedPage==='function')&&myOwnedPage();if(pg&&pageLicenseValid(pg.name))return ' <a href="#" onclick="closeOvl(\'seller-ovl\');viewSellerStore(\''+escJS(pg.name)+'\');return false" style="color:#1a8f3c;font-weight:700"><i class="ti ti-building-store"></i> View my storefront →</a>';return '';})()+'</div>'
       : '<div style="font-size:11px;background:rgba(195,125,22,.1);border:1px solid var(--gold);border-radius:9px;padding:9px 11px;margin-bottom:10px;color:var(--gold)"><i class="ti ti-info-circle"></i> <b>Tag Talk seller.</b> Your products show inside Tag Talk only. Validate a ReadBi license to appear in the public marketplace with your own storefront.<button class="btn" style="width:100%;margin-top:8px;background:var(--gold);color:#000;border:none;border-radius:7px;padding:8px;font-weight:700" onclick="closeOvl(\'seller-ovl\');openLicensePanel()"><i class="ti ti-license"></i> Validate License</button></div>';
     var qrP=prods.reduce(function(s,p){return s+(p.printedQty||0);},0);
     var qrB=prods.reduce(function(s,p){var b=(p.qty||0)-(p.printedQty||0);return s+(b>0?b:0);},0);
@@ -5727,9 +5741,11 @@ function showMyProducts(tab){
     // category-wise listing: each category shows its count + balance labels to print
     var byCat={};prods.forEach(function(p){var k=p.category||'Other';(byCat[k]=byCat[k]||[]).push(p);});
     var catKeys=Object.keys(byCat).sort();
-    var listHtml=catKeys.map(function(k){
+    var CF=window.__catFilter||'';
+    if(CF&&byCat[CF])catKeys=[CF];
+    var listHtml=(CF?'<a href="#" onclick="window.__catFilter=\'\';showMyProducts(\'listings\');return false" style="font-size:11px;color:var(--g)"><i class="ti ti-arrow-left"></i> All categories</a>':'')+catKeys.map(function(k){
       var ps=byCat[k];var bal=ps.reduce(function(s,p){var b=(p.qty||0)-(p.printedQty||0);return s+(b>0?b:0);},0);
-      return '<div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px"><div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--mt)"><i class="ti ti-category"></i> '+esc(k)+' ('+ps.length+')</div>'
+      return '<div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px"><div onclick="window.__catFilter=\''+escJS(k)+'\';showMyProducts(\'listings\')" style="cursor:pointer;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--g)"><i class="ti ti-category"></i> '+esc(k)+' ('+ps.length+') <i class="ti ti-chevron-right" style="font-size:9px"></i></div>'
         +(bal>0?'<span style="font-size:10px;color:var(--gold)"><i class="ti ti-qrcode"></i> '+bal+' labels to print</span>':'<span style="font-size:10px;color:#1a8f3c">✓ labels done</span>')+'</div>'
         +ps.map(function(p){return productCardSeller(p);}).join('');
     }).join('');
@@ -5764,6 +5780,25 @@ function showMyProducts(tab){
           +'<div class="anal-bar"><div class="anal-fill" style="width:'+pct+'%"></div></div>'
           +'<div class="anal-sub">'+r.d.orders+' order'+(r.d.orders!==1?'s':'')+' · '+esc(cur)+' '+r.d.rev.toLocaleString()+' revenue</div></div>';
       }).join('');
+    }
+    // month-by-month sales & profit history (works for any number of years)
+    var byMon={};
+    orders.forEach(function(o){
+      var d=new Date(o.ts||0);var key=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);
+      var q=o.qty||1;var sp=parseFloat(String(o.price).replace(/[^0-9.]/g,''))||0;
+      var pr2=getProducts().find(function(x){return x.id===o.productId;});
+      var cp2=pr2?parseFloat(String(pr2.cost).replace(/[^0-9.]/g,''))||0:0;
+      var b=byMon[key]=byMon[key]||{placed:0,delivered:0,rev:0,prof:0};
+      b.placed+=q;
+      if(o.status==='delivered'){b.delivered+=q;b.rev+=sp*q;b.prof+=(sp-cp2)*q;}
+    });
+    var monKeys=Object.keys(byMon).sort().reverse();
+    if(monKeys.length){
+      content+='<div style="font-size:11px;font-weight:700;margin:12px 0 6px"><i class="ti ti-calendar-stats"></i> Monthly sales &amp; profit</div>'
+        +monKeys.map(function(k2){var b=byMon[k2];
+          return '<div class="act-row"><div><b style="font-size:12px">'+k2+'</b><small style="display:block;color:var(--mt2)">'+b.placed+' ordered · '+b.delivered+' delivered</small></div>'
+            +'<div style="text-align:right"><div style="font-size:12px;font-weight:700">'+Math.round(b.rev*100)/100+'</div><small style="color:'+(b.prof>=0?'#1a8f3c':'var(--red)')+'">profit '+Math.round(b.prof*100)/100+'</small></div></div>';
+        }).join('');
     }
   }
   body.innerHTML=head+content;
@@ -6028,6 +6063,9 @@ function finalizeOnlinePayment(method){
 function showMyOrders(){
   if(!requireAuth('view orders'))return;
   var orders=getOrders().filter(function(o){return o.buyerUid===CU.uid;});
+  var doneO=orders.filter(function(o){return o.status==='delivered'||o.status==='returned';});
+  orders=orders.filter(function(o){return o.status!=='delivered'&&o.status!=='returned';});
+  if(window.__buyShowDone)orders=orders.concat(doneO);
   var body=document.getElementById('myorders-body');
   if(!orders.length){body.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No orders yet.</p>';document.getElementById('myorders-ovl').classList.add('open');return;}
   body.innerHTML=orders.map(function(o){
@@ -6044,6 +6082,7 @@ function showMyOrders(){
       +((o.status==='delivered'&&o.agentUid&&!o.rated)?'<button class="ord-qr" style="border-color:var(--gold);color:var(--gold)" onclick="openRateDelivery(\''+o.id+'\')"><i class="ti ti-star"></i> Rate delivery</button>':'')
       +'</div>';
   }).join('');
+  if(doneO.length){body.innerHTML+='<div style="text-align:center;margin-top:8px"><a href="#" onclick="window.__buyShowDone=!window.__buyShowDone;showMyOrders();return false" style="font-size:11px;color:var(--g)">'+(window.__buyShowDone?'Hide delivered':'Show delivered/returned ('+doneO.length+')')+'</a></div>';}
   document.getElementById('myorders-ovl').classList.add('open');
 }
 
@@ -6260,7 +6299,7 @@ function runProductSearch(q){
   q=(q||'').trim().toLowerCase();
   var prods=getProducts().filter(function(p){return productInMarketplace(p);});
   if(psCategory)prods=prods.filter(function(p){return (p.category||'Other')===psCategory;});
-  var matches=q?prods.filter(function(p){return ((p.title||'')+' '+(p.desc||'')+' '+(p.category||'')).toLowerCase().indexOf(q)>=0;}):prods;
+  var matches=q?prods.filter(function(p){return ((p.title||'')+' '+(p.desc||'')+' '+(p.category||'')+' '+(p.brand||'')).toLowerCase().indexOf(q)>=0;}):prods;
   // nearby sellers first: products whose location shares a word with the user's location rank on top
   var myLocW=(CU&&CU.location?CU.location:'').toLowerCase().split(/[\s,]+/).filter(function(w){return w.length>2;});
   if(myLocW.length){matches=matches.slice().sort(function(a,b){
@@ -6593,8 +6632,8 @@ function psCard(p){
   return '<div class="ps-card">'+shopRibbon(p)
     +'<img src="'+esc(p.photos&&p.photos[0]||'')+'" class="ps-img">'
     +'<div style="flex:1;min-width:0">'
-    +'<div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
-    +'<div style="font-size:13px">'+priceHtml(p)+' '+((typeof reviewSummary==='function')?reviewSummary(p):'')+'</div>'
+    +'<div style="font-weight:700;font-size:13px">'+esc(p.title)+(p.brand?' <span style="font-size:9px;color:var(--mt2);font-weight:600">'+esc(p.brand)+'</span>':'')+'</div>'
+    +'<div style="font-size:13px">'+priceHtml(p)+' '+((typeof reviewSummary==='function')?reviewSummary(p):'')+(p.vatPct?'<small style="color:var(--mt2)"> +VAT '+p.vatPct+'%</small>':'')+(p.payOpts==='cod'?'<small style="color:var(--gold)"> · COD only</small>':p.payOpts==='online'?'<small style="color:var(--g)"> · Online only</small>':'')+'</div>'
     +'<div style="font-size:10px;color:var(--mt2)">by '+sellerLink+(p.category?' · '+esc(p.category):'')+' · <a href="#" onclick="shareProduct(\''+escJS(p.id)+'\');return false" style="color:#1a8f3c"><i class="ti ti-brand-whatsapp"></i> Share</a> · <a href="#" onclick="copyProductLink(\''+escJS(p.id)+'\');return false" style="color:var(--g)"><i class="ti ti-link"></i> Copy link</a>'+(mine?'':' · <a href="#" onclick="openReview(\''+escJS(p.id)+'\');return false" style="color:var(--gold)"><i class="ti ti-star"></i> Review</a>')+'</div>'
     +(p.location?'<div style="font-size:10px;color:var(--g)"><i class="ti ti-map-pin"></i> '+esc(p.location)+'</div>':'')
     +(mine?'<button class="ps-btn" style="background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="closeOvl(\'prodsearch-ovl\');showMyProducts(\'listings\')"><i class="ti ti-building-store"></i> Manage</button>'
@@ -6611,7 +6650,8 @@ function viewSellerStore(pageName){
   var hdr='<div style="background:linear-gradient(135deg,rgba(10,102,194,.08),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:12px;padding:12px;margin-bottom:10px">'
     +'<div style="font-weight:800;font-size:15px"><i class="ti ti-building-store" style="color:var(--g)"></i> '+esc(pageName)+' <span class="pay-badge pay-online-b" style="font-size:9px">ReadBi approved seller</span></div>'
     +(pg&&pg.about?'<div style="font-size:11px;color:var(--mt);margin-top:3px">'+esc(pg.about)+'</div>':'')
-    +(pg&&pg.ownerName?'<div style="font-size:10px;color:var(--mt2);margin-top:3px">Owner: '+esc(pg.ownerName)+'</div>':'')
+    +(pg&&pg.ownerName?'<div style="font-size:10px;color:var(--mt2);margin-top:3px">Owner: '+esc(pg.ownerName)+' · 👥 '+(1+((pg.members||[]).length))+' member'+(((pg.members||[]).length)!==0?'s':'')+'</div>':'')
+    +(pg&&CU&&!pageRole(pageName)?'<a href="#" onclick="requestJoinPage(\''+escJS(pageName)+'\');return false" style="font-size:10px;color:var(--g)"><i class="ti ti-user-plus"></i> Request to join as member</a>':'')
     +'<div style="font-size:10px;color:var(--mt2);margin-top:3px">'+prods.length+' product'+(prods.length!==1?'s':'')+' listed</div>'
     +'<div style="display:flex;gap:10px;margin-top:5px"><a href="#" onclick="openProductSearch();return false" style="font-size:10px;color:var(--g)">&larr; All products</a>'
     +'<a href="#" onclick="sharePage(\''+escJS(pageName)+'\');return false" style="font-size:10px;color:#1a8f3c"><i class="ti ti-brand-whatsapp"></i> Share this store</a></div></div>';
@@ -6781,6 +6821,70 @@ function distancesHtml(o){
   if(fee!==null)h+='<div style="font-size:11px;color:var(--g)"><i class="ti ti-coin"></i> Delivery fee: <b>'+cfg.cur+' '+fee+'</b> · Agent commission: <b>'+cfg.commission+'%</b> ('+cfg.cur+' '+(Math.round(fee*cfg.commission)/100)+')</div>';
   if(!h)h='<div style="font-size:10px;color:var(--mt2)">Add map coordinates (lat,lng) to shop &amp; delivery addresses to see distance &amp; fee</div>';
   return h;
+}
+
+/* ===== Join-as-member workflow + employee monitoring ===== */
+function getJoinReqs(){return LS.get('rb_joinreqs',[])||[];}
+function saveJoinReqs(r){LS.set('rb_joinreqs',r);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('joinreqs').set({list:r},{merge:true}).catch(function(e){});}catch(e){}}}
+function requestJoinPage(pageName){
+  if(!requireAuth('join a page'))return;
+  var pg=getPageByName(pageName);if(!pg){toast('Page not found','err');return;}
+  if(pageRole(pageName)){toast('You are already a member of '+pageName,'info');return;}
+  var reqs=getJoinReqs();
+  if(reqs.find(function(r){return r.page===pageName&&r.uid===CU.uid&&r.status==='pending';})){toast('Your membership request is pending with the page owner','info');return;}
+  reqs.push({id:'jr'+Date.now(),page:pageName,uid:CU.uid,name:CU.name,email:CU.email||'',status:'pending',ts:Date.now()});
+  saveJoinReqs(reqs);
+  toast('Membership request sent to “'+pageName+'” — once approved you can list under this page','ok');
+}
+function decideJoinReq(reqId,allow){
+  var reqs=getJoinReqs();var r=reqs.find(function(x){return x.id===reqId;});if(!r)return;
+  r.status=allow?'approved':'rejected';r.decidedTs=Date.now();
+  saveJoinReqs(reqs);
+  if(allow){
+    var pgs=getPages();var pg=pgs.find(function(x){return x.name===r.page;});
+    if(pg){pg.members=pg.members||[];if(!pg.members.find(function(m){return m.uid===r.uid;}))pg.members.push({uid:r.uid,name:r.name,role:'viewer',ts:Date.now()});savePages(pgs);}
+    notifyEvent('team','👥 '+esc(r.name)+' joined “'+esc(r.page)+'” — assign them a role (editor = can list products / post jobs)');
+  }
+  if(typeof openPageTeam==='function')openPageTeam(r.page);
+}
+function openPageTeam(pageName){
+  var pg=getPageByName(pageName);if(!pg)return;
+  var amOwner=pageRole(pageName)==='owner'||pageRole(pageName)==='admin';
+  var ovl=document.getElementById('pgteam-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='pgteam-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:14px"><i class="ti ti-users"></i> <span id="pgteam-title"></span></b><button class="modal-x" onclick="closeOvl(\'pgteam-ovl\')"><i class="ti ti-x"></i></button></div><div id="pgteam-body"></div></div>';
+    document.body.appendChild(ovl);}
+  document.getElementById('pgteam-title').textContent=pageName+' — team';
+  var members=pg.members||[];
+  var pend=getJoinReqs().filter(function(r){return r.page===pageName&&r.status==='pending';});
+  var prods=getProducts();
+  var h='<div style="font-size:12px;color:var(--mt);margin-bottom:8px"><b>'+(members.length+1)+'</b> registered under this page (owner + '+members.length+' employee'+(members.length!==1?'s':'')+')</div>';
+  if(amOwner&&pend.length){
+    h+='<div style="font-size:11px;font-weight:700;margin-bottom:5px">Membership requests ('+pend.length+')</div>'
+      +pend.map(function(r){var rid="'"+r.id+"'";
+        return '<div class="act-row"><div><b>'+esc(r.name)+'</b><small style="display:block;color:var(--mt2)">'+fmtDT(r.ts)+'</small></div>'
+          +'<div style="display:flex;gap:5px"><button class="lbl-mini" style="color:#1a8f3c;border-color:#1a8f3c" onclick="decideJoinReq('+rid+',true)">Approve</button>'
+          +'<button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="decideJoinReq('+rid+',false)">Reject</button></div></div>';
+      }).join('');
+  }
+  h+='<div style="font-size:11px;font-weight:700;margin:8px 0 5px">Employees — monitor &amp; assign</div>';
+  h+='<div class="act-row"><div><b>'+esc(pg.ownerName||'Owner')+'</b><small style="display:block;color:var(--g)">owner</small></div></div>';
+  h+=members.length?members.map(function(m){
+    var listed=prods.filter(function(p){return p.sellerUid===m.uid&&p.pageName===pageName;}).length;
+    var mid="'"+m.uid+"'",pn="'"+pageName.replace(/'/g,"\\'")+"'";
+    return '<div class="act-row"><div><b>'+esc(m.name)+'</b><small style="display:block;color:var(--mt2)">'+esc(m.role)+' · '+listed+' product'+(listed!==1?'s':'')+' listed under this page</small></div>'
+      +(amOwner?'<select onchange="setPageMemberRole('+pn+','+mid+',this.value)" style="background:var(--card);border:1px solid var(--b);border-radius:7px;padding:5px;color:var(--tx);font-size:10px;font-family:var(--fn)">'
+        +['viewer','editor','admin'].map(function(rr){return '<option value="'+rr+'"'+(m.role===rr?' selected':'')+'>'+rr+(rr==='editor'?' (can list/post)':'')+'</option>';}).join('')+'</select>':'')
+      +'</div>';
+  }).join(''):'<div style="font-size:11px;color:var(--mt2);padding:8px">No employees yet — approve membership requests to add staff.</div>';
+  document.getElementById('pgteam-body').innerHTML=h;
+  ovl.classList.add('open');
+}
+function setPageMemberRole(pageName,uid,role){
+  var pgs=getPages();var pg=pgs.find(function(x){return x.name===pageName;});if(!pg)return;
+  var m=(pg.members||[]).find(function(x){return x.uid===uid;});if(!m)return;
+  m.role=role;savePages(pgs);
+  toast(m.name+' is now '+role+(role==='editor'?' — they can list products and post jobs as '+pageName:''),'ok');
 }
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
@@ -7475,7 +7579,11 @@ function adminUnsuspendPage(name){
 }
 function adminDeletePage(name){
   if(!confirm('Delete page “'+name+'” permanently? Its products will leave the ReadBi marketplace.'))return;
-  var pgs=getPages().filter(function(x){return x.name!==name;});savePages(pgs);
+  // tombstone (deleted:true) instead of removal — syncs to the server and to EVERY device,
+  // so no other device can re-upload the page back
+  var pgs=getAllPagesRaw();var pg=pgs.find(function(x){return x.name===name;});
+  if(pg){pg.deleted=true;pg.licensed=false;}
+  savePages(pgs);
   var prods=getProducts();prods.forEach(function(p){if(p.pageName===name){p.pageName='';}});saveProducts(prods);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(name.toLowerCase()).delete().catch(function(){});}catch(e){}}
   adminTab('content');toast('Page “'+name+'” deleted','info');
@@ -7483,12 +7591,10 @@ function adminDeletePage(name){
 
 function adminDeleteSeller(uid,name){
   if(!confirm('Delete seller "'+name+'" completely? Their products and pages will be removed from Reedbi.'))return;
-  // remove their products
-  saveProducts(getProducts().filter(function(p){return p.sellerUid!==uid;}));
-  // remove their pages (and unlink page products)
-  var theirPages=getPages().filter(function(pg){return pg.ownerUid===uid;}).map(function(pg){return pg.name;});
-  savePages(getPages().filter(function(pg){return pg.ownerUid!==uid;}));
-  var prods=getProducts();prods.forEach(function(p){if(theirPages.indexOf(p.pageName)>=0)p.pageName='';});saveProducts(prods);
+  // withdraw their products (tombstone — syncs everywhere, cannot be re-uploaded back)
+  var prods=getProducts();prods.forEach(function(p){if(p.sellerUid===uid){p.withdrawn=true;}});saveProducts(prods);
+  // tombstone their pages
+  var pgs=getAllPagesRaw();pgs.forEach(function(pg){if(pg.ownerUid===uid){pg.deleted=true;pg.licensed=false;}});savePages(pgs);
   // revoke license + drop from directory
   setUserLicensed(uid,false,name);
   var idx=(LS.get('rb_fusers',[])||[]).filter(function(u){return u.uid!==uid;});LS.set('rb_fusers',idx);
@@ -7618,15 +7724,22 @@ function runAiSearch(){
   if(!q){toast('Type what you are looking for','err');return;}
   var ql=q.toLowerCase();
   var box=document.getElementById('ais-res');
-  var prods=getProducts().filter(function(p){return !p.withdrawn&&((p.title||'')+' '+(p.desc||'')+' '+(p.category||'')).toLowerCase().indexOf(ql)>=0;});
+  var prods=getProducts().filter(function(p){return !p.withdrawn&&((p.title||'')+' '+(p.desc||'')+' '+(p.category||'')+' '+(p.brand||'')).toLowerCase().indexOf(ql)>=0;});
   // priority: Reedbi Ecommerce (approved) first, then Reedbi Tagtalk, then web
-  prods.sort(function(a,b){return (productInMarketplace(b)?1:0)-(productInMarketplace(a)?1:0);});
+  var myW=(CU&&CU.location?CU.location:'').toLowerCase().split(/[\s,]+/).filter(function(w){return w.length>2;});
+  function near(p){var pl=(p.location||'').toLowerCase();return myW.some(function(w){return pl.indexOf(w)>=0;})?0:1;}
+  prods.sort(function(a,b){
+    var d=near(a)-near(b);if(d)return d;                      // nearby first
+    return (productInMarketplace(b)?1:0)-(productInMarketplace(a)?1:0); // then Ecommerce before Tagtalk
+  });
   var rows=prods.slice(0,8).map(function(p){
     var inRB=productInMarketplace(p);
     var pid="'"+p.id+"'";
     return '<div class="act-row" style="gap:8px">'
       +'<img src="'+esc(p.photos&&p.photos[0]||'')+'" style="width:38px;height:38px;border-radius:8px;object-fit:cover">'
-      +'<div style="flex:1;min-width:0"><b style="font-size:12px">'+esc(p.title)+'</b><small style="display:block;color:'+(inRB?'#1a8f3c':'var(--gold)')+'">'+(inRB?'Reedbi Ecommerce':'Reedbi Tagtalk')+' · '+esc(p.currency||'')+' '+esc(p.offer||p.price||'')+'</small></div>'
+      +'<div style="flex:1;min-width:0"><b style="font-size:12px">'+esc(p.title)+'</b>'
+      +(p.desc?'<small style="display:block;color:var(--mt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(String(p.desc).slice(0,70))+'</small>':'')
+      +'<small style="display:block;color:'+(inRB?'#1a8f3c':'var(--gold)')+'">'+(inRB?'Reedbi Ecommerce':'Reedbi Tagtalk')+(near(p)===0?' · 📍nearby':'')+' · <b>'+esc(p.currency||'')+' '+esc(p.offer||p.price||'')+'</b></small></div>'
       +(inRB?'<button class="lbl-mini" style="color:var(--g);border-color:var(--g)" onclick="closeOvl(\'aisearch-ovl\');viewInReadBi('+pid+')">Buy</button>':'<button class="lbl-mini" onclick="closeOvl(\'aisearch-ovl\');openTag(\'sell\')">View</button>')
       +'</div>';
   }).join('');
