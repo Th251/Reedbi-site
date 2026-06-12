@@ -410,7 +410,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 #prodsearch-ovl .modal{max-width:1100px;width:96vw;height:92vh;max-height:92vh;display:flex;flex-direction:column}
 #prodsearch-ovl .modal>div:last-child,#ps-results{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 @media(max-width:700px){#prodsearch-ovl .modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}}
-@media(min-width:701px){.sf-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}.sf-img{height:170px}.sf-hero{padding:26px 24px}.sf-hero .sf-av{width:68px;height:68px;font-size:30px}.sf-ttl{font-size:13px}}
+@media(min-width:701px){.sf-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}.sf-img{height:150px;object-fit:contain;background:#fff;padding:6px}.sf-hero{padding:26px 24px}.sf-hero .sf-av{width:68px;height:68px;font-size:30px}.sf-ttl{font-size:13px}}
 .p3d-ovl{position:fixed;inset:0;background:rgba(8,8,8,.92);z-index:100000;display:none;align-items:center;justify-content:center;flex-direction:column}
 .p3d-ovl.open{display:flex}
 .p3d-stage{perspective:900px;width:min(80vw,420px);height:min(60vh,420px);display:flex;align-items:center;justify-content:center}
@@ -432,6 +432,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sf-bd{padding:8px 9px;display:flex;flex-direction:column;gap:2px;flex:1}
 .sf-ttl{font-size:12px;font-weight:700;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .sf-pr{font-size:13px;font-weight:800;color:var(--g)}
+.sf-off{font-size:10px;color:#1a8f3c;font-weight:700}
+.sf-mrp{font-size:10px;color:var(--mt2);text-decoration:line-through}
 .sf-buy{margin-top:auto;background:var(--g);color:#fff;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fn)}
 @media(min-width:701px){.hacts{gap:7px;align-items:center}.hacts .ib{width:38px;height:38px;border-radius:10px;font-size:17px;display:flex;align-items:center;justify-content:center;transition:background .15s}.hacts .ib:hover{background:var(--card2)}}
 .acct-item{display:flex;align-items:center;gap:11px;width:100%;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:13px 14px;margin-bottom:7px;font-size:13px;font-weight:600;color:var(--tx);cursor:pointer;font-family:var(--fn);text-align:left;touch-action:manipulation;transition:background .15s}
@@ -579,7 +581,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v104</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v105</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5166,7 +5168,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v104 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v105 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -7065,7 +7067,11 @@ function openMainStore(cat){
         +'<div class="sf-bd">'+(p.brand?'<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;font-weight:700">'+esc(p.brand)+'</div>':'')
         +'<div class="sf-ttl">'+esc(p.title)+'</div>'
         +'<div style="font-size:9px;color:var(--mt2)">'+esc(p.sellerName||'')+(near(p)===0?' · 📍nearby':'')+'</div>'
-        +'<div class="sf-pr">'+esc(p.currency||'')+' '+esc(p.offer||p.price)+(p.vatPct?' <small style="font-weight:400;color:var(--mt2)">+VAT '+p.vatPct+'%</small>':'')+'</div>'
+        +(function(){var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0,of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;
+          var d=(of&&pr&&of<pr)?Math.round((pr-of)/pr*100):0;
+          return '<div class="sf-pr">'+esc(p.currency||'')+' '+esc(p.offer||p.price)
+            +(d?' <span class="sf-mrp">'+esc(p.price)+'</span> <span class="sf-off">'+d+'% off</span>':'')
+            +(p.vatPct?' <small style="font-weight:400;color:var(--mt2)">+VAT '+p.vatPct+'%</small>':'')+'</div>';})()
         +((typeof reviewSummary==='function')?'<div style="font-size:10px">'+reviewSummary(p)+'</div>':'')
         +(avail?'<button class="sf-buy" onclick="closeOvl(\'prodsearch-ovl\');buyProduct('+pid+')"><i class="ti ti-shopping-cart"></i> Buy Now</button>'
                :'<button class="sf-buy" style="background:var(--card2);color:var(--gold)" onclick="expressInterest('+pid+')">Notify me</button>')
