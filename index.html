@@ -407,6 +407,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .bub-media{width:100%;max-width:240px;max-height:240px;object-fit:cover;border-radius:10px;display:block}
 .user-ad{position:relative;background:linear-gradient(135deg,rgba(10,102,194,.06),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:10px;padding:10px 11px;margin:8px 10px 0;font-size:12px}
 .ad-tag{position:absolute;top:7px;right:9px;font-size:8px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.5px}\n.bub{box-shadow:0 1px 3px rgba(0,0,0,.06)}\n.abtn{border-radius:10px;font-weight:600}\n.ps-card{box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:12px}\n.appl-card{box-shadow:0 1px 3px rgba(0,0,0,.05)}
+@media(min-width:701px){.hacts{gap:7px;align-items:center}.hacts .ib{width:38px;height:38px;border-radius:10px;font-size:17px;display:flex;align-items:center;justify-content:center;transition:background .15s}.hacts .ib:hover{background:var(--card2)}}
 .acct-item{display:flex;align-items:center;gap:11px;width:100%;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:13px 14px;margin-bottom:7px;font-size:13px;font-weight:600;color:var(--tx);cursor:pointer;font-family:var(--fn);text-align:left;touch-action:manipulation;transition:background .15s}
 .acct-item:hover{background:var(--b)}
 .acct-item i{font-size:18px;flex-shrink:0}
@@ -552,7 +553,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v99</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v100</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -3647,9 +3648,19 @@ function dlCV(uid,id,name){
   }
   toast('CV is stored on the applicant\u2019s device. Enable cloud sync to view it.','err');
 }
+function dataUriToBlobUrl(d){
+  try{
+    var m=d.match(/^data:([^;]+);base64,(.*)$/);if(!m)return null;
+    var bin=atob(m[2]),arr=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+    return URL.createObjectURL(new Blob([arr],{type:m[1]}));
+  }catch(e){return null;}
+}
 function openCVData(d,name){
   try{
-    // PDFs and images open in a viewer tab; other types download.
+    // Chrome blocks data: URIs in new tabs — convert to a Blob URL first.
+    var bu=dataUriToBlobUrl(d);
+    if(bu){window.open(bu,'_blank');return;}
     var isViewable=/^data:(application\/pdf|image\/)/.test(d);
     if(isViewable){
       var w=window.open();
@@ -5057,6 +5068,7 @@ function openAccountMenu(){
   var __pgI=(typeof myOwnedPage==='function')?myOwnedPage():null;
   var __ident=(__pgI&&pageLicenseValid(__pgI.name))?'<span class="pay-badge pay-online-b" style="font-size:9px">Reedbi Ecommerce — '+esc(__pgI.name)+'</span>':'<span class="pay-badge" style="font-size:9px;background:rgba(195,125,22,.12);color:#c37d16">Reedbi Tagtalk</span>';
   h='<div style="text-align:center;margin-bottom:8px">'+__ident+'</div>'+h;
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openEditAccount()"><i class="ti ti-user-edit" style="color:var(--g)"></i> Edit account details <small>name, WhatsApp, location, interests</small></button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openNotifSettings()"><i class="ti ti-bell" style="color:var(--gold)"></i> Notifications <small>sound, tune, mute</small></button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openProfile(CU.name,CU.co||\'\',\'\',CU.avIdx||0)"><i class="ti ti-user"></i> View Public Profile</button>';
   // ADMIN / OWNER control — only visible to authorized owner emails
@@ -5127,7 +5139,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v99 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v100 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5563,6 +5575,40 @@ function agentMarkCodCollected(orderId){
   notifyEvent('cod','💵 Cash collected for “'+esc(o.productTitle)+'” by '+esc(o.codCollectedBy));
   if(typeof showAgentDashboard==='function')try{showAgentDashboard();}catch(e){}
 }
+
+/* ===== Edit account details ===== */
+function openEditAccount(){
+  if(!CU){toast('Sign in first','err');return;}
+  var ovl=document.getElementById('editacct-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='editacct-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:400px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:14px"><i class="ti ti-user-edit"></i> Edit account details</b><button class="modal-x" onclick="closeOvl(\'editacct-ovl\')"><i class="ti ti-x"></i></button></div><div id="editacct-body"></div></div>';
+    document.body.appendChild(ovl);}
+  function fld(l,id,v,ph){return '<div class="afg"><label>'+l+'</label><input type="text" id="'+id+'" value="'+esc(v||'')+'" placeholder="'+ph+'"></div>';}
+  document.getElementById('editacct-body').innerHTML=
+    fld('Name','ea-name',CU.name,'Your name')
+    +fld('Company','ea-co',CU.co,'Company (optional)')
+    +fld('WhatsApp number','ea-wa',CU.phone,'+971 50 …')
+    +fld('Contact number','ea-cn',CU.contact,'+971 4 …')
+    +fld('Location','ea-loc',CU.location,'UAE, Dubai, Marina')
+    +fld('Interests','ea-int',CU.interests,'electronics, groceries…')
+    +'<div style="font-size:10px;color:var(--mt2);margin:4px 0 8px">Email cannot be changed ('+esc(CU.email||'')+')</div>'
+    +'<button class="btn btnok" style="width:100%" onclick="saveAccountEdits()">Save changes</button>';
+  ovl.classList.add('open');
+}
+function saveAccountEdits(){
+  var g=function(id){return (document.getElementById(id)||{value:''}).value.trim();};
+  var nm=g('ea-name');if(!nm){toast('Name cannot be empty','err');return;}
+  CU.name=nm;CU.co=g('ea-co');CU.phone=g('ea-wa');CU.contact=g('ea-cn');CU.location=g('ea-loc');CU.interests=g('ea-int');
+  LS.set('rb_user',CU);
+  // update local account record + admin directory + cloud profile
+  var accs=LS.get('rb_accs',[])||[];var a=accs.find(function(x){return x.uid===CU.uid;});
+  if(a){a.name=CU.name;a.co=CU.co;a.phone=CU.phone;a.contact=CU.contact;a.location=CU.location;a.interests=CU.interests;LS.set('rb_accs',accs);}
+  try{indexUserForAdmin(CU);}catch(e){}
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('users').doc(CU.uid).set({name:CU.name,co:CU.co,phone:CU.phone,contact:CU.contact,location:CU.location,interests:CU.interests},{merge:true}).catch(function(){});}catch(e){}}
+  closeOvl('editacct-ovl');
+  toast('Account details updated','ok');
+  try{renderMe();}catch(e){}
+}
 /* ============================================================
    MARKETPLACE — product listing, photos, orders, shipping status
    ============================================================ */
@@ -5733,7 +5779,16 @@ function showMyProducts(tab){
     var amLic=userLicensed(CU.uid);
     var licBanner=amLic
       ? '<div style="font-size:11px;background:rgba(26,143,60,.1);border:1px solid #1a8f3c;border-radius:9px;padding:9px 11px;margin-bottom:10px;color:#1a8f3c"><i class="ti ti-license"></i> <b>Reedbi Ecommerce ✓</b> Your products appear in the public marketplace and you have a storefront.'
-        +(function(){var pg=(typeof myOwnedPage==='function')&&myOwnedPage();if(pg&&pageLicenseValid(pg.name))return ' <a href="#" onclick="closeOvl(\'seller-ovl\');viewSellerStore(\''+escJS(pg.name)+'\');return false" style="color:#1a8f3c;font-weight:700"><i class="ti ti-building-store"></i> View my storefront →</a>';return '';})()+'</div>'
+        +(function(){var pg=(typeof myOwnedPage==='function')&&myOwnedPage();
+          if(pg&&pageLicenseValid(pg.name)){
+            var pn="'"+pg.name.replace(/'/g,"\\'")+"'";
+            return '<div style="display:flex;gap:6px;margin-top:8px">'
+              +'<button class="btn btnok" style="flex:1;font-size:12px" onclick="openMyStorefront('+pn+')"><i class="ti ti-building-store"></i> Open my Ecommerce storefront</button>'
+              +'<button class="btn" style="font-size:12px;border:1px solid #1a8f3c;background:var(--card2);color:#1a8f3c" onclick="copyText(pageLink('+pn+'));toast(\'Store link copied: \'+pageLink('+pn+'),\'ok\')"><i class="ti ti-link"></i> Copy store link</button></div>'
+              +'<div style="font-size:9px;color:var(--mt2);margin-top:4px;word-break:break-all">'+esc(pageLink(pg.name))+'</div>';
+          }
+          return '<div style="font-size:10px;margin-top:5px">Get your e-commerce storefront: create a page and request approval in the <a href="#" onclick="closeOvl(\'seller-ovl\');openLicensePanel();return false" style="color:#1a8f3c">License panel</a>.</div>';
+        })()+'</div>'
       : '<div style="font-size:11px;background:rgba(195,125,22,.1);border:1px solid var(--gold);border-radius:9px;padding:9px 11px;margin-bottom:10px;color:var(--gold)"><i class="ti ti-info-circle"></i> <b>Tag Talk seller.</b> Your products show inside Tag Talk only. Validate a ReadBi license to appear in the public marketplace with your own storefront.<button class="btn" style="width:100%;margin-top:8px;background:var(--gold);color:#000;border:none;border-radius:7px;padding:8px;font-weight:700" onclick="closeOvl(\'seller-ovl\');openLicensePanel()"><i class="ti ti-license"></i> Validate License</button></div>';
     var qrP=prods.reduce(function(s,p){return s+(p.printedQty||0);},0);
     var qrB=prods.reduce(function(s,p){var b=(p.qty||0)-(p.printedQty||0);return s+(b>0?b:0);},0);
@@ -6885,6 +6940,11 @@ function setPageMemberRole(pageName,uid,role){
   var m=(pg.members||[]).find(function(x){return x.uid===uid;});if(!m)return;
   m.role=role;savePages(pgs);
   toast(m.name+' is now '+role+(role==='editor'?' — they can list products and post jobs as '+pageName:''),'ok');
+}
+
+function openMyStorefront(name){
+  document.querySelectorAll('.overlay.open').forEach(function(o){o.classList.remove('open');});
+  setTimeout(function(){viewSellerStore(name);},60);
 }
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
