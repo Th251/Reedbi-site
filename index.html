@@ -552,11 +552,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v91</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v93</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
           <button class="ib" onclick="openCreateModal()"><i class="ti ti-square-plus"></i></button>
+          <button class="ib" onclick="openInbox()" title="Messages" style="position:relative"><i class="ti ti-message"></i><span id="dm-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#cc1016;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px">0</span></button>
           <button class="ib" onclick="showCart()" title="My Bag" style="position:relative"><i class="ti ti-shopping-bag"></i><span id="cart-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#cc1016;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px">0</span></button>
           <button class="ib" onclick="openProductSearch()" title="Search products to buy"><i class="ti ti-search"></i></button>
           <button class="ib" onclick="showAgentDashboard()" title="Delivery Agent"><i class="ti ti-moped"></i></button>
@@ -1028,6 +1029,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <button class="btn btnok" style="width:100%;border-radius:10px" onclick="closeOvl('ok-ovl')">Done</button>
   </div>
 </div>
+<div class="overlay" id="dm-ovl"><div class="modal" style="max-width:430px"><div style="display:flex;justify-content:flex-end"><button class="modal-x" onclick="closeOvl('dm-ovl')"><i class="ti ti-x"></i></button></div><div id="dm-body"></div></div></div>
 <div class="overlay" id="agent-assign-ovl"><div class="modal" style="max-width:420px"></div></div>
 <div id="agent-dash" style="display:none"></div>
 </div></div>
@@ -3789,6 +3791,7 @@ function enterApp(){
   document.getElementById('auth-scr').classList.remove('show');
   document.getElementById('app').style.display='flex';
   try{if(typeof renderUserAds==='function')renderUserAds();}catch(e){}
+  try{if(typeof handleDeepLink==='function')setTimeout(function(){handleDeepLink(false);},600);}catch(e){}
   document.getElementById('uc-nm').textContent=CU.name;
   document.getElementById('uc-av').textContent=ini(CU.name);
   document.getElementById('uc-av').className='uchip-av '+avC(CU.avIdx);
@@ -4374,13 +4377,14 @@ function buildBubble(t,p,isMine){
     if(prod){
       var isSeller=CU&&prod.sellerUid===CU.uid;
       var inRB=(typeof productInMarketplace==='function')&&productInMarketplace(prod);
+      var shBtn='<button class="abtn" onclick="shareProduct(\''+escJS(prod.id)+'\')" style="background:var(--card2);color:#1a8f3c;border:1px solid #1a8f3c;margin-top:5px"><i class="ti ti-brand-whatsapp"></i> Share product link</button>';
       var rbBtn=inRB?'<button class="abtn" onclick="viewInReadBi(\''+escJS(prod.id)+'\')" style="background:linear-gradient(135deg,var(--g),#0a8f5c);color:#fff;margin-top:5px"><i class="ti ti-building-store"></i> View in ReadBi store · '+esc(prod.pageName||'')+'</button>':'';
       var movBtn=(isSeller&&!prod.pageName&&typeof myOwnedPage==='function'&&myOwnedPage())?'<button class="abtn" onclick="assignProductToPage(\''+escJS(prod.id)+'\')" style="background:var(--card2);color:var(--gold);border:1px solid var(--gold);margin-top:5px"><i class="ti ti-flag"></i> Move under my page</button>':'';
       applyHtml=isSeller
         ? '<button class="abtn" onclick="showMyProducts()" style="background:var(--card2);color:var(--g);border:1px solid var(--g)"><i class="ti ti-building-store"></i> Manage Listing</button>'
-          +movBtn+rbBtn
+          +movBtn+rbBtn+shBtn
           +'<button class="abtn" onclick="openBoost(\''+escJS(t.id)+'\','+pid+')" style="background:linear-gradient(135deg,var(--gold),#fbbf24);color:#000;margin-top:5px"><i class="ti ti-speakerphone"></i> Advertise this Product</button>'
-        : rbBtn+(typeof productAvailable==='function'&&!productAvailable(prod)
+        : rbBtn+shBtn+(typeof productAvailable==='function'&&!productAvailable(prod)
             ? '<button class="abtn" onclick="expressInterest(\''+prod.id+'\')" style="background:var(--card2);color:var(--gold);border:1px solid var(--gold)"><i class="ti ti-heart"></i> Out of stock — Notify me when available</button>'
             : '<button class="abtn" onclick="buyProduct(\''+prod.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now · '+esc(prod.currency)+' '+esc(prod.offer||prod.price)+'</button><button class="abtn" onclick="addToCart(\''+prod.id+'\')" style="background:var(--card2);color:var(--g);border:1px solid var(--g);margin-top:5px"><i class="ti ti-shopping-bag"></i> Add to Bag</button>');
     }
@@ -5015,7 +5019,7 @@ function openProfile(user,co,tagName,avIdx){
     var isFol=followedUsers.has(user);
     acts.innerHTML='<button class="pm-btn pm-btn-f" id="pm-fol-btn" onclick="followUser()">'+(isFol?'<i class="ti ti-user-check"></i> Following':'<i class="ti ti-user-plus"></i> Follow')+'</button>'
       +(ownsCo?'<button class="pm-btn pm-btn-pg" onclick="closePM();openCompanyPage(\''+escJS(co)+'\')"><i class="ti ti-building"></i> '+esc(co)+' Page</button>':'')
-      +'<button class="pm-btn pm-btn-m" onclick="closePM();toast(\'DM coming soon!\',\'info\')"><i class="ti ti-message"></i> Message</button>';
+      +(function(){var pu=(LS.get('rb_fusers',[])||[]).find(function(u){return u.name===user;});var puid=pu?pu.uid:('name:'+user);return '<button class="pm-btn pm-btn-m" onclick="closePM();openDM(\''+escJS(puid)+'\',\''+escJS(user)+'\')"><i class="ti ti-message"></i> Message</button>';})();
   }
   document.getElementById('pmb').classList.add('open');
 }
@@ -5041,10 +5045,8 @@ function openAccountMenu(){
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyApps()"><i class="ti ti-briefcase"></i> My Job Applications</button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openProfile(CU.name,CU.co||\'\',\'\',CU.avIdx||0)"><i class="ti ti-user"></i> View Public Profile</button>';
   // ADMIN / OWNER control — only visible to authorized owner emails
-  if(typeof isOwnerEmail==='function'&&isOwnerEmail(CU.email)){
-    h+='<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:8px"></div>';
-    h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openAdminPanel()"><i class="ti ti-shield-lock" style="color:var(--red)"></i> Admin Control Panel <small>owner: approve licenses, remove content, manage users &amp; team</small></button>';
-  }
+  h+='<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:8px"></div>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openAdminPanel()"><i class="ti ti-shield-lock" style="color:var(--red)"></i> Admin Control Panel <small>owner only — server verified</small></button>';
   h+='<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:8px"></div>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');doSignOut()"><i class="ti ti-logout"></i> Sign Out</button>';
   body.innerHTML=h;
@@ -5110,7 +5112,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v91 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v93 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5205,6 +5207,7 @@ function checkCloudStatus(){
       updateCloudChip('live','Cloud database connected — orders, posts and approvals sync to every device.');
       try{cloudMigrateLocal(false);}catch(e1){}
       try{fbListenAllApps();}catch(e2){}
+      try{fbListenDMs();}catch(e3){}
     }).catch(function(err){
       var m=(err&&err.code)||'';
       if(m.indexOf('permission-denied')>=0)updateCloudChip('blocked','Database exists but rules block this read — check Layer 2 rules.');
@@ -5279,6 +5282,95 @@ function fbListenAllApps(){
     },function(err){if(fbIsPermErr(err))fbStopListener('apps_all','perm');});
   }catch(e){}
 }
+
+/* ===== Instant Messages (DM) ===== */
+function getDMs(){return LS.get('rb_dms',[])||[];}
+function saveDMs(d){LS.set('rb_dms',d);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{d.forEach(function(c){if(c&&c.id)FB.db.collection('dms').doc(c.id).set(c,{merge:true}).catch(function(){});});}catch(e){}}}
+function dmKey(u1,u2){return [String(u1),String(u2)].sort().join('__');}
+function myDMs(){if(!CU)return [];return getDMs().filter(function(c){return c.aUid===CU.uid||c.bUid===CU.uid;});}
+function dmUnread(c){if(!CU)return 0;var myRead=(c.aUid===CU.uid?c.readA:c.readB)||0;return (c.msgs||[]).filter(function(m){return m.uid!==CU.uid&&m.ts>myRead;}).length;}
+function dmUnreadTotal(){var n=0;myDMs().forEach(function(c){n+=dmUnread(c);});return n;}
+function updateDmBadge(){var b=document.getElementById('dm-badge');if(!b)return;var n=dmUnreadTotal();b.style.display=n?'flex':'none';b.textContent=n>99?'99+':n;}
+var curDM=null;
+function openInbox(){
+  if(!requireAuth('use messages'))return;
+  curDM=null;
+  var list=myDMs().sort(function(a,b){return (b.lastTs||0)-(a.lastTs||0);});
+  var h='<div style="font-weight:800;font-size:14px;margin-bottom:10px"><i class="ti ti-message"></i> Messages</div>';
+  if(list.length){
+    h+=list.map(function(c){
+      var other=c.aUid===CU.uid?{uid:c.bUid,name:c.bName}:{uid:c.aUid,name:c.aName};
+      var un=dmUnread(c);
+      var key="'"+c.id+"'";
+      // privacy: show only the unread COUNT outside the chat — never message text
+      return '<div class="act-row" style="cursor:pointer" onclick="openDMByKey('+key+')">'
+        +'<div><b>'+esc(other.name||'User')+'</b><small style="display:block;color:var(--mt2)">'+(c.msgs?c.msgs.length:0)+' message'+((c.msgs||[]).length!==1?'s':'')+' · '+fmtDT(c.lastTs)+'</small></div>'
+        +(un?'<span style="background:#cc1016;color:#fff;font-size:10px;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px">'+un+'</span>':'<i class="ti ti-chevron-right" style="color:var(--mt2)"></i>')
+        +'</div>';
+    }).join('');
+  }else h+='<p style="font-size:12px;color:var(--mt);text-align:center;padding:18px">No conversations yet. Open someone\'s profile and tap Message.</p>';
+  document.getElementById('dm-body').innerHTML=h;
+  document.getElementById('dm-ovl').classList.add('open');
+}
+function openDMByKey(id){var c=getDMs().find(function(x){return x.id===id;});if(!c)return;var other=c.aUid===CU.uid?{uid:c.bUid,name:c.bName}:{uid:c.aUid,name:c.aName};openDM(other.uid,other.name);}
+function openDM(uid,name){
+  if(!requireAuth('send messages'))return;
+  if(!uid||uid===CU.uid){toast('Cannot message yourself','err');return;}
+  var dms=getDMs();var id=dmKey(CU.uid,uid);
+  var c=dms.find(function(x){return x.id===id;});
+  if(!c){c={id:id,aUid:CU.uid,aName:CU.name,bUid:uid,bName:name||'User',msgs:[],lastTs:Date.now(),readA:0,readB:0};dms.push(c);}
+  // mark read for me
+  if(c.aUid===CU.uid)c.readA=Date.now();else c.readB=Date.now();
+  saveDMs(dms);curDM=id;
+  renderDMView();
+  document.getElementById('dm-ovl').classList.add('open');
+  updateDmBadge();
+}
+function renderDMView(){
+  var c=getDMs().find(function(x){return x.id===curDM;});if(!c)return;
+  var other=c.aUid===CU.uid?c.bName:c.aName;
+  var h='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><button class="lbl-mini" onclick="openInbox()"><i class="ti ti-arrow-left"></i></button><b style="font-size:14px">'+esc(other)+'</b></div>'
+    +'<div id="dm-msgs" style="max-height:46vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:4px 0">';
+  h+=(c.msgs||[]).map(function(m){
+    var mine=m.uid===CU.uid;
+    return '<div style="align-self:'+(mine?'flex-end':'flex-start')+';max-width:80%;background:'+(mine?'var(--g)':'var(--card2)')+';color:'+(mine?'#fff':'var(--tx)')+';border-radius:11px;padding:7px 11px;font-size:13px">'+esc(m.txt)+'<div style="font-size:9px;opacity:.7;margin-top:2px">'+fmtDT(m.ts)+'</div></div>';
+  }).join('')||'<p style="font-size:11px;color:var(--mt2);text-align:center">Say hello 👋</p>';
+  h+='</div><div style="display:flex;gap:6px;margin-top:8px"><input type="text" id="dm-input" placeholder="Type a message…" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:18px;padding:10px 13px;color:var(--tx);font-family:var(--fn)" onkeydown="if(event.key===\'Enter\')sendDM()"><button class="btn btnok" style="border-radius:18px;padding:10px 14px" onclick="sendDM()"><i class="ti ti-send"></i></button></div>';
+  document.getElementById('dm-body').innerHTML=h;
+  var mbox=document.getElementById('dm-msgs');if(mbox)mbox.scrollTop=mbox.scrollHeight;
+}
+function sendDM(){
+  var inp=document.getElementById('dm-input');if(!inp)return;
+  var txt=inp.value.trim();if(!txt)return;
+  var dms=getDMs();var c=dms.find(function(x){return x.id===curDM;});if(!c)return;
+  c.msgs.push({uid:CU.uid,name:CU.name,txt:txt,ts:Date.now()});
+  c.lastTs=Date.now();
+  if(c.aUid===CU.uid)c.readA=Date.now();else c.readB=Date.now();
+  saveDMs(dms);
+  renderDMView();
+}
+function fbListenDMs(){
+  if(!FB.ready||FB_CLOUD_DISABLED||!FB.db||FB_LISTENERS['dms'])return;
+  try{
+    FB_LISTENERS['dms']=FB.db.collection('dms').onSnapshot(function(snap){
+      var local=getDMs();var map={};local.forEach(function(c){map[c.id]=c;});
+      snap.forEach(function(doc){var d=doc.data();d.id=d.id||doc.id;
+        var ex=map[d.id];
+        if(ex&&ex.msgs&&d.msgs){ // merge msgs by ts to not lose any
+          var seen={};var all=[];(ex.msgs||[]).concat(d.msgs||[]).forEach(function(m){var k=m.uid+'_'+m.ts;if(!seen[k]){seen[k]=1;all.push(m);}});
+          all.sort(function(a,b){return a.ts-b.ts;});d.msgs=all;
+        }
+        map[d.id]=Object.assign(ex||{},d);
+      });
+      LS.set('rb_dms',Object.keys(map).map(function(k){return map[k];}));
+      updateDmBadge();
+      if(curDM&&document.getElementById('dm-ovl')&&document.getElementById('dm-ovl').classList.contains('open'))renderDMView();
+    },function(err){if(fbIsPermErr(err))fbStopListener('dms','perm');});
+  }catch(e){}
+}
+/* order time formatting */
+function fmtDT(ts){if(!ts)return '';var d=new Date(ts);var dd=d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getFullYear();var h=d.getHours(),m=d.getMinutes();return dd+', '+(h<10?'0':'')+h+':'+(m<10?'0':'')+m;}
+try{setTimeout(updateDmBadge,1500);}catch(e){}
 /* ============================================================
    MARKETPLACE — product listing, photos, orders, shipping status
    ============================================================ */
@@ -5402,7 +5494,9 @@ function showMyProducts(tab){
     +'<div><div style="font-size:18px;font-weight:800;color:var(--tx)">'+totalUnits+'</div><div style="font-size:10px;color:var(--mt2)">Units sold</div></div>'
     +'<div><div style="font-size:18px;font-weight:800;color:var(--gold)">'+esc(cur)+' '+revenue.toLocaleString()+'</div><div style="font-size:10px;color:var(--mt2)">Revenue</div></div>'
     +'</div>'
-    +'<button class="btn btnok" style="margin-top:11px;border-radius:18px;width:100%" onclick="closeOvl(\'seller-ovl\');openListProduct()"><i class="ti ti-plus"></i> List a New Product</button></div>';
+    +'<button class="btn btnok" style="margin-top:11px;border-radius:18px;width:100%" onclick="closeOvl(\'seller-ovl\');openListProduct()"><i class="ti ti-plus"></i> List a New Product</button>'
+    +(function(){var pg=(typeof myOwnedPage==='function')&&myOwnedPage();if(!pg)return '';return '<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="closeOvl(\'seller-ovl\');openCompanyPage(\''+escJS(pg.name)+'\')"><i class="ti ti-users"></i> '+esc(pg.name)+' — manage page team (assign staff for listings)</button>';})()
+    +'</div>';
   head+='<div class="seller-tabs">'
     +'<button class="seller-tab'+(sellerTab==='orders'?' on':'')+'" onclick="showMyProducts(\'orders\')"><i class="ti ti-package"></i> Orders</button>'
     +'<button class="seller-tab'+(sellerTab==='listings'?' on':'')+'" onclick="showMyProducts(\'listings\')"><i class="ti ti-list"></i> Listings</button>'
@@ -5531,7 +5625,7 @@ function orderCardSeller(o){
   return '<div class="appl-card">'
     +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
     +'<div><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="font-weight:400;color:var(--mt2);font-size:11px">×'+o.qty+'</span></div>'
-    +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'
+    +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'+(o.ts?'<div style="font-size:10px;color:var(--mt2)"><i class="ti ti-clock"></i> Received: '+fmtDT(o.ts)+'</div>':'')
     +'<div style="font-size:11px;color:var(--mt)">Buyer: '+esc(o.buyerName)+'</div></div>'
     +'<span class="pay-badge '+(o.payMethod==='online'?'pay-online-b':'pay-cod-b')+'">'+(o.payMethod==='online'?'💳 Online'+(o.payStatus==='paid'?' ✓':''):'💵 COD')+'</span></div>'
     +(o.buyerPhone?'<div style="font-size:11px;color:var(--g);margin-top:3px"><i class="ti ti-brand-whatsapp"></i> <a href="https://wa.me/'+esc((o.buyerPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">Message buyer: '+esc(o.buyerPhone)+'</a></div>':'')
@@ -5724,7 +5818,7 @@ function showMyOrders(){
     var si=orderStatusIndex(o.status);var so=orderStatusObj(o.status);
     var track=ORDER_STATUS.map(function(s,i){return '<div class="trk-step'+(i<=si?' done':'')+'"><i class="ti ti-'+s.icon+'"></i><span>'+s.label+'</span></div>';}).join('');
     return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="color:var(--mt2);font-weight:400;font-size:11px">×'+o.qty+'</span></div>'
-      +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'
+      +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'+(o.ts?'<div style="font-size:10px;color:var(--mt2)"><i class="ti ti-clock"></i> Received: '+fmtDT(o.ts)+'</div>':'')
       +'<div style="font-size:11px;color:var(--mt)">Seller: '+esc(o.sellerName)+'</div>'
       +(o.agentName?'<div style="font-size:11px;color:var(--g)"><i class="ti ti-moped"></i> Agent: '+esc(o.agentName)+(o.agentPhone?' · <a href="https://wa.me/'+esc((o.agentPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(o.agentPhone)+'</a>':'')+'</div>':'')
       +((o.status==='out_delivery'&&o.deliveryOtp)?'<div class="otp-box"><i class="ti ti-shield-lock"></i> Delivery OTP: <b>'+esc(o.deliveryOtp)+'</b><div style="font-size:9px;color:var(--mt2);font-weight:400">Give this to the agent to confirm delivery</div></div>':'')
@@ -6254,6 +6348,8 @@ function viewInReadBi(prodId){
   var inp=document.getElementById('ps-q');
   if(inp){inp.value=p.title;}
   runProductSearch(p.title);
+  var box0=document.getElementById('ps-results');
+  if(box0)box0.innerHTML='<a href="#" onclick="openProductSearch();return false" style="display:inline-block;font-size:11px;color:var(--g);margin-bottom:8px"><i class="ti ti-arrow-left"></i> Back to all products</a>'+box0.innerHTML;
   // related products from the same category
   var rel=getProducts().filter(function(x){return x.id!==p.id&&productInMarketplace(x)&&(x.category||'Other')===(p.category||'Other');}).slice(0,6);
   if(rel.length){
@@ -6274,7 +6370,7 @@ function psCard(p){
     +'<div style="flex:1;min-width:0">'
     +'<div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
     +'<div style="font-size:13px">'+priceHtml(p)+'</div>'
-    +'<div style="font-size:10px;color:var(--mt2)">by '+sellerLink+(p.category?' · '+esc(p.category):'')+'</div>'
+    +'<div style="font-size:10px;color:var(--mt2)">by '+sellerLink+(p.category?' · '+esc(p.category):'')+' · <a href="#" onclick="shareProduct(\''+escJS(p.id)+'\');return false" style="color:#1a8f3c"><i class="ti ti-brand-whatsapp"></i> Share</a></div>'
     +(p.location?'<div style="font-size:10px;color:var(--g)"><i class="ti ti-map-pin"></i> '+esc(p.location)+'</div>':'')
     +(mine?'<button class="ps-btn" style="background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="closeOvl(\'prodsearch-ovl\');showMyProducts(\'listings\')"><i class="ti ti-building-store"></i> Manage</button>'
           :(avail?'<button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button>'
@@ -6366,7 +6462,7 @@ function showAgentDashboard(){
     +'<div style="font-size:14px;font-weight:700"><i class="ti ti-moped"></i> My Deliveries</div>'
     +'<div style="display:flex;gap:12px;margin-top:8px"><div><div style="font-size:18px;font-weight:800">'+pending.length+'</div><div style="font-size:10px;color:var(--mt2)">Pending</div></div></div></div>'
     +pending.map(function(o){var oid="'"+o.id+"'";
-      return '<div class="appl-card"><b>'+esc(o.productTitle)+' → '+esc(o.buyerName)+'</b>'
+      return '<div class="appl-card"><b>'+esc(o.productTitle)+' → '+esc(o.buyerName)+'</b>'+(o.ts?'<div style="font-size:10px;color:var(--mt2)"><i class="ti ti-clock"></i> Received: '+fmtDT(o.ts)+'</div>':'')
         +(o.buyerAddr?'<div style="font-size:11px;color:var(--mt2);margin-top:3px">'+esc(o.buyerAddr)+'</div>':'')
         +(o.buyerPhone?'<div style="font-size:11px"><a href="https://wa.me/'+esc((o.buyerPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">WhatsApp</a></div>':'')
         +'<button class="btn btnok" style="width:100%;margin-top:8px;font-size:12px" onclick="setOrderStatus('+oid+',3)">Mark delivered</button></div>';
@@ -6374,6 +6470,37 @@ function showAgentDashboard(){
     +(pending.length?'':'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No pending.</p>');
   document.getElementById('agent-dash').innerHTML=html;
   document.getElementById('agent-dash').style.display='block';
+}
+
+/* ===== Product sharing + deep links ===== */
+function productLink(id){return location.origin+location.pathname+'#p='+id;}
+function shareProduct(id){
+  var p=getProducts().find(function(x){return x.id===id;});if(!p)return;
+  var txt=p.title+' — '+(p.offer||p.price)+' '+(p.currency||'')+' — '+productLink(id);
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+function handleDeepLink(retry){
+  var h=location.hash||'';
+  var mp=h.match(/#p=([\w\-]+)/);
+  var mg=h.match(/#pg=([^&]+)/);
+  if(mp){
+    var prod=getProducts().find(function(x){return x.id===mp[1];});
+    if(!prod){
+      if(!retry){setTimeout(function(){handleDeepLink(true);},3000);} // cloud may still be syncing
+      else toast('Shared product not found (it may have been removed)','err');
+      return;
+    }
+    if(productInMarketplace(prod)){viewInReadBi(prod.id);}        // approved → e-commerce app
+    else{openTag('sell');toast('“'+prod.title+'” is in Tag Talk — the seller/page is not ReadBi approved yet','info');}
+    return;
+  }
+  if(mg){
+    var name=decodeURIComponent(mg[1]);
+    var pg=getPageByName(name);
+    if(!pg){if(!retry){setTimeout(function(){handleDeepLink(true);},3000);}else toast('Shared page not found','err');return;}
+    if(pageLicenseValid(name)){viewSellerStore(name);}            // approved page → its e-commerce storefront
+    else{openCompanyPage(name);toast('“'+name+'” is a Tag Talk page — not ReadBi approved yet','info');}
+  }
 }
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
