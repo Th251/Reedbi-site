@@ -407,6 +407,21 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .bub-media{width:100%;max-width:240px;max-height:240px;object-fit:cover;border-radius:10px;display:block}
 .user-ad{position:relative;background:linear-gradient(135deg,rgba(10,102,194,.06),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:10px;padding:10px 11px;margin:8px 10px 0;font-size:12px}
 .ad-tag{position:absolute;top:7px;right:9px;font-size:8px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.5px}\n.bub{box-shadow:0 1px 3px rgba(0,0,0,.06)}\n.abtn{border-radius:10px;font-weight:600}\n.ps-card{box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:12px}\n.appl-card{box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sf-hero{background:linear-gradient(135deg,#0a66c2,#0a8f5c);border-radius:14px;padding:18px 16px;color:#fff;margin-bottom:12px;position:relative;overflow:hidden}
+.sf-hero::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08)}
+.sf-av{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;margin-bottom:8px}
+.sf-stats{display:flex;gap:14px;margin-top:8px;font-size:11px}
+.sf-stats b{display:block;font-size:15px}
+.sf-cats{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch}
+.sf-cat{flex-shrink:0;background:var(--card2);border:1px solid var(--b);border-radius:14px;padding:5px 12px;font-size:11px;cursor:pointer;color:var(--tx)}
+.sf-cat.on{background:var(--g);color:#fff;border-color:var(--g)}
+.sf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.sf-card{background:var(--sf);border:1px solid var(--b);border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column}
+.sf-img{width:100%;height:110px;object-fit:cover;background:var(--card2)}
+.sf-bd{padding:8px 9px;display:flex;flex-direction:column;gap:2px;flex:1}
+.sf-ttl{font-size:12px;font-weight:700;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.sf-pr{font-size:13px;font-weight:800;color:var(--g)}
+.sf-buy{margin-top:auto;background:var(--g);color:#fff;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fn)}
 @media(min-width:701px){.hacts{gap:7px;align-items:center}.hacts .ib{width:38px;height:38px;border-radius:10px;font-size:17px;display:flex;align-items:center;justify-content:center;transition:background .15s}.hacts .ib:hover{background:var(--card2)}}
 .acct-item{display:flex;align-items:center;gap:11px;width:100%;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:13px 14px;margin-bottom:7px;font-size:13px;font-weight:600;color:var(--tx);cursor:pointer;font-family:var(--fn);text-align:left;touch-action:manipulation;transition:background .15s}
 .acct-item:hover{background:var(--b)}
@@ -553,7 +568,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v100</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v101</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5139,7 +5154,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v100 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v101 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6697,20 +6712,43 @@ function psCard(p){
     +'</div></div>';
 }
 /* seller PAGE storefront inside the e-commerce site */
-function viewSellerStore(pageName){
+function viewSellerStore(pageName,cat,q){
   var pg=getPageByName(pageName);
   openProductSearch();
-  var box=document.getElementById('ps-results');var q=document.getElementById('ps-q');if(q)q.value='';
-  var prods=getProducts().filter(function(p){return p.pageName===pageName&&productInMarketplace(p);});
-  var hdr='<div style="background:linear-gradient(135deg,rgba(10,102,194,.08),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:12px;padding:12px;margin-bottom:10px">'
-    +'<div style="font-weight:800;font-size:15px"><i class="ti ti-building-store" style="color:var(--g)"></i> '+esc(pageName)+' <span class="pay-badge pay-online-b" style="font-size:9px">ReadBi approved seller</span></div>'
-    +(pg&&pg.about?'<div style="font-size:11px;color:var(--mt);margin-top:3px">'+esc(pg.about)+'</div>':'')
-    +(pg&&pg.ownerName?'<div style="font-size:10px;color:var(--mt2);margin-top:3px">Owner: '+esc(pg.ownerName)+' · 👥 '+(1+((pg.members||[]).length))+' member'+(((pg.members||[]).length)!==0?'s':'')+'</div>':'')
-    +(pg&&CU&&!pageRole(pageName)?'<a href="#" onclick="requestJoinPage(\''+escJS(pageName)+'\');return false" style="font-size:10px;color:var(--g)"><i class="ti ti-user-plus"></i> Request to join as member</a>':'')
-    +'<div style="font-size:10px;color:var(--mt2);margin-top:3px">'+prods.length+' product'+(prods.length!==1?'s':'')+' listed</div>'
-    +'<div style="display:flex;gap:10px;margin-top:5px"><a href="#" onclick="openProductSearch();return false" style="font-size:10px;color:var(--g)">&larr; All products</a>'
-    +'<a href="#" onclick="sharePage(\''+escJS(pageName)+'\');return false" style="font-size:10px;color:#1a8f3c"><i class="ti ti-brand-whatsapp"></i> Share this store</a></div></div>';
-  box.innerHTML=hdr+(prods.length?prods.map(psCard).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No live products from this seller yet.</p>');
+  var box=document.getElementById('ps-results');var qi=document.getElementById('ps-q');if(qi)qi.value='';
+  var all=getProducts().filter(function(p){return p.pageName===pageName&&productInMarketplace(p);});
+  var cats={};all.forEach(function(p){cats[p.category||'Other']=(cats[p.category||'Other']||0)+1;});
+  var prods=all.filter(function(p){
+    if(cat&&(p.category||'Other')!==cat)return false;
+    if(q&&((p.title||'')+' '+(p.brand||'')+' '+(p.desc||'')).toLowerCase().indexOf(q.toLowerCase())<0)return false;
+    return true;
+  });
+  var pn="'"+pageName.replace(/'/g,"\\'")+"'";
+  var hero='<div class="sf-hero">'
+    +'<div class="sf-av">'+esc((pageName[0]||'S').toUpperCase())+'</div>'
+    +'<div style="font-size:17px;font-weight:800">'+esc(pageName)+' <span class="pay-badge" style="background:rgba(255,255,255,.22);color:#fff;font-size:9px">Reedbi Ecommerce ✓</span></div>'
+    +(pg&&pg.about?'<div style="font-size:11px;opacity:.85;margin-top:2px">'+esc(pg.about)+'</div>':'')
+    +'<div class="sf-stats"><div><b>'+all.length+'</b>Products</div><div><b>'+(1+((pg&&pg.members||[]).length))+'</b>Members</div><div><b>'+(pg&&pg.ownerName?esc(pg.ownerName):'—')+'</b>Owner</div></div>'
+    +'<div style="display:flex;gap:8px;margin-top:10px;font-size:11px;position:relative;z-index:1">'
+    +'<a href="#" onclick="sharePage('+pn+');return false" style="color:#fff;font-weight:700"><i class="ti ti-brand-whatsapp"></i> Share store</a>'
+    +(CU&&!pageRole(pageName)?'<a href="#" onclick="requestJoinPage('+pn+');return false" style="color:#fff"><i class="ti ti-user-plus"></i> Join as member</a>':'')
+    +'<a href="#" onclick="openProductSearch();return false" style="color:#fff;margin-left:auto">&larr; All products</a></div></div>';
+  var search='<div class="sw" style="margin-bottom:8px"><i class="ti ti-search"></i><input type="text" placeholder="Search in '+esc(pageName)+'…" value="'+esc(q||'')+'" oninput="viewSellerStore('+pn+','+(cat?"'"+String(cat).replace(/'/g,"\\'")+"'":'null')+',this.value)"></div>';
+  var chips='<div class="sf-cats"><span class="sf-cat'+(!cat?' on':'')+'" onclick="viewSellerStore('+pn+')">All ('+all.length+')</span>'
+    +Object.keys(cats).sort().map(function(k){var kk="'"+k.replace(/'/g,"\\'")+"'";return '<span class="sf-cat'+(cat===k?' on':'')+'" onclick="viewSellerStore('+pn+','+kk+')">'+esc(k)+' ('+cats[k]+')</span>';}).join('')+'</div>';
+  var grid='<div class="sf-grid">'+prods.map(function(p){
+    var pid="'"+p.id+"'";var avail=productAvailable(p);
+    return '<div class="sf-card"><img class="sf-img" src="'+esc(p.photos&&p.photos[0]||'')+'">'
+      +'<div class="sf-bd">'
+      +(p.brand?'<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;font-weight:700">'+esc(p.brand)+'</div>':'')
+      +'<div class="sf-ttl">'+esc(p.title)+'</div>'
+      +'<div class="sf-pr">'+esc(p.currency||'')+' '+esc(p.offer||p.price)+(p.vatPct?' <small style="font-weight:400;color:var(--mt2)">+VAT '+p.vatPct+'%</small>':'')+'</div>'
+      +((typeof reviewSummary==='function')?'<div style="font-size:10px">'+reviewSummary(p)+'</div>':'')
+      +(avail?'<button class="sf-buy" onclick="closeOvl(\'prodsearch-ovl\');buyProduct('+pid+')"><i class="ti ti-shopping-cart"></i> Buy Now</button>'
+             :'<button class="sf-buy" style="background:var(--card2);color:var(--gold)" onclick="expressInterest('+pid+')">Notify me</button>')
+      +'</div></div>';
+  }).join('')+'</div>';
+  box.innerHTML=hero+search+chips+(prods.length?grid:'<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products'+(cat?' in '+esc(cat):'')+(q?' matching "'+esc(q)+'"':'')+' yet.</p>');
 }
 /* admin one-click communications */
 function adminFilteredUsers(){
