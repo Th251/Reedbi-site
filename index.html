@@ -578,7 +578,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v102</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v103</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5164,7 +5164,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v102 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v103 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -7024,6 +7024,48 @@ function open3DView(prodId){
   document.getElementById('p3d-title').textContent=p.title;
   __p3dRX=-8;__p3dRY=18;window.__p3dApply&&window.__p3dApply();
   ovl.classList.add('open');
+}
+
+/* ===== Main Reedbi Ecommerce store (mall homepage: all approved sellers + products) ===== */
+function openMainStore(){
+  openProductSearch();
+  var box=document.getElementById('ps-results');var qi=document.getElementById('ps-q');if(qi)qi.value='';
+  var pages=getPages().filter(function(pg){return pageLicenseValid(pg.name);});
+  var prods=getProducts().filter(function(p){return productInMarketplace(p)&&!p.withdrawn;});
+  // nearby products first
+  var myW=(CU&&CU.location?CU.location:'').toLowerCase().split(/[\s,]+/).filter(function(w){return w.length>2;});
+  function near(p){var pl=(p.location||'').toLowerCase();return myW.some(function(w){return pl.indexOf(w)>=0;})?0:1;}
+  if(myW.length)prods=prods.slice().sort(function(a,b){return near(a)-near(b);});
+  var hero='<div class="sf-hero" style="background:linear-gradient(135deg,#0a66c2,#7c3aed)">'
+    +'<div class="sf-av">⬡</div>'
+    +'<div style="font-size:19px;font-weight:800">Reedbi Ecommerce</div>'
+    +'<div style="font-size:11px;opacity:.85;margin-top:2px">Shop from approved sellers — nearby first, worldwide always</div>'
+    +'<div class="sf-stats"><div><b>'+pages.length+'</b>Stores</div><div><b>'+prods.length+'</b>Products</div></div></div>';
+  var search='<div class="sw" style="margin-bottom:10px"><i class="ti ti-search"></i><input type="text" placeholder="Search all products &amp; brands…" onkeydown="if(event.key===\'Enter\'){document.getElementById(\'ps-q\').value=this.value;runProductSearch(this.value);}"></div>';
+  var stores='<div style="font-size:12px;font-weight:800;margin:4px 0 8px"><i class="ti ti-building-store"></i> Approved stores</div>'
+    +(pages.length?'<div class="sf-grid" style="margin-bottom:14px">'+pages.map(function(pg){
+      var pn="'"+pg.name.replace(/'/g,"\\'")+"'";
+      var cnt=getProducts().filter(function(p){return p.pageName===pg.name&&productInMarketplace(p);}).length;
+      return '<div class="sf-card" style="cursor:pointer" onclick="viewSellerStore('+pn+')">'
+        +'<div style="height:64px;background:linear-gradient(135deg,#0a66c2,#0a8f5c);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff">'+esc((pg.name[0]||'S').toUpperCase())+'</div>'
+        +'<div class="sf-bd"><div class="sf-ttl">'+esc(pg.name)+' <span class="pay-badge pay-online-b" style="font-size:8px">✓</span></div>'
+        +'<div style="font-size:10px;color:var(--mt2)">'+cnt+' products · '+(1+((pg.members||[]).length))+' members'+(pg.ownerName?' · '+esc(pg.ownerName):'')+'</div>'
+        +'<button class="sf-buy" style="margin-top:6px">Visit store</button></div></div>';
+    }).join('')+'</div>':'<p style="font-size:11px;color:var(--mt2);margin-bottom:12px">No approved stores yet.</p>');
+  var grid='<div style="font-size:12px;font-weight:800;margin:4px 0 8px"><i class="ti ti-sparkles"></i> All products'+(myW.length?' — nearby first':'')+'</div>'
+    +'<div class="sf-grid">'+prods.slice(0,40).map(function(p){
+      var pid="'"+p.id+"'";var avail=productAvailable(p);
+      return '<div class="sf-card"><div style="position:relative"><img class="sf-img" src="'+esc(p.photos&&p.photos[0]||'')+'" style="cursor:pointer" onclick="open3DView('+pid+')"><span style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:2px 7px"><i class="ti ti-3d-cube-sphere"></i> 3D</span></div>'
+        +'<div class="sf-bd">'+(p.brand?'<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;font-weight:700">'+esc(p.brand)+'</div>':'')
+        +'<div class="sf-ttl">'+esc(p.title)+'</div>'
+        +'<div style="font-size:9px;color:var(--mt2)">'+esc(p.sellerName||'')+(near(p)===0?' · 📍nearby':'')+'</div>'
+        +'<div class="sf-pr">'+esc(p.currency||'')+' '+esc(p.offer||p.price)+(p.vatPct?' <small style="font-weight:400;color:var(--mt2)">+VAT '+p.vatPct+'%</small>':'')+'</div>'
+        +((typeof reviewSummary==='function')?'<div style="font-size:10px">'+reviewSummary(p)+'</div>':'')
+        +(avail?'<button class="sf-buy" onclick="closeOvl(\'prodsearch-ovl\');buyProduct('+pid+')"><i class="ti ti-shopping-cart"></i> Buy Now</button>'
+               :'<button class="sf-buy" style="background:var(--card2);color:var(--gold)" onclick="expressInterest('+pid+')">Notify me</button>')
+        +'</div></div>';
+    }).join('')+'</div>';
+  box.innerHTML=hero+search+stores+grid;
 }
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
