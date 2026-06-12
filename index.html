@@ -407,6 +407,16 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .bub-media{width:100%;max-width:240px;max-height:240px;object-fit:cover;border-radius:10px;display:block}
 .user-ad{position:relative;background:linear-gradient(135deg,rgba(10,102,194,.06),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:10px;padding:10px 11px;margin:8px 10px 0;font-size:12px}
 .ad-tag{position:absolute;top:7px;right:9px;font-size:8px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.5px}\n.bub{box-shadow:0 1px 3px rgba(0,0,0,.06)}\n.abtn{border-radius:10px;font-weight:600}\n.ps-card{box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:12px}\n.appl-card{box-shadow:0 1px 3px rgba(0,0,0,.05)}
+#prodsearch-ovl .modal{max-width:1100px;width:96vw;height:92vh;max-height:92vh;display:flex;flex-direction:column}
+#prodsearch-ovl .modal>div:last-child,#ps-results{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:700px){#prodsearch-ovl .modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}}
+@media(min-width:701px){.sf-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}.sf-img{height:170px}.sf-hero{padding:26px 24px}.sf-hero .sf-av{width:68px;height:68px;font-size:30px}.sf-ttl{font-size:13px}}
+.p3d-ovl{position:fixed;inset:0;background:rgba(8,8,8,.92);z-index:100000;display:none;align-items:center;justify-content:center;flex-direction:column}
+.p3d-ovl.open{display:flex}
+.p3d-stage{perspective:900px;width:min(80vw,420px);height:min(60vh,420px);display:flex;align-items:center;justify-content:center}
+.p3d-card{width:100%;height:100%;transform-style:preserve-3d;transition:transform .08s linear;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.6);background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.p3d-card img{width:100%;height:100%;object-fit:contain}
+.p3d-hint{color:#aaa;font-size:12px;margin-top:14px}
 .sf-hero{background:linear-gradient(135deg,#0a66c2,#0a8f5c);border-radius:14px;padding:18px 16px;color:#fff;margin-bottom:12px;position:relative;overflow:hidden}
 .sf-hero::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08)}
 .sf-av{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;margin-bottom:8px}
@@ -568,7 +578,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v101</span></span>
+      <span class="logo" onclick="goHome()" style="cursor:pointer">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v102</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -895,7 +905,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   <div class="mbd" id="qr-body"></div>
 </div></div>
 <!-- SEARCH PRODUCTS -->
-<div class="overlay" id="prodsearch-ovl"><div class="modal" style="max-width:420px">
+<div class="overlay" id="prodsearch-ovl"><div class="modal">
   <div class="mhd"><h3><i class="ti ti-search" style="font-size:13px"></i> Search Products</h3><button class="ib" onclick="closeOvl('prodsearch-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd">
     <div class="sw" style="margin-bottom:10px"><i class="ti ti-search"></i><input type="text" id="ps-q" placeholder="Search by name, e.g. iPhone, shoes, camera..." oninput="runProductSearch(this.value)" autocomplete="off"></div>
@@ -5154,7 +5164,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v101 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v102 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6738,7 +6748,7 @@ function viewSellerStore(pageName,cat,q){
     +Object.keys(cats).sort().map(function(k){var kk="'"+k.replace(/'/g,"\\'")+"'";return '<span class="sf-cat'+(cat===k?' on':'')+'" onclick="viewSellerStore('+pn+','+kk+')">'+esc(k)+' ('+cats[k]+')</span>';}).join('')+'</div>';
   var grid='<div class="sf-grid">'+prods.map(function(p){
     var pid="'"+p.id+"'";var avail=productAvailable(p);
-    return '<div class="sf-card"><img class="sf-img" src="'+esc(p.photos&&p.photos[0]||'')+'">'
+    return '<div class="sf-card"><div style="position:relative"><img class="sf-img" src="'+esc(p.photos&&p.photos[0]||'')+'" style="cursor:pointer" onclick="open3DView('+pid+')"><span style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:2px 7px"><i class="ti ti-3d-cube-sphere"></i> 3D</span></div>'
       +'<div class="sf-bd">'
       +(p.brand?'<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;font-weight:700">'+esc(p.brand)+'</div>':'')
       +'<div class="sf-ttl">'+esc(p.title)+'</div>'
@@ -6983,6 +6993,37 @@ function setPageMemberRole(pageName,uid,role){
 function openMyStorefront(name){
   document.querySelectorAll('.overlay.open').forEach(function(o){o.classList.remove('open');});
   setTimeout(function(){viewSellerStore(name);},60);
+}
+
+/* ===== 3D product viewer (CSS 3D — drag to rotate, no libraries) ===== */
+var __p3dRX=-8,__p3dRY=18,__p3dDrag=null;
+function open3DView(prodId){
+  var p=getProducts().find(function(x){return x.id===prodId;});if(!p||!(p.photos&&p.photos[0]))return;
+  var ovl=document.getElementById('p3d-ovl');
+  if(!ovl){
+    ovl=document.createElement('div');ovl.id='p3d-ovl';ovl.className='p3d-ovl';
+    ovl.innerHTML='<button class="modal-x" style="position:absolute;top:16px;right:16px;color:#fff" onclick="document.getElementById(\'p3d-ovl\').classList.remove(\'open\')"><i class="ti ti-x"></i></button>'
+      +'<div class="p3d-stage"><div class="p3d-card" id="p3d-card"><img id="p3d-img"></div></div>'
+      +'<div class="p3d-hint"><i class="ti ti-hand-move"></i> Drag to rotate in 3D · double-tap to reset</div>'
+      +'<div id="p3d-title" style="color:#fff;font-weight:700;margin-top:8px;font-size:14px"></div>';
+    document.body.appendChild(ovl);
+    var card=ovl.querySelector('#p3d-card');
+    function apply(){card.style.transform='rotateX('+__p3dRX+'deg) rotateY('+__p3dRY+'deg)';}
+    function start(x,y){__p3dDrag={x:x,y:y,rx:__p3dRX,ry:__p3dRY};}
+    function move(x,y){if(!__p3dDrag)return;__p3dRY=__p3dDrag.ry+(x-__p3dDrag.x)*0.5;__p3dRX=Math.max(-60,Math.min(60,__p3dDrag.rx-(y-__p3dDrag.y)*0.5));apply();}
+    ovl.addEventListener('mousedown',function(e){start(e.clientX,e.clientY);});
+    ovl.addEventListener('mousemove',function(e){move(e.clientX,e.clientY);});
+    ovl.addEventListener('mouseup',function(){__p3dDrag=null;});
+    ovl.addEventListener('touchstart',function(e){var t=e.touches[0];start(t.clientX,t.clientY);},{passive:true});
+    ovl.addEventListener('touchmove',function(e){var t=e.touches[0];move(t.clientX,t.clientY);},{passive:true});
+    ovl.addEventListener('touchend',function(){__p3dDrag=null;});
+    ovl.addEventListener('dblclick',function(){__p3dRX=-8;__p3dRY=18;apply();});
+    window.__p3dApply=apply;
+  }
+  document.getElementById('p3d-img').src=p.photos[0];
+  document.getElementById('p3d-title').textContent=p.title;
+  __p3dRX=-8;__p3dRY=18;window.__p3dApply&&window.__p3dApply();
+  ovl.classList.add('open');
 }
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
