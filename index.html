@@ -422,6 +422,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sf-av{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;margin-bottom:8px}
 .sf-stats{display:flex;gap:14px;margin-top:8px;font-size:11px}
 .sf-stats b{display:block;font-size:15px}
+#ps-results{scroll-behavior:smooth;overscroll-behavior:contain}
 .sf-cats{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch}
 .sf-cat{flex-shrink:0;background:var(--card2);border:1px solid var(--b);border-radius:14px;padding:5px 12px;font-size:11px;cursor:pointer;color:var(--tx)}
 .sf-cat.on{background:var(--g);color:#fff;border-color:var(--g)}
@@ -581,7 +582,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v108</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v110</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -823,6 +824,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <div class="fg"><label>Product title</label><input type="text" id="lp-title" placeholder="e.g. iPhone 14 Pro 256GB"></div>
     <div class="fg" style="margin-top:8px"><label>Sell as (your name or your page)</label><select id="lp-as" style="width:100%"><option value="">My own name</option></select></div>
     <div class="fg" style="margin-top:8px"><label>Location (country / emirate / city)</label><input type="text" id="lp-location" placeholder="e.g. UAE, Dubai, Deira"></div>
+    <div class="fg" style="margin-top:8px"><label>International shipping</label><select id="lp-intl"><option value="yes">Available — ships worldwide</option><option value="no">Not available — local only</option></select></div>
     <div class="fg" style="margin-top:8px"><label>Sizes / variants (optional, comma separated)</label><input type="text" id="lp-sizes" placeholder="e.g. S,M,L,XL or 38,40,42 or 1kg,5kg"></div>
     <div class="fg" style="margin-top:8px"><label>Accepted payment</label><select id="lp-pay"><option value="both">Online + Cash on Delivery</option><option value="cod">Cash on Delivery only</option><option value="online">Online only</option></select></div>
     <div class="fg" style="margin-top:8px"><label>Brand (optional)</label><input type="text" id="lp-brand" placeholder="e.g. Samsung, Nike, Al Ain"></div>
@@ -3972,7 +3974,7 @@ function orderStatusIndex(id){for(var i=0;i<ORDER_STATUS.length;i++){if(ORDER_ST
 var CURRENCIES=['USD $','EUR €','GBP £','AED د.إ','INR ₹','SAR ﷼','PKR ₨','PHP ₱','SGD S$','CAD C$','AUD A$','JPY ¥','CNY ¥','BRL R$','NGN ₦','ZAR R','MYR RM','IDR Rp','THB ฿','TRY ₺','RUB ₽','KRW ₩','HKD HK$','CHF Fr','SEK kr','MXN $','EGP £','BDT ৳','LKR Rs','KWD د.ك','QAR ﷼','OMR ﷼','BHD .د.ب'];
 /* ===== Products store ===== */
 function getProducts(){return LS.get('rb_products',[])||[];}
-function saveProducts(p){LS.set('rb_products',p);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{p.forEach(function(x){if(x&&x.id)FB.db.collection('products').doc(x.id).set(x,{merge:true}).catch(function(){});});}catch(e){}}}
+function saveProducts(p){LS.set('rb_products',p);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{p.forEach(function(x){if(x&&x.id)FB.db.collection('products').doc(x.id).set(x,{merge:true}).catch(function(err){try{if(!window.__bigWarned&&/exceeds|too large|INVALID_ARGUMENT|longer than/i.test(String(err&&err.message||err))){window.__bigWarned=true;toast('⚠ “'+(x.title||'A product')+'” could not sync to cloud — its photo is too large. Edit/Add stock → re-save to compress it.','err');}}catch(e2){}});});}catch(e){}}}
 function getMyProducts(){
   var uid=CU?CU.uid:'';
   return getProducts().filter(function(x){
@@ -5170,7 +5172,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v108 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v110 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5688,7 +5690,7 @@ function listPhotoSel(inp){
   var done=0;
   arr.forEach(function(f){
     if(f.size>2*1024*1024){toast('Each photo max 2MB','err');return;}
-    readB64(f).then(function(b64){listPhotos.push(b64);done++;renderListPhotos();}).catch(function(){});
+    readB64(f).then(function(b64){return compressImg(b64,900,0.72);}).then(function(b64){listPhotos.push(b64);done++;renderListPhotos();}).catch(function(){});
   });
   inp.value='';
 }
@@ -5733,9 +5735,10 @@ function submitProduct(){
   var sellAs=(document.getElementById('lp-as')||{}).value||'';
   var brand=(document.getElementById('lp-brand')||{}).value||'';
   var payOpts=(document.getElementById('lp-pay')||{}).value||'both';
+  var intlShip=((document.getElementById('lp-intl')||{}).value||'yes');
   var sizes=((document.getElementById('lp-sizes')||{}).value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
   var vatPct=(function(L){L=L.toLowerCase();if(L.indexOf('uae')>=0||L.indexOf('dubai')>=0||L.indexOf('emirates')>=0)return 5;if(L.indexOf('saudi')>=0||L.indexOf('ksa')>=0)return 15;if(L.indexOf('india')>=0)return 18;if(L.indexOf('uk')>=0||L.indexOf('united kingdom')>=0)return 20;if(L.indexOf('bahrain')>=0||L.indexOf('oman')>=0)return 10;return 0;})(location||'');
-  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',brand:brand,payOpts:payOpts,vatPct:vatPct,sizes:sizes,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
+  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',brand:brand,payOpts:payOpts,vatPct:vatPct,sizes:sizes,intlShip:intlShip,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
     batches:[{batchCode:'B-'+Date.now().toString(36).toUpperCase().slice(-4),qty:qty,cost:cost,vendor:'',vendorPhone:'',brand:'',date:Date.now()}],interest:0,interestLog:[],
     photos:listPhotos.slice(),addr:addr,phone:phone,map:map,ts:Date.now()};
   var prods=getProducts();prods.unshift(prod);saveProducts(prods);
@@ -6137,7 +6140,7 @@ function placeOrder(){
   var map=document.getElementById('buy-map').value.trim();
   if(!addr||!phone){toast('Enter delivery address and WhatsApp number','err');return;}
   var orderNo='RB-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
-  var o={id:'ord'+Date.now(),orderNo:orderNo,productId:curBuyProduct.id,productTitle:curBuyProduct.title+(bSize?' ['+bSize+']':''),size:bSize,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
+  var o={id:'ord'+Date.now()+Math.floor(Math.random()*1000),orderNo:orderNo,productId:curBuyProduct.id,productTitle:curBuyProduct.title+(bSize?' ['+bSize+']':''),size:bSize,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
     sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,pageName:(curBuyProduct.pageName||''),buyerUid:CU.uid,buyerEmail:(CU.email||'').toLowerCase(),buyerName:CU.name,buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:map,
     payMethod:selPayMethod,status:'placed',storeMap:(curBuyProduct.map||curBuyProduct.geo||''),storeAddr:(curBuyProduct.addr||''),ts:Date.now()};
   var orders=getOrders();orders.unshift(o);saveOrders(orders);
@@ -6190,6 +6193,10 @@ function showMyOrders(){
       +'<div class="trk">'+track+'</div>'
       +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Show tracking QR &amp; order #</button>'
       +((o.status==='delivered'&&o.agentUid&&!o.rated)?'<button class="ord-qr" style="border-color:var(--gold);color:var(--gold)" onclick="openRateDelivery(\''+o.id+'\')"><i class="ti ti-star"></i> Rate delivery</button>':'')
+      +(o.cancelledTs?'<div style="font-size:11px;color:var(--red);margin-top:4px"><i class="ti ti-ban"></i> Cancelled '+fmtDT(o.cancelledTs)+(o.refundInit?' · refund initiated to original payment':'')+'</div>':'')
+      +((o.status!=='delivered'&&o.status!=='returned'&&!o.cancelledTs)?'<button class="ord-qr" style="border-color:var(--red);color:var(--red)" onclick="openCancelOrder(\''+o.id+'\')"><i class="ti ti-x"></i> Cancel order</button>'
+          +'<button class="ord-qr" onclick="openChangeAddr(\''+o.id+'\')"><i class="ti ti-map-pin"></i> Change delivery location</button>':'')
+      +'<button class="ord-qr" onclick="openCustomerCare(\''+o.id+'\')"><i class="ti ti-headset"></i> Customer care</button>'
       +'</div>';
   }).join('');
   if(doneO.length){body.innerHTML+='<div style="text-align:center;margin-top:8px"><a href="#" onclick="window.__buyShowDone=!window.__buyShowDone;showMyOrders();return false" style="font-size:11px;color:var(--g)">'+(window.__buyShowDone?'Hide delivered':'Show delivered/returned ('+doneO.length+')')+'</a></div>';}
@@ -6773,12 +6780,12 @@ function viewSellerStore(pageName,cat,q){
     +'<a href="#" onclick="sharePage('+pn+');return false" style="color:#fff;font-weight:700"><i class="ti ti-brand-whatsapp"></i> Share store</a>'
     +(CU&&!pageRole(pageName)?'<a href="#" onclick="requestJoinPage('+pn+');return false" style="color:#fff"><i class="ti ti-user-plus"></i> Join as member</a>':'')
     +'<a href="#" onclick="openProductSearch();return false" style="color:#fff;margin-left:auto">&larr; All products</a></div></div>';
-  var search='<div class="sw" style="margin-bottom:8px"><i class="ti ti-search"></i><input type="text" placeholder="Search in '+esc(pageName)+'…" value="'+esc(q||'')+'" oninput="viewSellerStore('+pn+','+(cat?"'"+String(cat).replace(/'/g,"\\'")+"'":'null')+',this.value)"></div>';
+  var search='<div class="sw" style="margin-bottom:8px"><i class="ti ti-search"></i><input type="text" placeholder="Search in '+esc(pageName)+'…" value="'+esc(q||'')+'" oninput="sfDebounce('+pn+','+(cat?"'"+String(cat).replace(/'/g,"\\'")+"'":'null')+',this.value)"></div>';
   var chips='<div class="sf-cats"><span class="sf-cat'+(!cat?' on':'')+'" onclick="viewSellerStore('+pn+')">All ('+all.length+')</span>'
     +Object.keys(cats).sort().map(function(k){var kk="'"+k.replace(/'/g,"\\'")+"'";return '<span class="sf-cat'+(cat===k?' on':'')+'" onclick="viewSellerStore('+pn+','+kk+')">'+esc(k)+' ('+cats[k]+')</span>';}).join('')+'</div>';
   var grid='<div class="sf-grid">'+prods.map(function(p){
     var pid="'"+p.id+"'";var avail=productAvailable(p);
-    return '<div class="sf-card"><div style="position:relative"><img class="sf-img" src="'+esc(p.photos&&p.photos[0]||'')+'" style="cursor:pointer" onclick="open3DView('+pid+')"><span style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:2px 7px"><i class="ti ti-3d-cube-sphere"></i> 3D</span></div>'
+    return '<div class="sf-card"><div style="position:relative"><img class="sf-img" loading="lazy" decoding="async" src="'+esc(p.photos&&p.photos[0]||'')+'" style="cursor:pointer" onclick="open3DView('+pid+')"><span style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:2px 7px"><i class="ti ti-3d-cube-sphere"></i> 3D</span></div>'
       +'<div class="sf-bd">'
       +(p.brand?'<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;font-weight:700">'+esc(p.brand)+'</div>':'')
       +'<div class="sf-ttl">'+esc(p.title)+'</div>'+(p.sizes&&p.sizes.length?'<div style="font-size:9px;color:var(--mt2)">Sizes: '+esc(p.sizes.join(', '))+'</div>':'')
@@ -7105,7 +7112,13 @@ function open3DView(prodId){
     ovl.addEventListener('dblclick',function(){__p3dRX=-8;__p3dRY=18;apply();});
     window.__p3dApply=apply;
   }
+  window.__p3dPi=0;window.__p3dPhotos=p.photos||[];
   document.getElementById('p3d-img').src=p.photos[0];
+  var nav=document.getElementById('p3d-nav');
+  if(!nav){nav=document.createElement('div');nav.id='p3d-nav';nav.style.cssText='display:flex;gap:18px;margin-top:8px';
+    nav.innerHTML='<button class="lbl-mini" style="color:#fff;border-color:#666" onclick="p3dPhoto(-1)">◀ Prev photo</button><button class="lbl-mini" style="color:#fff;border-color:#666" onclick="p3dPhoto(1)">Next photo ▶</button>';
+    document.querySelector('#p3d-ovl .p3d-hint').parentNode.insertBefore(nav,document.querySelector('#p3d-ovl .p3d-hint'));}
+  nav.style.display=(p.photos.length>1)?'flex':'none';
   document.getElementById('p3d-title').innerHTML='<div style="font-size:15px;font-weight:800">'+esc(p.title)+'</div>'
     +'<div style="color:#7ee2a8;font-size:14px;font-weight:700;margin-top:2px">'+esc(p.currency||'')+' '+esc(p.offer||p.price)+(p.vatPct?' <small style="color:#999;font-weight:400">+VAT '+p.vatPct+'%</small>':'')+'</div>'
     +(productAvailable(p)?'<button class="sf-buy" style="margin-top:10px;padding:11px 26px;font-size:13px" onclick="document.getElementById(\'p3d-ovl\').classList.remove(\'open\');closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button>':'');
@@ -7150,10 +7163,10 @@ function openMainStore(cat){
   var grid='<div style="font-size:12px;font-weight:800;margin:4px 0 8px"><i class="ti ti-sparkles"></i> All products'+(myW.length?' — nearby first':'')+'</div>'
     +'<div class="sf-grid">'+prods.slice(0,40).map(function(p){
       var pid="'"+p.id+"'";var avail=productAvailable(p);
-      return '<div class="sf-card"><div style="position:relative"><img class="sf-img" src="'+esc(p.photos&&p.photos[0]||'')+'" style="cursor:pointer" onclick="open3DView('+pid+')"><span style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:2px 7px"><i class="ti ti-3d-cube-sphere"></i> 3D</span></div>'
+      return '<div class="sf-card"><div style="position:relative"><img class="sf-img" loading="lazy" decoding="async" src="'+esc(p.photos&&p.photos[0]||'')+'" style="cursor:pointer" onclick="open3DView('+pid+')"><span style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:2px 7px"><i class="ti ti-3d-cube-sphere"></i> 3D</span></div>'
         +'<div class="sf-bd">'+(p.brand?'<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;font-weight:700">'+esc(p.brand)+'</div>':'')
         +'<div class="sf-ttl">'+esc(p.title)+'</div>'+(p.sizes&&p.sizes.length?'<div style="font-size:9px;color:var(--mt2)">Sizes: '+esc(p.sizes.join(', '))+'</div>':'')
-        +'<div style="font-size:9px;color:var(--mt2)">'+esc(p.sellerName||'')+(near(p)===0?' · 📍nearby':'')+'</div>'
+        +'<div style="font-size:9px;color:var(--mt2)">'+esc(p.sellerName||'')+(near(p)===0?' · 📍nearby':'')+'</div>'+intlTag(p)
         +(function(){var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0,of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;
           var d=(of&&pr&&of<pr)?Math.round((pr-of)/pr*100):0;
           return '<div class="sf-pr">'+esc(p.currency||'')+' '+esc(p.offer||p.price)
@@ -7166,6 +7179,35 @@ function openMainStore(cat){
     }).join('')+'</div>';
   box.innerHTML=hero+search+catChips+stores+grid;
 }
+
+function compressImg(dataUri,maxW,q){
+  return new Promise(function(res){
+    try{
+      var img=new Image();
+      img.onload=function(){
+        var sc=Math.min(1,maxW/img.width);
+        var cv=document.createElement('canvas');
+        cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);
+        cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+        var out=cv.toDataURL('image/jpeg',q||0.72);
+        res(out.length<dataUri.length?out:dataUri);
+      };
+      img.onerror=function(){res(dataUri);};
+      img.src=dataUri;
+    }catch(e){res(dataUri);}
+  });
+}
+
+function countryOf(L){return String(L||'').split(',')[0].trim().toLowerCase();}
+function intlTag(p){
+  if(!CU||!CU.location||!p.location)return '';
+  if(countryOf(CU.location)&&countryOf(p.location)&&countryOf(CU.location)!==countryOf(p.location)){
+    return '<div style="font-size:9px;color:#7c3aed;font-weight:700">🌍 International ('+esc(p.location.split(',')[0])+') · Shipping: '+(p.intlShip==='no'?'<span style="color:var(--red)">not available</span>':'<span style="color:#1a8f3c">available</span>')+'</div>';
+  }
+  return '';
+}
+
+function p3dPhoto(d){var ph=window.__p3dPhotos||[];if(ph.length<2)return;window.__p3dPi=((window.__p3dPi||0)+d+ph.length)%ph.length;document.getElementById('p3d-img').src=ph[window.__p3dPi];}
 /* ============================================================
    DELIVERY AGENT module — profile, documents, assignment, commission
    ============================================================ */
@@ -7548,6 +7590,7 @@ function renderAdminPanel(){
     +'<button class="seller-tab" onclick="adminTab(\'licenses\')">Licenses</button>'
     +'<button class="seller-tab" onclick="adminTab(\'ads\')">Ads</button>'
     +'<button class="seller-tab" onclick="adminTab(\'content\')">Content</button>'
+    +'<button class="seller-tab" onclick="adminTab(\'cancels\')">Cancellations</button>'
     +'</div><div id="admin-tabbody"></div>';
   body.innerHTML=h;
   adminTab('overview');
@@ -7664,6 +7707,17 @@ function adminTab(t){
         +'<button class="lbl-mini" style="margin-top:6px;color:var(--red);border-color:var(--red)" onclick="adminDeleteAd(\''+escJS(a.id)+'\')"><i class="ti ti-trash"></i> Remove</button></div>';
     }).join(''):'<div class="act-empty" style="font-size:11px;color:var(--mt2)">No ads yet.</div>';
     tb.innerHTML=h2;
+  }else if(t==='cancels'){
+    var log=(LS.get('rb_cancellog',[])||[]).slice().sort(function(a,b){return b.ts-a.ts;});
+    var allOrders=getOrders();
+    tb.innerHTML='<div style="font-size:11px;color:var(--mt);margin-bottom:8px">Cancelled orders & refunds. Click a customer to see all their past orders.</div>'
+      +(log.length?log.map(function(x){
+        var uid="'"+x.buyerUid+"'";
+        return '<div class="appl-card" style="padding:9px 11px"><div style="font-size:11.5px"><b>'+esc(x.productTitle)+'</b> · '+esc(x.amount)+(x.online?' <span style="color:#1a8f3c">· refund initiated</span>':' <span style="color:var(--mt2)">· cash, no refund</span>')+'</div>'
+          +'<div style="font-size:10px;color:var(--mt2)">#'+esc(x.orderNo||x.orderId)+' · '+fmtDT(x.ts)+'</div>'
+          +'<div style="font-size:10px;color:var(--mt2)">Customer: <b>'+esc(x.buyerName||'')+'</b>'+(x.buyerEmail?' · '+esc(x.buyerEmail):'')+'</div>'
+          +'<button class="lbl-mini" style="margin-top:5px" onclick="adminViewCustomerOrders('+uid+',\''+escJS(x.buyerName||'')+'\')">View all orders by this customer</button></div>';
+      }).join(''):'<p style="font-size:12px;color:var(--mt2)">No cancellations yet.</p>');
   }else if(t==='content'){
     // PAGES CONTROL: every page created by every user, grouped by owner
     var allPgs=getPages().filter(function(p){return !p.isStore;});
@@ -8030,4 +8084,112 @@ function runAiSearch(){
     }).join('');
   box.innerHTML=(prods.length?'<div style="font-size:11px;font-weight:700;margin-bottom:5px;color:#1a8f3c">'+prods.length+' found on Reedbi (shown first)</div>':'<div style="font-size:11px;color:var(--mt2);margin-bottom:5px">Nothing on Reedbi yet — try the web links below</div>')+rows;
 }
+
+/* ===== Order cancellation + refund + change address + customer care (v110) ===== */
+function ovlEnsure(id,title){
+  var o=document.getElementById(id);
+  if(!o){o=document.createElement('div');o.id=id;o.className='overlay';
+    o.innerHTML='<div class="modal" style="max-width:430px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:14px">'+title+'</b><button class="modal-x" onclick="closeOvl(\''+id+'\')"><i class="ti ti-x"></i></button></div><div id="'+id+'-b"></div></div>';
+    document.body.appendChild(o);o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('open');});}
+  return o;
+}
+function openCancelOrder(orderId){
+  var mine=getOrders().filter(function(o){return o.buyerUid===CU.uid;}).sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  ovlEnsure('cancel-ovl','<i class="ti ti-ban"></i> Cancel an order');
+  var h='<div style="font-size:11px;color:var(--mt);margin-bottom:8px">Select the order to cancel. Online payments are refunded to the original source; cash orders are simply cancelled.</div>';
+  h+=mine.map(function(o){
+    var done=(o.status==='delivered'||o.status==='returned');
+    var cancelled=!!o.cancelledTs;
+    var oid="'"+o.id+"'";
+    return '<div class="act-row"><div style="flex:1"><b style="font-size:12px">'+esc(o.productTitle)+'</b>'
+      +'<small style="display:block;color:var(--mt2)">#'+esc(o.orderNo||o.id)+' · '+esc(o.currency||'')+' '+esc(o.price)+' ×'+o.qty+'</small>'
+      +'<small style="display:block;color:var(--mt2)">'+(done?'Delivered':esc(orderStatusObj(o.status).label))+' · '+fmtDT(o.deliveredTs||o.ts)+'</small></div>'
+      +(cancelled?'<span style="font-size:10px;color:var(--red)">Cancelled</span>'
+        :(done?'<span style="font-size:10px;color:var(--mt2)">Delivered</span>'
+        :'<button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="doCancelOrder('+oid+')">Cancel</button>'))
+      +'</div>';
+  }).join('')||'<p style="font-size:12px;color:var(--mt2)">No orders.</p>';
+  document.getElementById('cancel-ovl-b').innerHTML=h;
+  document.getElementById('cancel-ovl').classList.add('open');
+  if(orderId)setTimeout(function(){},0);
+}
+function doCancelOrder(orderId){
+  if(!confirm('Cancel this order? This cannot be undone.'))return;
+  var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});if(!o)return;
+  o.cancelledTs=Date.now();o.cancelledBy=CU.uid;o.status='cancelled';
+  var online=(o.payMethod&&o.payMethod!=='cod');
+  if(online){o.refundInit=true;o.refundTs=Date.now();}
+  saveOrders(orders);
+  // notify seller + admin
+  try{notifyEvent('cancel','❌ Order #'+esc(o.orderNo||o.id)+' cancelled by buyer'+(online?' — refund initiated':''));}catch(e){}
+  // log for admin monitoring
+  var log=LS.get('rb_cancellog',[])||[];log.push({orderId:o.id,orderNo:o.orderNo,buyerUid:CU.uid,buyerName:CU.name,buyerEmail:CU.email||'',productTitle:o.productTitle,amount:(o.currency||'')+' '+o.price,online:online,ts:Date.now()});LS.set('rb_cancellog',log);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('cancellog').set({list:log},{merge:true}).catch(function(){});}catch(e){}}
+  // email the buyer (mailto draft — real auto-email needs the backend)
+  var sub=encodeURIComponent('Reedbi order #'+(o.orderNo||o.id)+' cancelled');
+  var bd=encodeURIComponent('Your order "'+o.productTitle+'" ('+(o.currency||'')+' '+o.price+') has been cancelled.\n'+(online?'A refund has been initiated to your original payment method. It may take 5–7 business days.':'This was a cash order, so no refund is needed.')+'\n\nReedbi Customer Care');
+  closeOvl('cancel-ovl');
+  toast('Order cancelled'+(online?' — refund initiated to original payment':''),'ok');
+  if(o.buyerEmail||CU.email){try{window.open('mailto:'+(o.buyerEmail||CU.email)+'?subject='+sub+'&body='+bd,'_blank');}catch(e){}}
+  showMyOrders();
+}
+function openChangeAddr(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o)return;
+  ovlEnsure('chaddr-ovl','<i class="ti ti-map-pin"></i> Change delivery location');
+  function f(l,id,v){return '<div class="afg"><label>'+l+'</label><input type="text" id="'+id+'" value="'+esc(v||'')+'"></div>';}
+  var a=o.addrParts||{};
+  document.getElementById('chaddr-ovl-b').innerHTML=
+    f('Country','ca-country',a.country)+f('State','ca-state',a.state)+f('District','ca-district',a.district)
+    +f('Building number','ca-building',a.building)+f('Street number','ca-street',a.street)+f('Apartment number','ca-apt',a.apt)
+    +f('Google Maps location (lat,lng or link)','ca-map',o.buyerMap)
+    +'<div style="display:flex;gap:6px;margin-top:8px">'
+    +'<button class="btn btnok" style="flex:1" onclick="saveChangeAddr(\''+orderId+'\')">Save new location</button>'
+    +'<button class="btn" style="border:1px solid var(--b);background:var(--card2);color:var(--mt)" onclick="useGpsForAddr()"><i class="ti ti-current-location"></i> Use GPS</button></div>';
+  document.getElementById('chaddr-ovl').classList.add('open');
+}
+function useGpsForAddr(){
+  if(!navigator.geolocation){toast('GPS not available','err');return;}
+  navigator.geolocation.getCurrentPosition(function(p){document.getElementById('ca-map').value=p.coords.latitude.toFixed(5)+','+p.coords.longitude.toFixed(5);toast('GPS location filled','ok');},function(){toast('Could not get GPS','err');});
+}
+function saveChangeAddr(orderId){
+  var g=function(id){return (document.getElementById(id)||{value:''}).value.trim();};
+  var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});if(!o)return;
+  o.addrParts={country:g('ca-country'),state:g('ca-state'),district:g('ca-district'),building:g('ca-building'),street:g('ca-street'),apt:g('ca-apt')};
+  o.buyerMap=g('ca-map');
+  o.buyerAddr=[o.addrParts.building,o.addrParts.street,o.addrParts.apt,o.addrParts.district,o.addrParts.state,o.addrParts.country].filter(Boolean).join(', ');
+  o.addrChangedTs=Date.now();
+  saveOrders(orders);
+  try{notifyEvent('addr','📍 Delivery location updated for order #'+esc(o.orderNo||o.id));}catch(e){}
+  closeOvl('chaddr-ovl');toast('Delivery location updated','ok');showMyOrders();
+}
+function openCustomerCare(orderId){
+  var o=orderId?getOrders().find(function(x){return x.id===orderId;}):null;
+  ovlEnsure('care-ovl','<i class="ti ti-headset"></i> Customer care');
+  var careWa='971500000000'; // Reedbi care WhatsApp (set your real number here)
+  var careEmail='care@reedbi.com';
+  var ref=o?('Order #'+(o.orderNo||o.id)+' — '+o.productTitle):'';
+  document.getElementById('care-ovl-b').innerHTML=
+    (ref?'<div style="font-size:12px;background:var(--card2);border-radius:8px;padding:9px;margin-bottom:10px">'+esc(ref)+'</div>':'')
+    +'<a class="btn btnok" style="width:100%;margin-bottom:8px;display:block;text-align:center;text-decoration:none" href="https://wa.me/'+careWa+'?text='+encodeURIComponent('Reedbi support: '+ref)+'" target="_blank"><i class="ti ti-brand-whatsapp"></i> Chat with care on WhatsApp</a>'
+    +'<a class="btn" style="width:100%;margin-bottom:8px;display:block;text-align:center;text-decoration:none;border:1px solid var(--b);background:var(--card2);color:var(--tx)" href="mailto:'+careEmail+'?subject='+encodeURIComponent(ref||'Reedbi support')+'"><i class="ti ti-mail"></i> Email care@reedbi.com</a>'
+    +(o&&o.sellerUid?'<button class="btn" style="width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="closeOvl(\'care-ovl\');openDM(\''+o.sellerUid+'\',\''+escJS(o.sellerName||'Seller')+'\')"><i class="ti ti-message"></i> Message the seller directly</button>':'');
+  document.getElementById('care-ovl').classList.add('open');
+}
+
+function adminViewCustomerOrders(uid,name){
+  var os=getOrders().filter(function(o){return o.buyerUid===uid;}).sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  var tb=document.getElementById('admin-tabbody');if(!tb)return;
+  tb.innerHTML='<button class="lbl-mini" onclick="adminTab(\'cancels\')"><i class="ti ti-arrow-left"></i> Back</button>'
+    +'<div style="font-size:13px;font-weight:800;margin:8px 0"><i class="ti ti-user"></i> '+esc(name)+' — order history ('+os.length+')</div>'
+    +(os.length?os.map(function(o){
+      var done=(o.status==='delivered');var canc=!!o.cancelledTs;
+      return '<div class="act-row"><div style="flex:1"><b style="font-size:12px">'+esc(o.productTitle)+'</b>'
+        +'<small style="display:block;color:var(--mt2)">#'+esc(o.orderNo||o.id)+' · '+esc(o.currency||'')+' '+esc(o.price)+' ×'+o.qty+'</small>'
+        +'<small style="display:block;color:var(--mt2)">'+fmtDT(o.deliveredTs||o.ts)+'</small></div>'
+        +'<span style="font-size:10px;color:'+(canc?'var(--red)':done?'#1a8f3c':'var(--gold)')+'">'+(canc?'Cancelled':done?'Delivered':esc(orderStatusObj(o.status).label))+'</span></div>';
+    }).join(''):'<p style="font-size:12px;color:var(--mt2)">No orders.</p>');
+}
+
+var __sfT=null;
+function sfDebounce(pn,cat,val){clearTimeout(__sfT);__sfT=setTimeout(function(){viewSellerStore(pn,cat,val);},220);}
 </script></body></html>
