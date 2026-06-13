@@ -423,6 +423,26 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sf-stats{display:flex;gap:14px;margin-top:8px;font-size:11px}
 .sf-stats b{display:block;font-size:15px}
 #ps-results{scroll-behavior:smooth;overscroll-behavior:contain}
+.vsh{position:fixed;inset:0;z-index:100000;display:none;background:radial-gradient(circle at 50% 40%,#13202e,#070b10);overflow:hidden}
+.vsh.open{display:block}
+.vsh-top{position:absolute;top:0;left:0;right:0;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;z-index:3;color:#fff}
+.vsh-badge{background:rgba(10,10,10,.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:7px 14px;font-size:11px;letter-spacing:.5px}
+.vsh-stage{position:absolute;inset:0}
+.vsh-tile{position:absolute;width:104px;background:rgba(255,255,255,.96);border-radius:14px;box-shadow:0 8px 26px rgba(0,0,0,.4);overflow:hidden;cursor:pointer;transition:transform .25s,opacity .3s;animation:vfloat 6s ease-in-out infinite}
+.vsh-tile:active{transform:scale(.92)}
+.vsh-tile img{width:100%;height:74px;object-fit:contain;background:#fff;padding:4px}
+.vsh-tile .vb{padding:5px 7px}
+.vsh-tile .vt{font-size:10px;font-weight:700;line-height:1.2;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vsh-tile .vp{font-size:11px;font-weight:800;color:#0a8f5c}
+@keyframes vfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.vsh-tray{position:absolute;bottom:0;left:0;right:0;background:rgba(8,12,18,.92);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.08);padding:12px 14px 18px;z-index:4}
+.vsh-tray-items{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;min-height:54px}
+.vsh-ti{flex-shrink:0;width:46px;height:46px;border-radius:10px;overflow:hidden;position:relative;border:2px solid #0a8f5c}
+.vsh-ti img{width:100%;height:100%;object-fit:cover}
+.vsh-ti .x{position:absolute;top:-1px;right:-1px;background:#cc1016;color:#fff;width:16px;height:16px;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.vsh-actions{display:flex;gap:8px;margin-top:6px}
+.vsh-btn{flex:1;padding:13px;border:none;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--fn)}
+
 .sf-cats{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch}
 .sf-cat{flex-shrink:0;background:var(--card2);border:1px solid var(--b);border-radius:14px;padding:5px 12px;font-size:11px;cursor:pointer;color:var(--tx)}
 .sf-cat.on{background:var(--g);color:#fff;border-color:var(--g)}
@@ -582,7 +602,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v110</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v112</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5172,7 +5192,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v110 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v112 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6808,14 +6828,14 @@ function adminFilteredUsers(){
   });
 }
 function adminEmailAll(){
-  var rows=adminFilteredUsers().filter(function(u){return u.email;});
+  var rows=adminCrmRows().filter(function(u){return u.email;});
   if(!rows.length){toast('No users with email match the filter','err');return;}
   var bcc=rows.map(function(u){return u.email;}).join(',');
   window.open('mailto:?bcc='+encodeURIComponent(bcc)+'&subject='+encodeURIComponent('Reedbi update'),'_blank');
   toast('Opening your mail app with '+rows.length+' recipients (BCC)','ok');
 }
 function adminCopyWhatsApp(){
-  var rows=adminFilteredUsers().filter(function(u){return u.phone;});
+  var rows=adminCrmRows().filter(function(u){return u.phone;});
   if(!rows.length){toast('No users with WhatsApp numbers match the filter','err');return;}
   var txt=rows.map(function(u){return u.name+': '+u.phone;}).join('\n');
   var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();
@@ -7146,6 +7166,7 @@ function openMainStore(cat){
     +'<div style="font-size:11px;opacity:.85;margin-top:2px">Shop from approved sellers — nearby first, worldwide always</div>'
     +'<div class="sf-stats"><div><b>'+pages.length+'</b>Stores</div><div><b>'+prods.length+'</b>Products</div></div></div>';
   var search='<div class="sw" style="margin-bottom:10px"><i class="ti ti-search"></i><input type="text" placeholder="Search all products &amp; brands…" onkeydown="if(event.key===\'Enter\'){document.getElementById(\'ps-q\').value=this.value;runProductSearch(this.value);}"></div>';
+  search+='<button class="btn" style="width:100%;margin-bottom:10px;border:1px solid #0a66c2;background:linear-gradient(135deg,rgba(10,102,194,.12),rgba(124,58,237,.12));color:#0a66c2;border-radius:11px;font-weight:700" onclick="openVisionShop()"><i class="ti ti-eye"></i> Vision Shop — tap-to-collect &amp; buy</button>';
   var allCats={};prods.forEach(function(p){allCats[p.category||'Other']=(allCats[p.category||'Other']||0)+1;});
   var catChips='<div class="sf-cats"><span class="sf-cat'+(!cat?' on':'')+'" onclick="openMainStore()">All</span>'
     +Object.keys(allCats).sort().map(function(k){var kk="'"+k.replace(/'/g,"\\'")+"'";return '<span class="sf-cat'+(cat===k?' on':'')+'" onclick="openMainStore('+kk+')">'+esc(k)+' ('+allCats[k]+')</span>';}).join('')+'</div>';
@@ -7625,21 +7646,23 @@ function adminTab(t){
       +'<button class="btn" style="width:100%;margin-top:10px;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="showCloudStatus()"><i class="ti ti-cloud"></i> Cloud Sync status &amp; manual sync</button>'
       +'<div style="border-top:1px solid var(--b);margin-top:12px;padding-top:12px;font-size:10px;color:var(--mt2)"><i class="ti ti-shield-lock"></i> Admin access is controlled entirely by the backend (Firebase custom claim). No admin password or owner email is stored in this app.</div>';
   }else if(t==='users'){
-    var fl=(adminUserFilter.loc||'').toLowerCase(),fi=(adminUserFilter.int||'').toLowerCase();
-    var shown=users.filter(function(u){
-      if(fl&&((u.location||'').toLowerCase().indexOf(fl)<0))return false;
-      if(fi&&((u.interests||'').toLowerCase().indexOf(fi)<0))return false;
-      return true;
-    });
-    tb.innerHTML='<div style="display:flex;gap:6px;margin-bottom:8px">'
-      +'<input type="text" id="auf-loc" placeholder="Filter location (e.g. Discovery Gardens)" value="'+esc(adminUserFilter.loc||'')+'" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn);font-size:11px">'
-      +'<input type="text" id="auf-int" placeholder="Filter interest" value="'+esc(adminUserFilter.int||'')+'" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn);font-size:11px">'
-      +'<button class="lbl-mini" onclick="adminApplyUserFilter()"><i class="ti ti-filter"></i></button></div>'
-      +'<div style="font-size:11px;color:var(--mt);margin-bottom:8px"><b>'+shown.length+'</b> user'+(shown.length!==1?'s':'')+' match'+((fl||fi)?' (filtered)':'')+'</div>'
-      +'<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">'
-      +'<button class="lbl-mini" style="color:var(--g);border-color:var(--g)" onclick="adminExportUsers()"><i class="ti ti-download"></i> Save list (CSV)</button>'
+    var shown=adminCrmRows();
+    var withWa=shown.filter(function(u){return u.phone;}).length, withEm=shown.filter(function(u){return u.email;}).length;
+    tb.innerHTML='<div style="font-size:12px;font-weight:800;margin-bottom:8px"><i class="ti ti-users-group"></i> Seller / Vendor CRM</div>'
+      +'<div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">'
+      +'<input type="text" id="auf-loc" placeholder="Country / state / area" value="'+esc(adminUserFilter.loc||'')+'" style="flex:1;min-width:120px;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn);font-size:11px">'
+      +'<input type="text" id="auf-cat" placeholder="Category / business" value="'+esc(adminUserFilter.cat||'')+'" style="flex:1;min-width:110px;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn);font-size:11px">'
+      +'<input type="text" id="auf-int" placeholder="Interest" value="'+esc(adminUserFilter.int||'')+'" style="flex:1;min-width:90px;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn);font-size:11px">'
+      +'<button class="lbl-mini" onclick="adminApplyUserFilter()"><i class="ti ti-filter"></i> Filter</button></div>'
+      +'<label style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:8px;cursor:pointer"><input type="checkbox" '+(adminUserFilter.sellersOnly?'checked':'')+' onchange="adminToggleSellersOnly()"> Approved sellers only</label>'
+      +'<div style="font-size:11px;color:var(--mt);margin-bottom:8px"><b>'+shown.length+'</b> match · '+withWa+' with WhatsApp · '+withEm+' with email</div>'
+      +'<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">'
+      +'<button class="lbl-mini" style="color:#0a66c2;border-color:#0a66c2" onclick="adminCompose()"><i class="ti ti-send"></i> Compose &amp; send to group</button>'
+      +'<button class="lbl-mini" style="color:var(--g);border-color:var(--g)" onclick="adminSaveList()"><i class="ti ti-bookmark"></i> Save this list</button>'
+      +'<button class="lbl-mini" style="color:var(--g);border-color:var(--g)" onclick="adminExportUsers()"><i class="ti ti-download"></i> CSV</button>'
       +'<button class="lbl-mini" style="color:var(--g);border-color:var(--g)" onclick="adminEmailAll()"><i class="ti ti-mail"></i> Email all</button>'
-      +'<button class="lbl-mini" style="color:#1a8f3c;border-color:#1a8f3c" onclick="adminCopyWhatsApp()"><i class="ti ti-brand-whatsapp"></i> Copy WhatsApp list</button></div>'
+      +'<button class="lbl-mini" style="color:#1a8f3c;border-color:#1a8f3c" onclick="adminCopyWhatsApp()"><i class="ti ti-brand-whatsapp"></i> WhatsApp list</button></div>'
+      +adminSavedListsHtml()
       +(shown.length?shown.map(function(u){
       var lic=userLicensed(u.uid);
       // single-line: Name | WhatsApp | location | interests — with actions
@@ -7830,20 +7853,27 @@ function adminDeletePost(tagId,postId){
 }
 
 /* ===== Admin: user filters + CSV export ===== */
-var adminUserFilter={loc:'',int:''};
+var adminUserFilter={loc:'',int:'',cat:'',sellersOnly:false};
+function adminCrmRows(){
+  var users=getAllUsersIndex();
+  var fl=(adminUserFilter.loc||'').toLowerCase(),fi=(adminUserFilter.int||'').toLowerCase(),fc=(adminUserFilter.cat||'').toLowerCase();
+  return users.filter(function(u){
+    if(fl&&((u.location||'').toLowerCase().indexOf(fl)<0))return false;
+    if(fi&&((u.interests||'').toLowerCase().indexOf(fi)<0))return false;
+    if(fc&&(((u.category||u.interests||'')+' '+(u.co||'')).toLowerCase().indexOf(fc)<0))return false;
+    if(adminUserFilter.sellersOnly&&!userLicensed(u.uid))return false;
+    return true;
+  });
+}
 function adminApplyUserFilter(){
   adminUserFilter.loc=(document.getElementById('auf-loc')||{value:''}).value.trim();
   adminUserFilter.int=(document.getElementById('auf-int')||{value:''}).value.trim();
+  adminUserFilter.cat=(document.getElementById('auf-cat')||{value:''}).value.trim();
   adminTab('users');
 }
+function adminToggleSellersOnly(){adminUserFilter.sellersOnly=!adminUserFilter.sellersOnly;adminTab('users');}
 function adminExportUsers(){
-  var users=getAllUsersIndex();
-  var fl=(adminUserFilter.loc||'').toLowerCase(),fi=(adminUserFilter.int||'').toLowerCase();
-  var rows=users.filter(function(u){
-    if(fl&&((u.location||'').toLowerCase().indexOf(fl)<0))return false;
-    if(fi&&((u.interests||'').toLowerCase().indexOf(fi)<0))return false;
-    return true;
-  });
+  var rows=adminCrmRows();
   var csv='Name,Email,WhatsApp,Contact,Location,Interests,Company\n'+rows.map(function(u){
     function q(s){return '"'+String(s||'').replace(/"/g,'""')+'"';}
     return [q(u.name),q(u.email),q(u.phone),q(u.contact),q(u.location),q(u.interests),q(u.co)].join(',');
@@ -8192,4 +8222,162 @@ function adminViewCustomerOrders(uid,name){
 
 var __sfT=null;
 function sfDebounce(pn,cat,val){clearTimeout(__sfT);__sfT=setTimeout(function(){viewSellerStore(pn,cat,val);},220);}
+
+/* ===== Seller CRM: compose, saved lists (v111) ===== */
+function adminCompose(){
+  var rows=adminCrmRows();
+  if(!rows.length){toast('No sellers match the current filter','err');return;}
+  var wa=rows.filter(function(u){return u.phone;}),em=rows.filter(function(u){return u.email;});
+  var o=document.getElementById('crm-compose-ovl');
+  if(!o){o=document.createElement('div');o.id='crm-compose-ovl';o.className='overlay';
+    o.innerHTML='<div class="modal" style="max-width:430px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:14px"><i class="ti ti-send"></i> Message the filtered group</b><button class="modal-x" onclick="closeOvl(\'crm-compose-ovl\')"><i class="ti ti-x"></i></button></div><div id="crm-compose-b"></div></div>';
+    document.body.appendChild(o);o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('open');});}
+  document.getElementById('crm-compose-b').innerHTML=
+    '<div style="font-size:11px;color:var(--mt);margin-bottom:8px"><b>'+rows.length+'</b> sellers in this list · '+wa.length+' WhatsApp · '+em.length+' email</div>'
+    +'<input type="text" id="crm-subj" placeholder="Subject (for email)" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn);margin-bottom:6px">'
+    +'<textarea id="crm-msg" rows="5" placeholder="Your message to these sellers…" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn)"></textarea>'
+    +'<div style="font-size:10px;color:var(--mt2);margin:8px 0">Email opens your mail app with all recipients in BCC (one send). WhatsApp can\'t bulk-send by policy — Reedbi opens each chat in turn with your text pre-filled so you press send. This keeps you compliant and avoids bans.</div>'
+    +'<div style="display:flex;gap:6px">'
+    +'<button class="btn btnok" style="flex:1" onclick="crmSendEmail()"><i class="ti ti-mail"></i> Email '+em.length+' (BCC)</button>'
+    +'<button class="btn" style="flex:1;border:1px solid #1a8f3c;background:var(--card2);color:#1a8f3c" onclick="crmSendWhatsApp()"><i class="ti ti-brand-whatsapp"></i> WhatsApp '+wa.length+'</button></div>';
+  o.classList.add('open');
+}
+function crmSendEmail(){
+  var rows=adminCrmRows().filter(function(u){return u.email;});
+  if(!rows.length){toast('No emails in this list','err');return;}
+  var subj=(document.getElementById('crm-subj')||{value:''}).value||'Reedbi';
+  var msg=(document.getElementById('crm-msg')||{value:''}).value||'';
+  var bcc=rows.map(function(u){return u.email;}).join(',');
+  window.open('mailto:?bcc='+encodeURIComponent(bcc)+'&subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(msg),'_blank');
+  toast('Opening mail with '+rows.length+' recipients in BCC','ok');
+}
+var __crmWaQueue=[],__crmWaMsg='';
+function crmSendWhatsApp(){
+  var rows=adminCrmRows().filter(function(u){return u.phone;});
+  if(!rows.length){toast('No WhatsApp numbers in this list','err');return;}
+  __crmWaMsg=(document.getElementById('crm-msg')||{value:''}).value||'';
+  __crmWaQueue=rows.slice();
+  crmWaNext();
+}
+function crmWaNext(){
+  if(!__crmWaQueue.length){toast('Finished — all chats opened','ok');return;}
+  var u=__crmWaQueue.shift();
+  var num=(u.phone||'').replace(/[^0-9]/g,'');
+  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(__crmWaMsg),'_blank');
+  if(__crmWaQueue.length)toast(__crmWaQueue.length+' more — tap "Next chat" after sending','info');
+  // show a floating Next button
+  var b=document.getElementById('crm-wa-next');
+  if(!b){b=document.createElement('button');b.id='crm-wa-next';b.className='btn btnok';b.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:100001;padding:12px 22px;border-radius:24px;box-shadow:0 8px 24px rgba(0,0,0,.3)';document.body.appendChild(b);}
+  b.innerHTML=__crmWaQueue.length?('<i class="ti ti-brand-whatsapp"></i> Next chat ('+__crmWaQueue.length+' left)'):'Done';
+  b.onclick=function(){if(__crmWaQueue.length)crmWaNext();else{b.remove();}};
+  if(!__crmWaQueue.length)setTimeout(function(){if(b)b.remove();},1500);
+}
+function getSavedLists(){return LS.get('rb_crmlists',[])||[];}
+function adminSaveList(){
+  var rows=adminCrmRows();
+  if(!rows.length){toast('Nothing to save','err');return;}
+  var nm=prompt('Name this seller list (e.g. "Dubai groceries"):');
+  if(!nm)return;
+  var lists=getSavedLists();
+  lists.push({id:'L'+Date.now(),name:nm,filter:JSON.parse(JSON.stringify(adminUserFilter)),count:rows.length,ts:Date.now()});
+  LS.set('rb_crmlists',lists);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('crmlists').set({list:lists},{merge:true}).catch(function(){});}catch(e){}}
+  adminTab('users');toast('List "'+nm+'" saved','ok');
+}
+function adminSavedListsHtml(){
+  var lists=getSavedLists();
+  if(!lists.length)return '';
+  return '<div style="font-size:11px;font-weight:700;margin:4px 0 6px"><i class="ti ti-bookmarks"></i> Saved lists</div>'
+    +lists.map(function(l){var lid="'"+l.id+"'";
+      return '<div class="act-row" style="padding:6px 9px"><div onclick="adminLoadList('+lid+')" style="cursor:pointer;flex:1"><b style="font-size:12px">'+esc(l.name)+'</b><small style="display:block;color:var(--mt2)">'+l.count+' sellers · saved '+fmtDT(l.ts)+'</small></div>'
+        +'<button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="adminDelList('+lid+')"><i class="ti ti-trash"></i></button></div>';
+    }).join('')+'<div style="height:8px"></div>';
+}
+function adminLoadList(id){var l=getSavedLists().find(function(x){return x.id===id;});if(!l)return;adminUserFilter=JSON.parse(JSON.stringify(l.filter));adminTab('users');toast('Loaded "'+l.name+'"','ok');}
+function adminDelList(id){LS.set('rb_crmlists',getSavedLists().filter(function(x){return x.id!==id;}));adminTab('users');}
+
+/* ===== Vision Shop: visual product picker → tray → cart/buy (v112) ===== */
+var __vshPick=[];
+function openVisionShop(){
+  if(!requireAuth('shop'))return;
+  var o=document.getElementById('vsh');
+  if(!o){
+    o=document.createElement('div');o.id='vsh';o.className='vsh';
+    o.innerHTML='<div class="vsh-top"><span class="vsh-badge"><i class="ti ti-eye"></i> Vision Shop — tap products to collect</span>'
+      +'<button class="vsh-badge" style="cursor:pointer" onclick="closeVisionShop()"><i class="ti ti-x"></i> Close</button></div>'
+      +'<div class="vsh-stage" id="vsh-stage"></div>'
+      +'<div class="vsh-tray"><div style="color:#9fb3c8;font-size:11px;margin-bottom:4px" id="vsh-traylabel">Your picks (0)</div>'
+      +'<div class="vsh-tray-items" id="vsh-tray-items"></div>'
+      +'<div class="vsh-actions">'
+      +'<button class="vsh-btn" style="background:#1f2d3d;color:#fff" onclick="vshShuffle()"><i class="ti ti-refresh"></i> More</button>'
+      +'<button class="vsh-btn" style="background:#0a66c2;color:#fff" onclick="vshAddAllToCart()"><i class="ti ti-shopping-cart"></i> Add picks to bag</button>'
+      +'<button class="vsh-btn" style="background:#0a8f5c;color:#fff" onclick="vshBuyNow()"><i class="ti ti-bolt"></i> Buy now</button>'
+      +'</div></div>';
+    document.body.appendChild(o);
+  }
+  __vshPick=[];
+  o.classList.add('open');
+  vshRenderTray();vshShuffle();
+}
+function closeVisionShop(){var o=document.getElementById('vsh');if(o)o.classList.remove('open');}
+function vshPool(){
+  var prods=getProducts().filter(function(p){return productInMarketplace(p)&&!p.withdrawn&&productAvailable(p)&&p.photos&&p.photos[0];});
+  // nearby first
+  var myW=(CU&&CU.location?CU.location:'').toLowerCase().split(/[\s,]+/).filter(function(w){return w.length>2;});
+  if(myW.length)prods.sort(function(a,b){function n(p){var pl=(p.location||'').toLowerCase();return myW.some(function(w){return pl.indexOf(w)>=0;})?0:1;}return n(a)-n(b);});
+  return prods;
+}
+function vshShuffle(){
+  var stage=document.getElementById('vsh-stage');if(!stage)return;
+  var pool=vshPool();
+  if(!pool.length){stage.innerHTML='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#9fb3c8;font-size:13px;text-align:center">No products available yet.<br>Approved sellers\' products will float here.</div>';return;}
+  // pick up to 8, prefer nearby/top then random spread
+  var picks=pool.slice(0,16);
+  for(var i=picks.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=picks[i];picks[i]=picks[j];picks[j]=t;}
+  picks=picks.slice(0,8);
+  var W=stage.clientWidth||window.innerWidth,H=stage.clientHeight||window.innerHeight;
+  stage.innerHTML=picks.map(function(p,idx){
+    var x=12+Math.random()*(W-128),y=90+Math.random()*(H-320);
+    var pid="'"+p.id+"'";
+    return '<div class="vsh-tile" style="left:'+x+'px;top:'+y+'px;animation-delay:'+(idx*0.4)+'s" onclick="vshAdd('+pid+')">'
+      +'<img src="'+esc(p.photos[0])+'" loading="lazy"><div class="vb"><div class="vt">'+esc(p.title)+'</div><div class="vp">'+esc(p.currency||'')+' '+esc(p.offer||p.price)+'</div></div></div>';
+  }).join('');
+}
+function vshAdd(pid){
+  if(__vshPick.indexOf(pid)>=0){toast('Already in your picks','info');return;}
+  __vshPick.push(pid);
+  try{if(typeof playTune==='function'&&!(getNotifCfg().muted))playTune('pop');}catch(e){}
+  vshRenderTray();
+  // little visual: fade the tapped tile
+  var stage=document.getElementById('vsh-stage');
+  if(stage){var tiles=stage.querySelectorAll('.vsh-tile');tiles.forEach(function(t){if(t.getAttribute('onclick').indexOf(pid)>=0){t.style.opacity='.35';t.style.transform='scale(.8)';}});}
+}
+function vshRenderTray(){
+  var box=document.getElementById('vsh-tray-items');if(!box)return;
+  document.getElementById('vsh-traylabel').textContent='Your picks ('+__vshPick.length+')';
+  box.innerHTML=__vshPick.map(function(pid){
+    var p=getProducts().find(function(x){return x.id===pid;});if(!p)return '';
+    var q="'"+pid+"'";
+    return '<div class="vsh-ti"><img src="'+esc(p.photos&&p.photos[0]||'')+'"><span class="x" onclick="vshRemove('+q+')">×</span></div>';
+  }).join('')||'<div style="color:#5d7388;font-size:11px;align-self:center">Tap floating products to collect them here</div>';
+}
+function vshRemove(pid){__vshPick=__vshPick.filter(function(x){return x!==pid;});vshRenderTray();vshShuffle();}
+function vshAddAllToCart(){
+  if(!__vshPick.length){toast('Tap some products first','err');return;}
+  var n=0;__vshPick.forEach(function(pid){var before=getCart().length;addToCartSilent(pid);n++;});
+  toast(n+' item'+(n!==1?'s':'')+' added to your bag','ok');
+  __vshPick=[];vshRenderTray();
+}
+function addToCartSilent(productId){
+  var p=getProducts().find(function(x){return x.id===productId;});if(!p||!productAvailable(p))return;
+  var cart=getCart();var ex=cart.find(function(i){return i.productId===productId;});
+  if(ex)ex.qty=(ex.qty||1)+1; else cart.push({productId:productId,qty:1});
+  saveCart(cart);
+}
+function vshBuyNow(){
+  if(!__vshPick.length){toast('Tap some products first','err');return;}
+  vshAddAllToCart();
+  closeVisionShop();
+  if(typeof showCart==='function')showCart();
+}
 </script></body></html>
