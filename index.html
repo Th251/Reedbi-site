@@ -481,6 +481,71 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 @keyframes tcmbag{0%,100%{transform:scale(1)}40%{transform:scale(1.18)}}
 .tcm-bag .ct{background:#fff;color:#0a8f5c;border-radius:12px;min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;padding:0 5px}
 .tcm-hint{text-align:center;color:#9fb3c8;font-size:11px;padding:4px 16px 14px}
+/* ===== Flipkart-style professional main store (v116) ===== */
+.fk-wrap{background:#f1f3f6;margin:-13px -16px 0;min-height:100%}
+.fk-bar{background:#0a66c2;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:8;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.fk-bar .brand{color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.fk-bar .brand small{font-style:italic;color:#ffe500;font-weight:600;font-size:9px}
+.fk-search{flex:1;display:flex;align-items:center;gap:7px;background:#fff;border-radius:4px;padding:9px 12px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.fk-search i{color:#0a66c2;font-size:15px}
+.fk-search input{flex:1;border:none;outline:none;font-size:13px;font-family:var(--fn);color:#111}
+.fk-cats{display:flex;gap:4px;overflow-x:auto;background:#fff;padding:12px 8px;-webkit-overflow-scrolling:touch;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.fk-cat{flex-shrink:0;width:74px;text-align:center;cursor:pointer}
+.fk-cat-ic{width:52px;height:52px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,#eaf2fb,#f3eafb)}
+.fk-cat.on .fk-cat-ic{background:linear-gradient(135deg,#0a66c2,#7c3aed);box-shadow:0 4px 12px rgba(10,102,194,.35)}
+.fk-cat span{font-size:10px;font-weight:600;color:#212121;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fk-cat.on span{color:#0a66c2}
+.fk-banner{margin:10px;border-radius:10px;overflow:hidden;background:linear-gradient(110deg,#0a66c2,#7c3aed 60%,#0a8f5c);color:#fff;padding:18px 18px 16px;position:relative;box-shadow:0 6px 18px rgba(10,102,194,.25)}
+.fk-banner::after{content:"";position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1)}
+.fk-banner .lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;opacity:.9;font-weight:700}
+.fk-banner h2{font-size:21px;font-weight:800;margin:3px 0;line-height:1.1}
+.fk-banner p{font-size:12px;opacity:.9}
+.fk-banner .cta{display:inline-flex;align-items:center;gap:5px;margin-top:10px;background:#fff;color:#0a66c2;font-weight:800;font-size:12px;border-radius:20px;padding:8px 16px;position:relative;z-index:1}
+.fk-feat{display:flex;gap:8px;margin:0 10px 10px}
+.fk-feat button{flex:1;border:none;border-radius:10px;padding:11px 6px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--fn);color:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.fk-feat button i{font-size:19px}
+.fk-feat .fT{background:linear-gradient(135deg,#0a8f5c,#0a66c2)}
+.fk-feat .fV{background:linear-gradient(135deg,#7c3aed,#0a66c2)}
+.fk-sec{background:#fff;margin:0 0 10px;padding:12px 0 14px}
+.fk-sec-h{display:flex;align-items:center;justify-content:space-between;padding:0 14px 10px}
+.fk-sec-h b{font-size:15px;font-weight:800;color:#212121}
+.fk-sec-h .deal{font-size:10px;background:#ff6161;color:#fff;font-weight:800;border-radius:4px;padding:3px 7px;letter-spacing:.5px}
+.fk-rail{display:flex;gap:10px;overflow-x:auto;padding:0 14px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.fk-rail::-webkit-scrollbar{display:none}
+.fk-rail .fk-tile{flex:0 0 140px}
+.fk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#e6e9ee}
+@media(min-width:560px){.fk-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:760px){.fk-grid{grid-template-columns:repeat(4,1fr)}}
+.fk-tile{background:#fff;padding:11px 10px 13px;cursor:pointer;position:relative;display:flex;flex-direction:column;transition:box-shadow .15s}
+.fk-tile:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:1}
+.fk-tile .imgwrap{position:relative;height:140px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.fk-tile img{max-width:100%;max-height:140px;object-fit:contain;mix-blend-mode:multiply}
+.fk-3d{position:absolute;bottom:0;right:0;background:rgba(10,102,194,.92);color:#fff;font-size:8px;font-weight:700;border-radius:6px;padding:2px 6px;display:flex;align-items:center;gap:2px}
+.fk-wish{position:absolute;top:0;right:0;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15);border:none;display:flex;align-items:center;justify-content:center;color:#878787;cursor:pointer;font-size:14px}
+.fk-brand{font-size:11px;color:#878787;font-weight:600}
+.fk-ttl{font-size:13px;color:#212121;line-height:1.3;margin:1px 0 5px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:34px}
+.fk-rate{display:inline-flex;align-items:center;gap:3px;margin-bottom:5px}
+.fk-rate .pill{background:#388e3c;color:#fff;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;display:inline-flex;align-items:center;gap:2px}
+.fk-rate .cnt{font-size:10px;color:#878787;font-weight:600}
+.fk-assured{height:13px;display:inline-flex;align-items:center;gap:2px;font-size:9px;font-weight:800;color:#0a66c2}
+.fk-price{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-top:auto}
+.fk-now{font-size:15px;font-weight:800;color:#212121}
+.fk-mrp{font-size:11px;color:#878787;text-decoration:line-through}
+.fk-off{font-size:11px;color:#388e3c;font-weight:800}
+.fk-vat{font-size:9px;color:#878787}
+.fk-nearby{display:inline-block;font-size:9px;color:#0a8f5c;font-weight:700;margin-top:2px}
+.fk-add{margin-top:8px;border:none;border-radius:5px;padding:9px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--fn);width:100%;display:flex;align-items:center;justify-content:center;gap:5px}
+.fk-add.buy{background:#ff9f00;color:#fff}
+.fk-add.cart{background:#fff;color:#0a66c2;border:1px solid #0a66c2;margin-top:5px}
+.fk-add.oos{background:#f1f3f6;color:#ff6161;border:1px solid #ffd0d0}
+.fk-stores-h{padding:12px 14px 8px;font-size:15px;font-weight:800;color:#212121;background:#fff;margin-bottom:1px}
+.fk-store-rail{display:flex;gap:10px;overflow-x:auto;padding:0 14px 14px;background:#fff;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:10px}
+.fk-store-rail::-webkit-scrollbar{display:none}
+.fk-store{flex:0 0 116px;text-align:center;cursor:pointer}
+.fk-store-av{width:80px;height:80px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0a66c2,#0a8f5c);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.fk-store b{font-size:11px;color:#212121;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fk-store small{font-size:9px;color:#878787}
+
 
 .vsh-btn{flex:1;padding:13px;border:none;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--fn)}
 
@@ -643,7 +708,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v115</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v116</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5235,7 +5300,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v115 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v116 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -7194,57 +7259,97 @@ function open3DView(prodId){
 }
 
 /* ===== Main Reedbi Ecommerce store (mall homepage: all approved sellers + products) ===== */
+function fkRating(p){
+  if(!p.reviews||!p.reviews.length)return '';
+  var avg=p.reviews.reduce(function(s,r){return s+r.stars;},0)/p.reviews.length;
+  return '<div class="fk-rate"><span class="pill">'+ (Math.round(avg*10)/10) +' <i class="ti ti-star-filled" style="font-size:8px"></i></span><span class="cnt">('+p.reviews.length+')</span></div>';
+}
+function fkTile(p){
+  var pid="'"+p.id+"'";
+  var avail=productAvailable(p);
+  var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0;
+  var of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;
+  var d=(of&&pr&&of<pr)?Math.round((pr-of)/pr*100):0;
+  var myW=(CU&&CU.location?CU.location:'').toLowerCase().split(/[\s,]+/).filter(function(w){return w.length>2;});
+  var near=myW.length&&myW.some(function(w){return (p.location||'').toLowerCase().indexOf(w)>=0;});
+  return '<div class="fk-tile">'
+    +'<div class="imgwrap">'
+    +'<button class="fk-wish" onclick="event.stopPropagation();expressInterest('+pid+')" title="Save"><i class="ti ti-heart"></i></button>'
+    +'<img src="'+esc(p.photos&&p.photos[0]||'')+'" loading="lazy" decoding="async" onclick="open3DView('+pid+')">'
+    +'<span class="fk-3d" onclick="event.stopPropagation();open3DView('+pid+')"><i class="ti ti-3d-cube-sphere"></i> 3D</span>'
+    +'</div>'
+    +(p.brand?'<div class="fk-brand">'+esc(p.brand)+'</div>':'')
+    +'<div class="fk-ttl">'+esc(p.title)+'</div>'
+    +fkRating(p)
+    +(pageLicenseValid(p.pageName)?'<div class="fk-assured"><i class="ti ti-discount-check-filled"></i> Reedbi Assured</div>':'')
+    +'<div class="fk-price"><span class="fk-now">'+esc(p.currency||'')+' '+esc(p.offer||p.price)+'</span>'
+    +(d?'<span class="fk-mrp">'+esc(p.currency||'')+' '+esc(p.price)+'</span><span class="fk-off">'+d+'% off</span>':'')
+    +'</div>'
+    +(p.vatPct?'<div class="fk-vat">+VAT '+p.vatPct+'%</div>':'')
+    +(p.sizes&&p.sizes.length?'<div class="fk-vat">Sizes: '+esc(p.sizes.join(', '))+'</div>':'')
+    +(near?'<span class="fk-nearby">📍 Nearby seller · fast delivery</span>':'')
+    +(avail
+      ? '<button class="fk-add buy" onclick="closeOvl(\'prodsearch-ovl\');buyProduct('+pid+')"><i class="ti ti-bolt"></i> Buy Now</button>'
+        +'<button class="fk-add cart" onclick="event.stopPropagation();addToCart('+pid+')"><i class="ti ti-shopping-cart"></i> Add to Cart</button>'
+      : '<button class="fk-add oos" onclick="expressInterest('+pid+')"><i class="ti ti-bell"></i> Notify me</button>')
+    +'</div>';
+}
 function openMainStore(cat){
   openProductSearch();
   var box=document.getElementById('ps-results');var qi=document.getElementById('ps-q');if(qi)qi.value='';
   var pages=getPages().filter(function(pg){return pageLicenseValid(pg.name);});
-  var prods=getProducts().filter(function(p){return productInMarketplace(p)&&!p.withdrawn;});
-  // nearby products first
+  var allProds=getProducts().filter(function(p){return productInMarketplace(p)&&!p.withdrawn;});
   var myW=(CU&&CU.location?CU.location:'').toLowerCase().split(/[\s,]+/).filter(function(w){return w.length>2;});
   function near(p){var pl=(p.location||'').toLowerCase();return myW.some(function(w){return pl.indexOf(w)>=0;})?0:1;}
-  if(myW.length)prods=prods.slice().sort(function(a,b){return near(a)-near(b);});
-  var hero='<div class="sf-hero" style="background:linear-gradient(135deg,#0a66c2,#7c3aed)">'
-    +'<div class="sf-av">⬡</div>'
-    +'<div style="font-size:19px;font-weight:800">Reedbi Ecommerce</div>'
-    +'<div style="font-size:11px;opacity:.85;margin-top:2px">Shop from approved sellers — nearby first, worldwide always</div>'
-    +'<div class="sf-stats"><div><b>'+pages.length+'</b>Stores</div><div><b>'+prods.length+'</b>Products</div></div></div>';
-  var search='<div class="sw" style="margin-bottom:10px"><i class="ti ti-search"></i><input type="text" placeholder="Search all products &amp; brands…" onkeydown="if(event.key===\'Enter\'){document.getElementById(\'ps-q\').value=this.value;runProductSearch(this.value);}"></div>';
-  search+='<button class="btn" style="width:100%;margin-bottom:10px;border:1px solid #0a66c2;background:linear-gradient(135deg,rgba(10,102,194,.12),rgba(124,58,237,.12));color:#0a66c2;border-radius:11px;font-weight:700" onclick="openVisionShop()"><i class="ti ti-eye"></i> Vision Shop — tap-to-collect &amp; buy</button>';
-  search+='<button class="btn" style="width:100%;margin-bottom:10px;border:none;background:linear-gradient(135deg,#0a8f5c,#0a66c2,#7c3aed);color:#fff;border-radius:11px;font-weight:800;padding:12px;box-shadow:0 4px 14px rgba(10,102,194,.3)" onclick="openTouchCollect()"><i class="ti ti-hand-finger"></i> Touch &amp; Collect — pick up products in 3D</button>';
-  var allCats={};prods.forEach(function(p){allCats[p.category||'Other']=(allCats[p.category||'Other']||0)+1;});
-  var catChips='<div class="sf-cats"><span class="sf-cat'+(!cat?' on':'')+'" onclick="openMainStore()">All</span>'
-    +Object.keys(allCats).sort().map(function(k){var kk="'"+k.replace(/'/g,"\\'")+"'";return '<span class="sf-cat'+(cat===k?' on':'')+'" onclick="openMainStore('+kk+')">'+esc(k)+' ('+allCats[k]+')</span>';}).join('')+'</div>';
-  if(cat)prods=prods.filter(function(p){return (p.category||'Other')===cat;});
-  var stores='<div style="font-size:12px;font-weight:800;margin:4px 0 8px"><i class="ti ti-building-store"></i> Approved stores</div>'
-    +(pages.length?'<div class="sf-grid" style="margin-bottom:14px">'+pages.map(function(pg){
-      var pn="'"+pg.name.replace(/'/g,"\\'")+"'";
-      var cnt=getProducts().filter(function(p){return p.pageName===pg.name&&productInMarketplace(p);}).length;
-      return '<div class="sf-card" style="cursor:pointer" onclick="viewSellerStore('+pn+')">'
-        +'<div style="height:64px;background:linear-gradient(135deg,#0a66c2,#0a8f5c);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff">'+esc((pg.name[0]||'S').toUpperCase())+'</div>'
-        +'<div class="sf-bd"><div class="sf-ttl">'+esc(pg.name)+' <span class="pay-badge pay-online-b" style="font-size:8px">✓</span></div>'
-        +'<div style="font-size:10px;color:var(--mt2)">'+cnt+' products · '+(1+((pg.members||[]).length))+' members'+(pg.ownerName?' · '+esc(pg.ownerName):'')+'</div>'
-        +'<button class="sf-buy" style="margin-top:6px">Visit store</button></div></div>';
-    }).join('')+'</div>':'<p style="font-size:11px;color:var(--mt2);margin-bottom:12px">No approved stores yet.</p>');
-  var grid='<div style="font-size:12px;font-weight:800;margin:4px 0 8px"><i class="ti ti-sparkles"></i> All products'+(myW.length?' — nearby first':'')+'</div>'
-    +'<div class="sf-grid">'+prods.slice(0,40).map(function(p){
-      var pid="'"+p.id+"'";var avail=productAvailable(p);
-      return '<div class="sf-card"><div style="position:relative"><img class="sf-img" loading="lazy" decoding="async" src="'+esc(p.photos&&p.photos[0]||'')+'" style="cursor:pointer" onclick="open3DView('+pid+')"><span style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:2px 7px"><i class="ti ti-3d-cube-sphere"></i> 3D</span></div>'
-        +'<div class="sf-bd">'+(p.brand?'<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;font-weight:700">'+esc(p.brand)+'</div>':'')
-        +'<div class="sf-ttl">'+esc(p.title)+'</div>'+(p.sizes&&p.sizes.length?'<div style="font-size:9px;color:var(--mt2)">Sizes: '+esc(p.sizes.join(', '))+'</div>':'')
-        +'<div style="font-size:9px;color:var(--mt2)">'+esc(p.sellerName||'')+(near(p)===0?' · 📍nearby':'')+'</div>'+intlTag(p)
-        +(function(){var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0,of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;
-          var d=(of&&pr&&of<pr)?Math.round((pr-of)/pr*100):0;
-          return '<div class="sf-pr">'+esc(p.currency||'')+' '+esc(p.offer||p.price)
-            +(d?' <span class="sf-mrp">'+esc(p.price)+'</span> <span class="sf-off">'+d+'% off</span>':'')
-            +(p.vatPct?' <small style="font-weight:400;color:var(--mt2)">+VAT '+p.vatPct+'%</small>':'')+'</div>';})()
-        +((typeof reviewSummary==='function')?'<div style="font-size:10px">'+reviewSummary(p)+'</div>':'')
-        +(avail?'<button class="sf-buy" onclick="closeOvl(\'prodsearch-ovl\');buyProduct('+pid+')"><i class="ti ti-shopping-cart"></i> Buy Now</button>'
-               :'<button class="sf-buy" style="background:var(--card2);color:var(--gold)" onclick="expressInterest('+pid+')">Notify me</button>')
-        +'</div></div>';
-    }).join('')+'</div>';
-  box.innerHTML=hero+search+catChips+stores+grid;
-}
+  if(myW.length)allProds=allProds.slice().sort(function(a,b){return near(a)-near(b);});
+  var allCats={};allProds.forEach(function(p){allCats[p.category||'Other']=(allCats[p.category||'Other']||0)+1;});
+  var catKeys=Object.keys(allCats).sort();
+  var prods=cat?allProds.filter(function(p){return (p.category||'Other')===cat;}):allProds;
 
+  // top bar + search
+  var bar='<div class="fk-bar"><div class="brand">⬡ Reedbi <small>Explore Plus</small></div>'
+    +'<div class="fk-search"><i class="ti ti-search"></i><input placeholder="Search for products, brands &amp; more" '
+    +'onkeydown="if(event.key===\'Enter\'){document.getElementById(\'ps-q\').value=this.value;runProductSearch(this.value);}"></div></div>';
+
+  // category circles
+  var cats='<div class="fk-cats"><div class="fk-cat'+(!cat?' on':'')+'" onclick="openMainStore()"><div class="fk-cat-ic">🛍️</div><span>All</span></div>'
+    +catKeys.map(function(k){var kk="'"+k.replace(/'/g,"\\'")+"'";
+      return '<div class="fk-cat'+(cat===k?' on':'')+'" onclick="openMainStore('+kk+')"><div class="fk-cat-ic">'+catEmoji(k)+'</div><span>'+esc(k)+'</span></div>';}).join('')+'</div>';
+
+  // hero deal banner — biggest discount drives it
+  var best=null,bestD=0;
+  allProds.forEach(function(p){var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0,of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;var dd=(of&&pr&&of<pr)?Math.round((pr-of)/pr*100):0;if(dd>bestD){bestD=dd;best=p;}});
+  var banner='<div class="fk-banner"><div class="lbl">Reedbi Ecommerce</div><h2>'+(bestD?('Up to '+bestD+'% OFF'):'Shop nearby & worldwide')+'</h2>'
+    +'<p>'+pages.length+' approved stores · '+allProds.length+' products · nearby sellers first</p>'
+    +'<span class="cta" onclick="document.getElementById(\'ps-results\').scrollTo({top:9999,behavior:\'smooth\'})">Shop deals <i class="ti ti-arrow-right"></i></span></div>';
+
+  // immersive shopping shortcuts
+  var feat='<div class="fk-feat">'
+    +'<button class="fT" onclick="openTouchCollect()"><i class="ti ti-hand-finger"></i> Touch &amp; Collect</button>'
+    +'<button class="fV" onclick="openVisionShop()"><i class="ti ti-eye"></i> Vision Shop</button></div>';
+
+  // stores rail
+  var storesRail=pages.length?('<div class="fk-stores-h">Stores you can trust</div><div class="fk-store-rail">'+pages.map(function(pg){
+    var pn="'"+pg.name.replace(/'/g,"\\'")+"'";
+    var cnt=getProducts().filter(function(p){return p.pageName===pg.name&&productInMarketplace(p);}).length;
+    return '<div class="fk-store" onclick="viewSellerStore('+pn+')"><div class="fk-store-av">'+esc((pg.name[0]||'S').toUpperCase())+'</div><b>'+esc(pg.name)+'</b><small>'+cnt+' products</small></div>';
+  }).join('')+'</div>'):'';
+
+  // deals of the day rail (top discounted)
+  var deals=allProds.filter(function(p){var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0,of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;return of&&pr&&of<pr;})
+    .sort(function(a,b){function dd(p){var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0,of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;return (of&&pr)?(pr-of)/pr:0;}return dd(b)-dd(a);}).slice(0,10);
+  var dealRail=deals.length?('<div class="fk-sec"><div class="fk-sec-h"><b>Deals of the Day</b><span class="deal">LIMITED</span></div><div class="fk-rail">'+deals.map(fkTile).join('')+'</div></div>'):'';
+
+  // main grid
+  var gridTitle=cat?(catEmoji(cat)+' '+esc(cat)):(myW.length?'Recommended — nearby first':'All products');
+  var grid='<div class="fk-sec"><div class="fk-sec-h"><b>'+gridTitle+'</b><span style="font-size:11px;color:#878787">'+prods.length+' items</span></div>'
+    +'<div class="fk-grid">'+(prods.length?prods.slice(0,60).map(fkTile).join(''):'<div style="grid-column:1/-1;padding:30px;text-align:center;color:#878787;font-size:13px">No products'+(cat?' in '+esc(cat):'')+' yet.</div>')+'</div></div>';
+
+  // category view = focused page (no global banner/deals/stores rails); All view = full homepage
+  var homeBlocks=cat?'':(banner+feat+storesRail+dealRail);
+  box.innerHTML='<div class="fk-wrap">'+bar+cats+homeBlocks+grid+'<div style="height:20px"></div></div>';
+  box.scrollTop=0;
+}
 function compressImg(dataUri,maxW,q){
   return new Promise(function(res){
     try{
