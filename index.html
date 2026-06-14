@@ -407,7 +407,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .bub-media{width:100%;max-width:240px;max-height:240px;object-fit:cover;border-radius:10px;display:block}
 .user-ad{position:relative;background:linear-gradient(135deg,rgba(10,102,194,.06),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:10px;padding:10px 11px;margin:8px 10px 0;font-size:12px}
 .ad-tag{position:absolute;top:7px;right:9px;font-size:8px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.5px}\n.bub{box-shadow:0 1px 3px rgba(0,0,0,.06)}\n.abtn{border-radius:10px;font-weight:600}\n.ps-card{box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:12px}\n.appl-card{box-shadow:0 1px 3px rgba(0,0,0,.05)}
-#prodsearch-ovl .modal{max-width:1100px;width:96vw;height:92vh;max-height:92vh;display:flex;flex-direction:column}
+#prodsearch-ovl .modal{max-width:1320px;width:97vw;height:96vh;max-height:96vh;display:flex;flex-direction:column}
 #prodsearch-ovl .modal>div:last-child,#ps-results{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 @media(max-width:700px){#prodsearch-ovl .modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}}
 @media(min-width:701px){.sf-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}.sf-img{height:150px;object-fit:contain;background:#fff;padding:6px}.sf-hero{padding:26px 24px}.sf-hero .sf-av{width:68px;height:68px;font-size:30px}.sf-ttl{font-size:13px}}
@@ -545,6 +545,34 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .fk-store-av{width:80px;height:80px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0a66c2,#0a8f5c);box-shadow:0 4px 12px rgba(0,0,0,.15)}
 .fk-store b{font-size:11px;color:#212121;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fk-store small{font-size:9px;color:#878787}
+/* ===== Category landing page (v117) ===== */
+.fk-crumb{display:flex;align-items:center;gap:6px;background:#fff;padding:9px 14px;font-size:11px;color:#878787;border-bottom:1px solid #eef1f5}
+.fk-crumb a{color:#0a66c2;cursor:pointer;font-weight:600}
+.fk-crumb i{font-size:11px}
+.fk-cathero{margin:10px;border-radius:12px;overflow:hidden;color:#fff;padding:22px 20px;position:relative;box-shadow:0 8px 22px rgba(0,0,0,.18)}
+.fk-cathero .em{font-size:40px;line-height:1}
+.fk-cathero h1{font-size:24px;font-weight:800;margin:6px 0 2px}
+.fk-cathero p{font-size:12px;opacity:.92}
+.fk-cathero .chips{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;position:relative;z-index:1}
+.fk-cathero .chips span{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:5px 12px;font-size:11px;font-weight:600}
+.fk-sub{background:#fff;padding:12px 0;margin-bottom:10px}
+.fk-sub-h{font-size:14px;font-weight:800;color:#212121;padding:0 14px 10px}
+.fk-sub-rail{display:flex;gap:12px;overflow-x:auto;padding:0 14px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.fk-sub-rail::-webkit-scrollbar{display:none}
+.fk-sub-item{flex:0 0 84px;text-align:center;cursor:pointer}
+.fk-sub-thumb{width:78px;height:78px;border-radius:12px;overflow:hidden;background:#f1f3f6;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:5px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.fk-sub-thumb img{width:100%;height:100%;object-fit:cover}
+.fk-sub-item b{font-size:10px;color:#212121;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fk-sub-item small{font-size:9px;color:#878787}
+.fk-sortbar{display:flex;gap:0;background:#fff;border-top:1px solid #eef1f5;border-bottom:1px solid #eef1f5;position:sticky;top:54px;z-index:6;overflow-x:auto;scrollbar-width:none}
+.fk-sortbar::-webkit-scrollbar{display:none}
+.fk-sortbar button{flex:1;min-width:84px;border:none;background:transparent;padding:11px 8px;font-size:12px;font-weight:600;color:#212121;cursor:pointer;font-family:var(--fn);white-space:nowrap;border-bottom:2px solid transparent}
+.fk-sortbar button.on{color:#0a66c2;border-bottom-color:#0a66c2;font-weight:800}
+.fk-brandrow{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;background:#fff;margin-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.fk-brandrow::-webkit-scrollbar{display:none}
+.fk-brandchip{flex-shrink:0;border:1px solid #dfe3e8;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:#212121;cursor:pointer;background:#fff}
+.fk-brandchip.on{background:#0a66c2;color:#fff;border-color:#0a66c2}
+
 
 
 .vsh-btn{flex:1;padding:13px;border:none;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--fn)}
@@ -708,7 +736,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v116</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v117</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5300,7 +5328,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v116 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v117 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -7314,7 +7342,7 @@ function openMainStore(cat){
   // category circles
   var cats='<div class="fk-cats"><div class="fk-cat'+(!cat?' on':'')+'" onclick="openMainStore()"><div class="fk-cat-ic">🛍️</div><span>All</span></div>'
     +catKeys.map(function(k){var kk="'"+k.replace(/'/g,"\\'")+"'";
-      return '<div class="fk-cat'+(cat===k?' on':'')+'" onclick="openMainStore('+kk+')"><div class="fk-cat-ic">'+catEmoji(k)+'</div><span>'+esc(k)+'</span></div>';}).join('')+'</div>';
+      return '<div class="fk-cat'+(cat===k?' on':'')+'" onclick="openCategoryPage('+kk+')"><div class="fk-cat-ic">'+catEmoji(k)+'</div><span>'+esc(k)+'</span></div>';}).join('')+'</div>';
 
   // hero deal banner — biggest discount drives it
   var best=null,bestD=0;
@@ -8657,5 +8685,106 @@ function tcCheckout(){
   if(!getCart().length){toast('Pick up some products first','info');return;}
   closeTouchCollect();
   if(typeof showCart==='function')showCart();
+}
+
+/* ===== Category landing page (v117) — a dedicated page per category =====
+   Tapping a category circle opens its own full page: hero, sub-categories
+   (by brand within the category), brand filter, sort bar, top-deals rail,
+   and the full product grid. Inspired by category store pages; uses only
+   Reedbi's own data and branding. */
+var __catSort='pop', __catBrand='';
+function catHeroGradient(c){
+  var k=(c||'').toLowerCase();
+  if(/fruit|veg|grocery|dairy|meat|egg/.test(k))return 'linear-gradient(120deg,#0a8f5c,#0a66c2)';
+  if(/cloth|dress|fashion|shoe|beauty/.test(k))return 'linear-gradient(120deg,#c8438f,#7c3aed)';
+  if(/electro|phone|gadget/.test(k))return 'linear-gradient(120deg,#0a66c2,#00111f)';
+  if(/home|kitchen|house|furniture/.test(k))return 'linear-gradient(120deg,#c37d16,#7c3aed)';
+  return 'linear-gradient(120deg,#0a66c2,#7c3aed)';
+}
+function openCategoryPage(cat,opts){
+  opts=opts||{};
+  if(opts.reset!==false){__catSort='pop';__catBrand='';}
+  openProductSearch();
+  var box=document.getElementById('ps-results');var qi=document.getElementById('ps-q');if(qi)qi.value='';
+  var all=getProducts().filter(function(p){return productInMarketplace(p)&&!p.withdrawn&&(p.category||'Other')===cat;});
+  var myW=(CU&&CU.location?CU.location:'').toLowerCase().split(/[\s,]+/).filter(function(w){return w.length>2;});
+  function near(p){var pl=(p.location||'').toLowerCase();return myW.some(function(w){return pl.indexOf(w)>=0;})?0:1;}
+
+  // brands within this category (act as sub-categories)
+  var brandCount={};all.forEach(function(p){var b=(p.brand||'').trim();if(b)brandCount[b]=(brandCount[b]||0)+1;});
+  var brands=Object.keys(brandCount).sort(function(a,b){return brandCount[b]-brandCount[a];});
+
+  var cE=catEmoji(cat);
+  var ce="'"+cat.replace(/'/g,"\\'")+"'";
+
+  // breadcrumb
+  var crumb='<div class="fk-crumb"><a onclick="openMainStore()">Reedbi</a><i class="ti ti-chevron-right"></i><a onclick="openMainStore()">Store</a><i class="ti ti-chevron-right"></i><span style="color:#212121;font-weight:700">'+esc(cat)+'</span></div>';
+
+  // top bar (reuse store bar feel)
+  var bar='<div class="fk-bar"><button class="brand" style="background:none;border:none;cursor:pointer" onclick="openMainStore()"><i class="ti ti-arrow-left"></i> Reedbi</button>'
+    +'<div class="fk-search"><i class="ti ti-search"></i><input placeholder="Search in '+esc(cat)+'…" onkeydown="if(event.key===\'Enter\'){catSearchIn('+ce+',this.value);}"></div></div>';
+
+  // hero
+  var maxD=0;all.forEach(function(p){var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0,of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;var dd=(of&&pr&&of<pr)?Math.round((pr-of)/pr*100):0;if(dd>maxD)maxD=dd;});
+  var hero='<div class="fk-cathero" style="background:'+catHeroGradient(cat)+'"><div class="em">'+cE+'</div>'
+    +'<h1>'+esc(cat)+'</h1><p>'+all.length+' products'+(maxD?' · up to '+maxD+'% off':'')+(brands.length?' · '+brands.length+' brands':'')+'</p>'
+    +'<div class="chips">'+(myW.length?'<span>📍 Nearby first</span>':'')+(maxD?'<span>🔥 Big savings</span>':'')+'<span>🛡 Reedbi Assured</span></div></div>';
+
+  // sub-category rail (by brand, using a sample product photo as the thumb)
+  var subRail='';
+  if(brands.length){
+    subRail='<div class="fk-sub"><div class="fk-sub-h">Shop by brand in '+esc(cat)+'</div><div class="fk-sub-rail">'
+      +brands.slice(0,14).map(function(b){
+        var sample=all.find(function(p){return (p.brand||'')===b&&p.photos&&p.photos[0];});
+        var bj="'"+b.replace(/'/g,"\\'")+"'";
+        var thumb=sample?'<img src="'+esc(sample.photos[0])+'">':cE;
+        return '<div class="fk-sub-item" onclick="catSetBrand('+ce+','+bj+')"><div class="fk-sub-thumb">'+thumb+'</div><b>'+esc(b)+'</b><small>'+brandCount[b]+' items</small></div>';
+      }).join('')+'</div></div>';
+  }
+
+  // brand filter chips
+  var brandRow=brands.length?('<div class="fk-brandrow"><span class="fk-brandchip'+(!__catBrand?' on':'')+'" onclick="catSetBrand('+ce+',\'\')">All brands</span>'
+    +brands.map(function(b){var bj="'"+b.replace(/'/g,"\\'")+"'";return '<span class="fk-brandchip'+(__catBrand===b?' on':'')+'" onclick="catSetBrand('+ce+','+bj+')">'+esc(b)+'</span>';}).join('')+'</div>'):'';
+
+  // sort bar
+  function sbtn(id,label){return '<button class="'+(__catSort===id?'on':'')+'" onclick="catSetSort('+ce+',\''+id+'\')">'+label+'</button>';}
+  var sortBar='<div class="fk-sortbar">'+sbtn('pop','Popularity')+sbtn('plow','Price ↑')+sbtn('phigh','Price ↓')+sbtn('disc','Discount')+sbtn('new','Newest')+'</div>';
+
+  // apply brand filter + sort
+  var list=all.slice();
+  if(__catBrand)list=list.filter(function(p){return (p.brand||'')===__catBrand;});
+  function priceOf(p){return parseFloat(String(p.offer||p.price).replace(/[^0-9.]/g,''))||0;}
+  function discOf(p){var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0,of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;return (of&&pr&&of<pr)?(pr-of)/pr:0;}
+  function rateOf(p){return (p.reviews&&p.reviews.length)?p.reviews.reduce(function(s,r){return s+r.stars;},0)/p.reviews.length:0;}
+  if(__catSort==='plow')list.sort(function(a,b){return priceOf(a)-priceOf(b);});
+  else if(__catSort==='phigh')list.sort(function(a,b){return priceOf(b)-priceOf(a);});
+  else if(__catSort==='disc')list.sort(function(a,b){return discOf(b)-discOf(a);});
+  else if(__catSort==='new')list.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  else { if(myW.length)list.sort(function(a,b){var n=near(a)-near(b);return n||(rateOf(b)-rateOf(a));}); else list.sort(function(a,b){return rateOf(b)-rateOf(a);}); }
+
+  // top deals rail in this category
+  var deals=all.filter(function(p){return discOf(p)>0;}).sort(function(a,b){return discOf(b)-discOf(a);}).slice(0,10);
+  var dealRail=deals.length?('<div class="fk-sec"><div class="fk-sec-h"><b>Top deals in '+esc(cat)+'</b><span class="deal">SAVE BIG</span></div><div class="fk-rail">'+deals.map(fkTile).join('')+'</div></div>'):'';
+
+  var gridTitle=(__catBrand?esc(__catBrand)+' · ':'')+esc(cat);
+  var grid='<div class="fk-sec"><div class="fk-sec-h"><b>'+gridTitle+'</b><span style="font-size:11px;color:#878787">'+list.length+' items</span></div>'
+    +'<div class="fk-grid">'+(list.length?list.slice(0,80).map(fkTile).join(''):'<div style="grid-column:1/-1;padding:30px;text-align:center;color:#878787">No products'+(__catBrand?' for '+esc(__catBrand):'')+'.</div>')+'</div></div>';
+
+  box.innerHTML='<div class="fk-wrap">'+bar+crumb+hero+subRail+brandRow+sortBar+dealRail+grid+'<div style="height:20px"></div></div>';
+  box.scrollTop=0;
+}
+function catSetSort(cat,s){__catSort=s;openCategoryPage(cat,{reset:false});}
+function catSetBrand(cat,b){__catBrand=b;openCategoryPage(cat,{reset:false});}
+function catSearchIn(cat,q){
+  q=(q||'').trim().toLowerCase();
+  if(!q){openCategoryPage(cat);return;}
+  openProductSearch();
+  var box=document.getElementById('ps-results');
+  var list=getProducts().filter(function(p){return productInMarketplace(p)&&!p.withdrawn&&(p.category||'Other')===cat&&((p.title||'')+' '+(p.desc||'')+' '+(p.brand||'')).toLowerCase().indexOf(q)>=0;});
+  var ce="'"+cat.replace(/'/g,"\\'")+"'";
+  box.innerHTML='<div class="fk-wrap"><div class="fk-bar"><button class="brand" style="background:none;border:none;cursor:pointer" onclick="openCategoryPage('+ce+')"><i class="ti ti-arrow-left"></i> '+esc(cat)+'</button></div>'
+    +'<div class="fk-sec"><div class="fk-sec-h"><b>Results for "'+esc(q)+'" in '+esc(cat)+'</b><span style="font-size:11px;color:#878787">'+list.length+' items</span></div>'
+    +'<div class="fk-grid">'+(list.length?list.map(fkTile).join(''):'<div style="grid-column:1/-1;padding:30px;text-align:center;color:#878787">No matches.</div>')+'</div></div></div>';
+  box.scrollTop=0;
 }
 </script></body></html>
