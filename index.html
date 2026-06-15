@@ -6,7 +6,25 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Reedbi — Global Tag Talk</title>
+<title>Reedbi — Online Shopping: Mobiles, Electronics, Fashion, Grocery, Home &amp; Kitchen | Best Offers &amp; Real-time 3D</title>
+<meta name="description" content="Reedbi is a global marketplace for mobiles, electronics, fashion, grocery, home &amp; kitchen and more — from approved local and worldwide sellers. Shop in real-time 3D, Touch &amp; Collect, nearby-first delivery and the best offers.">
+<meta name="keywords" content="online shopping, ecommerce, marketplace, 3D shopping, touch and collect, grocery, fashion, electronics, home and kitchen, Reedbi, best offers, nearby sellers">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#0a66c2">
+<link rel="canonical" href="https://reedbi.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Reedbi">
+<meta property="og:title" content="Reedbi — Online Shopping with Real-time 3D &amp; Best Offers">
+<meta property="og:description" content="Shop mobiles, electronics, fashion, grocery, home &amp; kitchen and more from approved sellers. Real-time 3D product views, Touch &amp; Collect, nearby-first delivery.">
+<meta property="og:url" content="https://reedbi.com/">
+<meta property="og:image" content="https://reedbi.com/og-cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reedbi — Online Shopping with Real-time 3D">
+<meta name="twitter:description" content="Mobiles, electronics, fashion, grocery &amp; more. Real-time 3D, Touch &amp; Collect, best offers.">
+<meta name="twitter:image" content="https://reedbi.com/og-cover.jpg">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"OnlineStore","name":"Reedbi","url":"https://reedbi.com/","description":"Global marketplace for mobiles, electronics, fashion, grocery, home & kitchen and more, with real-time 3D shopping and nearby-first delivery.","potentialAction":{"@type":"SearchAction","target":"https://reedbi.com/?product={search_term_string}","query-input":"required name=search_term_string"}}
+</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9645;</text></svg>">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
@@ -572,6 +590,205 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .fk-brandrow::-webkit-scrollbar{display:none}
 .fk-brandchip{flex-shrink:0;border:1px solid #dfe3e8;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:#212121;cursor:pointer;background:#fff}
 .fk-brandchip.on{background:#0a66c2;color:#fff;border-color:#0a66c2}
+/* ===== v118: storytelling + motion (AOS-like) + real-time 3D ===== */
+/* scroll-reveal motion — pure ES6 IntersectionObserver, no external lib */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);will-change:opacity,transform}
+.reveal.in{opacity:1;transform:none}
+.reveal.r-left{transform:translateX(-30px)}
+.reveal.r-right{transform:translateX(30px)}
+.reveal.r-zoom{transform:scale(.92)}
+.reveal.in.r-left,.reveal.in.r-right,.reveal.in.r-zoom{transform:none}
+.reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}.reveal.d4{transition-delay:.32s}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1!important;transform:none!important;transition:none!important}}
+/* storytelling hero */
+.fk-story{position:relative;margin:10px;border-radius:16px;overflow:hidden;color:#fff;min-height:230px;display:flex;flex-direction:column;justify-content:center;padding:26px 22px;background:linear-gradient(120deg,#06101f,#0a2a52 55%,#3a1d6e);box-shadow:0 12px 30px rgba(8,20,40,.35)}
+.fk-story::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(124,58,237,.45),transparent 55%),radial-gradient(circle at 10% 90%,rgba(10,143,92,.4),transparent 50%);pointer-events:none}
+.fk-story .eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.85;font-weight:700;position:relative}
+.fk-story h1{font-size:27px;line-height:1.12;font-weight:800;margin:7px 0 8px;position:relative;max-width:15ch}
+.fk-story h1 .hl{background:linear-gradient(90deg,#ffd166,#06d6a0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.fk-story p{font-size:13px;opacity:.92;position:relative;max-width:42ch}
+.fk-story .acts{display:flex;gap:9px;margin-top:15px;position:relative;flex-wrap:wrap}
+.fk-story .acts button{border:none;border-radius:24px;padding:11px 18px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--fn);display:inline-flex;align-items:center;gap:6px}
+.fk-story .acts .p1{background:#fff;color:#0a2a52}
+.fk-story .acts .p2{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3)}
+/* real-time 3D stage */
+.fk-3dstage{position:relative;height:188px;margin:10px;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 35%,#14233d,#070d16 72%);box-shadow:0 10px 28px rgba(0,0,0,.3)}
+.fk-3dstage canvas{display:block;width:100%;height:100%}
+.fk-3dstage .lbl{position:absolute;top:10px;left:12px;z-index:2;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);color:#cfe0f2;font-size:10px;font-weight:700;border-radius:14px;padding:5px 11px;letter-spacing:.4px}
+.fk-3dstage .live{width:7px;height:7px;border-radius:50%;background:#06d6a0;box-shadow:0 0 0 0 rgba(6,214,160,.6);animation:fklive 1.6s infinite}
+@keyframes fklive{0%{box-shadow:0 0 0 0 rgba(6,214,160,.6)}70%{box-shadow:0 0 0 8px rgba(6,214,160,0)}100%{box-shadow:0 0 0 0 rgba(6,214,160,0)}}
+.fk-3dstage .meta{position:absolute;left:12px;bottom:12px;z-index:2;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.fk-3dstage .meta .t{font-size:14px;font-weight:800}
+.fk-3dstage .meta .pr{font-size:12px;color:#ffd166;font-weight:800}
+.fk-3dstage .cta{position:absolute;right:12px;bottom:12px;z-index:2;background:#ff9f00;color:#fff;border:none;border-radius:22px;padding:9px 16px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--fn)}
+/* CSS-3D fallback spinner */
+.fk-3dfall{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;perspective:800px}
+.fk-3dfall img{max-width:60%;max-height:74%;object-fit:contain;animation:fkspin 7s linear infinite;transform-style:preserve-3d;filter:drop-shadow(0 14px 24px rgba(0,0,0,.5))}
+@keyframes fkspin{0%{transform:rotateY(0)}100%{transform:rotateY(360deg)}}
+/* story strip (value props) */
+.fk-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0 10px 12px}
+@media(min-width:560px){.fk-strip{grid-template-columns:repeat(4,1fr)}}
+.fk-strip .card{background:#fff;border-radius:12px;padding:14px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.fk-strip .ic{font-size:22px}
+.fk-strip b{display:block;font-size:13px;color:#212121;margin:6px 0 2px}
+.fk-strip small{font-size:11px;color:#878787;line-height:1.3;display:block}
+/* ===== v119: nav back bar, product detail, wishlist, likes, VAT ===== */
+.rb-navbar{position:sticky;top:0;z-index:9;display:flex;align-items:center;gap:8px;background:#0a66c2;color:#fff;padding:10px 12px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.rb-navbar button{background:rgba(255,255,255,.0);border:none;color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%}
+.rb-navbar button:active{background:rgba(255,255,255,.18)}
+.rb-navbar .ttl{flex:1;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rb-navbar .sp{width:1px;height:22px;background:rgba(255,255,255,.25)}
+.rb-refreshing{animation:rbspin .7s linear infinite}
+@keyframes rbspin{to{transform:rotate(360deg)}}
+.rb-ptr{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;justify-content:center;color:#0a66c2;font-size:12px;height:0;overflow:hidden;transition:height .15s;z-index:20;background:#eaf2fb}
+/* product detail page */
+.pd{background:#fff}
+.pd-gal{position:relative;background:#fff;padding:14px;text-align:center;border-bottom:1px solid #eef1f5}
+.pd-main{height:300px;display:flex;align-items:center;justify-content:center}
+.pd-main img{max-width:100%;max-height:300px;object-fit:contain;mix-blend-mode:multiply;cursor:pointer}
+.pd-3d{position:absolute;top:12px;right:12px;background:#0a66c2;color:#fff;font-size:10px;font-weight:700;border-radius:14px;padding:6px 11px;border:none;cursor:pointer;display:flex;align-items:center;gap:4px}
+.pd-wish{position:absolute;top:12px;left:12px;width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18);border:none;cursor:pointer;font-size:18px;color:#878787}
+.pd-wish.on{color:#ff4d67}
+.pd-thumbs{display:flex;gap:7px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.pd-thumbs img{width:46px;height:46px;object-fit:cover;border-radius:7px;border:2px solid #e6e9ee;cursor:pointer}
+.pd-thumbs img.on{border-color:#0a66c2}
+.pd-body{padding:14px 16px 90px}
+.pd-brand{font-size:12px;color:#878787;font-weight:700;text-transform:uppercase}
+.pd-title{font-size:18px;font-weight:700;color:#212121;line-height:1.3;margin:3px 0 7px}
+.pd-rate{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px}
+.pd-rate .pill{background:#388e3c;color:#fff;font-size:12px;font-weight:700;border-radius:5px;padding:2px 8px}
+.pd-rate .cnt{font-size:12px;color:#878787;font-weight:600}
+.pd-price{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin:6px 0}
+.pd-now{font-size:24px;font-weight:800;color:#212121}
+.pd-mrp{font-size:14px;color:#878787;text-decoration:line-through}
+.pd-off{font-size:14px;color:#388e3c;font-weight:800}
+.pd-sec{border-top:1px solid #eef1f5;padding:13px 0}
+.pd-sec h4{font-size:13px;font-weight:800;color:#212121;margin-bottom:9px}
+.pd-opts{display:flex;gap:9px;flex-wrap:wrap}
+.pd-color{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.pd-sw{width:38px;height:38px;border-radius:50%;border:2px solid #e6e9ee;box-shadow:inset 0 0 0 2px #fff}
+.pd-color.on .pd-sw{border-color:#0a66c2;box-shadow:inset 0 0 0 2px #fff,0 0 0 2px #0a66c2}
+.pd-color small{font-size:10px;color:#555}
+.pd-size{min-width:42px;text-align:center;border:1px solid #cfd6df;border-radius:7px;padding:9px 12px;font-size:13px;font-weight:700;color:#212121;cursor:pointer;background:#fff}
+.pd-size.on{border-color:#0a66c2;color:#0a66c2;background:#eaf2fb}
+.pd-qty{display:inline-flex;align-items:center;border:1px solid #cfd6df;border-radius:8px;overflow:hidden}
+.pd-qty button{width:38px;height:38px;border:none;background:#f4f6f9;font-size:18px;cursor:pointer;color:#212121}
+.pd-qty span{min-width:42px;text-align:center;font-weight:700}
+/* VAT breakdown */
+.pd-vat{background:#f7faff;border:1px solid #dbe7fb;border-radius:10px;padding:11px 13px;margin-top:6px}
+.pd-vat .row{display:flex;justify-content:space-between;font-size:13px;color:#444;padding:3px 0}
+.pd-vat .row.tot{border-top:1px dashed #cdd9ec;margin-top:5px;padding-top:7px;font-weight:800;color:#0a66c2;font-size:15px}
+/* store block + like */
+.pd-store{display:flex;align-items:center;gap:11px;border:1px solid #eef1f5;border-radius:12px;padding:11px;margin-top:6px}
+.pd-store-av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:19px;background:linear-gradient(135deg,#0a66c2,#0a8f5c)}
+.pd-store b{font-size:14px;color:#212121;display:block}
+.pd-store small{font-size:11px;color:#878787}
+.pd-like{border:1px solid #ff4d67;color:#ff4d67;background:#fff;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.pd-like.on{background:#ff4d67;color:#fff}
+/* reviews */
+.pd-rev{border:1px solid #eef1f5;border-radius:10px;padding:11px;margin-bottom:9px}
+.pd-rev .top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.pd-rev .star{background:#388e3c;color:#fff;font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px}
+.pd-rev .nm{font-size:12px;font-weight:700;color:#212121}
+.pd-rev .dt{font-size:10px;color:#aaa;margin-left:auto}
+.pd-rev .tx{font-size:13px;color:#444;line-height:1.4}
+.pd-rev .rimg{width:54px;height:54px;border-radius:8px;object-fit:cover;margin-top:6px}
+.pd-rev .rcol{font-size:10px;color:#878787;font-weight:600;margin-top:3px}
+/* sticky buy bar */
+.pd-buybar{position:sticky;bottom:0;display:flex;gap:0;background:#fff;border-top:1px solid #e6e9ee;box-shadow:0 -2px 10px rgba(0,0,0,.07);z-index:8}
+.pd-buybar button{flex:1;border:none;padding:15px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:6px}
+.pd-buybar .cart{background:#fff;color:#0a66c2}
+.pd-buybar .buy{background:#ff9f00;color:#fff}
+/* ===== v120: AI Job Agent + voice search ===== */
+.ja-hero{background:linear-gradient(135deg,#3a1d6e,#0a2a52);color:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.ja-hero h3{font-size:16px;font-weight:800;display:flex;align-items:center;gap:7px}
+.ja-hero p{font-size:11px;opacity:.9;margin-top:4px;line-height:1.4}
+.ja-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--b)}
+.ja-row b{font-size:13px}.ja-row small{font-size:10px;color:var(--mt2);display:block}
+.ja-switch{position:relative;width:44px;height:24px;border-radius:13px;background:var(--b2);cursor:pointer;flex-shrink:0;transition:background .2s}
+.ja-switch.on{background:#7c3aed}
+.ja-switch::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s}
+.ja-switch.on::after{left:22px}
+.ja-ats{height:8px;border-radius:5px;background:var(--b2);overflow:hidden;margin-top:5px}
+.ja-ats i{display:block;height:100%;background:linear-gradient(90deg,#ff6161,#f4c41a,#2ea44f)}
+.ja-match{border:1px solid var(--b);border-radius:11px;padding:11px;margin-bottom:9px}
+.ja-match .pct{font-size:20px;font-weight:800}
+.ja-match .pct.hi{color:#2ea44f}.ja-match .pct.mid{color:#f4a31a}
+.ja-bar{height:7px;border-radius:5px;background:var(--b2);overflow:hidden;margin:6px 0}
+.ja-bar i{display:block;height:100%;background:#7c3aed}
+.ja-actbtn{border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--fn)}
+.ja-apply{background:#2ea44f;color:#fff}.ja-skip{background:var(--card2);color:var(--mt)}
+.ja-prompt{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:100050;background:var(--sf);border:1px solid #7c3aed;border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.3);padding:14px 16px;width:min(92vw,420px);animation:fi .35s ease}
+.ja-prompt h4{font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.ja-prompt .jm{font-size:12px;color:var(--mt);margin-bottom:9px}
+.ja-prompt .acts{display:flex;gap:8px;align-items:center}
+.mic-btn{border:none;background:#7c3aed;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px}
+.mic-btn.rec{animation:micpulse 1s infinite;background:#e23b3b}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(226,59,59,.5)}50%{box-shadow:0 0 0 8px rgba(226,59,59,0)}}
+.int-rail{display:flex;gap:7px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.int-rail::-webkit-scrollbar{display:none}
+.int-chip{flex-shrink:0;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(10,102,194,.12));border:1px solid rgba(124,58,237,.3);color:#7c3aed;border-radius:16px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+/* ===== v121: scanner, collection/picking, yellow AI care ===== */
+.scan-ovl{position:fixed;inset:0;z-index:100060;background:#0a0f17;display:none;flex-direction:column}
+.scan-ovl.open{display:flex}
+.scan-top{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;color:#fff}
+.scan-top b{font-size:15px}
+.scan-stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.scan-stage video{width:100%;height:100%;object-fit:cover}
+.scan-frame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.scan-frame .box{width:74%;max-width:320px;aspect-ratio:1.4;border:3px solid #ffd23f;border-radius:16px;box-shadow:0 0 0 4000px rgba(0,0,0,.45)}
+.scan-laser{position:absolute;left:13%;right:13%;height:2px;background:#ff3b3b;box-shadow:0 0 8px #ff3b3b;animation:scanl 1.8s ease-in-out infinite}
+@keyframes scanl{0%,100%{top:32%}50%{top:66%}}
+.scan-bottom{padding:14px 16px 22px;background:#0d1420;color:#fff}
+.scan-bottom .man{display:flex;gap:8px;margin-top:10px}
+.scan-bottom input{flex:1;background:#1a2433;border:1px solid #2a3a50;border-radius:9px;padding:11px;color:#fff;font-size:14px;font-family:var(--fn)}
+.scan-bottom .hint{font-size:11px;color:#8aa0bb;line-height:1.4}
+.scan-result{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:3;border-radius:22px;padding:9px 18px;font-size:14px;font-weight:800;display:none;align-items:center;gap:7px}
+.scan-result.ok{display:flex;background:#16a34a;color:#fff}
+.scan-result.bad{display:flex;background:#e23b3b;color:#fff}
+/* collection panel */
+.col-line{border:1px solid var(--b);border-radius:11px;padding:12px;margin-bottom:10px}
+.col-line .hd{display:flex;justify-content:space-between;align-items:center}
+.col-line .cnt{font-size:20px;font-weight:800}
+.col-line .cnt .o{color:var(--mt2);font-size:14px}
+.col-prog{height:8px;border-radius:5px;background:var(--b2);overflow:hidden;margin:8px 0}
+.col-prog i{display:block;height:100%;background:#16a34a;transition:width .25s}
+.col-scanbtn{background:#0a66c2;color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:800;width:100%;cursor:pointer;font-family:var(--fn);display:flex;align-items:center;justify-content:center;gap:6px}
+.col-short{background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:9px 11px;font-size:12px;color:#9a3412;margin-top:8px}
+.col-track{background:var(--card2);border-radius:9px;padding:9px 11px;font-size:11px;margin-top:7px}
+.col-track b{color:var(--tx)}
+/* yellow AI care */
+.care-fab{position:fixed;right:16px;bottom:84px;z-index:9000;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#ffd23f,#ffb800);color:#3a2a00;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(255,184,0,.5);display:flex;align-items:center;justify-content:center;font-size:24px}
+.care-modal{max-width:430px}
+.care-hero{background:linear-gradient(135deg,#ffe169,#ffb800);border-radius:14px;padding:15px;margin-bottom:12px;color:#3a2a00}
+.care-hero h3{font-size:16px;font-weight:800;display:flex;align-items:center;gap:7px}
+.care-hero p{font-size:11px;margin-top:3px;opacity:.85}
+.care-bubbles{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;max-height:42vh;overflow-y:auto}
+.care-b{max-width:85%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.45}
+.care-b.bot{align-self:flex-start;background:#fff7d6;border:1px solid #ffe08a;color:#5a4500;border-bottom-left-radius:4px}
+.care-b.me{align-self:flex-end;background:#0a66c2;color:#fff;border-bottom-right-radius:4px}
+.care-opts{display:flex;flex-wrap:wrap;gap:7px}
+.care-opt{border:1px solid #ffb800;background:#fffbe9;color:#7a5a00;border-radius:18px;padding:8px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fn)}
+.care-opt:hover{background:#ffe169}
+.care-input{display:flex;gap:7px;margin:8px 0 10px}
+.care-input input{flex:1;border:1px solid #ffd23f;border-radius:20px;padding:10px 14px;font-size:13px;font-family:var(--fn);background:#fffdf5;outline:none}
+.care-input button{background:#ffb800;color:#3a2a00;border:none;border-radius:20px;padding:10px 16px;font-weight:800;cursor:pointer;font-family:var(--fn)}
+.care-b.typing{opacity:.6;font-style:italic}
+.tkt-card{border:1px solid var(--b);border-radius:11px;padding:12px;margin-bottom:10px}
+.tkt-ref{font-family:monospace;font-size:12px;font-weight:800;color:#0a66c2}
+.tkt-status{font-size:10px;font-weight:800;border-radius:8px;padding:2px 8px}
+.tkt-open{background:#fff7ed;color:#c2410c}
+.tkt-prog{background:#eff6ff;color:#1d4ed8}
+.tkt-res{background:#ecfdf5;color:#16a34a}
+.tkt-trans{background:var(--card2);border-radius:9px;padding:9px;margin-top:8px;max-height:180px;overflow-y:auto}
+.tkt-msg{font-size:11px;margin-bottom:5px;line-height:1.4}
+.tkt-msg .who{font-weight:800;color:var(--mt)}
+.tkt-msg.me .who{color:#0a66c2}
+
+
+
+
+
 
 
 
@@ -736,7 +953,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v117</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v125</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -980,6 +1197,23 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
     <div class="fg" style="margin-top:8px"><label>Location (country / emirate / city)</label><input type="text" id="lp-location" placeholder="e.g. UAE, Dubai, Deira"></div>
     <div class="fg" style="margin-top:8px"><label>International shipping</label><select id="lp-intl"><option value="yes">Available — ships worldwide</option><option value="no">Not available — local only</option></select></div>
     <div class="fg" style="margin-top:8px"><label>Sizes / variants (optional, comma separated)</label><input type="text" id="lp-sizes" placeholder="e.g. S,M,L,XL or 38,40,42 or 1kg,5kg"></div>
+    <div class="fg" style="margin-top:8px"><label>Colors (optional, comma separated)</label><input type="text" id="lp-colors" placeholder="e.g. Black, White, Blue, Frosted White"></div>
+    <div class="fg" style="margin-top:8px"><label>Product barcode (EAN-13)</label>
+      <div style="display:flex;gap:7px;align-items:center">
+        <input type="text" id="lp-barcode" placeholder="Scan or type, e.g. 6299200048576" inputmode="numeric" autocomplete="off" oninput="lpBarcodePreview(this.value)">
+        <button type="button" class="btn" style="white-space:nowrap;border:1px solid #0a66c2;color:#0a66c2;background:rgba(10,102,194,.08);border-radius:9px;padding:9px 12px;font-weight:700" onclick="lpScanBarcode()"><i class="ti ti-barcode"></i> Scan</button>
+        <button type="button" class="btn" style="white-space:nowrap;border:1px solid #16a34a;color:#16a34a;background:rgba(22,163,74,.08);border-radius:9px;padding:9px 12px;font-weight:700" onclick="lpGenBarcode()"><i class="ti ti-wand"></i> Auto</button>
+      </div>
+      <div id="lp-barcode-prev" style="margin-top:6px"></div><div style="font-size:10px;color:var(--mt2);margin-top:3px">No barcode on the product? Tap <b>Auto</b> — Reedbi creates a scannable in-store barcode. A product number is added automatically.</div>
+    </div>
+    <div class="fg" style="margin-top:8px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="lp-byweight" onchange="lpWeightToggle()"> Sold by weight (variable — e.g. fruit, vegetables, meat)</label>
+      <div id="lp-weight-row" style="display:none;margin-top:6px">
+        <div style="font-size:11px;color:var(--mt2);margin-bottom:4px">Set the price <b>per unit of weight</b>. The price field above is the price per:</div>
+        <select id="lp-weightunit" style="width:100%"><option value="kg">per kilogram (kg)</option><option value="100g">per 100 grams</option><option value="g">per gram</option></select>
+        <div style="font-size:10px;color:var(--mt2);margin-top:4px">At pickup the agent weighs the item; the bill auto-adjusts (extra collected if over, refunded if under).</div>
+      </div>
+    </div>
     <div class="fg" style="margin-top:8px"><label>Accepted payment</label><select id="lp-pay"><option value="both">Online + Cash on Delivery</option><option value="cod">Cash on Delivery only</option><option value="online">Online only</option></select></div>
     <div class="fg" style="margin-top:8px"><label>Brand (optional)</label><input type="text" id="lp-brand" placeholder="e.g. Samsung, Nike, Al Ain"></div>
     <div class="fg" style="margin-top:8px"><label>Category</label><input type="text" id="lp-category" list="cat-list" placeholder="e.g. Eggs, Electronics, Grocery"><datalist id="cat-list"><option>Grocery</option><option>Electronics</option><option>Clothing</option><option>Eggs</option><option>Dairy</option><option>Vegetables</option><option>Fruits</option><option>Meat</option><option>Household</option><option>Other</option></datalist></div>
@@ -1068,7 +1302,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="overlay" id="prodsearch-ovl"><div class="modal">
   <div class="mhd"><h3><i class="ti ti-search" style="font-size:13px"></i> Search Products</h3><button class="ib" onclick="closeOvl('prodsearch-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd">
-    <div class="sw" style="margin-bottom:10px"><i class="ti ti-search"></i><input type="text" id="ps-q" placeholder="Search by name, e.g. iPhone, shoes, camera..." oninput="runProductSearch(this.value)" autocomplete="off"></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px"><div class="sw" style="flex:1;margin:0"><i class="ti ti-search"></i><input type="text" id="ps-q" placeholder="Search or tap the mic to speak…" oninput="runProductSearch(this.value)" autocomplete="off"></div><button class="mic-btn" onclick="rbVoiceSearch(this)" title="Voice search"><i class="ti ti-microphone"></i></button></div>
     <div id="ps-cats" class="ps-cats"></div>
     <div id="ps-results"></div>
   </div>
@@ -1224,13 +1458,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 </div></div>
 
 <button class="fab" id="fab" onclick="openPostChooser()"><i class="ti ti-plus"></i> <span class="fab-txt">Post</span></button>
+<button class="care-fab" id="care-fab" onclick="openCareAi()" title="Reedbi Care — help with orders, delivery, returns"><i class="ti ti-headset"></i></button>
 <div class="tstack" id="tstack"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <!-- three.js — activates the WebGL 3D product viewer (open3DThree). Loads window.THREE; falls back to CSS-3D if it fails. -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <script>
 //---------------------------------------------------------------------
 //
@@ -3716,6 +3951,7 @@ function fbListenMarketData(){
             else if(doc.id==='ads'&&d.list){LS.set('rb_ads',d.list);if(typeof renderUserAds==='function')try{renderUserAds();}catch(e2){}}
             else if(doc.id==='agents'&&d.list){LS.set('rb_agents',d.list);}
             else if(doc.id==='admin'){LS.set('rb_admin',d);}
+            else if(doc.id==='pagelikes'){var cl=LS.get('rb_pagelikes',{})||{};LS.set('rb_pagelikes',Object.assign(cl,d));}
           }catch(e3){}
         });
         try{var ao=document.getElementById('admin-ovl');if(ao&&ao.classList.contains('open')&&typeof adminTab==='function'&&typeof curAdminTab!=='undefined')adminTab(curAdminTab);}catch(e4){}
@@ -4162,7 +4398,7 @@ function fmtC(ts){var d=new Date(ts);return d.getHours().toString().padStart(2,'
 function fmtB(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(2)+'MB';}
 function toast(msg,type){var s=document.getElementById('tstack');var d=document.createElement('div');var tc={ok:'tok',err:'terr',info:'t-inf',live:'tlv',gold:'tgld'};var ic={ok:'check',err:'alert-circle',info:'info-circle',live:'activity',gold:'sparkles'};d.className='toast '+(tc[type]||'tok');d.innerHTML='<i class="ti ti-'+(ic[type]||'check')+'"></i> '+msg;s.appendChild(d);setTimeout(function(){d.style.opacity='0';d.style.transition='opacity .3s';setTimeout(function(){d.remove();},300);},2700);}
 function setTick(h){var e=document.getElementById('ttxt');if(e)e.innerHTML=h;}
-function closeOvl(id){var el=document.getElementById(id);if(el)el.classList.remove('open');}
+function closeOvl(id){var el=document.getElementById(id);if(el)el.classList.remove('open');if(id==='prodsearch-ovl'&&typeof fkStop3DHero==='function')fkStop3DHero();}
 function isAdActive(p){return p&&p.boosted&&p.boostExpiry&&Date.now()<p.boostExpiry;}
 function extractAT(title,body){
   var text=((title||'')+' '+(body||'')).toLowerCase();
@@ -5251,14 +5487,20 @@ function openAccountMenu(){
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyActivity()"><i class="ti ti-layout-dashboard" style="color:var(--g)"></i> My Activity <small>jobs, orders, shop, license — all in one place</small></button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openLicensePanel()"><i class="ti ti-license" style="color:var(--gold)"></i> ReadBi Seller License <small>'+(lic?'manage / renew':'request or validate')+'</small></button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyProducts()"><i class="ti ti-building-store"></i> My Shop</button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openCounter()"><i class="ti ti-cash-register" style="color:#0a66c2"></i> Billing Counter <small>pick status · bill collected orders</small></button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openBarcodeLabels()"><i class="ti ti-barcode" style="color:#0a66c2"></i> Barcode labels <small>print labels for items without a barcode</small></button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyOrders()"><i class="ti ti-package"></i> My Orders</button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyApps()"><i class="ti ti-briefcase"></i> My Job Applications</button>';
+  h+='<button class="acct-item" style="border:1px solid #7c3aed;border-radius:10px" onclick="closeOvl(\'acctmenu-ovl\');openJobAgent()"><i class="ti ti-robot" style="color:#7c3aed"></i> <b>AI Job Agent</b> <small>finds &amp; auto-applies to matching jobs</small>'+(jobAgentBadge()?' <span style="background:#7c3aed;color:#fff;border-radius:9px;font-size:9px;padding:1px 6px;font-weight:800">'+jobAgentBadge()+' new</span>':'')+'</button>';
   var __pgI=(typeof myOwnedPage==='function')?myOwnedPage():null;
   var __ident=(__pgI&&pageLicenseValid(__pgI.name))?'<span class="pay-badge pay-online-b" style="font-size:9px">Reedbi Ecommerce — '+esc(__pgI.name)+'</span>':'<span class="pay-badge" style="font-size:9px;background:rgba(195,125,22,.12);color:#c37d16">Reedbi Tagtalk</span>';
   h='<div style="text-align:center;margin-bottom:8px">'+__ident+'</div>'
     +'<button class="acct-item" style="border:1px solid var(--g);border-radius:10px;margin-bottom:6px" onclick="closeOvl(\'acctmenu-ovl\');openMainStore()"><i class="ti ti-building-store" style="color:var(--g)"></i> <b>Reedbi Ecommerce — Main store</b> <small>all approved sellers &amp; products</small></button>'+h;
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openEditAccount()"><i class="ti ti-user-edit" style="color:var(--g)"></i> Edit account details <small>name, WhatsApp, location, interests</small></button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openNotifSettings()"><i class="ti ti-bell" style="color:var(--gold)"></i> Notifications <small>sound, tune, mute</small></button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openCareAi()"><i class="ti ti-headset" style="color:#ffb800"></i> Reedbi Care <small>orders, delivery, returns &amp; refunds</small></button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openMyTickets()"><i class="ti ti-ticket" style="color:#ffb800"></i> My Support Tickets <small>status &amp; emailed decisions</small></button>';
+  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openSupportDesk()"><i class="ti ti-headset" style="color:#0a66c2"></i> Support Desk <small>human agents: resolve tickets &amp; email customers</small></button>';
   h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openProfile(CU.name,CU.co||\'\',\'\',CU.avIdx||0)"><i class="ti ti-user"></i> View Public Profile</button>';
   // ADMIN / OWNER control — only visible to authorized owner emails
   h+='<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:8px"></div>';
@@ -5328,7 +5570,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v117 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v125 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -5488,8 +5730,21 @@ function cloudMigrateLocal(force){
   }catch(e){toast('Migration error: '+e.message,'err');}
 }
 /* listen to ALL applications so sellers receive applications on every device */
+function fbListenTickets(){
+  if(!FB.ready||FB_CLOUD_DISABLED||!FB.db||FB_LISTENERS['tickets'])return;
+  try{
+    FB_LISTENERS['tickets']=FB.db.collection('tickets').onSnapshot(function(snap){
+      var local=getTickets();var map={};local.forEach(function(t){map[t.id]=t;});
+      snap.forEach(function(doc){var d=doc.data();d.id=d.id||doc.id;map[d.id]=Object.assign(map[d.id]||{},d);});
+      LS.set('rb_tickets',Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return (b.createdTs||0)-(a.createdTs||0);}));
+      try{if(document.getElementById('support-ovl')&&document.getElementById('support-ovl').classList.contains('open'))renderSupportDesk();}catch(e){}
+      try{if(document.getElementById('mytkt-ovl')&&document.getElementById('mytkt-ovl').classList.contains('open'))openMyTickets();}catch(e){}
+    },function(err){if(fbIsPermErr(err))fbStopListener('tickets','perm');});
+  }catch(e){}
+}
 function fbListenAllApps(){
   if(!FB.ready||FB_CLOUD_DISABLED||!FB.db||FB_LISTENERS['apps_all'])return;
+  try{fbListenTickets();}catch(e){}
   try{
     FB_LISTENERS['apps_all']=FB.db.collection('applications').onSnapshot(function(snap){
       var local=getAllApps();var map={};local.forEach(function(a){map[a.id]=a;});
@@ -5824,7 +6079,7 @@ var listPhotos=[]; // base64 photos for the product being listed
 function openListProduct(){
   if(!requireAuth('list a product'))return;
   listPhotos=[];
-  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category','lp-location','lp-brand','lp-sizes'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category','lp-location','lp-brand','lp-sizes','lp-colors','lp-barcode'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   var cs=document.getElementById('lp-cur');if(cs&&!cs.options.length){CURRENCIES.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o);});}
   // sell-as: my name or any page I own/admin
   var sa=document.getElementById('lp-as');
@@ -5893,8 +6148,14 @@ function submitProduct(){
   var payOpts=(document.getElementById('lp-pay')||{}).value||'both';
   var intlShip=((document.getElementById('lp-intl')||{}).value||'yes');
   var sizes=((document.getElementById('lp-sizes')||{}).value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var colors=((document.getElementById('lp-colors')||{}).value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var barcode=normalizeBarcode((document.getElementById('lp-barcode')||{}).value||'');
+  var byWeight=!!(document.getElementById('lp-byweight')&&document.getElementById('lp-byweight').checked);
+  var weightUnit=byWeight?((document.getElementById('lp-weightunit')||{}).value||'kg'):'';
   var vatPct=(function(L){L=L.toLowerCase();if(L.indexOf('uae')>=0||L.indexOf('dubai')>=0||L.indexOf('emirates')>=0)return 5;if(L.indexOf('saudi')>=0||L.indexOf('ksa')>=0)return 15;if(L.indexOf('india')>=0)return 18;if(L.indexOf('uk')>=0||L.indexOf('united kingdom')>=0)return 20;if(L.indexOf('bahrain')>=0||L.indexOf('oman')>=0)return 10;return 0;})(location||'');
-  var prod={id:'prd'+Date.now(),serialNo:serialNo,sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',brand:brand,payOpts:payOpts,vatPct:vatPct,sizes:sizes,intlShip:intlShip,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
+  var prodNo=fmtProdNo(nextProdNoSeq());
+  if(!barcode){barcode=genInternalBarcode(prodNo+'|'+title);var _bcAuto=true;}
+  var prod={id:'prd'+Date.now(),prodNo:prodNo,barcodeAuto:(typeof _bcAuto!=='undefined'),serialNo:serialNo,sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',brand:brand,payOpts:payOpts,vatPct:vatPct,sizes:sizes,colors:colors,barcode:barcode,byWeight:byWeight,weightUnit:weightUnit,intlShip:intlShip,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
     batches:[{batchCode:'B-'+Date.now().toString(36).toUpperCase().slice(-4),qty:qty,cost:cost,vendor:'',vendorPhone:'',brand:'',date:Date.now()}],interest:0,interestLog:[],
     photos:listPhotos.slice(),addr:addr,phone:phone,map:map,ts:Date.now()};
   var prods=getProducts();prods.unshift(prod);saveProducts(prods);
@@ -6089,6 +6350,7 @@ function productCardSeller(p){
   return '<div class="appl-card"><div style="display:flex;gap:9px"><img src="'+esc(p.photos[0]||'')+'" style="width:54px;height:54px;border-radius:8px;object-fit:cover">'
     +'<div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div>'
     +(p.serialNo?'<div class="order-no">'+esc(p.serialNo)+'</div>':'')
+    +(function(){ensureProdMeta(p);return '<div style="font-size:10px;color:#0a66c2;font-weight:700"><i class="ti ti-hash"></i> '+esc(p.prodNo)+' · <i class="ti ti-barcode"></i> '+esc(p.barcode)+(p.barcodeAuto?' <span style="color:var(--gold)">(Reedbi)</span>':'')+'</div>';})()
     +'<div style="font-size:12px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+(p.offer?' <span style="color:var(--gold);font-size:11px">offer '+esc(p.offer)+'</span>':'')+'</div>'
     +'<div style="font-size:10px;color:var(--mt2);margin-top:2px">Sold: <b style="color:var(--cyan)">'+sold+'</b> · Stock: <b style="color:'+(remaining>0?'var(--g)':'var(--red)')+'">'+remaining+'</b> · Listed '+idleStr+' ago</div>'
     +(expStr?'<div style="margin-top:4px">'+expStr+'</div>':'')
@@ -6149,6 +6411,7 @@ function orderCardSeller(o){
     +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Order QR (track)</button>'
     +'<button class="ord-qr" onclick="openAssignAgent(\''+o.id+'\')"><i class="ti ti-user-check"></i> '+(o.agentName?'Agent: '+esc(o.agentName)+' ✓':'Assign delivery agent')+'</button>'
     +(o.agentName?'':'<button class="ord-qr" style="color:var(--gold);border-color:var(--gold)" onclick="offerOrderToAgents(\''+o.id+'\')"><i class="ti ti-speakerphone"></i> '+(o.pickupOpen?'Offer sent — waiting for an agent…':'Offer to ALL delivery agents')+'</button>')
+    +((o.collectedQty!=null||o.collectedConfirmed||o.byWeight&&o.agentUid)?'<div class="col-track">'+(o.byWeight?('<b><i class="ti ti-scale-outline"></i> Weighed:</b> '+(o.collectedConfirmed?(o.actualWeight+' '+weightUnitLabel(o.weightUnit||"kg")+' (ordered '+o.orderedWeight+') <span style="color:#16a34a">✓</span>'+(o.weightExtraDue?'<br><span style="color:#c2410c">Collect extra '+esc(o.currency||"")+' '+o.weightExtraDue+(o.payMethod==="online"?" at delivery":"")+'</span>':'')+(o.refundDue?'<br><span style="color:#e23b3b">Refund '+esc(o.currency||"")+' '+o.refundDue+'</span>':'')):'<span style="color:var(--gold)">picking…</span>')):('<b><i class="ti ti-clipboard-check"></i> Picked by agent:</b> '+(o.billQty!=null?o.billQty:(o.collectedQty||0))+'/'+o.qty+(o.collectedConfirmed?' <span style="color:#16a34a">✓ confirmed</span>':' <span style="color:var(--gold)">picking…</span>')+(o.refundDue?'<br><span style="color:#e23b3b">Refund due to buyer: '+esc(o.currency||'')+' '+o.refundDue+' ('+o.collectedShort+' short)</span>':'')))+(o.collectedConfirmed?'<br><button style="background:none;border:none;color:#0a66c2;font-weight:700;cursor:pointer;padding:4px 0" onclick="printInvoice(\''+o.id+'\')"><i class="ti ti-printer"></i> Print bill</button>':'')+'</div>':'')
     +distancesHtml(o)
     +((o.payMethod==='cod')?('<div style="font-size:11px;'+(o.codCollectedTs?'color:#1a8f3c':'color:var(--gold)')+'">💵 COD: '+(o.codCollectedTs?('Collected by '+esc(o.codCollectedBy||'agent')+' · '+fmtDT(o.codCollectedTs)):'cash NOT yet collected')+'</div>'):'')
     +(o.status!=='returned'&&o.status!=='delivered'?'<button class="ord-qr" style="border-color:var(--red);color:var(--red)" onclick="markReturned(\''+o.id+'\')"><i class="ti ti-arrow-back-up"></i> Mark returned</button>':'')
@@ -6296,7 +6559,7 @@ function placeOrder(){
   var map=document.getElementById('buy-map').value.trim();
   if(!addr||!phone){toast('Enter delivery address and WhatsApp number','err');return;}
   var orderNo='RB-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
-  var o={id:'ord'+Date.now()+Math.floor(Math.random()*1000),orderNo:orderNo,productId:curBuyProduct.id,productTitle:curBuyProduct.title+(bSize?' ['+bSize+']':''),size:bSize,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
+  ensureProdMeta(curBuyProduct);var o={id:'ord'+Date.now()+Math.floor(Math.random()*1000),orderNo:orderNo,prodNo:curBuyProduct.prodNo,barcode:curBuyProduct.barcode,byWeight:!!curBuyProduct.byWeight,weightUnit:curBuyProduct.weightUnit||'',orderedWeight:(curBuyProduct.byWeight?qty:0),productId:curBuyProduct.id,productTitle:curBuyProduct.title+(bSize?' ['+bSize+']':''),size:bSize,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
     sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,pageName:(curBuyProduct.pageName||''),buyerUid:CU.uid,buyerEmail:(CU.email||'').toLowerCase(),buyerName:CU.name,buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:map,
     payMethod:selPayMethod,status:'placed',storeMap:(curBuyProduct.map||curBuyProduct.geo||''),storeAddr:(curBuyProduct.addr||''),ts:Date.now()};
   var orders=getOrders();orders.unshift(o);saveOrders(orders);
@@ -6343,6 +6606,8 @@ function showMyOrders(){
     return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(o.productTitle)+' <span style="color:var(--mt2);font-weight:400;font-size:11px">×'+o.qty+'</span></div>'
       +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'+(o.ts?'<div style="font-size:10px;color:var(--mt2)"><i class="ti ti-clock"></i> Received: '+fmtDT(o.ts)+'</div>':'')
       +'<div style="font-size:11px;color:var(--mt)">Seller: '+esc(o.sellerName)+'</div>'
+      +trackStrip(o)
+      +(o.collectedConfirmed?'<div class="col-track">'+(o.byWeight?('<i class="ti ti-scale-outline" style="color:#0a8f5c"></i> <b>Weighed '+o.actualWeight+' '+weightUnitLabel(o.weightUnit||"kg")+'</b> (you ordered '+o.orderedWeight+')'+(o.weightExtraDue?' · <span style="color:#c2410c">extra '+esc(o.currency||"")+' '+o.weightExtraDue+(o.payMethod==="online"?" payable at delivery":"")+'</span>':'')+(o.refundDue?' · <span style="color:#16a34a">refund '+esc(o.currency||"")+' '+o.refundDue+'</span>':'')):('<i class="ti ti-clipboard-check" style="color:#16a34a"></i> <b>'+(o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty+' items confirmed</b> by agent'+(o.refundDue?' · <span style="color:#e23b3b">refund '+esc(o.currency||'')+' '+o.refundDue+' for '+o.collectedShort+' short</span>':'')))+'</div>':'')
       +(o.agentName?'<div style="font-size:11px;color:var(--g)"><i class="ti ti-moped"></i> Agent: '+esc(o.agentName)+(o.agentPhone?' · <a href="https://wa.me/'+esc((o.agentPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(o.agentPhone)+'</a>':'')+'</div>':'')
       +((o.status==='out_delivery'&&o.deliveryOtp)?'<div class="otp-box"><i class="ti ti-shield-lock"></i> Delivery OTP: <b>'+esc(o.deliveryOtp)+'</b><div style="font-size:9px;color:var(--mt2);font-weight:400">Give this to the agent to confirm delivery</div></div>':'')
       +'<div style="font-size:11px;color:var(--g);font-weight:700;margin-top:3px"><i class="ti ti-'+so.icon+'"></i> '+so.label+'</div>'
@@ -6582,7 +6847,8 @@ function runProductSearch(q){
   var box=document.getElementById('ps-results');if(!box)return;
   if(!prods.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products listed yet.</p>';return;}
   if(!matches.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products match “'+esc(q)+'”.</p>';return;}
-  box.innerHTML='<div style="font-size:10px;color:var(--mt2);margin-bottom:6px">'+matches.length+' product'+(matches.length!==1?'s':'')+'</div>'+matches.map(psCard).join('');
+  var intro=(!q?rbInterestChips():'');
+  box.innerHTML=intro+'<div style="font-size:10px;color:var(--mt2);margin-bottom:6px">'+matches.length+' product'+(matches.length!==1?'s':'')+'</div>'+matches.map(psCard).join('');
 }
 
 /* ===== Bulk label printing with printed/balance tracking ===== */
@@ -6934,6 +7200,7 @@ function viewSellerStore(pageName,cat,q){
     +'<div class="sf-stats"><div><b>'+all.length+'</b>Products</div><div><b>'+(1+((pg&&pg.members||[]).length))+'</b>Members</div><div><b>'+(pg&&pg.ownerName?esc(pg.ownerName):'—')+'</b>Owner</div></div>'
     +'<div style="display:flex;gap:8px;margin-top:10px;font-size:11px;position:relative;z-index:1">'
     +'<a href="#" onclick="sharePage('+pn+');return false" style="color:#fff;font-weight:700"><i class="ti ti-brand-whatsapp"></i> Share store</a>'
+    +'<a href="#" data-like="'+escAttr(pageName)+'" onclick="togglePageLike('+pn+',event);return false" style="color:#fff;font-weight:700" class="'+(iLikePage(pageName)?'on':'')+'"><i class="ti ti-heart'+(iLikePage(pageName)?'-filled':'')+'"></i> Like <span class="lc">'+pageLikeCount(pageName)+'</span></a>'
     +(CU&&!pageRole(pageName)?'<a href="#" onclick="requestJoinPage('+pn+');return false" style="color:#fff"><i class="ti ti-user-plus"></i> Join as member</a>':'')
     +'<a href="#" onclick="openProductSearch();return false" style="color:#fff;margin-left:auto">&larr; All products</a></div></div>';
   var search='<div class="sw" style="margin-bottom:8px"><i class="ti ti-search"></i><input type="text" placeholder="Search in '+esc(pageName)+'…" value="'+esc(q||'')+'" oninput="sfDebounce('+pn+','+(cat?"'"+String(cat).replace(/'/g,"\\'")+"'":'null')+',this.value)"></div>';
@@ -6941,7 +7208,7 @@ function viewSellerStore(pageName,cat,q){
     +Object.keys(cats).sort().map(function(k){var kk="'"+k.replace(/'/g,"\\'")+"'";return '<span class="sf-cat'+(cat===k?' on':'')+'" onclick="viewSellerStore('+pn+','+kk+')">'+esc(k)+' ('+cats[k]+')</span>';}).join('')+'</div>';
   var grid='<div class="sf-grid">'+prods.map(function(p){
     var pid="'"+p.id+"'";var avail=productAvailable(p);
-    return '<div class="sf-card"><div style="position:relative"><img class="sf-img" loading="lazy" decoding="async" src="'+esc(p.photos&&p.photos[0]||'')+'" style="cursor:pointer" onclick="open3DView('+pid+')"><span style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:2px 7px"><i class="ti ti-3d-cube-sphere"></i> 3D</span></div>'
+    return '<div class="sf-card"><div style="position:relative"><img class="sf-img" loading="lazy" decoding="async" src="'+esc(p.photos&&p.photos[0]||'')+'" style="cursor:pointer" onclick="openProductDetail('+pid+')"><span style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:2px 7px"><i class="ti ti-3d-cube-sphere"></i> 3D</span></div>'
       +'<div class="sf-bd">'
       +(p.brand?'<div style="font-size:9px;color:var(--mt2);text-transform:uppercase;font-weight:700">'+esc(p.brand)+'</div>':'')
       +'<div class="sf-ttl">'+esc(p.title)+'</div>'+(p.sizes&&p.sizes.length?'<div style="font-size:9px;color:var(--mt2)">Sizes: '+esc(p.sizes.join(', '))+'</div>':'')
@@ -7302,12 +7569,12 @@ function fkTile(p){
   var near=myW.length&&myW.some(function(w){return (p.location||'').toLowerCase().indexOf(w)>=0;});
   return '<div class="fk-tile">'
     +'<div class="imgwrap">'
-    +'<button class="fk-wish" onclick="event.stopPropagation();expressInterest('+pid+')" title="Save"><i class="ti ti-heart"></i></button>'
-    +'<img src="'+esc(p.photos&&p.photos[0]||'')+'" loading="lazy" decoding="async" onclick="open3DView('+pid+')">'
+    +'<button class="fk-wish'+(inWishlist(p.id)?' on':'')+'" data-wish="'+esc(p.id)+'" onclick="toggleWishlist('+pid+',event)" title="Wishlist" style="'+(inWishlist(p.id)?'color:#ff4d67':'')+'"><i class="ti ti-heart'+(inWishlist(p.id)?'-filled':'')+'"></i></button>'
+    +'<img src="'+esc(p.photos&&p.photos[0]||'')+'" loading="lazy" decoding="async" onclick="openProductDetail('+pid+')">'
     +'<span class="fk-3d" onclick="event.stopPropagation();open3DView('+pid+')"><i class="ti ti-3d-cube-sphere"></i> 3D</span>'
     +'</div>'
     +(p.brand?'<div class="fk-brand">'+esc(p.brand)+'</div>':'')
-    +'<div class="fk-ttl">'+esc(p.title)+'</div>'
+    +'<div class="fk-ttl" onclick="openProductDetail('+pid+')" style="cursor:pointer">'+esc(p.title)+'</div>'
     +fkRating(p)
     +(pageLicenseValid(p.pageName)?'<div class="fk-assured"><i class="ti ti-discount-check-filled"></i> Reedbi Assured</div>':'')
     +'<div class="fk-price"><span class="fk-now">'+esc(p.currency||'')+' '+esc(p.offer||p.price)+'</span>'
@@ -7318,7 +7585,7 @@ function fkTile(p){
     +(near?'<span class="fk-nearby">📍 Nearby seller · fast delivery</span>':'')
     +(avail
       ? '<button class="fk-add buy" onclick="closeOvl(\'prodsearch-ovl\');buyProduct('+pid+')"><i class="ti ti-bolt"></i> Buy Now</button>'
-        +'<button class="fk-add cart" onclick="event.stopPropagation();addToCart('+pid+')"><i class="ti ti-shopping-cart"></i> Add to Cart</button>'
+        +'<button class="fk-add cart" onclick="event.stopPropagation();'+((p.colors&&p.colors.length||p.sizes&&p.sizes.length)?'openProductDetail('+pid+')':'addToCart('+pid+')')+'"><i class="ti ti-shopping-cart"></i> Add to Cart</button>'
       : '<button class="fk-add oos" onclick="expressInterest('+pid+')"><i class="ti ti-bell"></i> Notify me</button>')
     +'</div>';
 }
@@ -7337,7 +7604,8 @@ function openMainStore(cat){
   // top bar + search
   var bar='<div class="fk-bar"><div class="brand">⬡ Reedbi <small>Explore Plus</small></div>'
     +'<div class="fk-search"><i class="ti ti-search"></i><input placeholder="Search for products, brands &amp; more" '
-    +'onkeydown="if(event.key===\'Enter\'){document.getElementById(\'ps-q\').value=this.value;runProductSearch(this.value);}"></div></div>';
+    +'onkeydown="if(event.key===\'Enter\'){document.getElementById(\'ps-q\').value=this.value;runProductSearch(this.value);}"></div>'
+    +'<button onclick="rbSnapPush();openWishlist()" title="Wishlist" style="background:none;border:none;color:#fff;cursor:pointer;position:relative;padding:4px 6px"><i class="ti ti-heart" style="font-size:20px"></i>'+(getWishlist().length?'<span style="position:absolute;top:-2px;right:-2px;background:#ff4d67;color:#fff;font-size:9px;font-weight:800;border-radius:9px;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px">'+getWishlist().length+'</span>':'')+'</button></div>';
 
   // category circles
   var cats='<div class="fk-cats"><div class="fk-cat'+(!cat?' on':'')+'" onclick="openMainStore()"><div class="fk-cat-ic">🛍️</div><span>All</span></div>'
@@ -7360,7 +7628,7 @@ function openMainStore(cat){
   var storesRail=pages.length?('<div class="fk-stores-h">Stores you can trust</div><div class="fk-store-rail">'+pages.map(function(pg){
     var pn="'"+pg.name.replace(/'/g,"\\'")+"'";
     var cnt=getProducts().filter(function(p){return p.pageName===pg.name&&productInMarketplace(p);}).length;
-    return '<div class="fk-store" onclick="viewSellerStore('+pn+')"><div class="fk-store-av">'+esc((pg.name[0]||'S').toUpperCase())+'</div><b>'+esc(pg.name)+'</b><small>'+cnt+' products</small></div>';
+    return '<div class="fk-store" onclick="rbSnapPush();viewSellerStore('+pn+')"><div class="fk-store-av">'+esc((pg.name[0]||'S').toUpperCase())+'</div><b>'+esc(pg.name)+'</b><small>'+cnt+' products</small></div>';
   }).join('')+'</div>'):'';
 
   // deals of the day rail (top discounted)
@@ -7368,15 +7636,44 @@ function openMainStore(cat){
     .sort(function(a,b){function dd(p){var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0,of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;return (of&&pr)?(pr-of)/pr:0;}return dd(b)-dd(a);}).slice(0,10);
   var dealRail=deals.length?('<div class="fk-sec"><div class="fk-sec-h"><b>Deals of the Day</b><span class="deal">LIMITED</span></div><div class="fk-rail">'+deals.map(fkTile).join('')+'</div></div>'):'';
 
+  // ===== v118 storytelling hero =====
+  var story='<div class="fk-story reveal r-zoom"><div class="eyebrow">Reedbi Ecommerce</div>'
+    +'<h1>Walk the market. <span class="hl">Touch it.</span> Spin it in 3D. Make it yours.</h1>'
+    +'<p>From a farmer\'s fruit nearby to a dress across the world — discover real products from approved sellers, see them in real-time 3D, and collect them with a tap.</p>'
+    +'<div class="acts"><button class="p1" onclick="openTouchCollect()"><i class="ti ti-hand-finger"></i> Start Touch &amp; Collect</button>'
+    +'<button class="p2" onclick="document.getElementById(\'ps-results\').scrollTo({top:9999,behavior:\'smooth\'})">Explore deals <i class="ti ti-arrow-down"></i></button></div></div>';
+
+  // ===== v118 real-time 3D hero (auto-rotating featured product) =====
+  var featured=best||allProds[0];
+  var stage='';
+  if(featured){
+    var fid="'"+featured.id+"'";
+    var fpr=esc((featured.currency||'')+' '+(featured.offer||featured.price));
+    stage='<div class="fk-3dstage reveal d1" id="fk-3dstage">'
+      +'<div class="lbl"><span class="live"></span> REAL-TIME 3D</div>'
+      +'<div class="fk-3dfall" id="fk-3dfall"><img src="'+esc(featured.photos&&featured.photos[0]||'')+'" alt="'+esc(featured.title)+'"></div>'
+      +'<div class="meta"><div class="t">'+esc(featured.title)+'</div><div class="pr">'+fpr+'</div></div>'
+      +'<button class="cta" onclick="open3DView('+fid+')">Open in 3D <i class="ti ti-3d-cube-sphere"></i></button></div>';
+  }
+
+  // ===== v118 value strip (storytelling props) =====
+  var strip='<div class="fk-strip">'
+    +'<div class="card reveal d1"><div class="ic">🧊</div><b>Real-time 3D</b><small>Spin any product before you buy</small></div>'
+    +'<div class="card reveal d2"><div class="ic">📍</div><b>Nearby first</b><small>Local sellers, faster delivery</small></div>'
+    +'<div class="card reveal d3"><div class="ic">🖐️</div><b>Touch &amp; Collect</b><small>Pick items off the shelf</small></div>'
+    +'<div class="card reveal d4"><div class="ic">🛡️</div><b>Reedbi Assured</b><small>Approved, trusted stores</small></div></div>';
+
   // main grid
   var gridTitle=cat?(catEmoji(cat)+' '+esc(cat)):(myW.length?'Recommended — nearby first':'All products');
   var grid='<div class="fk-sec"><div class="fk-sec-h"><b>'+gridTitle+'</b><span style="font-size:11px;color:#878787">'+prods.length+' items</span></div>'
     +'<div class="fk-grid">'+(prods.length?prods.slice(0,60).map(fkTile).join(''):'<div style="grid-column:1/-1;padding:30px;text-align:center;color:#878787;font-size:13px">No products'+(cat?' in '+esc(cat):'')+' yet.</div>')+'</div></div>';
 
-  // category view = focused page (no global banner/deals/stores rails); All view = full homepage
-  var homeBlocks=cat?'':(banner+feat+storesRail+dealRail);
-  box.innerHTML='<div class="fk-wrap">'+bar+cats+homeBlocks+grid+'<div style="height:20px"></div></div>';
+  // category view = focused page; All view = full storytelling homepage
+  var homeBlocks=cat?'':(story+stage+strip+'<div class="reveal">'+banner+'</div>'+feat+'<div class="reveal">'+storesRail+'</div>'+'<div class="reveal">'+dealRail+'</div>');
+  box.innerHTML='<div class="fk-wrap">'+bar+cats+homeBlocks+'<div class="reveal">'+grid+'</div>'+'<div style="height:20px"></div></div>';
   box.scrollTop=0;
+  fkInitMotion(box);
+  if(!cat&&featured)fkStart3DHero(featured);
 }
 function compressImg(dataUri,maxW,q){
   return new Promise(function(res){
@@ -7594,7 +7891,9 @@ function showAgentDashboard(){
       +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> Navigate</a></div>':'')
       +(typeof distancesHtml==='function'?distancesHtml(o):'')
       +'<div class="ord-current"><i class="ti ti-'+os.icon+'"></i> '+os.label+'</div>'
+      +trackStrip(o)
       +(deliveryTimeStr(o)?'<div style="margin-top:5px">'+deliveryTimeStr(o)+'</div>':'')
+      +(!o.collectedConfirmed?'<button class="ord-next" style="background:#0a66c2" onclick="openCollection(\''+o.id+'\')"><i class="ti ti-scan"></i> Pick &amp; Collect at shop'+((o.collectedQty||0)>0?' ('+(o.collectedQty||0)+'/'+o.qty+')':'')+'</button>':'<div style="font-size:11px;color:#16a34a;margin-top:5px"><i class="ti ti-circle-check"></i> Collected '+(o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty+(o.refundDue?' · refund '+esc(o.currency||'')+' '+o.refundDue:'')+' <button style="background:none;border:none;color:#0a66c2;font-weight:700;cursor:pointer" onclick="openCollection(\''+o.id+'\')">view</button></div>')
       +(next?(next.id==='delivered'
           ?'<button class="ord-next" onclick="agentConfirmDelivery(\''+o.id+'\')"><i class="ti ti-shield-check"></i> Confirm delivery (enter OTP)</button>'
           :'<button class="ord-next" onclick="agentUpdateStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark: '+next.label+'</button>')
@@ -8786,5 +9085,1259 @@ function catSearchIn(cat,q){
     +'<div class="fk-sec"><div class="fk-sec-h"><b>Results for "'+esc(q)+'" in '+esc(cat)+'</b><span style="font-size:11px;color:#878787">'+list.length+' items</span></div>'
     +'<div class="fk-grid">'+(list.length?list.map(fkTile).join(''):'<div style="grid-column:1/-1;padding:30px;text-align:center;color:#878787">No matches.</div>')+'</div></div></div>';
   box.scrollTop=0;
+}
+
+/* ===== v118: motion + real-time 3D engines ===== */
+// AOS-like scroll reveal — pure ES6 IntersectionObserver
+function fkInitMotion(scope){
+  try{
+    scope=scope||document;
+    var els=scope.querySelectorAll('.reveal:not(.in)');
+    if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});return;}
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+    },{root:scope.scrollTop!==undefined?scope:null,rootMargin:'0px 0px -8% 0px',threshold:0.08});
+    els.forEach(function(e){io.observe(e);});
+    // safety: reveal anything already in view on next frame
+    requestAnimationFrame(function(){els.forEach(function(e){var r=e.getBoundingClientRect();if(r.top<(window.innerHeight||800))e.classList.add('in');});});
+  }catch(e){ try{(scope||document).querySelectorAll('.reveal').forEach(function(x){x.classList.add('in');});}catch(_){} }
+}
+
+// real-time 3D hero — three.js auto-rotating textured panel; CSS-3D fallback if THREE absent
+var __fk3d=null;
+function fkStop3DHero(){ if(__fk3d){ try{cancelAnimationFrame(__fk3d.raf);}catch(e){} try{__fk3d.renderer&&__fk3d.renderer.dispose&&__fk3d.renderer.dispose();}catch(e){} __fk3d=null; } }
+function fkStart3DHero(p){
+  fkStop3DHero();
+  var stage=document.getElementById('fk-3dstage'); if(!stage||!p)return;
+  if(typeof THREE==='undefined'||!p.photos||!p.photos[0]){ return; } // CSS-3D fallback (.fk-3dfall) already shows
+  try{
+    var fall=document.getElementById('fk-3dfall'); // hide CSS fallback when WebGL works
+    var W=stage.clientWidth||320, H=stage.clientHeight||188;
+    var scene=new THREE.Scene();
+    var cam=new THREE.PerspectiveCamera(40,W/H,0.1,100); cam.position.z=3.4;
+    var renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+    renderer.setSize(W,H); renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    stage.insertBefore(renderer.domElement, stage.firstChild);
+    if(fall)fall.style.display='none';
+    scene.add(new THREE.AmbientLight(0xffffff,0.95));
+    var dl=new THREE.DirectionalLight(0xffffff,0.55); dl.position.set(2,3,4); scene.add(dl);
+    var loader=new THREE.TextureLoader(); loader.crossOrigin='anonymous';
+    var grp=new THREE.Group(); scene.add(grp);
+    loader.load(p.photos[0], function(tex){
+      var iw=(tex.image&&tex.image.width)||1, ih=(tex.image&&tex.image.height)||1;
+      var ar=iw/ih, w=1.7, h=w/ar; if(h>1.7){h=1.7;w=h*ar;}
+      var mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide});
+      var geo=new THREE.PlaneGeometry(w,h);
+      var mesh=new THREE.Mesh(geo,mat); grp.add(mesh);
+      var back=new THREE.Mesh(new THREE.PlaneGeometry(w*1.04,h*1.04),new THREE.MeshBasicMaterial({color:0x0e1a2c,side:THREE.DoubleSide}));
+      back.position.z=-0.03; grp.add(back);
+    }, undefined, function(){ if(fall)fall.style.display='flex'; if(renderer.domElement&&renderer.domElement.parentNode)renderer.domElement.parentNode.removeChild(renderer.domElement); });
+    // drag to rotate + auto spin
+    var auto=true, vy=0.012, dragging=false, lastX=0;
+    function down(x){dragging=true;lastX=x;auto=false;}
+    function move(x){if(!dragging)return;var dx=x-lastX;lastX=x;grp.rotation.y+=dx*0.01;}
+    function up(){dragging=false;setTimeout(function(){auto=true;},1500);}
+    renderer.domElement.addEventListener('mousedown',function(e){down(e.clientX);});
+    window.addEventListener('mousemove',function(e){move(e.clientX);});
+    window.addEventListener('mouseup',up);
+    renderer.domElement.addEventListener('touchstart',function(e){down(e.touches[0].clientX);},{passive:true});
+    renderer.domElement.addEventListener('touchmove',function(e){move(e.touches[0].clientX);},{passive:true});
+    renderer.domElement.addEventListener('touchend',up);
+    var st={renderer:renderer,raf:0};
+    function loop(){ if(auto)grp.rotation.y+=vy; grp.rotation.x=Math.sin(Date.now()*0.0006)*0.08; renderer.render(scene,cam); st.raf=requestAnimationFrame(loop); }
+    loop(); __fk3d=st;
+  }catch(e){ var fb=document.getElementById('fk-3dfall'); if(fb)fb.style.display='flex'; }
+}
+
+/* ===== v119: shop navigation (back / home / refresh / swipe), wishlist, likes, product detail ===== */
+var __rbNav=[];            // snapshot stack of previous shop pages (innerHTML+scroll)
+var __rbView=null;         // function to re-render the current shop page (for refresh)
+var __pdSel={color:'',size:'',qty:1};
+
+function rbSetView(fn){__rbView=fn;}
+function rbSnapPush(){
+  var box=document.getElementById('ps-results');
+  if(box&&box.innerHTML.trim())__rbNav.push({html:box.innerHTML,top:box.scrollTop||0,view:__rbView});
+  if(__rbNav.length>80)__rbNav.shift();
+  try{history.pushState({rb:1},'');}catch(e){}
+}
+function rbNavBack(){
+  var box=document.getElementById('ps-results');if(!box)return;
+  var s=__rbNav.pop();
+  if(s){box.innerHTML=s.html;box.scrollTop=s.top||0;__rbView=s.view||null;try{fkInitMotion(box);}catch(e){}}
+  else { openMainStore(); }
+}
+function rbNavHome(){ __rbNav=[]; openMainStore(); }
+function rbRefresh(btn){
+  if(btn){btn.classList.add('rb-refreshing');}
+  // pull fresh data if cloud is connected, then re-render current page
+  try{ if(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
+    FB.db.collection('products').get().then(function(){}).catch(function(){});
+  }}catch(e){}
+  setTimeout(function(){
+    try{ if(typeof __rbView==='function'){__rbView();} else {openMainStore();} }catch(e){openMainStore();}
+    toast('Refreshed','ok');
+  },420);
+}
+// reusable top navigation bar (back + title + home + refresh)
+function rbTopBar(title){
+  return '<div class="rb-navbar">'
+    +'<button onclick="rbNavBack()" title="Back" aria-label="Go back"><i class="ti ti-arrow-left"></i></button>'
+    +'<div class="ttl">'+esc(title||'Reedbi')+'</div>'
+    +'<button onclick="rbNavHome()" title="Home"><i class="ti ti-home"></i></button>'
+    +'<span class="sp"></span>'
+    +'<button onclick="rbRefresh(this)" title="Refresh"><i class="ti ti-refresh"></i></button>'
+    +'</div>';
+}
+
+/* ---- Wishlist ---- */
+function getWishlist(){return LS.get('rb_wishlist',[])||[];}
+function inWishlist(pid){return getWishlist().indexOf(pid)>=0;}
+function toggleWishlist(pid,ev){
+  if(ev&&ev.stopPropagation)ev.stopPropagation();
+  if(!requireAuth('save to wishlist'))return;
+  var w=getWishlist();var i=w.indexOf(pid);
+  if(i>=0){w.splice(i,1);toast('Removed from wishlist','info');}else{w.unshift(pid);toast('Saved to wishlist ♥','ok');}
+  LS.set('rb_wishlist',w);
+  // update any heart in view
+  document.querySelectorAll('[data-wish="'+pid+'"]').forEach(function(el){el.classList.toggle('on',inWishlist(pid));});
+  try{if(typeof __rbView==='function'&&__rbView.__isWishlist)__rbView();}catch(e){}
+}
+function openWishlist(){
+  if(!requireAuth('view your wishlist'))return;
+  openProductSearch();
+  var box=document.getElementById('ps-results');
+  var ids=getWishlist();
+  var prods=ids.map(function(id){return getProducts().find(function(p){return p.id===id;});}).filter(Boolean);
+  var grid=prods.length?('<div class="fk-grid">'+prods.map(fkTile).join('')+'</div>'):'<div style="padding:40px;text-align:center;color:#878787"><i class="ti ti-heart" style="font-size:34px;display:block;margin-bottom:8px"></i>Your wishlist is empty.<div style="margin-top:10px"><button class="btn btnok" onclick="rbNavHome()">Browse the store</button></div></div>';
+  var render=function(){openWishlist();};render.__isWishlist=true;rbSetView(render);
+  box.innerHTML='<div class="fk-wrap">'+rbTopBar('My Wishlist ('+prods.length+')')
+    +'<div class="fk-sec"><div class="fk-sec-h"><b>Saved items</b><span style="font-size:11px;color:#878787">'+prods.length+'</span></div>'+grid+'</div></div>';
+  box.scrollTop=0;
+}
+
+/* ---- Page (store) likes — cloud-synced aggregate + per-user ---- */
+function getPageLikes(){return LS.get('rb_pagelikes',{})||{};}
+function savePageLikes(m){LS.set('rb_pagelikes',m);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('config').doc('pagelikes').set(m,{merge:true}).catch(function(){});}catch(e){}}}
+function getMyLikes(){return LS.get('rb_mylikes',[])||[];}
+function iLikePage(name){return getMyLikes().indexOf(name)>=0;}
+function pageLikeCount(name){var m=getPageLikes();return m[name]||0;}
+function togglePageLike(name,ev){
+  if(ev&&ev.stopPropagation)ev.stopPropagation();
+  if(!requireAuth('like a store'))return;
+  var mine=getMyLikes();var m=getPageLikes();var i=mine.indexOf(name);
+  if(i>=0){mine.splice(i,1);m[name]=Math.max(0,(m[name]||1)-1);toast('Unliked','info');}
+  else{mine.unshift(name);m[name]=(m[name]||0)+1;toast('You liked '+name+' ♥','ok');}
+  LS.set('rb_mylikes',mine);savePageLikes(m);
+  document.querySelectorAll('[data-like="'+escAttr(name)+'"]').forEach(function(el){
+    el.classList.toggle('on',iLikePage(name));
+    var c=el.querySelector('.lc');if(c)c.textContent=pageLikeCount(name);
+  });
+}
+function escAttr(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+/* ---- Product Detail Page (PDP) ---- */
+function pdNum(v){return parseFloat(String(v==null?'':v).replace(/[^0-9.]/g,''))||0;}
+function openProductDetail(pid,opts){
+  opts=opts||{};
+  var p=getProducts().find(function(x){return x.id===pid;});
+  if(!p){toast('Product not found','err');return;}
+  if(!document.getElementById('prodsearch-ovl')||!document.getElementById('prodsearch-ovl').classList.contains('open'))openProductSearch();
+  if(opts.nav!==false)rbSnapPush();
+  __pdSel={color:'',size:'',qty:1};__pdPi=0;
+  var render=function(){renderProductDetail(p.id);};rbSetView(render);
+  renderProductDetail(p.id);
+}
+function renderProductDetail(pid){
+  var p=getProducts().find(function(x){return x.id===pid;});if(!p)return;
+  var box=document.getElementById('ps-results');if(!box)return;
+  var base=pdNum(p.offer||p.price), mrp=pdNum(p.price);
+  var off=(mrp&&base&&base<mrp)?Math.round((mrp-base)/mrp*100):0;
+  var cur=esc(p.currency||'');
+  var photos=(p.photos||[]).filter(Boolean);
+  var mainPhoto=photos[__pdPi||0]||photos[0]||'';
+  var pidJ="'"+p.id+"'";
+
+  // rating
+  var rate='';
+  if(p.reviews&&p.reviews.length){var avg=p.reviews.reduce(function(s,r){return s+r.stars;},0)/p.reviews.length;
+    rate='<div class="pd-rate"><span class="pill">'+(Math.round(avg*10)/10)+' ★</span><span class="cnt">'+p.reviews.length+' rating'+(p.reviews.length!==1?'s':'')+'</span></div>';}
+
+  // gallery
+  var gal='<div class="pd-gal"><button class="pd-wish'+(inWishlist(p.id)?' on':'')+'" data-wish="'+esc(p.id)+'" onclick="toggleWishlist('+pidJ+',event)"><i class="ti ti-heart'+(inWishlist(p.id)?'-filled':'')+'"></i></button>'
+    +'<button class="pd-3d" onclick="open3DView('+pidJ+')"><i class="ti ti-3d-cube-sphere"></i> View in 3D</button>'
+    +'<div class="pd-main"><img id="pd-main-img" src="'+esc(mainPhoto)+'" onclick="open3DView('+pidJ+')"></div>'
+    +(photos.length>1?'<div class="pd-thumbs">'+photos.map(function(ph,i){return '<img src="'+esc(ph)+'" class="'+((i===(__pdPi||0))?'on':'')+'" onclick="pdSetPhoto('+i+')">';}).join('')+'</div>':'')
+    +'</div>';
+
+  // colors
+  var colorSec='';
+  if(p.colors&&p.colors.length){
+    colorSec='<div class="pd-sec"><h4>Color'+(__pdSel.color?': '+esc(__pdSel.color):'')+'</h4><div class="pd-opts">'
+      +p.colors.map(function(c){var nm=(typeof c==='string')?c:(c.name||'');var hex=(typeof c==='object'&&c.hex)?c.hex:colorToHex(nm);
+        var nj="'"+String(nm).replace(/'/g,"\\'")+"'";
+        return '<div class="pd-color'+(__pdSel.color===nm?' on':'')+'" onclick="pdSetColor('+nj+')"><span class="pd-sw" style="background:'+esc(hex)+'"></span><small>'+esc(nm)+'</small></div>';
+      }).join('')+'</div></div>';
+  }
+  // sizes
+  var sizeSec='';
+  if(p.sizes&&p.sizes.length){
+    sizeSec='<div class="pd-sec"><h4>Size'+(__pdSel.size?': '+esc(__pdSel.size):'')+'</h4><div class="pd-opts">'
+      +p.sizes.map(function(s){var sj="'"+String(s).replace(/'/g,"\\'")+"'";return '<div class="pd-size'+(__pdSel.size===s?' on':'')+'" onclick="pdSetSize('+sj+')">'+esc(s)+'</div>';}).join('')+'</div></div>';
+  }
+
+  // VAT calculation
+  var qty=__pdSel.qty||1;
+  var vatPct=pdNum(p.vatPct);
+  var lineBase=base*qty;
+  var vatAmt=lineBase*vatPct/100;
+  var grand=lineBase+vatAmt;
+  var vatSec='<div class="pd-sec"><h4>Price details (VAT included)</h4><div class="pd-vat">'
+    +'<div class="row"><span>Price ('+cur+' '+base.toLocaleString()+' × '+qty+')</span><span>'+cur+' '+lineBase.toLocaleString(undefined,{maximumFractionDigits:2})+'</span></div>'
+    +(off?'<div class="row" style="color:#388e3c"><span>You save</span><span>'+off+'% off MRP</span></div>':'')
+    +'<div class="row"><span>VAT '+(vatPct||0)+'%</span><span>'+cur+' '+vatAmt.toLocaleString(undefined,{maximumFractionDigits:2})+'</span></div>'
+    +'<div class="row tot"><span>Total payable</span><span>'+cur+' '+grand.toLocaleString(undefined,{maximumFractionDigits:2})+'</span></div>'
+    +'</div></div>';
+
+  // qty
+  var qtySec='<div class="pd-sec"><h4>Quantity</h4><div class="pd-qty"><button onclick="pdQty(-1)">−</button><span id="pd-qtyval">'+qty+'</span><button onclick="pdQty(1)">+</button></div>'
+    +'<span style="font-size:11px;color:#878787;margin-left:10px">'+(productAvailable(p)?(p.qty!=null?('In stock'+(p.qty<=5?' · only '+p.qty+' left':'')):'In stock'):'Out of stock')+'</span></div>';
+
+  // store block + like
+  var store='';
+  var pg=getPageByName(p.pageName);
+  if(p.pageName){var pn="'"+String(p.pageName).replace(/'/g,"\\'")+"'";
+    store='<div class="pd-sec"><h4>Sold by</h4><div class="pd-store"><div class="pd-store-av">'+esc((p.pageName[0]||'S').toUpperCase())+'</div>'
+      +'<div style="flex:1"><b>'+esc(p.pageName)+' '+(pageLicenseValid(p.pageName)?'<i class="ti ti-discount-check-filled" style="color:#0a66c2;font-size:13px"></i>':'')+'</b><small>'+(pg&&pg.about?esc(pg.about):'Reedbi Assured store')+'</small>'
+      +'<div style="margin-top:6px;display:flex;gap:8px"><button class="pd-like'+(iLikePage(p.pageName)?' on':'')+'" data-like="'+escAttr(p.pageName)+'" onclick="togglePageLike('+pn+',event)"><i class="ti ti-heart"></i> Like <span class="lc">'+pageLikeCount(p.pageName)+'</span></button>'
+      +'<button class="pd-like" style="border-color:#0a66c2;color:#0a66c2" onclick="rbSnapPush();viewSellerStore('+pn+')"><i class="ti ti-building-store"></i> Visit store</button></div>'
+      +'</div></div></div>';
+  }
+
+  // reviews
+  var revList=(p.reviews||[]).slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).map(function(r){
+    return '<div class="pd-rev"><div class="top"><span class="star">'+r.stars+' ★</span><span class="nm">'+esc(r.name||'User')+'</span><span class="dt">'+(r.ts?new Date(r.ts).toLocaleDateString():'')+'</span></div>'
+      +(r.txt?'<div class="tx">'+esc(r.txt)+'</div>':'')
+      +(r.color?'<div class="rcol">Color: '+esc(r.color)+'</div>':'')
+      +(r.photo?'<img class="rimg" src="'+esc(r.photo)+'">':'')
+      +'</div>';
+  }).join('');
+  var reviews='<div class="pd-sec"><h4>Ratings &amp; Reviews</h4>'
+    +'<button class="btn btnok" style="margin-bottom:10px" onclick="openReview('+pidJ+')"><i class="ti ti-star"></i> Write a review</button>'
+    +(revList||'<div style="font-size:12px;color:#878787">No reviews yet. Be the first to review.</div>')+'</div>';
+
+  var desc=p.desc?'<div class="pd-sec"><h4>Product description</h4><div style="font-size:13px;color:#444;line-height:1.5">'+esc(p.desc)+'</div></div>':'';
+  ensureProdMeta(p);var barcodeSec='<div class="pd-sec"><h4>Product number &amp; barcode</h4><div style="font-size:13px;font-weight:700;color:#0a66c2;margin-bottom:6px"><i class="ti ti-hash"></i> '+esc(p.prodNo||'')+'</div><div style="display:inline-block;background:#fff;border:1px solid #e6e9ee;border-radius:8px;padding:8px">'+makeBarcodeSvg(p.barcode,{height:54,unit:2})+'</div><div style="font-size:11px;color:#878787;margin-top:4px">'+(p.barcodeAuto?'Reedbi in-store barcode':(isValidEan13(p.barcode)?'Verified EAN-13':'Product code'))+' · scannable at pickup &amp; counter</div></div>';
+
+  var avail=productAvailable(p);
+  var buybar='<div class="pd-buybar">'
+    +(avail?'<button class="cart" onclick="pdAddToCart('+pidJ+')"><i class="ti ti-shopping-cart"></i> Add to Cart</button>'
+            +'<button class="buy" onclick="pdBuyNow('+pidJ+')"><i class="ti ti-bolt"></i> Buy Now</button>'
+           :'<button class="buy" style="background:#ff6161" onclick="expressInterest('+pidJ+')"><i class="ti ti-bell"></i> Notify me when available</button>')
+    +'</div>';
+
+  box.innerHTML='<div class="fk-wrap pd">'+rbTopBar(p.title)+gal
+    +'<div class="pd-body">'
+    +(p.brand?'<div class="pd-brand">'+esc(p.brand)+'</div>':'')
+    +'<div class="pd-title">'+esc(p.title)+'</div>'
+    +rate
+    +'<div class="pd-price"><span class="pd-now">'+cur+' '+base.toLocaleString()+'</span>'+(off?'<span class="pd-mrp">'+cur+' '+mrp.toLocaleString()+'</span><span class="pd-off">'+off+'% off</span>':'')+'</div>'
+    +'<div style="font-size:11px;color:#878787">Inclusive of all taxes shown below</div>'
+    +colorSec+sizeSec+qtySec+vatSec+store+desc+barcodeSec+reviews
+    +'</div>'+buybar+'</div>';
+  box.scrollTop=0;
+}
+function colorToHex(name){
+  var m={black:'#222',white:'#f3f3f3',red:'#e23b3b',blue:'#2b6fd6',green:'#2ea44f',yellow:'#f4c41a',orange:'#f08a24',purple:'#7c3aed',pink:'#e85aa0',grey:'#9aa3ad',gray:'#9aa3ad',silver:'#c8ccd1',gold:'#d4af37',brown:'#8a5a33',navy:'#1c2c54',beige:'#e3d6bf','frosted white':'#eef1f4'};
+  var k=String(name||'').toLowerCase().trim();
+  return m[k]||'#cfd6df';
+}
+var __pdPi=0;
+function pdSetPhoto(i){__pdPi=i;if(typeof __rbView==='function')__rbView();}
+function pdSetColor(c){__pdSel.color=(__pdSel.color===c?'':c);if(typeof __rbView==='function')__rbView();}
+function pdSetSize(s){__pdSel.size=(__pdSel.size===s?'':s);if(typeof __rbView==='function')__rbView();}
+function pdQty(d){__pdSel.qty=Math.max(1,(__pdSel.qty||1)+d);if(typeof __rbView==='function')__rbView();}
+function pdAddToCart(pid){
+  var p=getProducts().find(function(x){return x.id===pid;});if(!p)return;
+  if(p.colors&&p.colors.length&&!__pdSel.color){toast('Please select a color','err');return;}
+  if(p.sizes&&p.sizes.length&&!__pdSel.size){toast('Please select a size','err');return;}
+  if(!requireAuth('add to cart'))return;
+  if(!productAvailable(p)){toast('Out of stock','err');return;}
+  var cart=getCart();
+  var ex=cart.find(function(i){return i.productId===pid&&(i.color||'')===(__pdSel.color||'')&&(i.size||'')===(__pdSel.size||'');});
+  if(ex)ex.qty=(ex.qty||1)+(__pdSel.qty||1); else cart.push({productId:pid,qty:(__pdSel.qty||1),color:__pdSel.color||'',size:__pdSel.size||''});
+  saveCart(cart);
+  toast('Added '+(__pdSel.qty||1)+' to bag'+(__pdSel.color?' · '+__pdSel.color:'')+(__pdSel.size?' · '+__pdSel.size:''),'ok');
+}
+function pdBuyNow(pid){
+  var p=getProducts().find(function(x){return x.id===pid;});if(!p)return;
+  if(p.colors&&p.colors.length&&!__pdSel.color){toast('Please select a color','err');return;}
+  if(p.sizes&&p.sizes.length&&!__pdSel.size){toast('Please select a size','err');return;}
+  closeOvl('prodsearch-ovl');
+  buyProduct(pid);
+}
+
+/* ===== v119: browser back + left-edge swipe-to-go-back for the shop ===== */
+(function rbNavGestures(){
+  function shopOpen(){var o=document.getElementById('prodsearch-ovl');return o&&o.classList.contains('open');}
+  // Browser / Android back button
+  window.addEventListener('popstate',function(){
+    if(shopOpen()&&__rbNav.length){ rbNavBack(); try{history.pushState({rb:1},'');}catch(e){} }
+  });
+  // Left-edge swipe right = go back (mobile feel)
+  var sx=0,sy=0,tracking=false;
+  document.addEventListener('touchstart',function(e){
+    if(!shopOpen())return;var t=e.touches[0];
+    if(t.clientX<=28){tracking=true;sx=t.clientX;sy=t.clientY;}
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(!tracking)return;tracking=false;var t=e.changedTouches[0];
+    var dx=t.clientX-sx,dy=Math.abs(t.clientY-sy);
+    if(dx>60&&dy<50){ rbNavBack(); }
+  },{passive:true});
+})();
+
+/* ===== v120: AI Job Agent =====
+   An in-app agent that reads the user's CV/skills + desired role, scores every
+   Reedbi job by skill/title overlap, and — with permission — auto-applies to
+   strong (>=70%) ATS-ready matches, with a sound notification. HONEST SCOPE:
+   it scans jobs POSTED ON REEDBI and applies WITHIN Reedbi. It runs while the
+   app is open (and on load). True always-on 24/7 background scanning and
+   auto-applying to EXTERNAL boards (LinkedIn/Indeed) need the cloud agent +
+   those sites' APIs (Layer 7). Matching is a transparent keyword/skill engine,
+   not a hidden LLM. */
+function getAgentCfg(){
+  var c=LS.get('rb_jobagent',null);
+  if(!c)c={enabled:false,autoApply:false,minMatch:70,muted:false,role:'',skills:'',seen:[],applied:[],lastScan:0};
+  if(c.minMatch==null)c.minMatch=70;
+  return c;
+}
+function saveAgentCfg(c){LS.set('rb_jobagent',c);}
+function agentProfile(){
+  var c=getAgentCfg();
+  var skills=c.skills||'';
+  // fall back to interests + latest CV extracted text
+  if(!skills&&CU){
+    if(CU.interests)skills=CU.interests;
+    var cvs=getCVs(CU.uid)||[];var latest=cvs[cvs.length-1];
+    if(latest&&latest.text)skills+=' '+latest.text;
+  }
+  var role=c.role||(CU&&CU.interests?'':'')||'';
+  return {role:role,skills:skills};
+}
+function tokenize(s){
+  return String(s||'').toLowerCase().replace(/[^a-z0-9\+\#\.\s]/g,' ').split(/\s+/)
+    .filter(function(w){return w.length>1 && ['the','and','for','with','you','are','our','your','job','role','work','will','have','from','this','that','who','all','can'].indexOf(w)<0;});
+}
+function jobsPool(){
+  var pool=[];
+  ['jobs','remote'].forEach(function(tid){
+    var t=tags.find(function(x){return x.id===tid;});
+    if(t&&t.posts)t.posts.forEach(function(p){pool.push({tagId:tid,postId:p.id,title:p.title||'',body:p.body||'',co:p.co||'',post:p});});
+  });
+  return pool;
+}
+function jobMatchScore(profile,job){
+  var pSkills=tokenize(profile.skills);
+  var pRole=tokenize(profile.role);
+  if(!pSkills.length&&!pRole.length)return 0;
+  var jt=tokenize(job.title+' '+job.body+' '+job.co);
+  var jset={};jt.forEach(function(w){jset[w]=1;});
+  var skillHit=0;var seen={};
+  pSkills.forEach(function(w){if(jset[w]&&!seen[w]){skillHit++;seen[w]=1;}});
+  var uniqSkills=Object.keys(seen).length+pSkills.filter(function(w,i){return pSkills.indexOf(w)===i;}).length;
+  var totalSkills=pSkills.filter(function(w,i){return pSkills.indexOf(w)===i;}).length||1;
+  var skillScore=skillHit/totalSkills; // 0..1
+  // title/role match bonus
+  var roleHit=0;pRole.forEach(function(w){if(jset[w])roleHit++;});
+  var roleScore=pRole.length?roleHit/pRole.length:0;
+  var score=Math.round((skillScore*0.7+roleScore*0.3)*100);
+  return Math.max(0,Math.min(100,score));
+}
+function atsReadiness(){
+  // simple ATS-readiness for the user's profile: has skills, has a CV, has contact, has a target role
+  var p=agentProfile();var c=getAgentCfg();var cvs=CU?(getCVs(CU.uid)||[]):[];
+  var pts=0;
+  if(tokenize(p.skills).length>=4)pts+=35;
+  if(cvs.length)pts+=30;
+  if(CU&&(CU.email||CU.phone))pts+=15;
+  if(p.role)pts+=20;
+  return Math.min(100,pts);
+}
+function jobAgentBadge(){
+  var c=getAgentCfg();if(!c.enabled)return 0;
+  return (c.__pending&&c.__pending.length)||0;
+}
+function agentMatches(){
+  var prof=agentProfile();
+  var c=getAgentCfg();
+  var mine=getMyApps();var appliedPosts={};mine.forEach(function(a){appliedPosts[a.tagId+'_'+a.postId]=1;});
+  return jobsPool().map(function(j){
+    j.score=jobMatchScore(prof,j);
+    j.applied=!!appliedPosts[j.tagId+'_'+j.postId];
+    return j;
+  }).filter(function(j){return j.score>0;}).sort(function(a,b){return b.score-a.score;});
+}
+function runJobAgent(manual){
+  if(!CU){if(manual)toast('Sign in to use the AI Job Agent','err');return;}
+  var c=getAgentCfg();
+  if(!c.enabled&&!manual)return;
+  var matches=agentMatches();
+  var strong=matches.filter(function(j){return j.score>=Math.max(70,c.minMatch||70)&&!j.applied;});
+  var ats=atsReadiness();
+  var newOnes=strong.filter(function(j){return (c.seen||[]).indexOf(j.tagId+'_'+j.postId)<0;});
+  c.lastScan=Date.now();
+  if(c.autoApply&&ats>=60){
+    // auto-apply to new strong matches (standing permission granted)
+    var did=[];
+    newOnes.forEach(function(j){ if(agentAutoApply(j,true)){did.push(j);} c.seen.push(j.tagId+'_'+j.postId); });
+    saveAgentCfg(c);
+    if(did.length){ if(!c.muted&&!getNotifCfg().muted)playTune('reedbi');
+      notifyEvent('jobagent','🤖 <b>AI Job Agent</b> auto-applied to '+did.length+' matching job'+(did.length>1?'s':'')+' ('+did[0].score+'% match)'); }
+    if(manual&&!did.length)toast('No new strong matches to auto-apply','info');
+    return;
+  }
+  // permission mode: queue prompts
+  c.__pending=newOnes;saveAgentCfg(c);
+  if(newOnes.length){
+    if(!c.muted&&!getNotifCfg().muted)playTune('reedbi');
+    showAgentPrompt(newOnes[0]);
+  } else if(manual){ toast('Scanned '+matches.length+' jobs — no new '+(c.minMatch||70)+'%+ matches','info'); }
+}
+function showAgentPrompt(j){
+  var ex=document.getElementById('ja-prompt');if(ex)ex.remove();
+  var d=document.createElement('div');d.id='ja-prompt';d.className='ja-prompt';
+  var key=j.tagId+'_'+j.postId;
+  d.innerHTML='<h4><i class="ti ti-robot" style="color:#7c3aed"></i> '+j.score+'% match found</h4>'
+    +'<div class="jm"><b>'+esc(j.title||'Job')+'</b>'+(j.co?' · '+esc(j.co):'')+'<br>Want me to apply for you with your CV?</div>'
+    +'<div class="acts">'
+    +'<button class="ja-actbtn ja-apply" onclick="agentPromptApply(\''+key+'\')"><i class="ti ti-send"></i> Apply for me</button>'
+    +'<button class="ja-actbtn ja-skip" onclick="agentPromptSkip(\''+key+'\')">Skip</button>'
+    +'<button class="ja-actbtn ja-skip" onclick="agentToggleMute()" title="Mute agent sound"><i class="ti ti-bell-off"></i></button>'
+    +'<button class="ja-actbtn ja-skip" style="margin-left:auto" onclick="document.getElementById(\'ja-prompt\').remove()"><i class="ti ti-x"></i></button>'
+    +'</div>';
+  document.body.appendChild(d);
+}
+function agentFindByKey(key){return agentMatches().find(function(j){return (j.tagId+'_'+j.postId)===key;});}
+function agentPromptApply(key){
+  var j=agentFindByKey(key);if(!j){toast('Job no longer available','err');return;}
+  if(agentAutoApply(j,false)){
+    var c=getAgentCfg();c.seen.push(key);c.__pending=(c.__pending||[]).filter(function(x){return (x.tagId+'_'+x.postId)!==key;});saveAgentCfg(c);
+    var d=document.getElementById('ja-prompt');if(d)d.remove();
+    var next=(c.__pending||[])[0];if(next)setTimeout(function(){showAgentPrompt(next);},600);
+  }
+}
+function agentPromptSkip(key){
+  var c=getAgentCfg();c.seen.push(key);c.__pending=(c.__pending||[]).filter(function(x){return (x.tagId+'_'+x.postId)!==key;});saveAgentCfg(c);
+  var d=document.getElementById('ja-prompt');if(d)d.remove();
+  var next=(c.__pending||[])[0];if(next)setTimeout(function(){showAgentPrompt(next);},300);
+}
+function agentToggleMute(){var c=getAgentCfg();c.muted=!c.muted;saveAgentCfg(c);toast(c.muted?'Agent muted 🔕':'Agent unmuted 🔔','info');}
+function agentAutoApply(j,silent){
+  if(!CU)return false;
+  var prof=agentProfile();
+  var cvs=getCVs(CU.uid)||[];var cv=cvs[cvs.length-1]||null;
+  var p=j.post||{};
+  var rec={id:'app'+Date.now()+Math.floor(Math.random()*1000),name:CU.name,email:CU.email||'',phone:CU.phone||'',
+    loc:CU.location||'',note:'Applied automatically by my Reedbi AI Job Agent ('+j.score+'% skill match). Skills: '+(prof.skills||'').slice(0,200),
+    skills:prof.skills||'',cvText:(cv&&cv.text)||'',cvId:cv?cv.id:null,cvName:cv?cv.name:'',cvOwnerUid:CU.uid,
+    company:j.co||'',companyLower:String(j.co||'').toLowerCase(),tagId:j.tagId,postId:j.postId,
+    postTitle:p.title||'',postBody:p.body||'',ts:Date.now(),uid:CU.uid,status:'received',statusTs:Date.now(),viaAgent:true,matchPct:j.score};
+  var apps=getAllApps();
+  if(apps.some(function(a){return a.uid===CU.uid&&a.tagId===j.tagId&&String(a.postId)===String(j.postId);})){return false;}
+  apps.push(rec);saveAllApps(apps);
+  if(p)p.applied=true;
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('applications').doc(rec.id).set(rec).catch(function(){});}catch(e){}}
+  if(!silent)toast('Applied to '+(j.title||'job')+' ✓','ok');
+  return true;
+}
+function openJobAgent(){
+  if(!requireAuth('use the AI Job Agent'))return;
+  var c=getAgentCfg();var prof=agentProfile();var ats=atsReadiness();
+  var ovl=document.getElementById('jobagent-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='jobagent-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:460px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-robot" style="color:#7c3aed"></i> AI Job Agent</b><button class="modal-x" onclick="closeOvl(\'jobagent-ovl\')"><i class="ti ti-x"></i></button></div><div id="jobagent-body"></div></div>';
+    document.body.appendChild(ovl);}
+  var matches=agentMatches();
+  var strong=matches.filter(function(j){return j.score>=(c.minMatch||70);});
+  function sw(on){return '<div class="ja-switch'+(on?' on':'')+'"></div>';}
+  var body=''
+    +'<div class="ja-hero"><h3><i class="ti ti-robot"></i> Your 24/7 job hunter</h3>'
+    +'<p>I read your CV &amp; skills, score every Reedbi job, and — with your permission — apply to strong matches automatically. I scan while Reedbi is open.</p></div>'
+    +'<div class="ja-row"><div><b>Enable AI Job Agent</b><small>Scan jobs &amp; notify me of matches</small></div><div onclick="agentSet(\'enabled\')">'+sw(c.enabled)+'</div></div>'
+    +'<div class="ja-row"><div><b>Auto-apply (≥70% only)</b><small>Apply automatically without asking each time</small></div><div onclick="agentSet(\'autoApply\')">'+sw(c.autoApply)+'</div></div>'
+    +'<div class="ja-row"><div><b>Mute agent sound</b><small>Still shows matches, no chime</small></div><div onclick="agentSet(\'muted\')">'+sw(c.muted)+'</div></div>'
+    +'<div style="padding:11px 0;border-bottom:1px solid var(--b)"><b style="font-size:13px">Minimum match to apply</b>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-top:6px"><input type="range" min="70" max="100" value="'+(c.minMatch||70)+'" style="flex:1" oninput="agentSetMin(this.value)"><span id="ja-minlbl" style="font-weight:800;color:#7c3aed;min-width:42px">'+(c.minMatch||70)+'%</span></div>'
+    +'<small style="color:var(--mt2)">Auto-apply is locked to 70% and above for safety.</small></div>'
+    +'<div style="padding:11px 0;border-bottom:1px solid var(--b)"><b style="font-size:13px">Desired role / title</b>'
+    +'<input type="text" id="ja-role" value="'+esc(c.role||'')+'" placeholder="e.g. Full Stack Developer" style="width:100%;margin-top:6px;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn)" onchange="agentSetText()"></div>'
+    +'<div style="padding:11px 0;border-bottom:1px solid var(--b)"><b style="font-size:13px">Your skills (comma separated)</b>'
+    +'<textarea id="ja-skills" rows="2" placeholder="React, Node.js, AWS, Python, SQL…" style="width:100%;margin-top:6px;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:9px;color:var(--tx);font-family:var(--fn)" onchange="agentSetText()">'+esc(c.skills||'')+'</textarea>'
+    +'<small style="color:var(--mt2)">Tip: these come from your experience. The closer to the job, the higher the match.</small></div>'
+    +'<div style="padding:11px 0;border-bottom:1px solid var(--b)"><b style="font-size:13px">ATS readiness <span style="color:'+(ats>=70?'#2ea44f':ats>=40?'#f4a31a':'#e23b3b')+'">'+ats+'%</span></b>'
+    +'<div class="ja-ats"><i style="width:'+ats+'%"></i></div>'
+    +'<small style="color:var(--mt2)">'+(ats>=60?'Good — agent can auto-apply.':'Add a CV, skills and a target role to reach 60%+ for auto-apply.')+'</small></div>'
+    +'<div style="margin:12px 0 6px;display:flex;gap:8px"><button class="btn btnok" style="flex:1" onclick="runJobAgent(true)"><i class="ti ti-radar"></i> Scan now</button></div>'
+    +'<b style="font-size:13px">Matches ('+strong.length+' at '+(c.minMatch||70)+'%+)</b>'
+    +(matches.length?matches.slice(0,12).map(function(j){
+        var cls=j.score>=70?'hi':(j.score>=40?'mid':'');
+        return '<div class="ja-match"><div style="display:flex;justify-content:space-between;align-items:center"><div style="flex:1;min-width:0"><b style="font-size:13px">'+esc(j.title||'Job')+'</b>'+(j.co?'<small style="color:var(--mt2)"> · '+esc(j.co)+'</small>':'')+'</div><div class="pct '+cls+'">'+j.score+'%</div></div>'
+          +'<div class="ja-bar"><i style="width:'+j.score+'%"></i></div>'
+          +(j.applied?'<span style="font-size:11px;color:#2ea44f;font-weight:700"><i class="ti ti-check"></i> Applied</span>'
+            :'<button class="ja-actbtn ja-apply" onclick="agentApplyOne(\''+j.tagId+'_'+j.postId+'\')"><i class="ti ti-send"></i> Apply now</button>')
+          +'</div>';
+      }).join('')
+      :'<div style="font-size:12px;color:var(--mt2);padding:10px 0">No jobs scored yet. Add your skills above and tap Scan now.</div>')
+    +'<div style="font-size:10px;color:var(--mt2);margin-top:10px;line-height:1.5;border-top:1px solid var(--b);padding-top:8px">'
+    +'<i class="ti ti-info-circle"></i> The agent scans <b>jobs posted on Reedbi</b> and applies within Reedbi while the app is open. Always-on 24/7 scanning and auto-applying to outside boards (LinkedIn, Indeed) need the Reedbi cloud agent.</div>';
+  document.getElementById('jobagent-body').innerHTML=body;
+  ovl.classList.add('open');
+}
+function agentSet(k){var c=getAgentCfg();c[k]=!c[k];if(k==='enabled'&&c[k]){toast('AI Job Agent on — scanning…','ok');}saveAgentCfg(c);openJobAgent();if(k==='enabled'&&c[k])setTimeout(function(){runJobAgent(true);},300);}
+function agentSetMin(v){v=Math.max(70,parseInt(v,10)||70);var c=getAgentCfg();c.minMatch=v;saveAgentCfg(c);var l=document.getElementById('ja-minlbl');if(l)l.textContent=v+'%';}
+function agentSetText(){var c=getAgentCfg();var r=document.getElementById('ja-role'),s=document.getElementById('ja-skills');if(r)c.role=r.value;if(s)c.skills=s.value;saveAgentCfg(c);}
+function agentApplyOne(key){var j=agentFindByKey(key);if(!j)return;if(agentAutoApply(j,false)){openJobAgent();}}
+
+/* ===== v120: agent background loop (while app open) + voice/interest product search ===== */
+(function jobAgentLoop(){
+  function tick(){ try{ var c=getAgentCfg(); if(CU&&c.enabled){ runJobAgent(false); } }catch(e){} }
+  setTimeout(tick,4500);            // first scan shortly after load
+  setInterval(tick,3*60*1000);      // re-scan every 3 minutes while open
+})();
+
+// Voice product search — uses the browser Speech Recognition API (Chrome/Edge/Android)
+var __rbRec=null;
+function rbVoiceSearch(btn){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Voice search needs Chrome, Edge or Android browser','err');return;}
+  try{
+    if(__rbRec){__rbRec.stop();__rbRec=null;if(btn)btn.classList.remove('rec');return;}
+    var rec=new SR();rec.lang=(navigator.language||'en-US');rec.interimResults=false;rec.maxAlternatives=1;
+    __rbRec=rec;if(btn)btn.classList.add('rec');toast('Listening… say a product','info');
+    rec.onresult=function(e){
+      var said=(e.results[0][0].transcript||'').trim();
+      var inp=document.getElementById('ps-q');
+      if(inp){inp.value=said;runProductSearch(said);}
+      toast('Searching “'+said+'”','ok');
+    };
+    rec.onerror=function(){toast('Didn’t catch that — try again','err');};
+    rec.onend=function(){__rbRec=null;if(btn)btn.classList.remove('rec');};
+    rec.start();
+  }catch(e){toast('Voice search unavailable','err');if(btn)btn.classList.remove('rec');}
+}
+// Interest-based product search — ranks by the user's stated interests
+function rbInterestChips(){
+  if(!CU||!CU.interests)return '';
+  var ints=String(CU.interests).split(/[,;]+/).map(function(s){return s.trim();}).filter(Boolean).slice(0,8);
+  if(!ints.length)return '';
+  return '<div style="font-size:11px;color:var(--mt2);margin:2px 0 4px"><i class="ti ti-sparkles" style="color:#7c3aed"></i> Based on your interests</div>'
+    +'<div class="int-rail">'+ints.map(function(i){return '<button class="int-chip" onclick="rbInterestSearch(\''+escJS(i)+'\')">'+esc(i)+'</button>';}).join('')+'</div>';
+}
+function rbInterestSearch(term){var inp=document.getElementById('ps-q');if(inp)inp.value=term;runProductSearch(term);}
+
+/* ===== v121: barcode/QR scanner (camera + hardware/manual) =====
+   Uses the native BarcodeDetector API (works on Android/Chrome and the Sunmi
+   device's camera). A focused input also captures the Sunmi hardware laser
+   scanner (it types the code + Enter), and lets anyone type a code manually.
+   Honest: no external scan SDK; pure browser APIs + manual entry fallback. */
+var __scanState=null;
+function rbOpenScanner(opts){
+  // opts: {title, match(code)->bool, onMatch(code), onAny(code)}
+  __scanState=opts||{};
+  var o=document.getElementById('scan-ovl');
+  if(!o){
+    o=document.createElement('div');o.id='scan-ovl';o.className='scan-ovl';
+    o.innerHTML='<div class="scan-top"><b id="scan-title">Scan product</b><button onclick="rbCloseScanner()" style="background:rgba(255,255,255,.12);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer"><i class="ti ti-x"></i></button></div>'
+      +'<div class="scan-stage"><div class="scan-result" id="scan-result"></div><video id="scan-video" playsinline muted></video><div class="scan-frame"><div class="box"></div></div><div class="scan-laser"></div></div>'
+      +'<div class="scan-bottom"><div class="hint"><i class="ti ti-scan"></i> Point the camera at the product barcode / QR, use the device scanner, or type the code.</div>'
+      +'<div class="man"><input id="scan-input" placeholder="Scan or type barcode / product code" autocomplete="off" onkeydown="if(event.key===\'Enter\'){rbScanSubmit(this.value);this.value=\'\';}"><button class="col-scanbtn" style="width:auto;padding:11px 16px" onclick="var i=document.getElementById(\'scan-input\');rbScanSubmit(i.value);i.value=\'\';">OK</button></div></div>';
+    document.body.appendChild(o);
+  }
+  document.getElementById('scan-title').textContent=(opts&&opts.title)||'Scan product';
+  document.getElementById('scan-result').className='scan-result';
+  o.classList.add('open');
+  setTimeout(function(){var i=document.getElementById('scan-input');if(i)i.focus();},250); // captures hardware scanner
+  rbStartCamera();
+}
+function rbCloseScanner(){var o=document.getElementById('scan-ovl');if(o)o.classList.remove('open');rbStopCamera();__scanState=null;}
+var __scanStream=null,__scanRAF=null,__scanDetector=null;
+function rbStartCamera(){
+  try{
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return; // manual entry still works
+    navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(stream){
+      __scanStream=stream;var v=document.getElementById('scan-video');if(!v)return;v.srcObject=stream;v.play();
+      if('BarcodeDetector' in window){
+        try{__scanDetector=new window.BarcodeDetector();}catch(e){__scanDetector=null;}
+        if(__scanDetector)rbScanLoop(v);
+      }
+    }).catch(function(){/* camera denied — manual/hardware entry still works */});
+  }catch(e){}
+}
+function rbScanLoop(v){
+  if(!__scanDetector||!document.getElementById('scan-ovl').classList.contains('open'))return;
+  __scanDetector.detect(v).then(function(codes){
+    if(codes&&codes.length){ rbScanSubmit(codes[0].rawValue); }
+    __scanRAF=requestAnimationFrame(function(){rbScanLoop(v);});
+  }).catch(function(){ __scanRAF=requestAnimationFrame(function(){rbScanLoop(v);}); });
+}
+function rbStopCamera(){try{if(__scanRAF)cancelAnimationFrame(__scanRAF);}catch(e){}try{if(__scanStream)__scanStream.getTracks().forEach(function(t){t.stop();});}catch(e){}__scanStream=null;__scanDetector=null;}
+var __lastScanVal='',__lastScanTs=0;
+function rbScanSubmit(val){
+  val=String(val||'').trim();if(!val)return;
+  var now=Date.now();if(val===__lastScanVal&&now-__lastScanTs<1200)return; // debounce duplicate camera reads
+  __lastScanVal=val;__lastScanTs=now;
+  var st=__scanState||{};
+  var res=document.getElementById('scan-result');
+  var ok=st.match?st.match(val):true;
+  if(ok){
+    if(res){res.className='scan-result ok';res.innerHTML='<i class="ti ti-check"></i> Match confirmed';}
+    try{if(!getNotifCfg().muted)playTune('pop');}catch(e){}
+    if(st.onMatch)st.onMatch(val);
+  }else{
+    if(res){res.className='scan-result bad';res.innerHTML='<i class="ti ti-x"></i> Wrong product';}
+  }
+  if(st.onAny)st.onAny(val,ok);
+}
+
+/* ===== v121: Order collection / picking by delivery agent ===== */
+function orderCodes(o){
+  // acceptable scan codes for this order's product
+  var p=getProducts().find(function(x){return x.id===o.productId;});
+  var codes=[String(o.productId||'').toLowerCase()];
+  if(p&&p.barcode){codes.push(String(p.barcode).toLowerCase());codes.push(normalizeBarcode(p.barcode).toLowerCase());}
+  if(o.barcode)codes.push(String(o.barcode).toLowerCase());
+  if(p&&p.serialNo)codes.push(String(p.serialNo).toLowerCase());
+  if(o.orderNo)codes.push(String(o.orderNo).toLowerCase());
+  return codes.filter(Boolean);
+}
+function openCollection(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o)return;
+  if(o.agentUid!==CU.uid){toast('This pickup is not assigned to you','err');return;}
+  var ovl=document.getElementById('collect-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='collect-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:430px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-clipboard-check" style="color:#0a66c2"></i> Pick &amp; Collect</b><button class="modal-x" onclick="closeOvl(\'collect-ovl\')"><i class="ti ti-x"></i></button></div><div id="collect-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderCollection(orderId);
+  ovl.classList.add('open');
+}
+function weightUnitLabel(u){return u==='100g'?'×100 g':(u==='g'?'g':'kg');}
+function renderCollection(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o)return;
+  if(o.byWeight){return renderWeightCollection(o);}
+  var got=o.collectedQty||0;var qty=o.qty||1;
+  var pct=Math.round(got/qty*100);
+  var unit=parseFloat(String(o.price).replace(/[^0-9.]/g,''))||0;
+  var short=qty-got;
+  var body='<div style="font-size:11px;color:var(--mt2);margin-bottom:4px">Order '+esc(o.orderNo||o.id)+' · from '+esc(o.sellerName)+'</div>'
+    +'<div class="col-line"><div class="hd"><div><b style="font-size:13px">'+esc(o.productTitle)+'</b><div style="font-size:11px;color:var(--mt2)">Scan each unit to confirm you picked it</div></div>'
+    +'<div class="cnt"><span style="color:'+(got>=qty?'#16a34a':'#0a66c2')+'">'+got+'</span><span class="o">/'+qty+'</span></div></div>'
+    +'<div class="col-prog"><i style="width:'+pct+'%"></i></div>'
+    +(o.collectedConfirmed?'<div style="font-size:12px;color:#16a34a;font-weight:700"><i class="ti ti-circle-check"></i> Collection confirmed</div>'
+      :'<button class="col-scanbtn" onclick="collectScan(\''+o.id+'\')"><i class="ti ti-scan"></i> Scan product to collect ('+got+'/'+qty+')</button>'
+       +'<div style="display:flex;gap:7px;margin-top:7px"><button class="col-scanbtn" style="background:var(--card2);color:var(--tx);border:1px solid var(--b)" onclick="collectAdjust(\''+o.id+'\',-1)">−1</button><button class="col-scanbtn" style="background:var(--card2);color:var(--tx);border:1px solid var(--b)" onclick="collectAdjust(\''+o.id+'\',1)">+1 manual</button></div>')
+    +'</div>';
+  if(!o.collectedConfirmed && got<qty && got>0){
+    body+='<div class="col-short"><i class="ti ti-alert-triangle"></i> You\'ve collected <b>'+got+' of '+qty+'</b>. '+short+' item'+(short>1?'s':'')+' short — confirm to bill only what you picked'+(o.payMethod==='online'?' and flag a refund for the rest.':'.')+'</div>';
+  }
+  if(!o.collectedConfirmed){
+    body+='<button class="btn btnok" style="width:100%;margin-top:6px" onclick="confirmCollection(\''+o.id+'\')"'+(got<1?' disabled style="opacity:.5;width:100%;margin-top:6px"':'')+'><i class="ti ti-shield-check"></i> Confirm collection &amp; take to billing</button>';
+  } else {
+    // reconciliation summary
+    var billQty=o.billQty!=null?o.billQty:got;
+    body+='<div class="col-track"><b><i class="ti ti-receipt"></i> Billing</b><br>Billed: <b>'+billQty+' × '+esc(o.currency||'')+' '+unit+'</b> = '+esc(o.currency||'')+' '+(billQty*unit)
+      +(o.refundDue?'<br><span style="color:#e23b3b">Refund due (online): '+esc(o.currency||'')+' '+o.refundDue+' for '+short+' missing</span>':'')+'</div>'
+      +'<button class="col-scanbtn" style="margin-top:8px" onclick="printInvoice(\''+o.id+'\')"><i class="ti ti-printer"></i> Print invoice / bill ('+billQty+' items)</button>';
+  }
+  document.getElementById('collect-body').innerHTML=body;
+}
+function collectScan(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o)return;
+  var codes=orderCodes(o);
+  rbOpenScanner({title:'Scan: '+o.productTitle,
+    match:function(code){return codes.indexOf(String(code).toLowerCase())>=0;},
+    onMatch:function(){
+      var os=getOrders();var oo=os.find(function(x){return x.id===orderId;});if(!oo)return;
+      if((oo.collectedQty||0)>=(oo.qty||1)){var rf=document.getElementById('scan-result');if(rf){rf.className='scan-result ok';rf.innerHTML='<i class="ti ti-check"></i> Already '+(oo.qty)+'/'+(oo.qty)+' confirmed';}return;}
+      oo.collectedQty=Math.min((oo.collectedQty||0)+1,oo.qty||1);saveOrders(os);
+      var rf2=document.getElementById('scan-result');if(rf2){rf2.className='scan-result ok';rf2.innerHTML='<i class="ti ti-check"></i> Item confirmed '+oo.collectedQty+'/'+oo.qty;}
+      try{toast('Item confirmed '+oo.collectedQty+'/'+oo.qty,'ok');}catch(e){}
+      if((oo.collectedQty)>=(oo.qty||1)){setTimeout(function(){rbCloseScanner();renderCollection(orderId);toast('All '+oo.qty+'/'+oo.qty+' items confirmed ✓','ok');},850);}
+      else { renderCollection(orderId); }
+    }
+  });
+}
+function collectAdjust(orderId,d){
+  var os=getOrders();var o=os.find(function(x){return x.id===orderId;});if(!o)return;
+  o.collectedQty=Math.max(0,Math.min((o.collectedQty||0)+d,o.qty||1));saveOrders(os);renderCollection(orderId);
+}
+function confirmCollection(orderId){
+  var os=getOrders();var o=os.find(function(x){return x.id===orderId;});if(!o)return;
+  var got=o.collectedQty||0;var qty=o.qty||1;if(got<1){toast('Scan at least 1 item','err');return;}
+  var unit=parseFloat(String(o.price).replace(/[^0-9.]/g,''))||0;
+  o.collectedConfirmed=true;o.collectedTs=Date.now();o.billQty=got;
+  o.collectedShort=qty-got;
+  if(got<qty && o.payMethod==='online'){o.refundDue=Math.round((qty-got)*unit*100)/100;o.refundStatus='due';}
+  o.pickLog=(o.pickLog||[]);o.pickLog.push({by:CU.name,got:got,qty:qty,ts:Date.now()});
+  saveOrders(os);
+  notifyEvent('collect','📦 <b>'+esc(CU.name)+'</b> collected '+got+'/'+qty+' of “'+esc(o.productTitle)+'”'+(o.refundDue?' · refund '+esc(o.currency||'')+' '+o.refundDue+' flagged':''));
+  renderCollection(orderId);
+  toast(got<qty?('Confirmed '+got+'/'+qty+' — billing adjusted'):'Collection confirmed ✓','ok');
+}
+function printInvoice(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o)return;
+  var unit=parseFloat(String(o.price).replace(/[^0-9.]/g,''))||0;
+  var p=getProducts().find(function(x){return x.id===o.productId;});
+  var vatPct=p&&p.vatPct?p.vatPct:0;
+  var rows,net,shortRow='';
+  if(o.byWeight){
+    var lbl=weightUnitLabel(o.weightUnit||'kg');
+    var aW=parseFloat(o.actualWeight||o.orderedWeight||o.qty||1);
+    net=Math.round(aW*unit*100)/100;
+    rows='<tr><td>'+esc(o.productTitle)+' <span style="color:#0a8f5c">(by weight)</span></td><td style="text-align:center">'+aW+' '+lbl+'</td><td style="text-align:right">'+esc(o.currency||'')+' '+unit+'/'+lbl+'</td><td style="text-align:right">'+esc(o.currency||'')+' '+net.toFixed(2)+'</td></tr>';
+    if(o.weightExtraDue)shortRow='<tr><td colspan="4" style="color:#c2410c;font-size:12px;padding-top:6px">Weight '+(o.weightDiffG||'over ordered')+': extra '+esc(o.currency||'')+' '+o.weightExtraDue+' to collect'+(o.payMethod==='online'?' at delivery':'')+'</td></tr>';
+    else if(o.refundDue)shortRow='<tr><td colspan="4" style="color:#b91c1c;font-size:12px;padding-top:6px">Weight '+(o.weightDiffG||'under ordered')+': refund '+esc(o.currency||'')+' '+o.refundDue+' to customer</td></tr>';
+  } else {
+    var billQty=o.billQty!=null?o.billQty:(o.collectedQty||o.qty);
+    net=billQty*unit;
+    rows='<tr><td>'+esc(o.productTitle)+'</td><td style="text-align:center">'+billQty+'</td><td style="text-align:right">'+esc(o.currency||'')+' '+unit+'</td><td style="text-align:right">'+esc(o.currency||'')+' '+net.toFixed(2)+'</td></tr>';
+    shortRow=(o.collectedShort?'<tr><td colspan="4" style="color:#b91c1c;font-size:12px;padding-top:6px">Note: '+o.collectedShort+' item(s) not available at pick — '+(o.payMethod==='online'?('refund '+esc(o.currency||'')+' '+(o.refundDue||0)+' to customer'):'not charged (COD)')+'</td></tr>':'');
+  }
+  var vat=Math.round(net*vatPct)/100;var tot=net+vat;
+  var w=window.open('','_blank');if(!w){toast('Allow pop-ups to print','err');return;}
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Invoice '+esc(o.orderNo||o.id)+'</title><style>*{font-family:Arial,sans-serif;margin:0;padding:0;box-sizing:border-box}body{padding:18px;color:#111}.inv{max-width:420px;margin:0 auto;border:1px solid #ccc;border-radius:10px;padding:18px}.brand{font-size:20px;font-weight:800;color:#0a66c2}table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}th,td{padding:7px 4px;border-bottom:1px solid #eee}th{text-align:left;font-size:11px;color:#666;text-transform:uppercase}.tot{font-size:16px;font-weight:800;text-align:right;margin-top:10px}.muted{font-size:11px;color:#777;margin-top:10px}@media print{.np{display:none}}</style></head><body><div class="inv"><div class="brand">⬡ Reedbi Invoice</div><div style="font-size:12px;color:#555;margin-top:3px">Order '+esc(o.orderNo||o.id)+' · '+new Date().toLocaleString()+'</div>'
+    +'<div style="font-size:12px;margin-top:8px"><b>Bill to:</b> '+esc(o.buyerName||'')+'<br>'+esc(o.buyerAddr||'')+'</div>'
+    +'<div style="font-size:12px;margin-top:4px"><b>Picked by agent:</b> '+esc(o.agentName||'-')+'</div>'
+    +'<table><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Unit</th><th style="text-align:right">Amount</th></tr>'+rows+shortRow+'</table>'
+    +'<div style="margin-top:10px;font-size:13px;display:flex;justify-content:space-between"><span>Subtotal</span><span>'+esc(o.currency||'')+' '+net.toFixed(2)+'</span></div>'
+    +(vatPct?'<div style="font-size:13px;display:flex;justify-content:space-between"><span>VAT '+vatPct+'%</span><span>'+esc(o.currency||'')+' '+vat.toFixed(2)+'</span></div>':'')
+    +'<div class="tot">Total: '+esc(o.currency||'')+' '+tot.toFixed(2)+'</div>'
+    +'<div class="muted">Payment: '+(o.payMethod==='online'?'Paid online':'Cash on delivery')+' · Generated at the billing counter after agent pick &amp; scan.</div>'
+    +'</div><div class="np" style="text-align:center;margin-top:16px"><button onclick="window.print()" style="background:#0a66c2;color:#fff;border:none;border-radius:8px;padding:12px 22px;font-size:15px;font-weight:700;cursor:pointer">🖨 Print / Save PDF</button></div></body></html>';
+  w.document.write(html);w.document.close();
+}
+
+/* ===== v121: Reedbi Care — yellow guided AI support assistant =====
+   A friendly, rule-based support assistant for delivery, returns, refunds,
+   missing items and order issues. Honest: it's a guided assistant that routes
+   you to the right action / contact — not a free-form LLM chatbot. */
+var __careCtx={}, __careLog=[];
+function openCareAi(ctx){
+  __careCtx=ctx||{}; __careLog=[];
+  var ovl=document.getElementById('care-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='care-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal care-modal"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-headset" style="color:#ffb800"></i> Reedbi Care <span style="font-size:9px;background:#ffe169;color:#5a4500;border-radius:8px;padding:2px 7px;font-weight:800">AI</span></b><span><button class="care-opt" style="font-size:11px;padding:5px 10px;margin-right:6px" onclick="openMyTickets()"><i class="ti ti-ticket"></i> My tickets</button><button class="modal-x" onclick="closeOvl(\'care-ovl\')"><i class="ti ti-x"></i></button></span></div><div id="care-body"></div></div>';
+    document.body.appendChild(ovl);}
+  careHome();
+  ovl.classList.add('open');
+}
+function careLogPush(arr){(arr||[]).forEach(function(x){__careLog.push({me:!!x.me,html:x.html,ts:Date.now()});});}
+function careRender(bubbles,opts){
+  careLogPush(bubbles);
+  var hero='<div class="care-hero"><h3><i class="ti ti-robot"></i> Hi'+(CU?' '+esc((CU.name||'').split(' ')[0]):'')+', I\'m Reedbi Care</h3><p>Chat with me about orders, delivery, returns &amp; refunds. I can also raise a ticket to a human.</p></div>';
+  var log='<div class="care-bubbles" id="care-scroll">'+__careLog.map(function(x){return '<div class="care-b '+(x.me?'me':'bot')+'">'+x.html+'</div>';}).join('')+'</div>';
+  var input='<div class="care-input"><input id="care-text" placeholder="Type your message…" autocomplete="off" onkeydown="if(event.key===\'Enter\'){careSend();}"><button onclick="careSend()"><i class="ti ti-send"></i></button></div>';
+  var optsHtml='<div class="care-opts">'+(opts||[]).map(function(o){return '<button class="care-opt" onclick="'+o.act+'">'+o.label+'</button>';}).join('')+'</div>';
+  var body=document.getElementById('care-body');if(!body)return;
+  body.innerHTML=hero+log+input+optsHtml;
+  var sc=document.getElementById('care-scroll');if(sc)sc.scrollTop=sc.scrollHeight;
+}
+function careSay(html){careLogPush([{me:false,html:html}]);careRenderRefresh();}
+function careRenderRefresh(){
+  var sc=document.getElementById('care-scroll');if(!sc)return;
+  sc.innerHTML=__careLog.map(function(x){return '<div class="care-b '+(x.me?'me':'bot')+'">'+x.html+'</div>';}).join('');
+  sc.scrollTop=sc.scrollHeight;
+}
+// free-text chat: user types, AI replies by keyword, can escalate to a ticket
+function careSend(){
+  var inp=document.getElementById('care-text');if(!inp)return;var t=(inp.value||'').trim();if(!t)return;
+  careLogPush([{me:true,html:esc(t)}]);inp.value='';careRenderRefresh();
+  setTimeout(function(){careAiReply(t);},250);
+}
+function careAiReply(text){
+  var s=text.toLowerCase();
+  if(/track|where.*order|status|delivery time|reach|arrive/.test(s)){careTrack();return;}
+  if(/missing|short|less|only.*receiv|fewer|not all/.test(s)){careMissing();return;}
+  if(/return|refund|money back|cancel/.test(s)){careReturn();return;}
+  if(/damage|broken|spoil|expired|wrong item|defect/.test(s)){careDamaged();return;}
+  if(/agent|rider|driver|deliver(y)? (guy|problem|late|wrong)|not deliver/.test(s)){careDelivery();return;}
+  if(/seller|shop|store|merchant/.test(s)){careSeller();return;}
+  if(/human|agent|person|talk to|complain|ticket|escalat|manager|unhappy|not solved|still/.test(s)){careOfferTicket();return;}
+  // default: acknowledge + offer ticket
+  careSay('I\'ve noted: “'+esc(text)+'”. I can help with tracking, missing items, returns, refunds, damaged goods and delivery issues. If you\'d like a person to handle this, I can raise a ticket and our team will email you.');
+  __careLog.push({me:false,html:''}); __careLog.pop();
+  careRender([],[{label:'🎫 Create a ticket (human)',act:'careOfferTicket()'},{label:'📦 Track order',act:'careTrack()'},{label:'↩️ Return / refund',act:'careReturn()'},{label:'🏠 Menu',act:'careHome()'}]);
+}
+function careHome(){
+  careRender(
+    [{html:'What do you need help with? Tap an option below.'}],
+    [{label:'📦 Where is my order?',act:'careTrack()'},
+     {label:'❗ Missing / short items',act:'careMissing()'},
+     {label:'↩️ Return or refund',act:'careReturn()'},
+     {label:'💔 Damaged item',act:'careDamaged()'},
+     {label:'🛵 Delivery problem',act:'careDelivery()'},
+     {label:'💬 Talk to the seller',act:'careSeller()'},
+     {label:'🧑‍💼 Human / WhatsApp',act:'careHuman()'}]
+  );
+}
+function myRecentOrder(){var os=(getOrders()||[]).filter(function(o){return CU&&o.buyerUid===CU.uid;});return os.sort(function(a,b){return (b.ts||0)-(a.ts||0);})[0];}
+function careTrack(){
+  var o=__careCtx.order||myRecentOrder();
+  if(!o){careRender([{html:'You don\'t have any orders yet. Once you order, I can track it here.'}],[{label:'← Back',act:'careHome()'},{label:'🛍️ Shop now',act:'closeOvl(\'care-ovl\');openMainStore()'}]);return;}
+  var cur=orderStatusObj(o.status);
+  careRender(
+    [{me:true,html:'Where is my order?'},
+     {html:'<b>'+esc(o.productTitle)+'</b> ×'+o.qty+'<br>Order '+esc(o.orderNo||o.id)+'<br>Status: <b>'+cur.label+'</b>'+(o.agentName?'<br>Agent: '+esc(o.agentName):'')+(o.collectedConfirmed?'<br>Picked: '+(o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty:'')}],
+    [{label:'📍 Live track',act:'closeOvl(\'care-ovl\');showMyOrders()'},{label:'← Back',act:'careHome()'}]
+  );
+}
+function careMissing(){
+  var o=__careCtx.order||myRecentOrder();
+  var txt='If you received fewer items than you ordered, our agent records exactly what was picked at the shop. ';
+  if(o&&o.collectedConfirmed&&o.collectedShort){txt+='For your latest order, the agent collected <b>'+(o.billQty!=null?o.billQty:o.collectedQty)+' of '+o.qty+'</b>. '+(o.refundDue?'A refund of <b>'+esc(o.currency||'')+' '+o.refundDue+'</b> for the '+o.collectedShort+' missing item(s) has been flagged'+(o.payMethod==='online'?' to your online payment.':'.'):'You were only billed for what you received.');}
+  else{txt+='You are only ever billed for the items actually collected and scanned. Online payments are auto-adjusted with a refund for anything short.';}
+  careRender([{me:true,html:'Some items are missing'},{html:txt}],
+    [{label:'↩️ Request refund',act:'careReturn()'},{label:'🧑‍💼 Contact support',act:'careHuman()'},{label:'← Back',act:'careHome()'}]);
+}
+function careReturn(){
+  var o=__careCtx.order||myRecentOrder();
+  careRender([{me:true,html:'I want a return or refund'},
+     {html:'Returns are accepted within 30 days for most items. '+(o?'For <b>'+esc(o.productTitle)+'</b>, I can open a return request to the seller.':'Open your order to start a return.')+' Refunds for online payments go back to your original payment method; COD refunds are arranged with the seller.'}],
+    [].concat(o&&o.buyerUid===(CU&&CU.uid)&&o.status!=='returned'?[{label:'↩️ Request return now',act:'careDoReturn(\''+o.id+'\')'}]:[],
+     [{label:'💬 Message seller',act:'careSeller()'},{label:'← Back',act:'careHome()'}]));
+}
+function careDoReturn(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o){toast('Order not found','err');return;}
+  o.returnRequested=true;o.returnTs=Date.now();saveOrders(getOrders().map(function(x){return x.id===orderId?o:x;}));
+  try{notifyEvent('return','↩️ Return requested for “'+esc(o.productTitle)+'” by '+esc(CU.name));}catch(e){}
+  careRender([{html:'✅ Your return request for <b>'+esc(o.productTitle)+'</b> has been sent to the seller. You\'ll get an update here and by notification.'}],[{label:'← Back',act:'careHome()'},{label:'Close',act:'closeOvl(\'care-ovl\')'}]);
+}
+function careDamaged(){
+  careRender([{me:true,html:'My item arrived damaged'},
+   {html:'Sorry about that! Please take a photo of the damage. You can request a replacement or refund through the seller — I\'ll start a return marked as “damaged”.'}],
+   [{label:'↩️ Start damaged return',act:'careReturn()'},{label:'🧑‍💼 Contact support',act:'careHuman()'},{label:'← Back',act:'careHome()'}]);
+}
+function careDelivery(){
+  var o=__careCtx.order||myRecentOrder();
+  careRender([{me:true,html:'I have a delivery problem'},
+   {html:'I can help with late, wrong-location or no-show deliveries. '+(o&&o.agentName?'Your agent is <b>'+esc(o.agentName)+'</b>'+(o.agentPhone?' — you can message them on WhatsApp.':'.'):'An agent will be assigned soon.')}],
+   [].concat(o&&o.agentPhone?[{label:'🛵 WhatsApp agent',act:'window.open(\'https://wa.me/'+String(o.agentPhone).replace(/[^0-9]/g,'')+'\',\'_blank\')'}]:[],
+    [{label:'🧑‍💼 Contact support',act:'careHuman()'},{label:'← Back',act:'careHome()'}]));
+}
+function careSeller(){
+  var o=__careCtx.order||myRecentOrder();
+  if(o&&o.sellerUid){careRender([{html:'Opening your chat with <b>'+esc(o.sellerName||'the seller')+'</b>…'}],[{label:'💬 Open chat',act:'closeOvl(\'care-ovl\');openDM(\''+o.sellerUid+'\',\''+escJS(o.sellerName||'Seller')+'\')'},{label:'← Back',act:'careHome()'}]);}
+  else{careRender([{html:'Open any product or order to message its seller directly.'}],[{label:'← Back',act:'careHome()'}]);}
+}
+function careHuman(){ careOfferTicket(); }
+function careOfferTicket(){
+  var email=(CU&&CU.email)||'';
+  careRender([{html:'I can raise a <b>support ticket</b> to our human team. They\'ll review this whole chat and <b>email you the decision</b>'+(email?' at <b>'+esc(email)+'</b>':'')+'.<br><br>'+(email?'Shall I create the ticket?':'First, what email should we reply to?')}],
+    email?[{label:'🎫 Yes, create my ticket',act:'careCreateTicket()'},{label:'🟢 WhatsApp instead',act:'window.open(\'https://wa.me/971500000000\',\'_blank\')'},{label:'← Back',act:'careHome()'}]
+         :[{label:'✉️ Use my account email',act:'careCreateTicket()'},{label:'← Back',act:'careHome()'}]);
+}
+function ticketRef(){return 'TKT-'+Date.now().toString(36).toUpperCase().slice(-6)+Math.floor(Math.random()*90+10);}
+function getTickets(){return LS.get('rb_tickets',[])||[];}
+function saveTickets(t){LS.set('rb_tickets',t);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{t.forEach(function(x){if(x&&x.id)FB.db.collection('tickets').doc(x.id).set(x,{merge:true}).catch(function(){});});}catch(e){}}}
+function careCreateTicket(){
+  if(!CU){toast('Sign in to create a ticket','err');return;}
+  var email=(CU.email||'').trim();
+  if(!email){ careRender([{html:'I don\'t have an email on file. Add one in Edit account, then come back — that\'s where the team will send the decision.'}],[{label:'← Back',act:'careHome()'}]); return; }
+  var o=__careCtx.order||myRecentOrder();
+  // summarise topic from the transcript
+  var lastUser=[].concat(__careLog).reverse().find(function(x){return x.me;});
+  var topic=lastUser?lastUser.html.replace(/<[^>]+>/g,'').slice(0,80):'Support request';
+  var t={id:'tkt'+Date.now()+Math.floor(Math.random()*1000),ref:ticketRef(),
+    uid:CU.uid,name:CU.name,email:email,phone:CU.phone||'',
+    topic:topic,orderId:o?o.id:'',orderNo:o?(o.orderNo||o.id):'',productTitle:o?o.productTitle:'',
+    sellerName:o?o.sellerName:'',pageName:o?o.pageName:'',
+    transcript:__careLog.map(function(x){return {who:x.me?'customer':'Reedbi Care (AI)',text:x.html.replace(/<[^>]+>/g,''),ts:x.ts};}),
+    status:'open',createdTs:Date.now(),source:'Reedbi Care AI',
+    resolution:'',resolvedBy:'',resolvedTs:0};
+  var all=getTickets();all.unshift(t);saveTickets(all);
+  try{notifyEvent('ticket','🎫 Ticket '+t.ref+' created — our team will email you at '+esc(email));}catch(e){}
+  careRender([{html:'✅ Ticket created!<br><b>Reference: '+t.ref+'</b><br><br>I\'ve attached our full conversation. A human will review it and <b>email the decision to '+esc(email)+'</b>. You can check status anytime under <b>My tickets</b>.'}],
+    [{label:'🎫 View my tickets',act:'openMyTickets()'},{label:'🏠 Menu',act:'careHome()'},{label:'Close',act:'closeOvl(\'care-ovl\')'}]);
+}
+function openMyTickets(){
+  if(!requireAuth('view your tickets'))return;
+  var mine=getTickets().filter(function(t){return t.uid===CU.uid;});
+  var ovl=document.getElementById('mytkt-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='mytkt-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:460px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-ticket" style="color:#ffb800"></i> My support tickets</b><button class="modal-x" onclick="closeOvl(\'mytkt-ovl\')"><i class="ti ti-x"></i></button></div><div id="mytkt-body"></div></div>';
+    document.body.appendChild(ovl);}
+  document.getElementById('mytkt-body').innerHTML=mine.length?mine.map(function(t){return ticketCardHtml(t,false);}).join(''):'<div style="font-size:12px;color:var(--mt2);padding:14px;text-align:center">No tickets yet. Open Reedbi Care and create one if you need a human.</div>';
+  ovl.classList.add('open');
+}
+function statusBadge(s){var m={open:['tkt-open','Open'],progress:['tkt-prog','In progress'],resolved:['tkt-res','Resolved']};var x=m[s]||m.open;return '<span class="tkt-status '+x[0]+'">'+x[1]+'</span>';}
+function ticketCardHtml(t,staff){
+  var trans='<div class="tkt-trans">'+(t.transcript||[]).map(function(m){return '<div class="tkt-msg '+(m.who==='customer'?'me':'')+'"><span class="who">'+esc(m.who)+':</span> '+esc(m.text)+'</div>';}).join('')+'</div>';
+  var h='<div class="tkt-card"><div style="display:flex;justify-content:space-between;align-items:center"><span class="tkt-ref">'+esc(t.ref)+'</span>'+statusBadge(t.status)+'</div>'
+    +'<div style="font-size:12px;margin-top:4px"><b>'+esc(t.topic||'Support request')+'</b></div>'
+    +(t.orderNo?'<div style="font-size:11px;color:var(--mt2)">Order '+esc(t.orderNo)+(t.productTitle?' · '+esc(t.productTitle):'')+'</div>':'')
+    +'<div style="font-size:10px;color:var(--mt2)">From '+esc(t.name)+' &lt;'+esc(t.email)+'&gt; · '+fmtDT(t.createdTs)+'</div>'
+    +'<details style="margin-top:6px"><summary style="font-size:11px;color:#0a66c2;cursor:pointer">View attached chat ('+(t.transcript||[]).length+' messages)</summary>'+trans+'</details>';
+  if(t.status==='resolved'){h+='<div style="background:#ecfdf5;border:1px solid #bbf7d0;border-radius:9px;padding:9px;margin-top:8px;font-size:12px"><b><i class="ti ti-circle-check" style="color:#16a34a"></i> Resolution</b><br>'+esc(t.resolution||'')+'<div style="font-size:10px;color:var(--mt2);margin-top:3px">by '+esc(t.resolvedBy||'Reedbi team')+' · emailed to '+esc(t.email)+' · '+fmtDT(t.resolvedTs)+'</div></div>';}
+  if(staff&&t.status!=='resolved'){
+    h+='<div style="margin-top:8px"><textarea id="tkt-res-'+t.id+'" rows="2" placeholder="Write the decision / resolution to email the customer…" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px;color:var(--tx);font-family:var(--fn)"></textarea>'
+      +'<div style="display:flex;gap:7px;margin-top:6px">'
+      +(t.status==='open'?'<button class="care-opt" onclick="ticketSetProgress(\''+t.id+'\')">Mark in progress</button>':'')
+      +'<button class="btn btnok" onclick="ticketResolve(\''+t.id+'\')"><i class="ti ti-mail-forward"></i> Send decision to customer</button></div></div>';
+  }
+  h+='</div>';return h;
+}
+function openSupportDesk(){
+  if(!requireAuth('open the support desk'))return;
+  var ovl=document.getElementById('support-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='support-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:520px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-headset" style="color:#0a66c2"></i> Support Desk <small style="font-weight:400;color:var(--mt2)">human agents</small></b><button class="modal-x" onclick="closeOvl(\'support-ovl\')"><i class="ti ti-x"></i></button></div><div id="support-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderSupportDesk();
+  ovl.classList.add('open');
+}
+function renderSupportDesk(){
+  // human agents see tickets for their stores; admins see all
+  var admin=(typeof adminUnlocked!=='undefined'&&adminUnlocked);
+  var mine=(typeof myStoreNames==='function')?myStoreNames():{};
+  var all=getTickets();
+  var list=admin?all:all.filter(function(t){return t.pageName&&mine[t.pageName]||t.sellerName&&mine[t.sellerName];});
+  var open=list.filter(function(t){return t.status!=='resolved';});
+  var done=list.filter(function(t){return t.status==='resolved';});
+  var h='<div class="dispatch-row" style="margin-bottom:11px"><div class="disp-box disp-pend"><b>'+list.filter(function(t){return t.status==='open';}).length+'</b><small>Open</small></div>'
+    +'<div class="disp-box disp-ship"><b>'+list.filter(function(t){return t.status==='progress';}).length+'</b><small>In progress</small></div>'
+    +'<div class="disp-box disp-done"><b>'+done.length+'</b><small>Resolved</small></div></div>'
+    +'<div style="font-size:10px;color:var(--mt2);margin-bottom:8px"><i class="ti ti-info-circle"></i> Each ticket has the full AI chat attached. Write a decision and send it to the customer\'s email.</div>';
+  h+=open.length?open.map(function(t){return ticketCardHtml(t,true);}).join(''):'<div style="font-size:12px;color:var(--mt2);padding:10px 0">No open tickets'+(admin?'':' for your store')+'.</div>';
+  if(done.length){h+='<div style="font-size:11px;font-weight:700;color:var(--mt);margin:12px 0 7px;text-transform:uppercase">Resolved</div>'+done.slice(0,8).map(function(t){return ticketCardHtml(t,false);}).join('');}
+  document.getElementById('support-body').innerHTML=h;
+}
+function ticketSetProgress(id){var all=getTickets();var t=all.find(function(x){return x.id===id;});if(!t)return;t.status='progress';saveTickets(all);renderSupportDesk();}
+function ticketResolve(id){
+  var all=getTickets();var t=all.find(function(x){return x.id===id;});if(!t)return;
+  var ta=document.getElementById('tkt-res-'+id);var msg=ta?(ta.value||'').trim():'';
+  if(!msg){toast('Write the decision to send the customer','err');return;}
+  t.status='resolved';t.resolution=msg;t.resolvedBy=CU?CU.name:'Reedbi team';t.resolvedTs=Date.now();
+  saveTickets(all);
+  // email the decision to the customer (opens a prefilled email; true auto-send = Layer 7)
+  var transTxt=(t.transcript||[]).map(function(m){return m.who+': '+m.text;}).join('\n');
+  var bodyTxt='Hello '+(t.name||'')+',\n\nRegarding your Reedbi support ticket '+t.ref+(t.orderNo?' (order '+t.orderNo+')':'')+':\n\n'+msg+'\n\n— Reedbi Care Team\n\n----- Your conversation -----\n'+transTxt;
+  var mailto='mailto:'+encodeURIComponent(t.email)+'?subject='+encodeURIComponent('Reedbi Care — Ticket '+t.ref+' resolved')+'&body='+encodeURIComponent(bodyTxt);
+  try{window.open(mailto,'_blank');}catch(e){}
+  try{notifyEvent('ticketres','✅ Ticket '+t.ref+' resolved — decision emailed to '+esc(t.email));}catch(e){}
+  renderSupportDesk();
+  toast('Decision sent to '+t.email,'ok');
+}
+
+/* ===== v122: real barcode rendering (EAN-13 + Code128 fallback) ===== */
+var __EAN_L=['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
+var __EAN_G=['0100111','0110011','0011011','0100001','0011101','0111001','0000101','0010001','0001001','0010111'];
+var __EAN_R=['1110010','1100110','1101100','1000010','1011100','1001110','1010000','1000100','1001000','1110100'];
+var __EAN_PARITY=['LLLLLL','LLGLGG','LLGGLG','LLGGGL','LGLLGG','LGGLLG','LGGGLL','LGLGLG','LGLGGL','LGGLGL'];
+function ean13CheckDigit(d12){var s=0;for(var i=0;i<12;i++){s+=parseInt(d12[i],10)*(i%2?3:1);}return (10-(s%10))%10;}
+function normalizeBarcode(code){
+  var digits=String(code||'').replace(/[^0-9]/g,'');
+  if(digits.length===12)digits=digits+ean13CheckDigit(digits); // add check digit
+  return digits;
+}
+function isValidEan13(code){
+  var d=String(code||'').replace(/[^0-9]/g,'');
+  if(d.length!==13)return false;
+  return ean13CheckDigit(d.slice(0,12))===parseInt(d[12],10);
+}
+function makeBarcodeSvg(code,opts){
+  opts=opts||{};var H=opts.height||64;var unit=opts.unit||2;var pad=10;
+  var digits=String(code||'').replace(/[^0-9]/g,'');
+  // EAN-13 if 13 digits (or 12 -> add check)
+  if(digits.length===12)digits=digits+ean13CheckDigit(digits);
+  if(digits.length===13){
+    var first=parseInt(digits[0],10);var parity=__EAN_PARITY[first];
+    var bits='101'; // start guard
+    for(var i=1;i<=6;i++){var d=parseInt(digits[i],10);bits+=(parity[i-1]==='L'?__EAN_L[d]:__EAN_G[d]);}
+    bits+='01010'; // center guard
+    for(var j=7;j<=12;j++){bits+=__EAN_R[parseInt(digits[j],10)];}
+    bits+='101'; // end guard
+    var w=bits.length*unit+pad*2;var totalH=H+18;
+    var s='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+totalH+'" viewBox="0 0 '+w+' '+totalH+'"><rect width="'+w+'" height="'+totalH+'" fill="#fff"/>';
+    for(var k=0;k<bits.length;k++){if(bits[k]==='1'){var guard=(k<3||(k>=45&&k<50)||k>=92);s+='<rect x="'+(pad+k*unit)+'" y="2" width="'+unit+'" height="'+(H+(guard?8:0))+'" fill="#000"/>';}}
+    // human-readable digits
+    s+='<text x="'+(pad-2)+'" y="'+(totalH-3)+'" font-family="monospace" font-size="13" fill="#000">'+digits[0]+'</text>';
+    s+='<text x="'+(pad+3*unit+21*unit)+'" y="'+(totalH-3)+'" font-family="monospace" font-size="13" fill="#000" text-anchor="middle">'+digits.slice(1,7)+'</text>';
+    s+='<text x="'+(pad+50*unit+21*unit)+'" y="'+(totalH-3)+'" font-family="monospace" font-size="13" fill="#000" text-anchor="middle">'+digits.slice(7)+'</text>';
+    s+='</svg>';return s;
+  }
+  // fallback: simple variable-width bars from the characters (Code128-like visual, not a true scannable Code128)
+  var src=String(code||'').trim()||'NO-CODE';var bars='';for(var c=0;c<src.length;c++){var v=src.charCodeAt(c);bars+=((v%4)+1)+''+((v>>2)%4+1);}
+  var x=pad,wdt=0;var parts='';for(var b=0;b<bars.length;b++){var bw=parseInt(bars[b],10)*unit;if(b%2===0){parts+='<rect x="'+x+'" y="2" width="'+bw+'" height="'+H+'" fill="#000"/>';}x+=bw;}
+  var w2=x+pad;var th2=H+18;
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="'+w2+'" height="'+th2+'" viewBox="0 0 '+w2+' '+th2+'"><rect width="'+w2+'" height="'+th2+'" fill="#fff"/>'+parts+'<text x="'+(w2/2)+'" y="'+(th2-3)+'" font-family="monospace" font-size="12" fill="#000" text-anchor="middle">'+esc(src)+'</text></svg>';
+}
+
+/* ===== v122: listing barcode scan + preview ===== */
+function lpScanBarcode(){
+  rbOpenScanner({title:'Scan product barcode',match:function(){return true;},onMatch:function(code){
+    var inp=document.getElementById('lp-barcode');if(inp){inp.value=normalizeBarcode(code);lpBarcodePreview(inp.value);}
+    setTimeout(function(){rbCloseScanner();toast('Barcode captured: '+normalizeBarcode(code),'ok');},500);
+  }});
+}
+function lpBarcodePreview(v){
+  var box=document.getElementById('lp-barcode-prev');if(!box)return;
+  var d=String(v||'').replace(/[^0-9]/g,'');
+  if(d.length>=12){var full=normalizeBarcode(d);box.innerHTML='<div style="display:inline-block;background:#fff;border:1px solid var(--b);border-radius:8px;padding:6px">'+makeBarcodeSvg(full,{height:46,unit:2})+'</div>'+(isValidEan13(full)?'<span style="font-size:10px;color:#16a34a;margin-left:8px"><i class="ti ti-check"></i> valid EAN-13</span>':'<span style="font-size:10px;color:var(--gold);margin-left:8px">check digit added</span>');}
+  else if(d.length){box.innerHTML='<span style="font-size:10px;color:var(--mt2)">Enter 12–13 digits for an EAN-13 barcode</span>';}
+  else box.innerHTML='';
+}
+
+/* ===== v122: Hypermarket billing Counter + unified pick/deliver tracking ===== */
+function pickStage(o){
+  // unified stage for shop / agent / counter tracking
+  if(o.status==='delivered')return {k:'delivered',label:'Delivered',icon:'circle-check',c:'#16a34a',pct:100};
+  if(o.billedTs)return {k:'billed',label:'Billed at counter',icon:'receipt',c:'#0a66c2',pct:80};
+  if(o.collectedConfirmed)return {k:'collected',label:'Collected by agent',icon:'clipboard-check',c:'#0a8f5c',pct:60};
+  if(o.agentUid&&(o.collectedQty||0)>0)return {k:'picking',label:'Agent picking',icon:'scan',c:'#f4a31a',pct:40};
+  if(o.agentUid)return {k:'assigned',label:'Agent assigned',icon:'moped',c:'#f4a31a',pct:25};
+  if(o.pickupOpen)return {k:'offered',label:'Finding an agent',icon:'broadcast',c:'#c37d16',pct:12};
+  return {k:'placed',label:'Order placed',icon:'shopping-cart',c:'var(--mt2)',pct:5};
+}
+function trackStrip(o){
+  var steps=[{k:'placed',l:'Placed',i:'shopping-cart'},{k:'assigned',l:'Agent',i:'moped'},{k:'picking',l:'Picking',i:'scan'},{k:'collected',l:'Collected',i:'clipboard-check'},{k:'billed',l:'Billed',i:'receipt'},{k:'delivered',l:'Delivered',i:'circle-check'}];
+  var cur=pickStage(o);var order=['placed','offered','assigned','picking','collected','billed','delivered'];
+  var ci=order.indexOf(cur.k);if(cur.k==='offered')ci=0;
+  return '<div style="display:flex;align-items:center;gap:0;margin:8px 0;overflow-x:auto">'+steps.map(function(s,idx){
+    var si=order.indexOf(s.k);var done=si<=ci;
+    return '<div style="display:flex;flex-direction:column;align-items:center;min-width:54px"><div style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:'+(done?'#0a66c2':'var(--b2)')+';color:'+(done?'#fff':'var(--mt2)')+'"><i class="ti ti-'+s.i+'" style="font-size:13px"></i></div><span style="font-size:9px;margin-top:3px;color:'+(done?'var(--tx)':'var(--mt2)')+'">'+s.l+'</span></div>'
+      +(idx<steps.length-1?'<div style="height:2px;flex:1;min-width:8px;background:'+(si<ci?'#0a66c2':'var(--b2)')+'"></div>':'');
+  }).join('')+'</div>';
+}
+function openCounter(){
+  if(!requireAuth('open the billing counter'))return;
+  var ovl=document.getElementById('counter-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='counter-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:520px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-cash-register" style="color:#0a66c2"></i> Billing Counter</b><button class="modal-x" onclick="closeOvl(\'counter-ovl\')"><i class="ti ti-x"></i></button></div><div id="counter-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderCounter();
+  ovl.classList.add('open');
+}
+function myStoreNames(){
+  var names={};getPages().forEach(function(pg){var r=pageRole(pg.name);if(r==='owner'||r==='admin'||r==='editor')names[pg.name]=1;});
+  if(CU&&CU.co)names[CU.co]=1;
+  return names;
+}
+function renderCounter(){
+  var mine=myStoreNames();
+  var orders=getOrders().filter(function(o){return (o.sellerUid===CU.uid)||(o.pageName&&mine[o.pageName]);});
+  var toBill=orders.filter(function(o){return o.collectedConfirmed&&!o.billedTs;});
+  var billed=orders.filter(function(o){return o.billedTs;});
+  var picking=orders.filter(function(o){return o.agentUid&&!o.collectedConfirmed;});
+  function row(o){
+    var got=o.billQty!=null?o.billQty:(o.collectedQty||0);
+    var st=pickStage(o);
+    return '<div class="col-line"><div class="hd"><div><b style="font-size:13px">'+esc(o.productTitle)+'</b><div style="font-size:11px;color:var(--mt2)">Order '+esc(o.orderNo||o.id)+' · '+esc(o.buyerName||'')+'</div></div>'
+      +'<span class="pay-badge" style="background:'+st.c+'22;color:'+st.c+'"><i class="ti ti-'+st.icon+'"></i> '+st.label+'</span></div>'
+      +trackStrip(o)
+      +'<div style="font-size:12px">Picked: <b>'+got+'/'+o.qty+'</b>'+(o.collectedShort?' · <span style="color:#e23b3b">'+o.collectedShort+' short'+(o.refundDue?' · refund '+esc(o.currency||'')+' '+o.refundDue:'')+'</span>':' · <span style="color:#16a34a">complete</span>')+(o.agentName?' · agent '+esc(o.agentName):'')+'</div>'
+      +(o.collectedConfirmed&&!o.billedTs?'<div style="display:flex;gap:7px;margin-top:8px"><button class="col-scanbtn" onclick="printInvoice(\''+o.id+'\')"><i class="ti ti-printer"></i> Print bill ('+got+')</button><button class="col-scanbtn" style="background:#16a34a" onclick="counterMarkBilled(\''+o.id+'\')"><i class="ti ti-check"></i> Mark billed &amp; release</button></div>':'')
+      +(o.billedTs?'<div style="font-size:11px;color:#16a34a;margin-top:6px"><i class="ti ti-receipt"></i> Billed '+fmtDT(o.billedTs)+' — ready for delivery</div>':'')
+      +'</div>';
+  }
+  var h='<div class="dispatch-row" style="margin-bottom:11px">'
+    +'<div class="disp-box disp-pend"><b>'+picking.length+'</b><small>Picking</small></div>'
+    +'<div class="disp-box disp-ship"><b>'+toBill.length+'</b><small>To bill</small></div>'
+    +'<div class="disp-box disp-done"><b>'+billed.length+'</b><small>Billed</small></div></div>';
+  h+='<div style="font-size:11px;font-weight:800;color:#0a66c2;margin:6px 0 7px;text-transform:uppercase"><i class="ti ti-receipt-2"></i> Ready to bill ('+toBill.length+')</div>';
+  h+=toBill.length?toBill.map(row).join(''):'<div style="font-size:12px;color:var(--mt2);padding:8px 0">No orders waiting for billing. They appear here once an agent confirms collection.</div>';
+  if(picking.length){h+='<div style="font-size:11px;font-weight:800;color:var(--gold);margin:12px 0 7px;text-transform:uppercase"><i class="ti ti-scan"></i> Agents picking now ('+picking.length+')</div>'+picking.map(row).join('');}
+  if(billed.length){h+='<div style="font-size:11px;font-weight:800;color:var(--mt);margin:12px 0 7px;text-transform:uppercase">Recently billed</div>'+billed.slice(0,8).map(row).join('');}
+  document.getElementById('counter-body').innerHTML=h;
+}
+function counterMarkBilled(orderId){
+  var os=getOrders();var o=os.find(function(x){return x.id===orderId;});if(!o)return;
+  o.billedTs=Date.now();o.billedBy=CU?CU.name:'';
+  // advance order status toward dispatch if still early
+  if(orderStatusIndex(o.status)<orderStatusIndex('ready'))o.status='ready';
+  saveOrders(os);
+  notifyEvent('billed','🧾 Order “'+esc(o.productTitle)+'” billed ('+(o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty+') — ready for delivery');
+  renderCounter();toast('Billed & released for delivery','ok');
+}
+
+/* ===== v123: product numbers + auto-generated barcodes for items without one =====
+   Every product gets a Reedbi product number (RBP-xxxxxx) for follow-up. If a
+   product has no manufacturer barcode, Reedbi auto-creates a valid in-store
+   EAN-13 (prefix "20" — the GS1 range reserved for retailer/in-store codes —
+   exactly what hypermarkets use for unbarcoded items). These are real,
+   scannable EAN-13s and can be printed as labels. */
+function nextProdNoSeq(){var n=(LS.get('rb_prodno_seq',0)||0)+1;LS.set('rb_prodno_seq',n);return n;}
+function fmtProdNo(n){return 'RBP-'+String(n).padStart(6,'0');}
+function digitsFromString(s,len){
+  // deterministic numeric hash → string of digits of given length
+  var h=5381,str=String(s||'');
+  for(var i=0;i<str.length;i++){h=((h<<5)+h+str.charCodeAt(i))>>>0;}
+  var out=String(h);
+  while(out.length<len)out+=String((h*(out.length+7))>>>0);
+  return out.slice(0,len);
+}
+function genInternalBarcode(seed){
+  // in-store EAN-13: '20' + 10 derived digits + check digit
+  var body='20'+digitsFromString(seed,10);
+  body=body.slice(0,12);
+  return body+ean13CheckDigit(body);
+}
+function ensureProdMeta(p){
+  var changed=false;
+  if(!p.prodNo){p.prodNo=fmtProdNo(nextProdNoSeq());changed=true;}
+  if(!p.barcode){p.barcode=genInternalBarcode(p.prodNo+'|'+(p.id||'')+'|'+(p.title||''));p.barcodeAuto=true;changed=true;}
+  return changed;
+}
+function backfillProdMeta(){
+  try{
+    var prods=getProducts();var changed=false;
+    prods.forEach(function(p){if(ensureProdMeta(p))changed=true;});
+    if(changed)saveProducts(prods);
+  }catch(e){}
+}
+// run backfill after products are available (load + a short delay for cloud sync)
+setTimeout(backfillProdMeta,2500);
+setTimeout(backfillProdMeta,7000);
+
+/* Bulk barcode label printing — prints labels for products (default: those
+   without a real/manufacturer barcode, i.e. Reedbi-generated ones). */
+function openBarcodeLabels(){
+  if(!requireAuth('print barcode labels'))return;
+  var ovl=document.getElementById('barlabels-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='barlabels-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:480px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-barcode" style="color:#0a66c2"></i> Barcode labels</b><button class="modal-x" onclick="closeOvl(\'barlabels-ovl\')"><i class="ti ti-x"></i></button></div><div id="barlabels-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderBarcodeLabels();
+  ovl.classList.add('open');
+}
+function myProductsForLabels(){
+  var mine=(typeof myStoreNames==='function')?myStoreNames():{};
+  return getProducts().filter(function(p){return p.sellerUid===CU.uid||(p.pageName&&mine[p.pageName]);});
+}
+function renderBarcodeLabels(){
+  var prods=myProductsForLabels();
+  prods.forEach(ensureProdMeta);
+  var noBarcode=prods.filter(function(p){return p.barcodeAuto;});
+  var withBarcode=prods.filter(function(p){return !p.barcodeAuto;});
+  var body='<div style="font-size:12px;color:var(--mt2);margin-bottom:10px">Every product has a product number. Products without a manufacturer barcode get a Reedbi in-store barcode you can print and stick on.</div>'
+    +'<div class="dispatch-row" style="margin-bottom:11px"><div class="disp-box disp-ship"><b>'+prods.length+'</b><small>Products</small></div>'
+    +'<div class="disp-box disp-pend"><b>'+noBarcode.length+'</b><small>Need label</small></div>'
+    +'<div class="disp-box disp-done"><b>'+withBarcode.length+'</b><small>Have barcode</small></div></div>'
+    +'<div style="display:flex;gap:7px;margin-bottom:12px"><button class="btn btnok" style="flex:1" onclick="printBarcodeSheet(true)"><i class="ti ti-printer"></i> Print labels (no barcode)</button>'
+    +'<button class="btn" style="flex:1;border:1px solid var(--b)" onclick="printBarcodeSheet(false)"><i class="ti ti-printer"></i> Print ALL labels</button></div>';
+  body+=prods.map(function(p){
+    return '<div class="col-line"><div style="display:flex;gap:10px;align-items:center">'
+      +'<img src="'+esc(p.photos&&p.photos[0]||'')+'" style="width:44px;height:44px;object-fit:contain;background:#fff;border:1px solid var(--b);border-radius:7px">'
+      +'<div style="flex:1;min-width:0"><b style="font-size:13px">'+esc(p.title)+'</b><div style="font-size:11px;color:var(--mt2)">'+esc(p.prodNo)+(p.barcodeAuto?' · <span style="color:var(--gold)">Reedbi barcode</span>':' · <span style="color:#16a34a">manufacturer barcode</span>')+'</div></div></div>'
+      +'<div style="display:inline-block;background:#fff;border:1px solid var(--b);border-radius:7px;padding:5px;margin-top:7px">'+makeBarcodeSvg(p.barcode,{height:42,unit:2})+'</div></div>';
+  }).join('')||'<div style="font-size:12px;color:var(--mt2)">No products yet. List a product first.</div>';
+  document.getElementById('barlabels-body').innerHTML=body;
+}
+function printBarcodeSheet(onlyNoBarcode){
+  var prods=myProductsForLabels();prods.forEach(ensureProdMeta);
+  if(onlyNoBarcode)prods=prods.filter(function(p){return p.barcodeAuto;});
+  if(!prods.length){toast('No products to print','info');return;}
+  saveProducts(getProducts()); // persist any new prodNo/barcode
+  var w=window.open('','_blank');if(!w){toast('Allow pop-ups to print labels','err');return;}
+  var cells=prods.map(function(p){
+    return '<div class="lbl"><div class="t">'+esc(p.title)+'</div><div class="bc">'+makeBarcodeSvg(p.barcode,{height:50,unit:2})+'</div><div class="pn">'+esc(p.prodNo)+(p.currency?' · '+esc(p.currency)+' '+esc(p.offer||p.price):'')+'</div></div>';
+  }).join('');
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Reedbi Barcode Labels</title><style>*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}body{padding:10px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.lbl{border:1px solid #ccc;border-radius:8px;padding:8px;text-align:center;page-break-inside:avoid}.t{font-size:11px;font-weight:700;height:28px;overflow:hidden;line-height:1.2;margin-bottom:4px}.bc svg{max-width:100%}.pn{font-size:10px;color:#444;margin-top:3px;font-weight:700}@media print{.np{display:none}}</style></head><body>'
+    +'<div class="np" style="text-align:center;margin-bottom:10px"><button onclick="window.print()" style="background:#0a66c2;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer">🖨 Print / Save PDF · '+prods.length+' labels</button></div>'
+    +'<div class="grid">'+cells+'</div></body></html>';
+  w.document.write(html);w.document.close();
+}
+
+function lpGenBarcode(){
+  var title=(document.getElementById('lp-title')||{}).value||'item';
+  var code=genInternalBarcode('RBP|'+title+'|'+Date.now());
+  var inp=document.getElementById('lp-barcode');if(inp){inp.value=code;lpBarcodePreview(code);}
+  toast('Reedbi barcode created: '+code,'ok');
+}
+
+function lpWeightToggle(){var on=document.getElementById('lp-byweight')&&document.getElementById('lp-byweight').checked;var r=document.getElementById('lp-weight-row');if(r)r.style.display=on?'block':'none';}
+
+/* ===== v125: variable-weight pick & weigh =====
+   Customer ordered an estimated weight (e.g. 1 kg bananas). At pickup the agent
+   scans to confirm the product, weighs it, and enters the actual weight (e.g.
+   1.05 kg). The bill auto-adjusts: extra collected if over, refund if under. */
+function renderWeightCollection(o){
+  var unitLbl=weightUnitLabel(o.weightUnit||'kg');
+  var unitPrice=parseFloat(String(o.price).replace(/[^0-9.]/g,''))||0; // price per unit (kg/100g/g)
+  var orderedW=parseFloat(o.orderedWeight||o.qty||1)||1;
+  var orderedAmt=Math.round(orderedW*unitPrice*100)/100;
+  var cur=esc(o.currency||'');
+  var body='<div style="font-size:11px;color:var(--mt2);margin-bottom:4px">Order '+esc(o.orderNo||o.id)+' · from '+esc(o.sellerName)+' · <span style="color:#0a8f5c;font-weight:700">weighed item</span></div>'
+    +'<div class="col-line"><div class="hd"><div><b style="font-size:13px">'+esc(o.productTitle)+'</b><div style="font-size:11px;color:var(--mt2)">Ordered: <b>'+orderedW+' '+unitLbl+'</b> · '+cur+' '+unitPrice+'/'+unitLbl+' = '+cur+' '+orderedAmt+'</div></div>'
+    +'<div class="cnt"><i class="ti ti-scale-outline" style="font-size:26px;color:#0a8f5c"></i></div></div>';
+  if(o.collectedConfirmed){
+    var actualW=parseFloat(o.actualWeight||0);var finalAmt=o.finalAmount!=null?o.finalAmount:orderedAmt;
+    body+='<div style="font-size:12px;color:#16a34a;font-weight:700"><i class="ti ti-circle-check"></i> Weighed &amp; confirmed: '+actualW+' '+unitLbl+'</div>';
+  } else {
+    body+='<div style="font-size:12px;margin-bottom:6px">'+(o.wScanned?'<span style="color:#16a34a"><i class="ti ti-check"></i> Product confirmed by scan</span>':'<button class="col-scanbtn" onclick="weightScan(\''+o.id+'\')"><i class="ti ti-scan"></i> Scan product to confirm it\'s correct</button>')+'</div>'
+      +'<label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px">Actual weight on the scale ('+unitLbl+')</label>'
+      +'<div style="display:flex;gap:8px;align-items:center"><input type="number" step="0.001" id="wc-actual-'+o.id+'" value="'+(o.actualWeight||'')+'" placeholder="e.g. '+(o.weightUnit==='g'?'1050':'1.050')+'" style="flex:1;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:11px;color:var(--tx);font-family:var(--fn);font-size:15px" oninput="weightPreview(\''+o.id+'\')"><span style="font-weight:800;color:var(--mt)">'+unitLbl+'</span></div>'
+      +'<div id="wc-preview-'+o.id+'" style="margin-top:8px"></div>'
+      +'<button class="btn btnok" style="width:100%;margin-top:10px" onclick="confirmWeightCollection(\''+o.id+'\')"><i class="ti ti-shield-check"></i> Confirm weight &amp; take to billing</button>';
+  }
+  body+='</div>';
+  if(o.collectedConfirmed){
+    var actualW2=parseFloat(o.actualWeight||0);var finalAmt2=o.finalAmount!=null?o.finalAmount:orderedAmt;
+    body+='<div class="col-track"><b><i class="ti ti-receipt"></i> Billing (by weight)</b><br>'
+      +'Ordered '+orderedW+' '+unitLbl+' = '+cur+' '+orderedAmt+'<br>Actual '+actualW2+' '+unitLbl+' = <b>'+cur+' '+finalAmt2+'</b>'
+      +(o.weightExtraDue?'<br><span style="color:#c2410c;font-weight:700">Extra to collect: '+cur+' '+o.weightExtraDue+' ('+(o.weightDiffG||'')+' over)'+(o.payMethod==='online'?' — collect at delivery':'')+'</span>':'')
+      +(o.refundDue?'<br><span style="color:#e23b3b;font-weight:700">Refund to buyer: '+cur+' '+o.refundDue+' (under weight)</span>':'')
+      +((!o.weightExtraDue&&!o.refundDue)?'<br><span style="color:#16a34a">Exact — no adjustment</span>':'')
+      +'</div>'
+      +'<button class="col-scanbtn" style="margin-top:8px" onclick="printInvoice(\''+o.id+'\')"><i class="ti ti-printer"></i> Print invoice (actual weight)</button>';
+  }
+  document.getElementById('collect-body').innerHTML=body;
+}
+function weightScan(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o)return;
+  var codes=orderCodes(o);
+  rbOpenScanner({title:'Scan: '+o.productTitle,match:function(code){return codes.indexOf(String(code).toLowerCase())>=0;},
+    onMatch:function(){var os=getOrders();var oo=os.find(function(x){return x.id===orderId;});if(!oo)return;oo.wScanned=true;saveOrders(os);
+      var rf=document.getElementById('scan-result');if(rf){rf.className='scan-result ok';rf.innerHTML='<i class="ti ti-check"></i> Product confirmed';}
+      setTimeout(function(){rbCloseScanner();renderCollection(orderId);},650);}});
+}
+function weightCalc(o,actualW){
+  var unitPrice=parseFloat(String(o.price).replace(/[^0-9.]/g,''))||0;
+  var orderedW=parseFloat(o.orderedWeight||o.qty||1)||1;
+  var orderedAmt=Math.round(orderedW*unitPrice*100)/100;
+  var actualAmt=Math.round(actualW*unitPrice*100)/100;
+  var diff=Math.round((actualAmt-orderedAmt)*100)/100;
+  // grams difference for display
+  var toG=o.weightUnit==='g'?1:(o.weightUnit==='100g'?100:1000);
+  var diffG=Math.round((actualW-orderedW)*toG);
+  return {unitPrice:unitPrice,orderedW:orderedW,orderedAmt:orderedAmt,actualAmt:actualAmt,diff:diff,diffG:diffG};
+}
+function weightPreview(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o)return;
+  var inp=document.getElementById('wc-actual-'+orderId);var box=document.getElementById('wc-preview-'+orderId);if(!box)return;
+  var actualW=parseFloat(inp&&inp.value)||0;var cur=esc(o.currency||'');var lbl=weightUnitLabel(o.weightUnit||'kg');
+  if(!actualW){box.innerHTML='';return;}
+  var r=weightCalc(o,actualW);
+  var msg;
+  if(r.diff>0)msg='<div class="col-short" style="background:#fff7ed;border-color:#fed7aa;color:#9a3412"><i class="ti ti-plus"></i> '+(r.diffG)+' g over → collect extra <b>'+cur+' '+r.diff+'</b>'+(o.payMethod==='online'?' at delivery':'')+'. New total: '+cur+' '+r.actualAmt+'</div>';
+  else if(r.diff<0)msg='<div class="col-short" style="background:#fef2f2;border-color:#fecaca;color:#991b1b"><i class="ti ti-minus"></i> '+Math.abs(r.diffG)+' g under → refund <b>'+cur+' '+Math.abs(r.diff)+'</b>. New total: '+cur+' '+r.actualAmt+'</div>';
+  else msg='<div class="col-short" style="background:#ecfdf5;border-color:#bbf7d0;color:#166534"><i class="ti ti-check"></i> Exact weight — total '+cur+' '+r.actualAmt+', no adjustment</div>';
+  box.innerHTML=msg;
+}
+function confirmWeightCollection(orderId){
+  var os=getOrders();var o=os.find(function(x){return x.id===orderId;});if(!o)return;
+  var inp=document.getElementById('wc-actual-'+orderId);var actualW=parseFloat(inp&&inp.value)||0;
+  if(actualW<=0){toast('Enter the actual weight from the scale','err');return;}
+  var r=weightCalc(o,actualW);
+  o.actualWeight=actualW;o.finalAmount=r.actualAmt;o.weightAdjust=r.diff;o.weightDiffG=(r.diffG>0?'+':'')+r.diffG+' g';
+  o.collectedConfirmed=true;o.collectedTs=Date.now();o.billQty=1;o.collectedShort=0;
+  o.weightExtraDue=r.diff>0?r.diff:0;
+  o.refundDue=r.diff<0?Math.abs(r.diff):0;if(o.refundDue)o.refundStatus='due';
+  if(o.weightExtraDue&&o.payMethod==='cod'){o.codExtra=(o.codExtra||0)+o.weightExtraDue;}
+  o.pickLog=(o.pickLog||[]);o.pickLog.push({by:CU.name,actualWeight:actualW,adjust:r.diff,ts:Date.now()});
+  saveOrders(os);
+  var cur=esc(o.currency||'');
+  notifyEvent('weigh','⚖️ <b>'+esc(CU.name)+'</b> weighed “'+esc(o.productTitle)+'”: '+actualW+' '+weightUnitLabel(o.weightUnit||'kg')+(o.weightExtraDue?' · collect extra '+cur+' '+o.weightExtraDue:(o.refundDue?' · refund '+cur+' '+o.refundDue:''))+'');
+  renderCollection(orderId);
+  toast(o.weightExtraDue?('Collect extra '+cur+' '+o.weightExtraDue):(o.refundDue?('Refund '+cur+' '+o.refundDue):'Weight confirmed'),'ok');
 }
 </script></body></html>
