@@ -39,6 +39,73 @@
   --bi:#eef3f8;--bo:#0a66c2;--bot:#ffffff;
   --fn:'Inter',sans-serif;--sab:env(safe-area-inset-bottom,0px);
 }
+/* ===== v128: dark mode + accessibility text size ===== */
+body.dark{
+  --bg:#0f141a;--sf:#171e26;--card:#171e26;--card2:#1f2832;
+  --b:#2a333f;--b2:#3a4654;
+  --tx:#e7eef5;--mt:#a7b4c2;--mt2:#7e8b99;
+  --bi:#1d2935;--bo:#3b82f6;
+  --g:#3b82f6;--blue:#3b82f6;--cyan:#38bdf8;
+}
+body.dark .fk-wrap{background:#0f141a}
+body.dark .fk-sec,body.dark .fk-cats,body.dark .fk-tile,body.dark .fk-store-rail,body.dark .fk-stores-h{background:#171e26}
+body.dark .fk-tile{box-shadow:none;border-bottom:1px solid #222b34}
+body.dark .fk-grid{background:#0f141a}
+body.dark .fk-ttl,body.dark .fk-now,body.dark .fk-sec-h b{color:#e7eef5}
+body.dark .pd,body.dark .pd-body,body.dark .pd-gal{background:#171e26}
+body.dark .pd-title,body.dark .pd-now,body.dark .pd-sec h4{color:#e7eef5}
+body.dark .pd-gal img,body.dark .fk-tile img{mix-blend-mode:normal}
+body.dark .care-input input{background:#1f2832;color:#e7eef5}
+html{font-size:var(--rb-fs,100%)}
+body.fs-lg{--rb-fs:112%}body.fs-xl{--rb-fs:125%}
+.appx-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 2px;border-bottom:1px solid var(--b)}
+.appx-row b{font-size:14px}.appx-row small{font-size:11px;color:var(--mt2);display:block}
+.appx-seg{display:flex;background:var(--card2);border-radius:10px;padding:3px}
+.appx-seg button{border:none;background:transparent;border-radius:8px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;color:var(--mt);font-family:var(--fn)}
+.appx-seg button.on{background:var(--g);color:#fff}
+.appx-sw{position:relative;width:48px;height:27px;border-radius:14px;background:var(--b2);cursor:pointer;flex-shrink:0;transition:background .2s}
+.appx-sw.on{background:var(--g)}
+.appx-sw::after{content:"";position:absolute;top:2px;left:2px;width:23px;height:23px;border-radius:50%;background:#fff;transition:left .2s}
+.appx-sw.on::after{left:23px}
+.addr-card{display:flex;align-items:flex-start;gap:9px;border:1px solid var(--b);border-radius:10px;padding:11px;margin-bottom:8px}
+.addr-card.sel{border-color:var(--g);background:var(--bi)}
+.addr-card .lbl{font-size:12px;font-weight:800}
+.addr-card .tx{font-size:12px;color:var(--mt);line-height:1.4}
+/* ===== v129: personalized Home / For You ===== */
+.home-hero{background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:0 0 22px 22px;padding:20px 16px 22px;position:relative;overflow:hidden}
+.home-hero::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08)}
+.home-hi{font-size:13px;opacity:.9}
+.home-name{font-size:24px;font-weight:800;line-height:1.1;margin:2px 0 3px}
+.home-sub{font-size:12px;opacity:.9}
+.home-checkin{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:12px;margin-top:14px;display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.home-checkin .flame{font-size:26px}
+.home-checkin b{font-size:14px}
+.home-checkin small{font-size:11px;opacity:.9;display:block}
+.home-checkin .pts{margin-left:auto;text-align:right}
+.home-checkin .pts b{font-size:18px;color:#ffd23f}
+.home-cibtn{background:#ffd23f;color:#3a2a00;border:none;border-radius:18px;padding:8px 14px;font-weight:800;font-size:12px;cursor:pointer;font-family:var(--fn)}
+.home-body{padding:14px 14px 90px}
+.home-sec{margin-bottom:18px}
+.home-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.home-sec-h b{font-size:15px;font-weight:800}
+.home-sec-h a{font-size:12px;color:var(--g);cursor:pointer;font-weight:600}
+.home-attn{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.home-tile{background:var(--sf);border:1px solid var(--b);border-radius:14px;padding:13px;cursor:pointer;display:flex;flex-direction:column;gap:5px;transition:transform .12s,box-shadow .12s}
+.home-tile:active{transform:scale(.97)}
+.home-tile .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff}
+.home-tile b{font-size:22px;font-weight:800;line-height:1}
+.home-tile small{font-size:11px;color:var(--mt2)}
+.home-tile .lbl{font-size:13px;font-weight:700}
+.home-rail{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.home-rail::-webkit-scrollbar{display:none}
+.home-rv{flex:0 0 110px;cursor:pointer}
+.home-rv img{width:110px;height:110px;object-fit:contain;background:#fff;border-radius:12px;border:1px solid var(--b)}
+.home-rv .t{font-size:11px;color:var(--tx);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-rv .p{font-size:12px;font-weight:800;color:#0a8f5c}
+.home-empty{text-align:center;color:var(--mt2);font-size:13px;padding:26px 16px;background:var(--card2);border-radius:14px}
+.home-fab{position:fixed;left:16px;bottom:84px;z-index:8800;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(10,102,194,.45);display:flex;align-items:center;justify-content:center;font-size:24px}
+
+
 html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg);color:var(--tx)}
 .shell{display:flex;height:100vh;overflow:hidden}
 .auth-scr{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
@@ -774,6 +841,41 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .care-input input{flex:1;border:1px solid #ffd23f;border-radius:20px;padding:10px 14px;font-size:13px;font-family:var(--fn);background:#fffdf5;outline:none}
 .care-input button{background:#ffb800;color:#3a2a00;border:none;border-radius:20px;padding:10px 16px;font-weight:800;cursor:pointer;font-family:var(--fn)}
 .care-b.typing{opacity:.6;font-style:italic}
+/* ===== v126: account groups + scroll buttons + compare ===== */
+.acct-group{border:1px solid var(--b);border-radius:12px;margin-bottom:9px;overflow:hidden}
+.acct-group>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:12px 13px;font-weight:800;font-size:13px;background:var(--card2)}
+.acct-group>summary::-webkit-details-marker{display:none}
+.acct-group>summary .chev{margin-left:auto;transition:transform .2s;color:var(--mt2)}
+.acct-group[open]>summary .chev{transform:rotate(90deg)}
+.acct-group>summary .gi{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.acct-group .acct-body{padding:7px 9px 9px}
+.acct-group .acct-item{border-radius:9px;margin-bottom:4px}
+.acct-locked{font-size:11px;color:var(--mt2);padding:9px 11px;line-height:1.5}
+.scroll-btns{position:fixed;right:14px;bottom:150px;z-index:8500;display:flex;flex-direction:column;gap:8px;opacity:0;pointer-events:none;transition:opacity .2s}
+.scroll-btns.show{opacity:1;pointer-events:auto}
+.scroll-btns button{width:42px;height:42px;border-radius:50%;border:none;background:var(--sf);color:var(--tx);box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;border:1px solid var(--b)}
+.scroll-btns button:active{transform:scale(.92)}
+.cmp-offer{display:flex;align-items:center;gap:10px;border:1px solid #e6e9ee;border-radius:10px;padding:10px;margin-bottom:8px}
+.cmp-offer img{width:42px;height:42px;object-fit:contain;background:#fff;border-radius:7px}
+.cmp-offer .nm{font-size:12px;font-weight:700;color:#212121}
+.cmp-offer .pr{font-size:14px;font-weight:800;color:#0a8f5c}
+.cmp-best{border-color:#16a34a;background:#f0fdf4}
+.cmp-badge{font-size:9px;font-weight:800;color:#fff;background:#16a34a;border-radius:6px;padding:2px 6px}
+.gap-have{display:inline-block;background:#ecfdf5;color:#166534;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;margin:2px 3px 0 0}
+.gap-miss{display:inline-block;background:#fff7ed;color:#9a3412;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;margin:2px 3px 0 0}
+/* ===== v127: bulk listing + agent basket ===== */
+.bulk-ta{width:100%;min-height:140px;background:var(--card);border:1px solid var(--b);border-radius:10px;padding:11px;color:var(--tx);font-family:monospace;font-size:12px;line-height:1.6}
+.bulk-help{background:var(--card2);border-radius:9px;padding:10px;font-size:11px;color:var(--mt);line-height:1.5;margin-bottom:10px}
+.bulk-prev{border:1px solid var(--b);border-radius:9px;padding:9px;margin-top:9px;max-height:200px;overflow-y:auto}
+.bulk-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px solid var(--b)}
+.bulk-row .bad{color:#e23b3b;font-size:10px}
+.bskt-item{border:1px solid var(--b);border-radius:11px;padding:11px;margin-bottom:9px}
+.bskt-item.na{opacity:.7;background:var(--card2)}
+.bskt-na-btn{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fn)}
+.bskt-done{background:#ecfdf5;color:#166534;border-radius:8px;padding:8px;font-size:12px;font-weight:700;text-align:center}
+.bskt-sum{background:var(--card2);border-radius:10px;padding:11px;margin-bottom:11px;font-size:13px}
+
+
 .tkt-card{border:1px solid var(--b);border-radius:11px;padding:12px;margin-bottom:10px}
 .tkt-ref{font-family:monospace;font-size:12px;font-weight:800;color:#0a66c2}
 .tkt-status{font-size:10px;font-weight:800;border-radius:8px;padding:2px 8px}
@@ -953,7 +1055,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v125</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v129</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1245,7 +1347,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   <div class="mbd">
     <div id="buy-info" style="background:var(--card2);border-radius:9px;padding:10px;margin-bottom:10px"></div>
     <div class="fg"><label>Quantity</label><input type="number" id="buy-qty" value="1" min="1"></div>
-    <div class="fg" style="margin-top:8px"><label>Delivery address</label><textarea id="buy-addr" rows="2" placeholder="Full delivery address"></textarea></div>
+    <div id="buy-saved-addr" style="margin-top:8px"></div><div class="fg" style="margin-top:8px"><label>Delivery address <span id="buy-save-addr-link" style="float:right;font-weight:600;color:#0a66c2;cursor:pointer;font-size:11px" onclick="buySaveCurrentAddr()">＋ Save this address</span></label><textarea id="buy-addr" rows="2" placeholder="Full delivery address"></textarea></div>
     <div class="fg" style="margin-top:8px"><label>Delivery location (Google Maps)</label>
       <div style="display:flex;gap:6px"><input type="text" id="buy-map" placeholder="Paste Maps link or tap pin" style="flex:1">
       <button class="btn" onclick="detectBuyerLocation()" style="border:1px solid var(--b);background:var(--card2);color:var(--g);white-space:nowrap"><i class="ti ti-current-location"></i></button></div>
@@ -1459,6 +1561,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 
 <button class="fab" id="fab" onclick="openPostChooser()"><i class="ti ti-plus"></i> <span class="fab-txt">Post</span></button>
 <button class="care-fab" id="care-fab" onclick="openCareAi()" title="Reedbi Care — help with orders, delivery, returns"><i class="ti ti-headset"></i></button>
+<button class="home-fab" id="home-fab" onclick="openHome()" title="Your Home — For You"><i class="ti ti-home"></i></button>
+<div class="scroll-btns" id="scroll-btns"><button onclick="rbScrollTo('up')" title="Scroll to top"><i class="ti ti-chevron-up"></i></button><button onclick="rbScrollTo('down')" title="Scroll to bottom"><i class="ti ti-chevron-down"></i></button></div>
 <div class="tstack" id="tstack"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -5477,36 +5581,78 @@ function openAccountMenu(){
   if(!CU){toast('Sign in first','info');return;}
   var body=document.getElementById('acctmenu-body');
   var lic=(typeof licenseValid==='function')&&licenseValid(CU.uid);
-  var isOwner=(typeof adminUnlocked!=='undefined'&&adminUnlocked)||(typeof canManageLicenses==='function'&&canManageLicenses());
-  var h='<div style="text-align:center;padding:6px 0 12px">'
+  var ownPg=(typeof myOwnedPage==='function')?myOwnedPage():null;
+  var ownApproved=ownPg&&(typeof pageLicenseValid==='function')&&pageLicenseValid(ownPg.name);
+  var hasProducts=(getProducts()||[]).some(function(p){return p.sellerUid===CU.uid;});
+  var isSeller=!!(lic||ownApproved||hasProducts);            // approved seller / shop
+  var isAdmin=(typeof adminUnlocked!=='undefined'&&adminUnlocked)||(typeof canManageLicenses==='function'&&canManageLicenses());
+  var ident=ownApproved?'<span class="pay-badge pay-online-b" style="font-size:9px">Reedbi Ecommerce — '+esc(ownPg.name)+'</span>'
+            :(lic?'<span class="pay-badge pay-online-b" style="font-size:9px">ReadBi Licensed ✓</span>'
+                 :'<span class="pay-badge" style="font-size:9px;background:rgba(195,125,22,.12);color:#c37d16">Reedbi Tag Talk</span>');
+
+  function item(act,icon,col,label,sub,extra){
+    return '<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');'+act+'"><i class="ti ti-'+icon+'"'+(col?' style="color:'+col+'"':'')+'></i> '+label+(sub?' <small>'+sub+'</small>':'')+(extra||'')+'</button>';
+  }
+  function group(title,icon,bg,inner,open){
+    return '<details class="acct-group"'+(open?' open':'')+'><summary><span class="gi" style="background:'+bg+'22;color:'+bg+'"><i class="ti ti-'+icon+'"></i></span> '+title+'<i class="ti ti-chevron-right chev"></i></summary><div class="acct-body">'+inner+'</div></details>';
+  }
+
+  // header
+  var h='<div style="text-align:center;padding:4px 0 10px">'
     +'<div class="uchip-av av'+(CU.avIdx||0)+'" style="width:56px;height:56px;font-size:20px;margin:0 auto 8px">'+esc((CU.name||'?').substring(0,2).toUpperCase())+'</div>'
     +'<div style="font-weight:800;font-size:15px">'+esc(CU.name||'You')+'</div>'
     +(CU.email?'<div style="font-size:11px;color:var(--mt)">'+esc(CU.email)+'</div>':'')
-    +(lic?'<span class="pay-badge pay-online-b" style="margin-top:6px;display:inline-block">ReadBi Licensed ✓</span>':'<span class="pay-badge" style="margin-top:6px;display:inline-block;background:rgba(195,125,22,.12);color:var(--gold)">Tag Talk seller</span>')
-    +'</div>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyActivity()"><i class="ti ti-layout-dashboard" style="color:var(--g)"></i> My Activity <small>jobs, orders, shop, license — all in one place</small></button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openLicensePanel()"><i class="ti ti-license" style="color:var(--gold)"></i> ReadBi Seller License <small>'+(lic?'manage / renew':'request or validate')+'</small></button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyProducts()"><i class="ti ti-building-store"></i> My Shop</button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openCounter()"><i class="ti ti-cash-register" style="color:#0a66c2"></i> Billing Counter <small>pick status · bill collected orders</small></button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openBarcodeLabels()"><i class="ti ti-barcode" style="color:#0a66c2"></i> Barcode labels <small>print labels for items without a barcode</small></button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyOrders()"><i class="ti ti-package"></i> My Orders</button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');showMyApps()"><i class="ti ti-briefcase"></i> My Job Applications</button>';
-  h+='<button class="acct-item" style="border:1px solid #7c3aed;border-radius:10px" onclick="closeOvl(\'acctmenu-ovl\');openJobAgent()"><i class="ti ti-robot" style="color:#7c3aed"></i> <b>AI Job Agent</b> <small>finds &amp; auto-applies to matching jobs</small>'+(jobAgentBadge()?' <span style="background:#7c3aed;color:#fff;border-radius:9px;font-size:9px;padding:1px 6px;font-weight:800">'+jobAgentBadge()+' new</span>':'')+'</button>';
-  var __pgI=(typeof myOwnedPage==='function')?myOwnedPage():null;
-  var __ident=(__pgI&&pageLicenseValid(__pgI.name))?'<span class="pay-badge pay-online-b" style="font-size:9px">Reedbi Ecommerce — '+esc(__pgI.name)+'</span>':'<span class="pay-badge" style="font-size:9px;background:rgba(195,125,22,.12);color:#c37d16">Reedbi Tagtalk</span>';
-  h='<div style="text-align:center;margin-bottom:8px">'+__ident+'</div>'
-    +'<button class="acct-item" style="border:1px solid var(--g);border-radius:10px;margin-bottom:6px" onclick="closeOvl(\'acctmenu-ovl\');openMainStore()"><i class="ti ti-building-store" style="color:var(--g)"></i> <b>Reedbi Ecommerce — Main store</b> <small>all approved sellers &amp; products</small></button>'+h;
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openEditAccount()"><i class="ti ti-user-edit" style="color:var(--g)"></i> Edit account details <small>name, WhatsApp, location, interests</small></button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openNotifSettings()"><i class="ti ti-bell" style="color:var(--gold)"></i> Notifications <small>sound, tune, mute</small></button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openCareAi()"><i class="ti ti-headset" style="color:#ffb800"></i> Reedbi Care <small>orders, delivery, returns &amp; refunds</small></button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openMyTickets()"><i class="ti ti-ticket" style="color:#ffb800"></i> My Support Tickets <small>status &amp; emailed decisions</small></button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openSupportDesk()"><i class="ti ti-headset" style="color:#0a66c2"></i> Support Desk <small>human agents: resolve tickets &amp; email customers</small></button>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openProfile(CU.name,CU.co||\'\',\'\',CU.avIdx||0)"><i class="ti ti-user"></i> View Public Profile</button>';
-  // ADMIN / OWNER control — only visible to authorized owner emails
-  h+='<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:8px"></div>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');openAdminPanel()"><i class="ti ti-shield-lock" style="color:var(--red)"></i> Admin Control Panel <small>owner only — server verified</small></button>';
-  h+='<div style="border-top:1px solid var(--b);margin:8px 0;padding-top:8px"></div>';
-  h+='<button class="acct-item" onclick="closeOvl(\'acctmenu-ovl\');doSignOut()"><i class="ti ti-logout"></i> Sign Out</button>';
+    +'<div style="margin-top:6px">'+ident+'</div></div>';
+
+  // personalized home — everyone
+  h+='<button class="acct-item" style="border:none;border-radius:11px;margin-bottom:8px;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff" onclick="closeOvl(\'acctmenu-ovl\');openHome()"><i class="ti ti-home"></i> <b>Home — For You</b> <small style="color:rgba(255,255,255,.85)">your orders, matches, picks &amp; rewards</small></button>';
+  // main store — everyone
+  h+='<button class="acct-item" style="border:1px solid var(--g);border-radius:11px;margin-bottom:9px" onclick="closeOvl(\'acctmenu-ovl\');openMainStore()"><i class="ti ti-building-store" style="color:var(--g)"></i> <b>Reedbi Ecommerce — Main store</b> <small>shop all approved sellers</small></button>';
+
+  // === MY ACTIVITY (everyone) ===
+  var act=item('showMyActivity()','layout-dashboard','var(--g)','My Activity','your jobs, orders, shop &amp; license in one place')
+    +item('showMyOrders()','package','','My Orders','track &amp; manage purchases')
+    +item('openCareAi()','headset','#ffb800','Reedbi Care','orders, delivery, returns &amp; refunds')
+    +item('openMyTickets()','ticket','#ffb800','My Support Tickets','status &amp; emailed decisions')
+    +item('openProfile(CU.name,CU.co||\'\',\'\',CU.avIdx||0)','user','','View Public Profile','');
+  h+=group('My Activity','layout-dashboard','#0a8f5c',act,true);
+
+  // === JOBS (everyone) ===
+  var jobs=item('showMyApps()','briefcase','','My Job Applications','where you applied + status')
+    +item('openJobAgent()','robot','#7c3aed','AI Job Agent','finds &amp; auto-applies to matches', jobAgentBadge()?' <span style="background:#7c3aed;color:#fff;border-radius:9px;font-size:9px;padding:1px 6px;font-weight:800">'+jobAgentBadge()+' new</span>':'');
+  h+=group('Jobs','briefcase','#7c3aed',jobs,false);
+
+  // === SHOPS & SELLING (approved sellers see all; others see how to start) ===
+  var shopInner;
+  if(isSeller){
+    shopInner=item('showMyProducts()','building-store','','My Shop','products, orders, sales')
+      +item('openListProduct()','plus','#0a66c2','List a product','add a new item to sell')
+      +item('openBulkList()','list-details','#0a66c2','Bulk add products','add many at once — paste a list')
+      +item('openCounter()','cash-register','#0a66c2','Billing Counter','pick status · bill collected orders')
+      +item('openBarcodeLabels()','barcode','#0a66c2','Barcode labels','print labels for items without a barcode')
+      +item('openSupportDesk()','headset','#0a66c2','Support Desk','resolve customer tickets &amp; email them')
+      +item('openLicensePanel()','license','var(--gold)','Seller License',lic?'manage / renew':'validate');
+  } else {
+    shopInner='<div class="acct-locked"><i class="ti ti-info-circle"></i> Want to sell on Reedbi? Get a seller license to unlock your shop, the billing counter, barcode labels and order pickup.</div>'
+      +item('openLicensePanel()','license','var(--gold)','Become a seller — get a license','request or validate');
+  }
+  h+=group(isSeller?'Shops &amp; Selling':'Sell on Reedbi','building-store','#0a66c2',shopInner,false);
+
+  // === ACCOUNT & SETTINGS (everyone) ===
+  var acc=item('openEditAccount()','user-edit','var(--g)','Edit account details','name, WhatsApp, location, interests')
+    +item('openAppearance()','adjustments','var(--g)','Appearance &amp; Accessibility','dark mode, text size')
+    +item('openAddressBook()','map-pin','var(--g)','Saved addresses','faster checkout')
+    +item('openNotifSettings()','bell','var(--gold)','Notifications','sound, tune, mute');
+  h+=group('Account &amp; Settings','settings','#64748b',acc,false);
+
+  // admin (owner)
+  if(isAdmin){
+    h+='<button class="acct-item" style="margin-top:4px" onclick="closeOvl(\'acctmenu-ovl\');openAdminPanel()"><i class="ti ti-shield-lock" style="color:var(--red)"></i> Admin Control Panel <small>owner only — server verified</small></button>';
+  } else {
+    h+='<button class="acct-item" style="margin-top:4px;opacity:.7" onclick="closeOvl(\'acctmenu-ovl\');openAdminPanel()"><i class="ti ti-shield-lock" style="color:var(--mt2)"></i> Admin Control Panel <small>owner only</small></button>';
+  }
+  h+='<button class="acct-item" style="margin-top:4px" onclick="closeOvl(\'acctmenu-ovl\');doSignOut()"><i class="ti ti-logout"></i> Sign Out</button>';
+
   body.innerHTML=h;
   document.getElementById('acctmenu-ovl').classList.add('open');
 }
@@ -5570,7 +5716,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v125 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v129 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6002,7 +6148,8 @@ function submitReview(){
   if(!stars){toast('Tap the stars to rate','err');return;}
   var prods=getProducts();var p=prods.find(function(x){return x.id===__revPid;});if(!p)return;
   p.reviews=p.reviews||[];
-  p.reviews.push({uid:CU.uid,name:CU.name,stars:stars,txt:txt,photo:__revPhoto||'',ts:Date.now()});
+  var verified=(getOrders()||[]).some(function(o){return o.buyerUid===CU.uid&&o.productId===p.id;});
+  p.reviews.push({uid:CU.uid,name:CU.name,stars:stars,txt:txt,photo:__revPhoto||'',ts:Date.now(),verified:verified});
   saveProducts(prods);
   closeOvl('rev-ovl');toast('Review posted — thank you!','ok');
 }
@@ -6206,7 +6353,8 @@ function showMyProducts(tab){
     +'<div><div style="font-size:18px;font-weight:800;color:var(--tx)">'+totalUnits+'</div><div style="font-size:10px;color:var(--mt2)">Units sold</div></div>'
     +'<div><div style="font-size:18px;font-weight:800;color:var(--gold)">'+esc(cur)+' '+revenue.toLocaleString()+'</div><div style="font-size:10px;color:var(--mt2)">Revenue</div></div>'
     +'</div>'
-    +'<button class="btn btnok" style="margin-top:11px;border-radius:18px;width:100%" onclick="closeOvl(\'seller-ovl\');openListProduct()"><i class="ti ti-plus"></i> List a New Product</button>'
+    +'<div style="display:flex;gap:8px;margin-top:11px"><button class="btn btnok" style="border-radius:18px;flex:1" onclick="closeOvl(\'seller-ovl\');openListProduct()"><i class="ti ti-plus"></i> List Product</button>'
+    +'<button class="btn" style="border-radius:18px;flex:1;border:1px solid #0a66c2;color:#0a66c2;background:rgba(10,102,194,.08)" onclick="closeOvl(\'seller-ovl\');openBulkList()"><i class="ti ti-list-details"></i> Bulk add</button></div>'
     +'<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid var(--gold);background:var(--card2);color:var(--gold)" onclick="openDelivSettings()"><i class="ti ti-truck-delivery"></i> Delivery fees &amp; commission (geo-based)</button>'
     +(function(){var pg=(typeof myOwnedPage==='function')&&myOwnedPage();if(!pg)return '';return '<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="closeOvl(\'seller-ovl\');openPageTeam(\''+escJS(pg.name)+'\')"><i class="ti ti-users"></i> '+esc(pg.name)+' — manage page team (assign staff for listings)</button>';})()
     +'</div>';
@@ -6532,6 +6680,7 @@ function buyProduct(productId){
   szRow.innerHTML=(curBuyProduct.sizes&&curBuyProduct.sizes.length)?'<div class="fg" style="margin-top:8px"><label>Size / variant</label><select id="buy-size">'+curBuyProduct.sizes.map(function(s){return '<option>'+esc(s)+'</option>';}).join('')+'</select></div>':'';
   var bm=document.getElementById('buy-map');if(bm)bm.value='';
   selectPay('cod');
+  buyRenderSavedAddr();
   document.getElementById('buy-ovl').classList.add('open');
 }
 var curBuyProduct=null;
@@ -7893,6 +8042,7 @@ function showAgentDashboard(){
       +'<div class="ord-current"><i class="ti ti-'+os.icon+'"></i> '+os.label+'</div>'
       +trackStrip(o)
       +(deliveryTimeStr(o)?'<div style="margin-top:5px">'+deliveryTimeStr(o)+'</div>':'')
+      +(function(){var sib=(getOrders()||[]).filter(function(x){return x.agentUid===CU.uid&&x.buyerUid&&x.buyerUid===o.buyerUid&&x.status!=='delivered'&&x.status!=='cancelled';});return sib.length>1?'<button class="ord-next" style="background:#0a8f5c;margin-bottom:5px" onclick="openAgentBasket(\''+esc(o.buyerUid)+'\')"><i class="ti ti-basket"></i> View buyer\'s full basket ('+sib.length+' items)</button>':'';})()
       +(!o.collectedConfirmed?'<button class="ord-next" style="background:#0a66c2" onclick="openCollection(\''+o.id+'\')"><i class="ti ti-scan"></i> Pick &amp; Collect at shop'+((o.collectedQty||0)>0?' ('+(o.collectedQty||0)+'/'+o.qty+')':'')+'</button>':'<div style="font-size:11px;color:#16a34a;margin-top:5px"><i class="ti ti-circle-check"></i> Collected '+(o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty+(o.refundDue?' · refund '+esc(o.currency||'')+' '+o.refundDue:'')+' <button style="background:none;border:none;color:#0a66c2;font-weight:700;cursor:pointer" onclick="openCollection(\''+o.id+'\')">view</button></div>')
       +(next?(next.id==='delivered'
           ?'<button class="ord-next" onclick="agentConfirmDelivery(\''+o.id+'\')"><i class="ti ti-shield-check"></i> Confirm delivery (enter OTP)</button>'
@@ -9242,6 +9392,7 @@ function openProductDetail(pid,opts){
   opts=opts||{};
   var p=getProducts().find(function(x){return x.id===pid;});
   if(!p){toast('Product not found','err');return;}
+  try{pushRecentViewed(pid);}catch(e){}
   if(!document.getElementById('prodsearch-ovl')||!document.getElementById('prodsearch-ovl').classList.contains('open'))openProductSearch();
   if(opts.nav!==false)rbSnapPush();
   __pdSel={color:'',size:'',qty:1};__pdPi=0;
@@ -9315,18 +9466,40 @@ function renderProductDetail(pid){
   }
 
   // reviews
-  var revList=(p.reviews||[]).slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).map(function(r){
-    return '<div class="pd-rev"><div class="top"><span class="star">'+r.stars+' ★</span><span class="nm">'+esc(r.name||'User')+'</span><span class="dt">'+(r.ts?new Date(r.ts).toLocaleDateString():'')+'</span></div>'
+  var allRev=(p.reviews||[]).slice().sort(function(a,b){return (b.verified?1:0)-(a.verified?1:0)||(b.ts||0)-(a.ts||0);});
+  var verCount=allRev.filter(function(r){return r.verified;}).length;
+  var revList=allRev.map(function(r){
+    return '<div class="pd-rev"><div class="top"><span class="star">'+r.stars+' ★</span><span class="nm">'+esc(r.name||'User')+'</span>'+(r.verified?'<span style="font-size:9px;font-weight:800;color:#16a34a;background:#ecfdf5;border-radius:6px;padding:1px 6px;margin-left:5px"><i class="ti ti-rosette-discount-check" style="font-size:9px"></i> Verified purchase</span>':'')+'<span class="dt">'+(r.ts?new Date(r.ts).toLocaleDateString():'')+'</span></div>'
       +(r.txt?'<div class="tx">'+esc(r.txt)+'</div>':'')
       +(r.color?'<div class="rcol">Color: '+esc(r.color)+'</div>':'')
       +(r.photo?'<img class="rimg" src="'+esc(r.photo)+'">':'')
       +'</div>';
   }).join('');
-  var reviews='<div class="pd-sec"><h4>Ratings &amp; Reviews</h4>'
+  var reviews='<div class="pd-sec"><h4>Ratings &amp; Reviews'+(verCount?' <span style="font-size:11px;font-weight:600;color:#16a34a">· '+verCount+' verified</span>':'')+'</h4>'
     +'<button class="btn btnok" style="margin-bottom:10px" onclick="openReview('+pidJ+')"><i class="ti ti-star"></i> Write a review</button>'
     +(revList||'<div style="font-size:12px;color:#878787">No reviews yet. Be the first to review.</div>')+'</div>';
 
   var desc=p.desc?'<div class="pd-sec"><h4>Product description</h4><div style="font-size:13px;color:#444;line-height:1.5">'+esc(p.desc)+'</div></div>':'';
+  // compare sellers offering the SAME product (by manufacturer barcode)
+  var cmpSec='';
+  if(p.barcode && !p.barcodeAuto){
+    var __bn=String(p.barcode);
+    var offers=getProducts().filter(function(x){return x.barcode===__bn && !x.barcodeAuto && productInMarketplace(x) && !x.withdrawn;});
+    if(offers.length>1){
+      var __myW=(CU&&CU.location?CU.location:'').toLowerCase().split(/[\s,]+/).filter(function(w){return w.length>2;});
+      var __nb=function(x){return __myW.some(function(w){return (x.location||'').toLowerCase().indexOf(w)>=0;});};
+      offers.sort(function(a,b){var pa=parseFloat(String(a.offer||a.price).replace(/[^0-9.]/g,''))||0,pb=parseFloat(String(b.offer||b.price).replace(/[^0-9.]/g,''))||0;return pa-pb;});
+      var __minP=parseFloat(String(offers[0].offer||offers[0].price).replace(/[^0-9.]/g,''))||0;
+      cmpSec='<div class="pd-sec"><h4>Compare '+offers.length+' sellers of this product</h4>'
+        +'<div style="font-size:11px;color:#878787;margin-bottom:8px">Same item (barcode '+esc(__bn)+') — sorted by price.</div>'
+        +offers.slice(0,8).map(function(x){var xp=parseFloat(String(x.offer||x.price).replace(/[^0-9.]/g,''))||0;var best=(xp===__minP);var xid="'"+x.id+"'";
+          return '<div class="cmp-offer'+(best?' cmp-best':'')+'" onclick="openProductDetail('+xid+')"><img src="'+esc(x.photos&&x.photos[0]||'')+'">'
+            +'<div style="flex:1;min-width:0"><div class="nm">'+esc(x.pageName||x.sellerName||'Seller')+(pageLicenseValid(x.pageName)?' <i class="ti ti-discount-check-filled" style="color:#0a66c2;font-size:11px"></i>':'')+'</div>'
+            +'<div style="font-size:10px;color:#878787">'+(__nb(x)?'📍 nearby · ':'')+(x.qty>0?'in stock':'out of stock')+'</div></div>'
+            +'<div style="text-align:right"><div class="pr">'+esc(x.currency||'')+' '+esc(x.offer||x.price)+'</div>'+(best?'<span class="cmp-badge">BEST PRICE</span>':'')+'</div></div>';
+        }).join('')+'</div>';
+    }
+  }
   ensureProdMeta(p);var barcodeSec='<div class="pd-sec"><h4>Product number &amp; barcode</h4><div style="font-size:13px;font-weight:700;color:#0a66c2;margin-bottom:6px"><i class="ti ti-hash"></i> '+esc(p.prodNo||'')+'</div><div style="display:inline-block;background:#fff;border:1px solid #e6e9ee;border-radius:8px;padding:8px">'+makeBarcodeSvg(p.barcode,{height:54,unit:2})+'</div><div style="font-size:11px;color:#878787;margin-top:4px">'+(p.barcodeAuto?'Reedbi in-store barcode':(isValidEan13(p.barcode)?'Verified EAN-13':'Product code'))+' · scannable at pickup &amp; counter</div></div>';
 
   var avail=productAvailable(p);
@@ -9343,7 +9516,7 @@ function renderProductDetail(pid){
     +rate
     +'<div class="pd-price"><span class="pd-now">'+cur+' '+base.toLocaleString()+'</span>'+(off?'<span class="pd-mrp">'+cur+' '+mrp.toLocaleString()+'</span><span class="pd-off">'+off+'% off</span>':'')+'</div>'
     +'<div style="font-size:11px;color:#878787">Inclusive of all taxes shown below</div>'
-    +colorSec+sizeSec+qtySec+vatSec+store+desc+barcodeSec+reviews
+    +colorSec+sizeSec+qtySec+vatSec+store+cmpSec+desc+barcodeSec+reviews
     +'</div>'+buybar+'</div>';
   box.scrollTop=0;
 }
@@ -9551,6 +9724,17 @@ function agentAutoApply(j,silent){
   if(!silent)toast('Applied to '+(j.title||'job')+' ✓','ok');
   return true;
 }
+function jobSkillGap(profile,job){
+  var SKILLS=['react','node','nodejs','javascript','typescript','python','java','sql','aws','azure','gcp','docker','kubernetes','git','html','css','php','laravel','django','flask','spring','go','rust','swift','kotlin','flutter','android','ios','figma','photoshop','illustrator','seo','marketing','excel','tableau','accounting','sales','communication','leadership','devops','linux','mongodb','postgres','redis','graphql','rest','api','agile','scrum','testing','qa','machine','learning','ml','data','analytics','vue','angular','tailwind','wordpress','shopify','salesforce','sap'];
+  function clean(w){return String(w).replace(/[^a-z0-9+#]/g,'');}
+  var jt=tokenize(job.title+' '+job.body);var jset={};jt.forEach(function(w){jset[clean(w)]=1;});
+  var pSet={};tokenize(profile.skills).forEach(function(w){pSet[clean(w)]=1;});
+  var have=[],miss=[];
+  Object.keys(jset).forEach(function(w){if(SKILLS.indexOf(w)>=0){if(pSet[w])have.push(w);else miss.push(w);}});
+  have=have.filter(function(v,i){return have.indexOf(v)===i;}).slice(0,8);
+  miss=miss.filter(function(v,i){return miss.indexOf(v)===i;}).slice(0,8);
+  return {have:have,miss:miss};
+}
 function openJobAgent(){
   if(!requireAuth('use the AI Job Agent'))return;
   var c=getAgentCfg();var prof=agentProfile();var ats=atsReadiness();
@@ -9584,6 +9768,7 @@ function openJobAgent(){
         var cls=j.score>=70?'hi':(j.score>=40?'mid':'');
         return '<div class="ja-match"><div style="display:flex;justify-content:space-between;align-items:center"><div style="flex:1;min-width:0"><b style="font-size:13px">'+esc(j.title||'Job')+'</b>'+(j.co?'<small style="color:var(--mt2)"> · '+esc(j.co)+'</small>':'')+'</div><div class="pct '+cls+'">'+j.score+'%</div></div>'
           +'<div class="ja-bar"><i style="width:'+j.score+'%"></i></div>'
+          +(function(){var g=jobSkillGap(prof,j);if(!g.have.length&&!g.miss.length)return '';return '<div style="margin:5px 0 7px">'+(g.have.length?'<div style="font-size:10px;color:var(--mt2);margin-bottom:2px">You have:</div>'+g.have.map(function(s){return '<span class="gap-have">'+esc(s)+'</span>';}).join(''):'')+(g.miss.length?'<div style="font-size:10px;color:var(--mt2);margin:4px 0 2px">To qualify, learn:</div>'+g.miss.map(function(s){return '<span class="gap-miss">'+esc(s)+'</span>';}).join(''):'<div style="font-size:10px;color:#16a34a;margin-top:3px"><i class="ti ti-check"></i> You have all the listed skills</div>')+'</div>';})()
           +(j.applied?'<span style="font-size:11px;color:#2ea44f;font-weight:700"><i class="ti ti-check"></i> Applied</span>'
             :'<button class="ja-actbtn ja-apply" onclick="agentApplyOne(\''+j.tagId+'_'+j.postId+'\')"><i class="ti ti-send"></i> Apply now</button>')
           +'</div>';
@@ -10339,5 +10524,323 @@ function confirmWeightCollection(orderId){
   notifyEvent('weigh','⚖️ <b>'+esc(CU.name)+'</b> weighed “'+esc(o.productTitle)+'”: '+actualW+' '+weightUnitLabel(o.weightUnit||'kg')+(o.weightExtraDue?' · collect extra '+cur+' '+o.weightExtraDue:(o.refundDue?' · refund '+cur+' '+o.refundDue:''))+'');
   renderCollection(orderId);
   toast(o.weightExtraDue?('Collect extra '+cur+' '+o.weightExtraDue):(o.refundDue?('Refund '+cur+' '+o.refundDue):'Weight confirmed'),'ok');
+}
+
+/* ===== v126: universal scroll up/down buttons (works on main page + every overlay) ===== */
+function rbActiveScroller(){
+  // the visible scrollable element: an open overlay's results/body, else the page
+  var sels=['#ps-results','#collect-body','#counter-body','.overlay.open .modal','#tcm','#vsh'];
+  for(var i=0;i<sels.length;i++){
+    var el=document.querySelector(sels[i]);
+    if(el&&el.offsetParent!==null&&el.scrollHeight>el.clientHeight+20)return el;
+  }
+  var se=document.scrollingElement||document.documentElement;
+  return se;
+}
+function rbScrollTo(dir){
+  var el=rbActiveScroller();if(!el)return;
+  var top=dir==='up'?0:(el.scrollHeight||999999);
+  try{el.scrollTo({top:top,behavior:'smooth'});}catch(e){el.scrollTop=top;}
+}
+function rbScrollBtnsUpdate(){
+  var btns=document.getElementById('scroll-btns');if(!btns)return;
+  var el=rbActiveScroller();
+  var sc=el&&(el.scrollHeight>el.clientHeight+120);
+  btns.classList.toggle('show',!!sc);
+}
+(function rbScrollInit(){
+  window.addEventListener('scroll',rbScrollBtnsUpdate,{passive:true});
+  document.addEventListener('scroll',rbScrollBtnsUpdate,{passive:true,capture:true});
+  setInterval(rbScrollBtnsUpdate,900);
+  setTimeout(rbScrollBtnsUpdate,1200);
+})();
+
+/* ===== v127: Bulk product listing =====
+   Paste one product per line: Title | price | qty | category | barcode(optional)
+   Reedbi assigns a product number + a barcode (auto if none) to each. Fast way
+   to load a whole shelf at once. */
+function openBulkList(){
+  if(!requireAuth('list products'))return;
+  var sellAs='';var pg=(typeof myOwnedPage==='function')?myOwnedPage():null;if(pg)sellAs=pg.name;
+  var ovl=document.getElementById('bulk-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='bulk-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:480px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-list-details" style="color:#0a66c2"></i> Bulk add products</b><button class="modal-x" onclick="closeOvl(\'bulk-ovl\')"><i class="ti ti-x"></i></button></div><div id="bulk-body"></div></div>';
+    document.body.appendChild(ovl);}
+  var cur=(CU&&CU.currency)||'AED';
+  document.getElementById('bulk-body').innerHTML=
+    '<div class="bulk-help"><b>One product per line:</b><br><code>Title | price | qty | category | barcode</code><br>Category &amp; barcode are optional. Example:<br><code>Red Apples 1kg | 12 | 50 | Fruits | 6299200048576</code><br><code>Loose Dates 1kg | 25 | 30 | Grocery</code></div>'
+    +'<div class="fg"><label>Currency</label><input type="text" id="bulk-cur" value="'+esc(cur)+'" style="width:90px"></div>'
+    +'<textarea class="bulk-ta" id="bulk-ta" placeholder="Red Apples 1kg | 12 | 50 | Fruits | 6299200048576&#10;Bananas | 6 | 80 | Fruits&#10;Tomatoes 1kg | 8 | 40 | Vegetables" oninput="bulkPreview()"></textarea>'
+    +'<div id="bulk-prev"></div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:11px" onclick="bulkSubmit(\''+escJS(sellAs)+'\')"><i class="ti ti-circle-plus"></i> Add all products</button>';
+  ovl.classList.add('open');
+}
+function bulkParse(){
+  var ta=document.getElementById('bulk-ta');if(!ta)return [];
+  return ta.value.split('\n').map(function(line){return line.trim();}).filter(Boolean).map(function(line){
+    var parts=line.split('|').map(function(s){return s.trim();});
+    var title=parts[0]||'';var price=(parts[1]||'').replace(/[^0-9.]/g,'');var qty=parseInt(parts[2],10)||0;
+    var category=parts[3]||'Other';var barcode=parts[4]||'';
+    var valid=!!(title&&price&&qty>0);
+    return {title:title,price:price,qty:qty,category:category,barcode:barcode,valid:valid,raw:line};
+  });
+}
+function bulkPreview(){
+  var rows=bulkParse();var box=document.getElementById('bulk-prev');if(!box)return;
+  if(!rows.length){box.innerHTML='';return;}
+  var ok=rows.filter(function(r){return r.valid;}).length;
+  box.innerHTML='<div class="bulk-prev"><div style="font-size:11px;color:var(--mt2);margin-bottom:5px">'+ok+' of '+rows.length+' ready</div>'
+    +rows.map(function(r){return '<div class="bulk-row"><span>'+esc(r.title||'(no title)')+'</span><span>'+(r.valid?(esc(r.price)+' × '+r.qty+' · '+esc(r.category)):'<span class="bad">needs title, price &amp; qty</span>')+'</span></div>';}).join('')+'</div>';
+}
+function bulkSubmit(sellAs){
+  var rows=bulkParse().filter(function(r){return r.valid;});
+  if(!rows.length){toast('Add at least one valid line','err');return;}
+  var cur=((document.getElementById('bulk-cur')||{}).value||'AED').trim();
+  var prods=getProducts();var added=0;
+  rows.forEach(function(r,idx){
+    var prodNo=fmtProdNo(nextProdNoSeq());
+    var bc=r.barcode?normalizeBarcode(r.barcode):genInternalBarcode(prodNo+'|'+r.title);
+    var prod={id:'prd'+Date.now()+idx+Math.floor(Math.random()*1000),prodNo:prodNo,barcodeAuto:!r.barcode,barcode:bc,
+      serialNo:'PRD-'+Date.now().toString(36).toUpperCase().slice(-5)+idx,
+      sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',brand:'',payOpts:'both',vatPct:0,sizes:[],colors:[],
+      byWeight:false,weightUnit:'',intlShip:'yes',title:r.title,desc:'',price:r.price,cost:'',offer:'',expiry:'',
+      currency:cur,qty:r.qty,sold:0,category:r.category,location:(CU&&CU.location)||'',
+      batches:[{batchCode:'B-'+Date.now().toString(36).toUpperCase().slice(-4)+idx,qty:r.qty,cost:'',vendor:'',date:Date.now()}],
+      interest:0,interestLog:[],photos:[],addr:(CU&&CU.location)||'',phone:(CU&&CU.phone)||'',map:'',ts:Date.now()+idx};
+    prods.unshift(prod);added++;
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(prod.id).set(prod).catch(function(){});}catch(e){}}
+  });
+  saveProducts(prods);
+  closeOvl('bulk-ovl');
+  toast(added+' products added ✓','ok');
+  try{showMyProducts();}catch(e){}
+}
+
+/* ===== v127: Agent basket — all of a buyer's items in one pick list =====
+   Groups every active order assigned to this agent for the same buyer, so the
+   agent works the whole basket and can mark any item NOT AVAILABLE (which bills
+   only what's collected and flags a refund for the rest). */
+function agentBaskets(){
+  if(!CU)return [];
+  var mine=(getOrders()||[]).filter(function(o){return o.agentUid===CU.uid&&o.status!=='delivered'&&o.status!=='cancelled';});
+  var groups={};
+  mine.forEach(function(o){var k=o.buyerUid||o.buyerName||o.id;(groups[k]=groups[k]||{buyer:o.buyerName,buyerUid:o.buyerUid,addr:o.buyerAddr,items:[]}).items.push(o);});
+  return Object.keys(groups).map(function(k){return groups[k];});
+}
+function openAgentBasket(buyerUid){
+  var b=agentBaskets().find(function(x){return (x.buyerUid||x.buyer)===buyerUid;});
+  if(!b){toast('Basket not found','err');return;}
+  var ovl=document.getElementById('bskt-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='bskt-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:460px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-basket" style="color:#0a66c2"></i> Buyer\'s basket</b><button class="modal-x" onclick="closeOvl(\'bskt-ovl\')"><i class="ti ti-x"></i></button></div><div id="bskt-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderAgentBasket(buyerUid);
+  ovl.classList.add('open');
+}
+function renderAgentBasket(buyerUid){
+  var b=agentBaskets().find(function(x){return (x.buyerUid||x.buyer)===buyerUid;});
+  if(!b){closeOvl('bskt-ovl');return;}
+  var done=b.items.filter(function(o){return o.collectedConfirmed||o.notAvailable;}).length;
+  var body='<div class="bskt-sum"><b>'+esc(b.buyer||'Buyer')+'</b> · '+b.items.length+' item'+(b.items.length>1?'s':'')+'<br><span style="font-size:11px;color:var(--mt2)">'+esc(b.addr||'')+'</span><div style="font-size:12px;margin-top:5px">Picked/handled: <b>'+done+'/'+b.items.length+'</b></div></div>';
+  body+=b.items.map(function(o){
+    var na=o.notAvailable;var confirmed=o.collectedConfirmed;
+    return '<div class="bskt-item'+(na?' na':'')+'"><div style="display:flex;gap:9px"><div style="flex:1"><b style="font-size:13px">'+esc(o.productTitle)+'</b>'
+      +'<div style="font-size:11px;color:var(--mt2)">Order '+esc(o.orderNo||o.id)+' · '+(o.byWeight?('ordered '+o.orderedWeight+' '+weightUnitLabel(o.weightUnit||'kg')):('qty '+o.qty))+'</div></div></div>'
+      +(na?'<div style="font-size:12px;color:#b91c1c;font-weight:700;margin-top:6px"><i class="ti ti-ban"></i> Marked NOT available'+(o.refundDue?' · refund '+esc(o.currency||'')+' '+o.refundDue:'')+'</div>'
+        :(confirmed?'<div class="bskt-done" style="margin-top:7px"><i class="ti ti-check"></i> '+(o.byWeight?('weighed '+o.actualWeight+' '+weightUnitLabel(o.weightUnit||'kg')):((o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty+' collected'))+'</div>'
+          :'<div style="display:flex;gap:7px;margin-top:8px"><button class="col-scanbtn" style="flex:1" onclick="closeOvl(\'bskt-ovl\');openCollection(\''+o.id+'\')"><i class="ti ti-scan"></i> Pick &amp; scan</button><button class="bskt-na-btn" onclick="markNotAvailable(\''+o.id+'\',\''+esc(buyerUid)+'\')"><i class="ti ti-ban"></i> Not available</button></div>'))
+      +'</div>';
+  }).join('');
+  if(done===b.items.length){body+='<div class="bskt-done" style="margin-top:6px;padding:11px"><i class="ti ti-circle-check"></i> Whole basket handled — ready for billing &amp; delivery</div>';}
+  document.getElementById('bskt-body').innerHTML=body;
+}
+function markNotAvailable(orderId,buyerUid){
+  var os=getOrders();var o=os.find(function(x){return x.id===orderId;});if(!o)return;
+  o.notAvailable=true;o.collectedConfirmed=true;o.collectedTs=Date.now();o.collectedQty=0;o.billQty=0;o.collectedShort=o.qty;
+  var unit=parseFloat(String(o.price).replace(/[^0-9.]/g,''))||0;
+  if(o.payMethod==='online'){o.refundDue=Math.round((o.byWeight?(parseFloat(o.orderedWeight||1)*unit):(o.qty*unit))*100)/100;o.refundStatus='due';}
+  o.pickLog=(o.pickLog||[]);o.pickLog.push({by:CU.name,notAvailable:true,ts:Date.now()});
+  saveOrders(os);
+  notifyEvent('na','🚫 <b>'+esc(CU.name)+'</b> marked “'+esc(o.productTitle)+'” NOT available'+(o.refundDue?' · refund '+esc(o.currency||'')+' '+o.refundDue+' flagged':''));
+  renderAgentBasket(buyerUid);
+  toast('Marked not available'+(o.refundDue?' — refund flagged':''),'info');
+}
+
+/* ===== v128: appearance (dark mode + text size) + saved addresses ===== */
+function rbApplyAppearance(){
+  var theme=LS.get('rb_theme','light')||'light';
+  var fs=LS.get('rb_textsize','normal')||'normal';
+  document.body.classList.toggle('dark',theme==='dark');
+  document.body.classList.remove('fs-lg','fs-xl');
+  if(fs==='large')document.body.classList.add('fs-lg');
+  else if(fs==='xl')document.body.classList.add('fs-xl');
+}
+// apply ASAP on load (and once DOM is ready)
+try{rbApplyAppearance();}catch(e){}
+setTimeout(function(){try{rbApplyAppearance();}catch(e){}},300);
+function rbSetTheme(t){LS.set('rb_theme',t);rbApplyAppearance();if(document.getElementById('appx-body'))openAppearance();}
+function rbSetTextSize(s){LS.set('rb_textsize',s);rbApplyAppearance();if(document.getElementById('appx-body'))openAppearance();}
+function openAppearance(){
+  var ovl=document.getElementById('appx-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='appx-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:430px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-adjustments" style="color:var(--g)"></i> Appearance &amp; Accessibility</b><button class="modal-x" onclick="closeOvl(\'appx-ovl\')"><i class="ti ti-x"></i></button></div><div id="appx-body"></div></div>';
+    document.body.appendChild(ovl);}
+  var theme=LS.get('rb_theme','light')||'light';
+  var fs=LS.get('rb_textsize','normal')||'normal';
+  function seg(cur,opts,fn){return '<div class="appx-seg">'+opts.map(function(o){return '<button class="'+(cur===o.v?'on':'')+'" onclick="'+fn+'(\''+o.v+'\')">'+o.l+'</button>';}).join('')+'</div>';}
+  document.getElementById('appx-body').innerHTML=
+    '<div class="appx-row"><div><b>Dark mode</b><small>Easier on the eyes, saves battery</small></div><div class="appx-sw'+(theme==='dark'?' on':'')+'" onclick="rbSetTheme(\''+(theme==='dark'?'light':'dark')+'\')"></div></div>'
+    +'<div class="appx-row"><div><b>Text size</b><small>Make everything bigger to read</small></div>'+seg(fs,[{v:'normal',l:'A'},{v:'large',l:'A+'},{v:'xl',l:'A++'}],'rbSetTextSize')+'</div>'
+    +'<div style="font-size:11px;color:var(--mt2);margin-top:12px;line-height:1.5"><i class="ti ti-accessible"></i> These settings are saved on your device and apply everywhere in Reedbi. Dark mode respects the in-store product photos, which stay on a clean background for accuracy.</div>';
+  ovl.classList.add('open');
+}
+
+/* ---- Saved delivery addresses ---- */
+function getAddresses(){return LS.get('rb_addresses',[])||[];}
+function saveAddresses(a){LS.set('rb_addresses',a);}
+function rbSaveAddress(label,text,phone,map){
+  var a=getAddresses();
+  var rec={id:'addr'+Date.now(),label:label||'Address',text:text||'',phone:phone||'',map:map||'',ts:Date.now()};
+  a.unshift(rec);saveAddresses(a);return rec;
+}
+function openAddressBook(){
+  if(!requireAuth('manage addresses'))return;
+  var ovl=document.getElementById('addrbook-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='addrbook-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:440px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-map-pin" style="color:var(--g)"></i> Saved addresses</b><button class="modal-x" onclick="closeOvl(\'addrbook-ovl\')"><i class="ti ti-x"></i></button></div><div id="addrbook-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderAddressBook();
+  ovl.classList.add('open');
+}
+function renderAddressBook(){
+  var a=getAddresses();
+  var h=a.length?a.map(function(x){return '<div class="addr-card"><i class="ti ti-map-pin" style="color:var(--g);font-size:18px"></i><div style="flex:1"><div class="lbl">'+esc(x.label)+'</div><div class="tx">'+esc(x.text)+(x.phone?'<br>'+esc(x.phone):'')+'</div></div><button style="background:none;border:none;color:var(--red);cursor:pointer" onclick="rbDelAddress(\''+x.id+'\')"><i class="ti ti-trash"></i></button></div>';}).join(''):'<div style="font-size:12px;color:var(--mt2);padding:10px 0">No saved addresses yet. Save one at checkout, or add it below.</div>';
+  h+='<div style="border-top:1px solid var(--b);margin-top:10px;padding-top:10px"><div class="fg"><label>Label</label><input id="addr-label" placeholder="Home, Office…"></div>'
+    +'<div class="fg" style="margin-top:6px"><label>Address</label><textarea id="addr-text" rows="2" placeholder="Building, street, area, city"></textarea></div>'
+    +'<div class="fg" style="margin-top:6px"><label>Phone</label><input id="addr-phone" placeholder="+9715…"></div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:8px" onclick="addrBookAdd()"><i class="ti ti-plus"></i> Save address</button></div>';
+  document.getElementById('addrbook-body').innerHTML=h;
+}
+function addrBookAdd(){
+  var l=(document.getElementById('addr-label')||{}).value||'';var t=(document.getElementById('addr-text')||{}).value||'';var p=(document.getElementById('addr-phone')||{}).value||'';
+  if(!t.trim()){toast('Enter the address','err');return;}
+  rbSaveAddress(l.trim()||'Address',t.trim(),p.trim(),'');renderAddressBook();toast('Address saved','ok');
+}
+function rbDelAddress(id){var a=getAddresses().filter(function(x){return x.id!==id;});saveAddresses(a);renderAddressBook();}
+// fill the checkout fields from a saved address
+function applySavedAddress(id){
+  var x=getAddresses().find(function(a){return a.id===id;});if(!x)return;
+  var ba=document.getElementById('buy-addr'),bp=document.getElementById('buy-phone'),bm=document.getElementById('buy-map');
+  if(ba)ba.value=x.text;if(bp)bp.value=x.phone||'';if(bm&&x.map)bm.value=x.map;
+  toast('Using '+x.label,'ok');
+}
+
+function buyRenderSavedAddr(){
+  var box=document.getElementById('buy-saved-addr');if(!box)return;
+  var a=getAddresses();
+  if(!a.length){box.innerHTML='';return;}
+  box.innerHTML='<label style="font-size:10px;font-weight:600;color:var(--mt);text-transform:uppercase;letter-spacing:.05em">Use a saved address</label>'
+    +'<div style="display:flex;gap:6px;overflow-x:auto;padding:5px 0;scrollbar-width:none">'+a.map(function(x){return '<button type="button" class="care-opt" style="white-space:nowrap;border-color:#0a66c2;color:#0a66c2;background:rgba(10,102,194,.06)" onclick="applySavedAddress(\''+x.id+'\')"><i class="ti ti-map-pin"></i> '+esc(x.label)+'</button>';}).join('')+'</div>';
+}
+function buySaveCurrentAddr(){
+  var t=(document.getElementById('buy-addr')||{}).value||'';var p=(document.getElementById('buy-phone')||{}).value||'';var m=(document.getElementById('buy-map')||{}).value||'';
+  if(!t.trim()){toast('Enter the address first','err');return;}
+  var label=t.trim().split(/[,\n]/)[0].slice(0,20)||'Address';
+  rbSaveAddress(label,t.trim(),p.trim(),m.trim());buyRenderSavedAddr();toast('Address saved for next time','ok');
+}
+
+/* ===== v129: personalized Home / "For You" =====
+   A warm, useful landing: greets by name, surfaces what needs attention,
+   remembers what you viewed, and a gentle daily check-in. Designed to be
+   genuinely helpful — no fake urgency, no guilt, no dark patterns. */
+function getRecentViewed(){return LS.get('rb_recent',[])||[];}
+function pushRecentViewed(pid){
+  var r=getRecentViewed().filter(function(x){return x!==pid;});r.unshift(pid);LS.set('rb_recent',r.slice(0,16));
+}
+function loyalty(){return LS.get('rb_loyalty',{points:0,streak:0,last:0})||{points:0,streak:0,last:0};}
+function saveLoyalty(l){LS.set('rb_loyalty',l);}
+function dayKey(ts){var d=new Date(ts||Date.now());return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();}
+function doCheckin(){
+  var l=loyalty();var today=dayKey();
+  if(l.lastKey===today){toast('Already checked in today — see you tomorrow!','info');return l;}
+  var yesterday=dayKey(Date.now()-86400000);
+  l.streak=(l.lastKey===yesterday)?(l.streak||0)+1:1;
+  var reward=10+Math.min((l.streak-1)*2,20); // grows a little with streak, capped
+  l.points=(l.points||0)+reward;l.lastKey=today;l.last=Date.now();
+  saveLoyalty(l);
+  try{if(!getNotifCfg().muted)playTune('reedbi');}catch(e){}
+  toast('Day '+l.streak+' · +'+reward+' Reedbi Points ✨','ok');
+  if(document.getElementById('home-scroll'))openHome();
+  return l;
+}
+function greetWord(){var h=new Date().getHours();return h<12?'Good morning':(h<17?'Good afternoon':'Good evening');}
+function openHome(){
+  if(!requireAuth('open your home'))return;
+  var ovl=document.getElementById('home-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='home-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:560px;padding:0;overflow:hidden"><div id="home-scroll" style="max-height:94vh;overflow-y:auto"></div><button class="modal-x" style="position:absolute;top:12px;right:12px;z-index:5;background:rgba(255,255,255,.2);color:#fff" onclick="closeOvl(\'home-ovl\')"><i class="ti ti-x"></i></button></div>';
+    document.body.appendChild(ovl);}
+  renderHome();
+  ovl.classList.add('open');
+}
+function renderHome(){
+  var box=document.getElementById('home-scroll');if(!box)return;
+  var name=(CU.name||'there').split(' ')[0];
+  var l=loyalty();var today=dayKey();var checkedToday=(l.lastKey===today);
+
+  // attention data
+  var myOrders=(getOrders()||[]).filter(function(o){return o.buyerUid===CU.uid;});
+  var inTransit=myOrders.filter(function(o){return o.status!=='delivered'&&o.status!=='cancelled';}).length;
+  var matches=0;try{var c=getAgentCfg();if(c.enabled||c.skills){matches=agentMatches().filter(function(j){return j.score>=(c.minMatch||70)&&!j.applied;}).length;}}catch(e){}
+  var wish=getWishlist().length;
+  var dmN=(typeof dmUnreadTotal==='function')?dmUnreadTotal():0;
+  var openTickets=getTickets().filter(function(t){return t.uid===CU.uid&&t.status!=='resolved';}).length;
+  var resolvedNew=getTickets().filter(function(t){return t.uid===CU.uid&&t.status==='resolved'&&!t.seen;}).length;
+
+  // hero + check-in
+  var hero='<div class="home-hero"><div class="home-hi">'+greetWord()+',</div><div class="home-name">'+esc(name)+' 👋</div>'
+    +'<div class="home-sub">'+(inTransit?inTransit+' order'+(inTransit>1?'s':'')+' on the way · ':'')+(matches?matches+' job match'+(matches>1?'es':'')+' waiting':'Here\'s what\'s new for you')+'</div>'
+    +'<div class="home-checkin"><span class="flame">'+(l.streak>2?'🔥':'✨')+'</span><div><b>'+(checkedToday?'Checked in!':'Daily check-in')+'</b><small>'+(l.streak?l.streak+'-day streak':'Start your streak today')+'</small></div>'
+    +'<div class="pts"><b>'+(l.points||0)+'</b><small style="opacity:.85">Reedbi Points</small></div>'
+    +(checkedToday?'':'<button class="home-cibtn" style="margin-left:10px" onclick="doCheckin()">Check in</button>')+'</div></div>';
+
+  // attention tiles
+  function tile(act,icon,bg,num,lbl,sub){return '<div class="home-tile" onclick="closeOvl(\'home-ovl\');'+act+'"><div class="ic" style="background:'+bg+'"><i class="ti ti-'+icon+'"></i></div><b>'+num+'</b><div class="lbl">'+lbl+'</div><small>'+sub+'</small></div>';}
+  var tiles='';
+  tiles+=tile('showMyOrders()','package','#0a66c2',inTransit,'Orders','on the way');
+  tiles+=tile('openJobAgent()','robot','#7c3aed',matches,'Job matches','ready to apply');
+  tiles+=tile('openWishlist()','heart','#e85aa0',wish,'Wishlist','saved items');
+  tiles+=tile('openInbox()','message','#0a8f5c',dmN,'Messages','unread');
+  if(openTickets||resolvedNew)tiles+=tile('openMyTickets()','ticket','#ffb800',(openTickets+resolvedNew),'Support',''+(resolvedNew?resolvedNew+' resolved':'open'));
+  var attn='<div class="home-sec"><div class="home-sec-h"><b>Needs your attention</b></div><div class="home-attn">'+tiles+'</div></div>';
+
+  // recently viewed
+  var rv=getRecentViewed().map(function(id){return getProducts().find(function(p){return p.id===id;});}).filter(Boolean).slice(0,12);
+  var rvSec=rv.length?'<div class="home-sec"><div class="home-sec-h"><b>Continue browsing</b></div><div class="home-rail">'
+    +rv.map(function(p){var pid="'"+p.id+"'";return '<div class="home-rv" onclick="closeOvl(\'home-ovl\');openProductDetail('+pid+')"><img src="'+esc(p.photos&&p.photos[0]||'')+'"><div class="t">'+esc(p.title)+'</div><div class="p">'+esc(p.currency||'')+' '+esc(p.offer||p.price)+'</div></div>';}).join('')+'</div></div>':'';
+
+  // personalized picks — nearby / interest, fall back to newest
+  var picks=[];
+  try{
+    var pool=getProducts().filter(function(p){return productInMarketplace(p)&&!p.withdrawn&&p.photos&&p.photos[0];});
+    var myW=(CU.location||'').toLowerCase().split(/[\\s,]+/).filter(function(w){return w.length>2;});
+    var ints=(CU.interests||'').toLowerCase();
+    pool.forEach(function(p){p.__s=0;
+      if(myW.length&&myW.some(function(w){return (p.location||'').toLowerCase().indexOf(w)>=0;}))p.__s+=2;
+      if(ints&&ints.split(/[,;]+/).some(function(t){t=t.trim();return t&&((p.title||'')+(p.category||'')).toLowerCase().indexOf(t)>=0;}))p.__s+=2;
+    });
+    picks=pool.sort(function(a,b){return (b.__s-a.__s)||(b.ts||0)-(a.ts||0);}).slice(0,8);
+  }catch(e){}
+  var picksSec=picks.length?'<div class="home-sec"><div class="home-sec-h"><b>'+((CU.interests||CU.location)?'Picked for you':'Fresh on Reedbi')+'</b><a onclick="closeOvl(\'home-ovl\');openMainStore()">See all</a></div><div class="home-rail">'
+    +picks.map(function(p){var pid="'"+p.id+"'";return '<div class="home-rv" onclick="closeOvl(\'home-ovl\');openProductDetail('+pid+')"><img src="'+esc(p.photos[0])+'"><div class="t">'+esc(p.title)+'</div><div class="p">'+esc(p.currency||'')+' '+esc(p.offer||p.price)+'</div></div>';}).join('')+'</div></div>':'';
+
+  // quick actions
+  var quick='<div class="home-sec"><div class="home-sec-h"><b>Jump to</b></div><div class="home-attn">'
+    +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openMainStore()"><div class="ic" style="background:#0a8f5c"><i class="ti ti-building-store"></i></div><div class="lbl">Shop the store</div><small>all sellers &amp; deals</small></div>'
+    +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openTouchCollect()"><div class="ic" style="background:#7c3aed"><i class="ti ti-hand-finger"></i></div><div class="lbl">Touch &amp; Collect</div><small>pick in 3D</small></div>'
+    +'</div></div>';
+
+  box.innerHTML=hero+'<div class="home-body">'+attn+rvSec+picksSec+quick+'</div>';
+  box.scrollTop=0;
 }
 </script></body></html>
