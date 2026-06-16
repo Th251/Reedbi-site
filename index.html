@@ -151,7 +151,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sw{display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--b);border-radius:18px;padding:6px 11px}
 .sw i{color:var(--mt2);font-size:13px}
 .sw input{border:none;background:transparent;outline:none;font-size:13px;color:var(--tx);flex:1;font-family:var(--fn)}
-.tlist{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.tlist{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:66px}
 .tgrow{touch-action:manipulation}
 .tgrow{display:flex;align-items:center;gap:10px;padding:9px 11px;cursor:pointer;border-bottom:1px solid rgba(30,45,69,.4)}
 .tgrow:hover{background:var(--card2)}
@@ -226,7 +226,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .fhd{padding:4px 12px;background:var(--card2);border-bottom:1px solid var(--b);display:none;align-items:center;justify-content:space-between;flex-shrink:0}
 .fhd strong{font-size:10px;color:var(--tx)}
 .clr{font-size:10px;color:var(--g);cursor:pointer;border:none;background:transparent;font-family:var(--fn)}
-.msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:11px;-webkit-overflow-scrolling:touch}
+.msgs{flex:1;overflow-y:auto;padding:12px 14px 70px;display:flex;flex-direction:column;gap:11px;-webkit-overflow-scrolling:touch}
 .ddiv{text-align:center;font-size:10px;color:var(--mt2);background:var(--card);border-radius:8px;padding:2px 8px;align-self:center;margin:2px 0}
 .nbanner{display:none;position:sticky;top:4px;align-self:center;z-index:10;background:var(--g);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:17px;cursor:pointer;box-shadow:0 3px 10px rgba(37,211,102,.4);align-items:center;gap:4px;animation:bop .6s ease infinite alternate}
 .nbanner.show{display:flex}
@@ -825,7 +825,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .col-track{background:var(--card2);border-radius:9px;padding:9px 11px;font-size:11px;margin-top:7px}
 .col-track b{color:var(--tx)}
 /* yellow AI care */
-.care-fab{position:fixed;right:16px;bottom:84px;z-index:9000;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#ffd23f,#ffb800);color:#3a2a00;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(255,184,0,.5);display:flex;align-items:center;justify-content:center;font-size:24px}
+.care-fab{position:fixed;right:16px;bottom:74px;z-index:7200;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#ffd23f,#ffb800);color:#3a2a00;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(255,184,0,.5);display:flex;align-items:center;justify-content:center;font-size:24px}
 .care-modal{max-width:430px}
 .care-hero{background:linear-gradient(135deg,#ffe169,#ffb800);border-radius:14px;padding:15px;margin-bottom:12px;color:#3a2a00}
 .care-hero h3{font-size:16px;font-weight:800;display:flex;align-items:center;gap:7px}
@@ -851,7 +851,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .acct-group .acct-body{padding:7px 9px 9px}
 .acct-group .acct-item{border-radius:9px;margin-bottom:4px}
 .acct-locked{font-size:11px;color:var(--mt2);padding:9px 11px;line-height:1.5}
-.scroll-btns{position:fixed;right:14px;bottom:150px;z-index:8500;display:flex;flex-direction:column;gap:8px;opacity:0;pointer-events:none;transition:opacity .2s}
+.scroll-btns{position:fixed;right:14px;bottom:140px;z-index:7100;display:flex;flex-direction:column;gap:8px;opacity:0;pointer-events:none;transition:opacity .2s}
 .scroll-btns.show{opacity:1;pointer-events:auto}
 .scroll-btns button{width:42px;height:42px;border-radius:50%;border:none;background:var(--sf);color:var(--tx);box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;border:1px solid var(--b)}
 .scroll-btns button:active{transform:scale(.92)}
@@ -879,6 +879,41 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .xls-tbl{max-height:240px;overflow-y:auto;border:1px solid var(--b);border-radius:9px;margin-top:8px}
 .xls-tr{display:flex;justify-content:space-between;gap:8px;font-size:11px;padding:7px 9px;border-bottom:1px solid var(--b)}
 .xls-tag{font-size:9px;font-weight:800;border-radius:6px;padding:1px 6px}
+/* ===== v134: simple bottom navigation (customer-friendly structure) ===== */
+.btmnav{position:fixed;left:0;right:0;bottom:0;z-index:7000;display:flex;background:var(--sf);border-top:1px solid var(--b);padding-bottom:var(--sab);box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+body.dark .btmnav{box-shadow:0 -2px 12px rgba(0,0,0,.4)}
+.btmnav button{flex:1;border:none;background:none;cursor:pointer;padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--mt2);font-family:var(--fn);position:relative}
+.btmnav button i{font-size:21px}
+.btmnav button span{font-size:10px;font-weight:600}
+.btmnav button.on{color:var(--g)}
+.btmnav button.on::before{content:"";position:absolute;top:0;width:30px;height:3px;border-radius:0 0 3px 3px;background:var(--g)}
+.btmnav .bn-home i{font-size:25px}
+.btmnav .bn-badge{position:absolute;top:4px;right:50%;margin-right:-18px;background:#cc1016;color:#fff;font-size:8px;font-weight:800;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+body{padding-bottom:0}
+/* ===== v135: fun & rewards — confetti, daily spin, levels ===== */
+#rb-confetti{position:fixed;inset:0;pointer-events:none;z-index:99999;overflow:hidden}
+.cft{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;opacity:.95;animation:cfall linear forwards}
+@keyframes cfall{0%{transform:translateY(-20px) rotate(0)}100%{transform:translateY(102vh) rotate(720deg);opacity:.3}}
+.spin-wrap{text-align:center;padding:6px 0 4px}
+.spin-stage{position:relative;width:248px;height:248px;margin:8px auto 14px}
+.spin-wheel{width:100%;height:100%;border-radius:50%;border:7px solid #fff;box-shadow:0 8px 26px rgba(0,0,0,.25);transition:transform 4.4s cubic-bezier(.17,.67,.16,.99)}
+body.dark .spin-wheel{border-color:#2a333f}
+.spin-ptr{position:absolute;top:-6px;left:50%;transform:translateX(-50%);z-index:3;color:#e23b3b;font-size:30px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.spin-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-size:24px;z-index:2}
+.spin-btn{background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;border:none;border-radius:24px;padding:13px 30px;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--fn);box-shadow:0 6px 18px rgba(124,58,237,.4)}
+.spin-btn:disabled{background:var(--card2);color:var(--mt2);box-shadow:none;cursor:default}
+.tier-card{background:linear-gradient(135deg,#1f2937,#374151);color:#fff;border-radius:16px;padding:14px;margin-bottom:14px}
+.tier-bar{height:8px;border-radius:5px;background:rgba(255,255,255,.2);margin-top:9px;overflow:hidden}
+.tier-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#ffd23f,#ff9800)}
+.spin-tile{background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;border:none;cursor:pointer}
+.ach-badge{display:inline-flex;flex-direction:column;align-items:center;gap:3px;width:72px;text-align:center}
+.ach-badge .ic{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--card2)}
+.ach-badge.got .ic{background:linear-gradient(135deg,#ffd23f,#ff9800);color:#fff}
+.ach-badge small{font-size:9px;color:var(--mt2);line-height:1.1}
+.ach-badge.got small{color:var(--tx)}
+
+@media(min-width:760px){.btmnav{max-width:600px;margin:0 auto;border-radius:16px 16px 0 0}}
+
 
 .bskt-item{border:1px solid var(--b);border-radius:11px;padding:11px;margin-bottom:9px}
 .bskt-item.na{opacity:.7;background:var(--card2)}
@@ -1066,7 +1101,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v132</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v135</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1580,8 +1615,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 </div></div>
 
 <button class="fab" id="fab" onclick="openPostChooser()"><i class="ti ti-plus"></i> <span class="fab-txt">Post</span></button>
+<nav class="btmnav" id="btmnav">
+  <button class="bn-feed" onclick="rbTab('feed')"><i class="ti ti-layout-grid"></i><span>Tag Talk</span></button>
+  <button class="bn-shop" onclick="rbTab('shop')"><i class="ti ti-building-store"></i><span>Shop</span></button>
+  <button class="bn-home on" onclick="rbTab('home')"><i class="ti ti-home"></i><span>Home</span></button>
+  <button class="bn-orders" onclick="rbTab('orders')"><i class="ti ti-package"></i><span>Orders</span></button>
+  <button class="bn-account" onclick="rbTab('account')"><i class="ti ti-user"></i><span>Account</span><span class="bn-badge" id="bn-acct-badge" style="display:none">0</span></button>
+</nav>
 <button class="care-fab" id="care-fab" onclick="openCareAi()" title="Reedbi Care — help with orders, delivery, returns"><i class="ti ti-headset"></i></button>
-<button class="home-fab" id="home-fab" onclick="openHome()" title="Your Home — For You"><i class="ti ti-home"></i></button>
 <div class="scroll-btns" id="scroll-btns"><button onclick="rbScrollTo('up')" title="Scroll to top"><i class="ti ti-chevron-up"></i></button><button onclick="rbScrollTo('down')" title="Scroll to bottom"><i class="ti ti-chevron-down"></i></button></div>
 <div class="tstack" id="tstack"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -5420,7 +5461,8 @@ function applicantCard(a,company){
   var atsBadge='';
   if(atsKeywords.trim()){var sc=atsScore(a,atsKeywords);if(sc){var col=sc.pct>=70?'var(--g)':sc.pct>=40?'var(--gold)':'var(--red)';atsBadge='<span class="ats-badge" style="color:'+col+';border-color:'+col+'" title="Matched: '+esc(sc.matched.join(', '))+'"><i class="ti ti-robot" style="font-size:9px"></i> ATS '+sc.pct+'%</span>';}}
   var statBtns=STATUSES.filter(function(s){return s.id!=='received';}).map(function(s){return '<button class="stat-set-btn '+(a.status===s.id?'on '+s.cls:'')+'" onclick="ownerSetStatus(\''+a.id+'\',\''+s.id+'\',\''+escJS(company)+'\')">'+s.label+'</button>';}).join('');
-  var cvBtn=a.cvId&&a.cvOwnerUid?'<button onclick="dlCV(\''+a.cvOwnerUid+'\',\''+a.cvId+'\',\''+escJS(a.cvName||'cv')+'\')" style="font-size:10px;color:var(--g);background:transparent;border:1px solid rgba(37,211,102,.3);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:var(--fn);margin-top:6px"><i class="ti ti-eye"></i> View CV: '+esc(a.cvName||'CV')+'</button>':'<div style="font-size:10px;color:var(--mt2);margin-top:6px">No CV attached</div>';
+  var hasCv=(a.cvId&&a.cvOwnerUid)||a.cvText;
+  var cvBtn=hasCv?'<button onclick="hrViewCV(\''+esc(a.id)+'\')" style="font-size:11px;color:#fff;background:#0a66c2;border:none;border-radius:7px;padding:6px 11px;cursor:pointer;font-family:var(--fn);margin-top:6px;font-weight:700"><i class="ti ti-eye"></i> View CV'+(a.cvName?' ('+esc(a.cvName)+')':'')+'</button>':'<div style="font-size:10px;color:var(--mt2);margin-top:6px">No CV attached</div>';
   var aiIv=(typeof getAiIntvs==='function')?getAiIntvs().find(function(x){return x.appId===a.id;}):null;
   var aiBtn=aiIv?'<button onclick="hrViewAiIntv(\''+a.id+'\')" style="font-size:10px;color:var(--purple);background:transparent;border:1px solid var(--purple);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:var(--fn);margin:6px 0 0 6px"><i class="ti ti-robot"></i> AI Interview: '+(aiIv.status==='done'?'done — view Q&A':'scheduled '+fmtDT(aiIv.schedTs))+'</button>':'';
   var appliedDT='<div style="font-size:9px;color:var(--mt2);margin-top:4px"><i class="ti ti-clock"></i> Applied: '+fmtDT(a.ts)+(a.statusTs&&a.status!=='received'?' · status changed: '+fmtDT(a.statusTs):'')+'</div>';
@@ -5630,6 +5672,7 @@ function openAccountMenu(){
   // === MY ACTIVITY (everyone) ===
   var act=item('showMyActivity()','layout-dashboard','var(--g)','My Activity','your jobs, orders, shop &amp; license in one place')
     +item('showMyOrders()','package','','My Orders','track &amp; manage purchases')
+    +item('openSpin()','gift','#7c3aed','Daily Spin &amp; Rewards','free points · your shopper level')
     +item('openCareAi()','headset','#ffb800','Reedbi Care','orders, delivery, returns &amp; refunds')
     +item('openMyTickets()','ticket','#ffb800','My Support Tickets','status &amp; emailed decisions')
     +item('openProfile(CU.name,CU.co||\'\',\'\',CU.avIdx||0)','user','','View Public Profile','');
@@ -5735,7 +5778,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v132 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v135 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6747,7 +6790,7 @@ function placeOrder(){
     return;
   }
   closeOvl('buy-ovl');
-  toast('Order placed (Cash on Delivery)! Track it in My Orders.','ok');
+  try{rbConfetti(90);}catch(e){}toast('Order placed (Cash on Delivery)! Track it in My Orders.','ok');
 }
 var curCheckoutOrder=null;
 function payByCard(){
@@ -6764,7 +6807,7 @@ function finalizeOnlinePayment(method){
       if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(curCheckoutOrder.id).set(curCheckoutOrder,{merge:true}).catch(function(){});}catch(e){}}}
   }
   closeOvl('checkout-ovl');
-  toast('Payment successful via '+method+'! Track your order in My Orders.','ok');
+  try{rbConfetti(110);}catch(e){}toast('Payment successful via '+method+'! Track your order in My Orders.','ok');
 }
 function showMyOrders(){
   if(!requireAuth('view orders'))return;
@@ -10852,6 +10895,7 @@ function doCheckin(){
   l.points=(l.points||0)+reward;l.lastKey=today;l.last=Date.now();
   saveLoyalty(l);
   try{if(!getNotifCfg().muted)playTune('reedbi');}catch(e){}
+  try{rbConfetti(l.streak>=3?120:70);}catch(e){}
   toast('Day '+l.streak+' · +'+reward+' Reedbi Points ✨','ok');
   if(document.getElementById('home-scroll'))openHome();
   return l;
@@ -10886,6 +10930,17 @@ function renderHome(){
     +'<div class="home-checkin"><span class="flame">'+(l.streak>2?'🔥':'✨')+'</span><div><b>'+(checkedToday?'Checked in!':'Daily check-in')+'</b><small>'+(l.streak?l.streak+'-day streak':'Start your streak today')+'</small></div>'
     +'<div class="pts"><b>'+(l.points||0)+'</b><small style="opacity:.85">Reedbi Points</small></div>'
     +(checkedToday?'':'<button class="home-cibtn" style="margin-left:10px" onclick="doCheckin()">Check in</button>')+'</div></div>';
+
+  // fun: tier + daily spin + achievements
+  var tinfo=rbTier(l.points||0);var tnext=tinfo.next;
+  var tierPct=tnext?Math.min(100,Math.round((((l.points||0)-tinfo.tier.min)/(tnext.min-tinfo.tier.min))*100)):100;
+  var funSec='<div class="tier-card"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:26px">'+(tinfo.tier.n==='Diamond'?'💎':tinfo.tier.n==='Platinum'?'🏆':tinfo.tier.n==='Gold'?'🥇':tinfo.tier.n==='Silver'?'🥈':'🥉')+'</div>'
+    +'<div style="flex:1"><b style="font-size:15px">'+tinfo.tier.n+' shopper</b><div style="font-size:11px;opacity:.85">'+(l.points||0)+' Reedbi Points'+(tnext?' · '+(tnext.min-(l.points||0))+' to '+tnext.n:' · top tier!')+'</div></div>'
+    +'<button class="spin-btn" style="padding:9px 16px;font-size:13px;'+(canSpinToday()?'':'opacity:.6')+'" onclick="closeOvl(\'home-ovl\');openSpin()">'+(canSpinToday()?'🎁 Spin':'Spun ✓')+'</button></div>'
+    +(tnext?'<div class="tier-bar"><i style="width:'+tierPct+'%"></i></div>':'')+'</div>';
+  var achs=rbAchievements();var got=achs.filter(function(a){return a.got;}).length;
+  var achSec='<div class="home-sec"><div class="home-sec-h"><b>Achievements</b><span style="font-size:12px;color:var(--mt2)">'+got+'/'+achs.length+'</span></div><div class="home-rail">'
+    +achs.map(function(a){return '<div class="ach-badge '+(a.got?'got':'')+'"><div class="ic">'+a.ic+'</div><small>'+esc(a.name)+'</small></div>';}).join('')+'</div></div>';
 
   // attention tiles
   function tile(act,icon,bg,num,lbl,sub){return '<div class="home-tile" onclick="closeOvl(\'home-ovl\');'+act+'"><div class="ic" style="background:'+bg+'"><i class="ti ti-'+icon+'"></i></div><b>'+num+'</b><div class="lbl">'+lbl+'</div><small>'+sub+'</small></div>';}
@@ -10923,7 +10978,7 @@ function renderHome(){
     +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openTouchCollect()"><div class="ic" style="background:#7c3aed"><i class="ti ti-hand-finger"></i></div><div class="lbl">Touch &amp; Collect</div><small>pick in 3D</small></div>'
     +'</div></div>';
 
-  box.innerHTML=hero+'<div class="home-body">'+attn+rvSec+picksSec+quick+'</div>';
+  box.innerHTML=hero+'<div class="home-body">'+funSec+attn+achSec+rvSec+picksSec+quick+'</div>';
   box.scrollTop=0;
 }
 
@@ -11113,5 +11168,192 @@ function bulkExcelCommit(){
   closeOvl('bulkxls-ovl');
   toast(c.new+' new · '+c.restock+' restocked ✓','ok');
   try{showMyProducts();}catch(e){}
+}
+
+/* ===== v133: bulletproof HR CV viewing =====
+   HR can now ALWAYS see a candidate's CV. We try the real file (local device →
+   cloud cvs collection → Storage URL); if none of those are reachable, we render
+   the CV's extracted TEXT plus the applicant's details as a clean document — so
+   the HR dashboard never shows an empty/blocked CV again. */
+function hrViewCV(appId){
+  var a=(typeof getAllApps==='function'?getAllApps():[]).find(function(x){return x.id===appId;});
+  if(!a){toast('Application not found','err');return;}
+  // 1) file on this device
+  var local=(a.cvOwnerUid&&a.cvId)?getCVData(a.cvOwnerUid,a.cvId):null;
+  if(local){openCVData(local,a.cvName||'CV');return;}
+  // 2) cloud cvs collection
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&a.cvOwnerUid&&a.cvId){
+    toast('Loading CV…','info');
+    FB.db.collection('cvs').doc(a.cvOwnerUid+'_'+a.cvId).get().then(function(doc){
+      if(doc&&doc.exists){var cd=doc.data();
+        if(cd.data){openCVData(cd.data,a.cvName||'CV');return;}
+        if(cd.url){openCVUrl(cd.url,a.cvName||'CV');return;}
+      }
+      hrViewCVText(a); // 3) text fallback
+    }).catch(function(){hrViewCVText(a);});
+    return;
+  }
+  // 3) text fallback (always available)
+  hrViewCVText(a);
+}
+function ensureCVViewer(){
+  var ovl=document.getElementById('cvview-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='cvview-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:760px;width:96vw;height:92vh;display:flex;flex-direction:column;padding:0">'
+      +'<div style="display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--b)"><i class="ti ti-file-cv" style="color:var(--g)"></i><b id="cvview-name" style="flex:1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CV</b>'
+      +'<a id="cvview-dl" style="display:none" download class="btn"><i class="ti ti-download"></i> Download</a>'
+      +'<button class="modal-x" onclick="closeOvl(\'cvview-ovl\')"><i class="ti ti-x"></i></button></div>'
+      +'<div id="cvview-frame" style="flex:1;overflow:auto;background:#fff"></div></div>';
+    document.body.appendChild(ovl);}
+  return ovl;
+}
+function openCVUrl(url,name){
+  ensureCVViewer();
+  document.getElementById('cvview-name').textContent=name||'CV';
+  var dl=document.getElementById('cvview-dl');dl.style.display='inline-flex';dl.href=url;dl.target='_blank';dl.removeAttribute('download');dl.innerHTML='<i class="ti ti-external-link"></i> Open';
+  dl.style.cssText='border:1px solid var(--g);color:var(--g);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px';
+  document.getElementById('cvview-frame').innerHTML='<iframe src="'+esc(url)+'" style="width:100%;height:100%;border:0;background:#fff"></iframe>';
+  document.getElementById('cvview-ovl').classList.add('open');
+}
+function hrViewCVText(a){
+  ensureCVViewer();
+  document.getElementById('cvview-name').textContent=(a.cvName||a.name||'Applicant')+' — CV';
+  document.getElementById('cvview-dl').style.display='none';
+  var txt=(a.cvText||'').trim();
+  var skills=(a.skills||'').trim();
+  var doc=''
+    +'<div style="max-width:680px;margin:0 auto;padding:26px 30px;color:#1a1a1a;font-family:Georgia,serif">'
+    +'<div style="border-bottom:2px solid #0a66c2;padding-bottom:12px;margin-bottom:16px"><h1 style="font-size:24px;margin:0;color:#0a2540">'+esc(a.name||'Applicant')+'</h1>'
+    +'<div style="font-size:13px;color:#555;margin-top:4px">'+[a.email,a.phone,a.loc].filter(Boolean).map(esc).join(' &nbsp;·&nbsp; ')+'</div></div>'
+    +(a.postTitle?'<div style="font-size:13px;color:#0a66c2;margin-bottom:14px"><b>Applied for:</b> '+esc(a.postTitle)+(a.company?' at '+esc(a.company):'')+'</div>':'')
+    +(skills?'<h3 style="font-size:14px;color:#0a2540;margin:16px 0 6px;text-transform:uppercase;letter-spacing:.05em">Skills</h3><div style="font-size:13px;line-height:1.7">'+esc(skills)+'</div>':'')
+    +(a.note?'<h3 style="font-size:14px;color:#0a2540;margin:16px 0 6px;text-transform:uppercase;letter-spacing:.05em">Cover note</h3><div style="font-size:13px;line-height:1.7;white-space:pre-wrap">'+esc(a.note)+'</div>':'')
+    +(txt?'<h3 style="font-size:14px;color:#0a2540;margin:16px 0 6px;text-transform:uppercase;letter-spacing:.05em">Résumé</h3><div style="font-size:13px;line-height:1.7;white-space:pre-wrap">'+esc(txt)+'</div>'
+        :'<div style="margin-top:18px;padding:14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;font-family:var(--fn);font-size:12px;color:#9a3412">The original CV file isn\'t synced to the cloud yet, so only the details the applicant typed are shown. To view original CV files across devices, turn on cloud sync and allow signed-in reads on the <b>cvs</b> collection.</div>')
+    +'</div>';
+  document.getElementById('cvview-frame').innerHTML=doc;
+  document.getElementById('cvview-ovl').classList.add('open');
+}
+
+/* ===== v134: bottom navigation handler ===== */
+function rbSetActiveTab(t){
+  ['feed','shop','home','orders','account'].forEach(function(x){
+    var b=document.querySelector('.btmnav .bn-'+x);if(b)b.classList.toggle('on',x===t);
+  });
+}
+function rbCloseAllOverlays(){
+  document.querySelectorAll('.overlay.open').forEach(function(o){o.classList.remove('open');});
+}
+function rbTab(t){
+  if(t==='feed'){ rbCloseAllOverlays(); try{var se=document.scrollingElement||document.documentElement;se.scrollTo({top:0,behavior:'smooth'});}catch(e){} rbSetActiveTab('feed'); return; }
+  if(t==='shop'){ rbSetActiveTab('shop'); openMainStore(); return; }
+  if(t==='home'){ rbSetActiveTab('home'); if(typeof openHome==='function')openHome(); return; }
+  if(t==='orders'){ rbSetActiveTab('orders'); if(typeof showMyOrders==='function')showMyOrders(); return; }
+  if(t==='account'){ rbSetActiveTab('account'); openAccountMenu(); return; }
+}
+// reflect unread (messages + order updates) on the Account tab badge
+function rbUpdateNavBadge(){
+  var b=document.getElementById('bn-acct-badge');if(!b)return;
+  var n=0;try{n+=(typeof dmUnreadTotal==='function')?dmUnreadTotal():0;}catch(e){}
+  try{n+=getTickets().filter(function(t){return CU&&t.uid===CU.uid&&t.status==='resolved'&&!t.seen;}).length;}catch(e){}
+  b.style.display=n?'flex':'none';b.textContent=n>9?'9+':n;
+}
+setInterval(rbUpdateNavBadge,1500);
+setTimeout(rbUpdateNavBadge,1000);
+// default: highlight Tag Talk feed on load (the landing)
+setTimeout(function(){rbSetActiveTab('feed');},400);
+
+/* ===== v135: confetti, daily spin wheel, shopper tiers, achievements =====
+   Healthy delight: a once-a-day spin, celebratory confetti, and a level that
+   grows with genuine activity. No paid spins, no loss-aversion, no pressure. */
+function rbConfetti(n){
+  n=n||80;var host=document.getElementById('rb-confetti');
+  if(!host){host=document.createElement('div');host.id='rb-confetti';document.body.appendChild(host);}
+  var cols=['#ffd23f','#0a66c2','#7c3aed','#16a34a','#e23b3b','#db2777','#06b6d4'];
+  var frag=document.createDocumentFragment();
+  for(var i=0;i<n;i++){
+    var d=document.createElement('div');d.className='cft';
+    d.style.left=(Math.random()*100)+'vw';
+    d.style.background=cols[i%cols.length];
+    d.style.animationDuration=(2.2+Math.random()*1.8)+'s';
+    d.style.animationDelay=(Math.random()*0.5)+'s';
+    d.style.transform='rotate('+(Math.random()*360)+'deg)';
+    if(i%3===0)d.style.borderRadius='50%';
+    frag.appendChild(d);
+  }
+  host.appendChild(frag);
+  setTimeout(function(){host.innerHTML='';},4500);
+}
+
+// ---- shopper tiers ----
+var RB_TIERS=[{n:'Bronze',min:0,c:'#cd7f32'},{n:'Silver',min:100,c:'#9ca3af'},{n:'Gold',min:300,c:'#f59e0b'},{n:'Platinum',min:700,c:'#22d3ee'},{n:'Diamond',min:1500,c:'#a78bfa'}];
+function rbTier(points){var t=RB_TIERS[0];for(var i=0;i<RB_TIERS.length;i++){if(points>=RB_TIERS[i].min)t=RB_TIERS[i];}var nxt=RB_TIERS[RB_TIERS.indexOf(t)+1]||null;return {tier:t,next:nxt};}
+
+// ---- daily spin ----
+var RB_SPIN=[ {l:'+20',pts:20,c:'#0a66c2'},{l:'+5',pts:5,c:'#16a34a'},{l:'+50',pts:50,c:'#7c3aed'},
+  {l:'Try again',pts:0,c:'#9ca3af'},{l:'+10',pts:10,c:'#db2777'},{l:'+30',pts:30,c:'#f59e0b'},
+  {l:'+100',pts:100,c:'#e23b3b'},{l:'+15',pts:15,c:'#06b6d4'} ];
+function canSpinToday(){var l=loyalty();return l.spinKey!==dayKey();}
+function openSpin(){
+  if(!requireAuth('spin'))return;
+  var ovl=document.getElementById('spin-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='spin-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:360px;text-align:center"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><b style="font-size:15px"><i class="ti ti-gift" style="color:#7c3aed"></i> Daily Spin</b><button class="modal-x" onclick="closeOvl(\'spin-ovl\')"><i class="ti ti-x"></i></button></div><div id="spin-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderSpin();
+  ovl.classList.add('open');
+}
+function spinGradient(){
+  var seg=360/RB_SPIN.length;var parts=[];
+  RB_SPIN.forEach(function(s,i){parts.push(s.c+' '+(i*seg)+'deg '+((i+1)*seg)+'deg');});
+  return 'conic-gradient('+parts.join(',')+')';
+}
+function spinLabels(){
+  var seg=360/RB_SPIN.length;
+  return RB_SPIN.map(function(s,i){var ang=(i*seg)+seg/2;
+    return '<div style="position:absolute;top:50%;left:50%;transform:rotate('+ang+'deg) translateY(-92px) rotate(-'+ang+'deg);font-size:12px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)">'+s.l+'</div>';
+  }).join('');
+}
+function renderSpin(){
+  var can=canSpinToday();var l=loyalty();
+  document.getElementById('spin-body').innerHTML=
+    '<div class="spin-wrap"><div style="font-size:12px;color:var(--mt2)">Spin once a day for free Reedbi Points 🎉</div>'
+    +'<div class="spin-stage"><div class="spin-ptr"><i class="ti ti-caret-down-filled"></i></div>'
+    +'<div class="spin-wheel" id="spin-wheel" style="background:'+spinGradient()+'">'+spinLabels()+'</div>'
+    +'<div class="spin-hub">🎁</div></div>'
+    +'<button class="spin-btn" id="spin-go" onclick="spinWheel()"'+(can?'':' disabled')+'>'+(can?'SPIN':'Come back tomorrow')+'</button>'
+    +'<div style="font-size:12px;color:var(--mt2);margin-top:10px">You have <b style="color:var(--gold)">'+(l.points||0)+'</b> Reedbi Points</div></div>';
+}
+var __spinning=false;
+function spinWheel(){
+  if(__spinning||!canSpinToday())return;__spinning=true;
+  var seg=360/RB_SPIN.length;
+  var idx=Math.floor(Math.random()*RB_SPIN.length);
+  var target=3600+(360-(idx*seg+seg/2)); // land idx under top pointer, +10 turns
+  var wheel=document.getElementById('spin-wheel');var btn=document.getElementById('spin-go');
+  if(btn){btn.disabled=true;btn.textContent='Spinning…';}
+  if(wheel){wheel.style.transform='rotate('+target+'deg)';}
+  setTimeout(function(){
+    var prize=RB_SPIN[idx];var l=loyalty();
+    l.points=(l.points||0)+prize.pts;l.spinKey=dayKey();saveLoyalty(l);
+    __spinning=false;
+    if(prize.pts>0){rbConfetti(prize.pts>=50?140:80);try{if(!getNotifCfg().muted)playTune('reedbi');}catch(e){}toast('You won '+prize.pts+' Reedbi Points! 🎉','ok');}
+    else{toast('No points this time — spin again tomorrow!','info');}
+    renderSpin();
+    if(document.getElementById('home-scroll'))renderHome();
+  },4600);
+}
+
+// ---- achievements ----
+function rbAchievements(){
+  var l=loyalty();var orders=(getOrders()||[]).filter(function(o){return CU&&o.buyerUid===CU.uid;}).length;
+  var posts=0;try{(tags||[]).forEach(function(t){posts+=(t.posts||[]).filter(function(p){return CU&&p.user===CU.name;}).length;});}catch(e){}
+  return [
+    {id:'first',ic:'🛍️',name:'First order',got:orders>=1},
+    {id:'streak3',ic:'🔥',name:'3-day streak',got:(l.streak||0)>=3},
+    {id:'social',ic:'💬',name:'First post',got:posts>=1},
+    {id:'points100',ic:'⭐',name:'100 points',got:(l.points||0)>=100},
+    {id:'loyal',ic:'🏆',name:'Gold tier',got:(l.points||0)>=300}
+  ];
 }
 </script></body></html>
