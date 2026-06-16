@@ -911,6 +911,20 @@ body.dark .spin-wheel{border-color:#2a333f}
 .ach-badge.got .ic{background:linear-gradient(135deg,#ffd23f,#ff9800);color:#fff}
 .ach-badge small{font-size:9px;color:var(--mt2);line-height:1.1}
 .ach-badge.got small{color:var(--tx)}
+/* ===== v138: friendly first-time welcome ===== */
+.ob-hero{background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:16px 16px 0 0;padding:24px 20px 20px;text-align:center;position:relative;overflow:hidden}
+.ob-hero::after{content:"";position:absolute;right:-26px;top:-26px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1)}
+.ob-logo{font-size:30px;font-weight:800;letter-spacing:-.5px}
+.ob-tag{font-size:13px;opacity:.92;margin-top:3px}
+.ob-body{padding:16px 18px 18px}
+.ob-step{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--b)}
+.ob-step:last-child{border-bottom:none}
+.ob-step .ic{width:40px;height:40px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff}
+.ob-step b{font-size:14px}
+.ob-step small{font-size:12px;color:var(--mt2);display:block;margin-top:1px}
+.ob-go{width:100%;margin-top:14px;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border:none;border-radius:24px;padding:14px;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--fn);box-shadow:0 6px 18px rgba(10,102,194,.35)}
+.ob-skip{display:block;width:100%;text-align:center;margin-top:9px;background:none;border:none;color:var(--mt2);font-size:13px;cursor:pointer;font-family:var(--fn)}
+
 
 @media(min-width:760px){.btmnav{max-width:600px;margin:0 auto;border-radius:16px 16px 0 0}}
 
@@ -1101,7 +1115,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v137</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v138</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5682,6 +5696,7 @@ function openAccountMenu(){
   var act=item('showMyActivity()','layout-dashboard','var(--g)','My Activity','your jobs, orders, shop &amp; license in one place')
     +item('showMyOrders()','package','','My Orders','track &amp; manage purchases')
     +item('openSpin()','gift','#7c3aed','Daily Spin &amp; Rewards','free points · your shopper level')
+    +item('rbOnboard(true)','help-circle','#0a8f5c','How Reedbi works','quick tour of the app')
     +item('openCareAi()','headset','#ffb800','Reedbi Care','orders, delivery, returns &amp; refunds')
     +item('openMyTickets()','ticket','#ffb800','My Support Tickets','status &amp; emailed decisions')
     +item('openProfile(CU.name,CU.co||\'\',\'\',CU.avIdx||0)','user','','View Public Profile','');
@@ -5787,7 +5802,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v137 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v138 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11405,4 +11420,32 @@ function buyRenderPerk(){
     box.innerHTML='<div style="background:linear-gradient(135deg,#f59e0b,#db2777);color:#fff;border-radius:11px;padding:10px 12px;font-size:12px"><b>'+(ti.tier.n==='Diamond'?'💎':ti.tier.n==='Platinum'?'🏆':'🥇')+' '+ti.tier.n+' member perk</b><br><span style="opacity:.95">Priority delivery handling + a loyalty offer applied at the counter. Thanks for being a '+ti.tier.n+' shopper!</span></div>';
   } else { box.innerHTML=''; }
 }
+
+/* ===== v138: friendly first-time welcome / app tour =====
+   Orients new people to the simple bottom-nav structure in a few seconds.
+   Shows once, fully skippable, replayable from the account menu. */
+function rbOnboard(force){
+  if(!force && LS.get('rb_onboarded',false))return;
+  var ovl=document.getElementById('onboard-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='onboard-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:400px;padding:0;overflow:hidden"><div id="onboard-body"></div></div>';
+    document.body.appendChild(ovl);}
+  var name=(CU&&CU.name)?(' '+(CU.name.split(' ')[0])):'';
+  function step(ic,bg,t,s){return '<div class="ob-step"><div class="ic" style="background:'+bg+'"><i class="ti ti-'+ic+'"></i></div><div><b>'+t+'</b><small>'+s+'</small></div></div>';}
+  document.getElementById('onboard-body').innerHTML=
+    '<div class="ob-hero"><div class="ob-logo">⬡ Reedbi</div><div class="ob-tag">Shop · Tag Talk · Jobs — all in one</div></div>'
+    +'<div class="ob-body"><div style="font-size:15px;font-weight:800;margin-bottom:4px">Welcome'+esc(name)+'! 👋</div>'
+    +'<div style="font-size:12px;color:var(--mt2);margin-bottom:8px">Everything lives in the bar at the bottom:</div>'
+    +step('layout-grid','#0a8f5c','Tag Talk','Posts, jobs &amp; community — connect worldwide')
+    +step('building-store','#0a66c2','Shop','Browse all sellers, deals, and 3D shopping')
+    +step('home','#7c3aed','Home','Your orders, picks, rewards &amp; daily spin 🎁')
+    +step('package','#f59e0b','Orders','Track every purchase, step by step')
+    +step('user','#64748b','Account','Your profile, addresses, shop tools &amp; settings')
+    +'<button class="ob-go" onclick="rbOnboardDone()">Got it — let\'s go!</button>'
+    +'<button class="ob-skip" onclick="rbOnboardDone()">Skip</button></div>';
+  ovl.classList.add('open');
+}
+function rbOnboardDone(){LS.set('rb_onboarded',true);closeOvl('onboard-ovl');try{rbConfetti(50);}catch(e){}}
+// show once shortly after load (after auth settles)
+setTimeout(function(){try{if(!LS.get('rb_onboarded',false))rbOnboard();}catch(e){}},1400);
 </script></body></html>
