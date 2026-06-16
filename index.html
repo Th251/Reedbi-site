@@ -107,7 +107,7 @@ body.fs-lg{--rb-fs:112%}body.fs-xl{--rb-fs:125%}
 
 
 html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg);color:var(--tx)}
-.shell{display:flex;height:100vh;overflow:hidden}
+.shell{display:flex;height:calc(100vh - 60px);overflow:hidden}
 .auth-scr{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
 .auth-scr.show{display:flex}
 .auth-box{background:var(--sf);border:1px solid var(--b2);border-radius:18px;width:100%;max-width:380px}
@@ -151,7 +151,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sw{display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--b);border-radius:18px;padding:6px 11px}
 .sw i{color:var(--mt2);font-size:13px}
 .sw input{border:none;background:transparent;outline:none;font-size:13px;color:var(--tx);flex:1;font-family:var(--fn)}
-.tlist{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:66px}
+.tlist{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:10px}
 .tgrow{touch-action:manipulation}
 .tgrow{display:flex;align-items:center;gap:10px;padding:9px 11px;cursor:pointer;border-bottom:1px solid rgba(30,45,69,.4)}
 .tgrow:hover{background:var(--card2)}
@@ -226,7 +226,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .fhd{padding:4px 12px;background:var(--card2);border-bottom:1px solid var(--b);display:none;align-items:center;justify-content:space-between;flex-shrink:0}
 .fhd strong{font-size:10px;color:var(--tx)}
 .clr{font-size:10px;color:var(--g);cursor:pointer;border:none;background:transparent;font-family:var(--fn)}
-.msgs{flex:1;overflow-y:auto;padding:12px 14px 70px;display:flex;flex-direction:column;gap:11px;-webkit-overflow-scrolling:touch}
+.msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:11px;-webkit-overflow-scrolling:touch}
 .ddiv{text-align:center;font-size:10px;color:var(--mt2);background:var(--card);border-radius:8px;padding:2px 8px;align-self:center;margin:2px 0}
 .nbanner{display:none;position:sticky;top:4px;align-self:center;z-index:10;background:var(--g);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:17px;cursor:pointer;box-shadow:0 3px 10px rgba(37,211,102,.4);align-items:center;gap:4px;animation:bop .6s ease infinite alternate}
 .nbanner.show{display:flex}
@@ -1037,10 +1037,10 @@ body.dark .spin-wheel{border-color:#2a333f}
 @keyframes tIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
 ::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:var(--b);border-radius:3px}
 @media(max-width:700px){
-  .shell{height:100dvh;position:relative}
-  .left{width:100%;position:absolute;inset:0;z-index:10;height:100dvh;background:var(--sf)}
+  .shell{height:calc(100dvh - 60px);position:relative}
+  .left{width:100%;position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;height:auto;background:var(--sf)}
   .left.hidden{display:none}
-  .right{width:100%;height:100dvh;position:absolute;inset:0;z-index:5}
+  .right{width:100%;position:absolute;top:0;left:0;right:0;bottom:0;height:auto;z-index:5}
   .backbtn{display:flex!important}
   #cv-view{height:100dvh!important}
   #cv-view[style*="flex"]{display:flex!important;flex-direction:column}
@@ -1101,7 +1101,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v135</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v136</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1393,7 +1393,7 @@ body.dark .spin-wheel{border-color:#2a333f}
   <div class="mbd">
     <div id="buy-info" style="background:var(--card2);border-radius:9px;padding:10px;margin-bottom:10px"></div>
     <div class="fg"><label>Quantity</label><input type="number" id="buy-qty" value="1" min="1"></div>
-    <div id="buy-saved-addr" style="margin-top:8px"></div><div class="fg" style="margin-top:8px"><label>Delivery address <span id="buy-save-addr-link" style="float:right;font-weight:600;color:#0a66c2;cursor:pointer;font-size:11px" onclick="buySaveCurrentAddr()">＋ Save this address</span></label><textarea id="buy-addr" rows="2" placeholder="Full delivery address"></textarea></div>
+    <div id="buy-perk" style="margin-bottom:8px"></div><div id="buy-saved-addr" style="margin-top:8px"></div><div class="fg" style="margin-top:8px"><label>Delivery address <span id="buy-save-addr-link" style="float:right;font-weight:600;color:#0a66c2;cursor:pointer;font-size:11px" onclick="buySaveCurrentAddr()">＋ Save this address</span></label><textarea id="buy-addr" rows="2" placeholder="Full delivery address"></textarea></div>
     <div class="fg" style="margin-top:8px"><label>Delivery location (Google Maps)</label>
       <div style="display:flex;gap:6px"><input type="text" id="buy-map" placeholder="Paste Maps link or tap pin" style="flex:1">
       <button class="btn" onclick="detectBuyerLocation()" style="border:1px solid var(--b);background:var(--card2);color:var(--g);white-space:nowrap"><i class="ti ti-current-location"></i></button></div>
@@ -5186,6 +5186,7 @@ function submitApply(){
   var uid=CU.uid;var cvs=getCVs(uid);var selCV2=selCVId?cvs.find(function(c){return c.id===selCVId;}):null;
   var t=tags.find(function(x){return x.id===curApplyPid.tagId;}),p=t&&t.posts.find(function(x){return x.id==curApplyPid.postId;});
   var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,skills:(document.getElementById('askills')?document.getElementById('askills').value:''),cvText:(selCV2&&selCV2.text?selCV2.text:''),cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',companyLower:(curApplyPid.company||(p?p.co:'')||'').toLowerCase(),tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),postBody:(p?p.body||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
+  try{var __kw=aiKeywordsFrom((rec.postBody||'')+' '+(rec.postTitle||''));var __sc=__kw.length?atsScore(rec,__kw.join(',')):null;rec.atsPct=__sc?__sc.pct:0;rec.atsMatched=__sc?__sc.matched:[];}catch(eA){rec.atsPct=0;}
   var apps=getAllApps();apps.push(rec);saveAllApps(apps);
   try{if(typeof maybeScheduleAiInterview==='function')maybeScheduleAiInterview(rec);}catch(eAI){}
   if(FB.ready){FB.db.collection('applications').doc(rec.id).set(rec).catch(function(){});}
@@ -5461,6 +5462,8 @@ function applicantCard(a,company){
   var atsBadge='';
   if(atsKeywords.trim()){var sc=atsScore(a,atsKeywords);if(sc){var col=sc.pct>=70?'var(--g)':sc.pct>=40?'var(--gold)':'var(--red)';atsBadge='<span class="ats-badge" style="color:'+col+';border-color:'+col+'" title="Matched: '+esc(sc.matched.join(', '))+'"><i class="ti ti-robot" style="font-size:9px"></i> ATS '+sc.pct+'%</span>';}}
   var statBtns=STATUSES.filter(function(s){return s.id!=='received';}).map(function(s){return '<button class="stat-set-btn '+(a.status===s.id?'on '+s.cls:'')+'" onclick="ownerSetStatus(\''+a.id+'\',\''+s.id+'\',\''+escJS(company)+'\')">'+s.label+'</button>';}).join('');
+  var atsP=(typeof a.atsPct==='number')?a.atsPct:null;
+  var atsBadge=(atsP!=null)?'<span class="ats-badge" style="color:'+(atsP>=70?'#16a34a':(atsP>=40?'#f59e0b':'#9ca3af'))+';border-color:currentColor;font-weight:800">ATS '+atsP+'%</span>':'';
   var hasCv=(a.cvId&&a.cvOwnerUid)||a.cvText;
   var cvBtn=hasCv?'<button onclick="hrViewCV(\''+esc(a.id)+'\')" style="font-size:11px;color:#fff;background:#0a66c2;border:none;border-radius:7px;padding:6px 11px;cursor:pointer;font-family:var(--fn);margin-top:6px;font-weight:700"><i class="ti ti-eye"></i> View CV'+(a.cvName?' ('+esc(a.cvName)+')':'')+'</button>':'<div style="font-size:10px;color:var(--mt2);margin-top:6px">No CV attached</div>';
   var aiIv=(typeof getAiIntvs==='function')?getAiIntvs().find(function(x){return x.appId===a.id;}):null;
@@ -5491,7 +5494,7 @@ function applicantCard(a,company){
     +'<div class="appl-mt">'+esc(a.email)+(a.phone?' · '+esc(a.phone):'')+(a.loc?' · '+esc(a.loc):'')+'</div></div></div>'
     +'<div style="font-size:11px;color:var(--mt2)">Applied for: <strong style="color:var(--tx)">'+esc(a.postTitle||'-')+'</strong> · '+new Date(a.ts).toLocaleDateString()+'</div>'
     +(a.note?'<div style="font-size:11px;color:var(--mt);margin-top:4px;line-height:1.5">"'+esc(a.note)+'"</div>':'')
-    +cvBtn+aiBtn+appliedDT+schedHtml+docHtml
+    +(atsBadge?'<div style="margin-top:6px">'+atsBadge+'</div>':'')+cvBtn+aiBtn+appliedDT+schedHtml+docHtml
     +'<div style="font-size:9px;color:var(--mt2);margin-top:8px;text-transform:uppercase;letter-spacing:.05em">Set status:</div>'
     +'<div class="appl-stat-row">'+statBtns+'</div>'
     +'</div>';
@@ -5778,7 +5781,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v135 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v136 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6744,6 +6747,7 @@ function buyProduct(productId){
   var bm=document.getElementById('buy-map');if(bm)bm.value='';
   selectPay('cod');
   try{selectDeliver('asap');}catch(e){}
+  try{buyRenderPerk();}catch(e){}
   buyRenderSavedAddr();
   document.getElementById('buy-ovl').classList.add('open');
 }
@@ -8689,13 +8693,21 @@ function aiKeywordsFrom(text){
   var freq={};(String(text||'').toLowerCase().match(/[a-z]{4,}/g)||[]).forEach(function(w){if(!stop[w])freq[w]=(freq[w]||0)+1;});
   return Object.keys(freq).sort(function(a,b){return freq[b]-freq[a];}).slice(0,6);
 }
-function aiQuestions(post){
-  var kws=aiKeywordsFrom(post);
-  var qs=['Tell me briefly about yourself and your background.'];
-  if(kws[0])qs.push('What hands-on experience do you have with '+kws[0]+'?');
-  if(kws[1])qs.push('Describe a challenge you solved involving '+kws[1]+', and what the result was.');
-  if(kws[2])qs.push('How would you rate your skill in '+kws[2]+' from 1 to 10, and why?');
-  qs.push('Why do you want this position, and when can you start?');
+function aiQuestions(post,cvText){
+  var kws=aiKeywordsFrom(post+' '+(cvText||''));
+  function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+  var openers=['Tell me briefly about yourself and your background.','Walk me through your career so far in two minutes.','What are you most proud of in your work to date?'];
+  var closers=['Why do you want this position, and when can you start?','Where do you see yourself in three years, and how does this role fit?','What would your first 30 days here look like?'];
+  var skillQ=['What hands-on experience do you have with %s?','Describe a real project where you used %s.','How recently did you work with %s, and at what depth?','What\'s the hardest problem you solved using %s?'];
+  var behav=['Describe a challenge you solved involving %s, and the result.','Tell me about a time %s went wrong — how did you handle it?','Give an example of teamwork around %s.'];
+  var rate=['How would you rate your skill in %s from 1 to 10, and why?','What would you still like to learn about %s?'];
+  function f(t,k){return t.replace('%s',k);}
+  var qs=[pick(openers)];
+  if(kws[0])qs.push(f(pick(skillQ),kws[0]));
+  if(kws[1])qs.push(f(pick(behav),kws[1]));
+  if(kws[2])qs.push(f(pick(rate),kws[2]));
+  else if(kws[0])qs.push(f(pick(rate),kws[0]));
+  qs.push(pick(closers));
   return qs.slice(0,5);
 }
 function maybeScheduleAiInterview(rec){
@@ -8705,7 +8717,7 @@ function maybeScheduleAiInterview(rec){
   var sc=atsScore(rec,kws.join(','));
   if(!sc||sc.pct<40)return; // not a match — no AI interview
   var l=getAiIntvs();
-  l.push({id:'ai'+Date.now(),appId:rec.id,uid:rec.uid,name:rec.name,company:rec.company,postTitle:rec.postTitle||'',questions:aiQuestions((rec.postBody||'')+' '+(rec.postTitle||'')),qa:[],status:'scheduled',schedTs:Date.now()+30*60000,ts:Date.now(),atsPct:sc.pct});
+  l.push({id:'ai'+Date.now(),appId:rec.id,uid:rec.uid,name:rec.name,company:rec.company,postTitle:rec.postTitle||'',questions:aiQuestions((rec.postBody||'')+' '+(rec.postTitle||''),rec.cvText||''),qa:[],status:'scheduled',schedTs:Date.now()+30*60000,ts:Date.now(),atsPct:sc.pct});
   saveAiIntvs(l);
   try{notifyEvent('ai','🤖 <b>AI Interview scheduled!</b> Your application for “'+esc(rec.postTitle||rec.company)+'” matched (ATS '+sc.pct+'%). Start it from My Activity.');}catch(e){}
 }
@@ -11355,5 +11367,36 @@ function rbAchievements(){
     {id:'points100',ic:'⭐',name:'100 points',got:(l.points||0)>=100},
     {id:'loyal',ic:'🏆',name:'Gold tier',got:(l.points||0)>=300}
   ];
+}
+
+/* ===== v136: robust wheel scrolling in the main store =====
+   Some inner elements (3D canvas, sticky bars) swallowed wheel events, so the
+   page wouldn't scroll when the cursor was over them. This forwards wheel scroll
+   to #ps-results whenever the store is open, regardless of cursor position. */
+(function(){
+  document.addEventListener('wheel',function(e){
+    var ovl=document.getElementById('prodsearch-ovl');
+    if(!ovl||!ovl.classList.contains('open'))return;
+    var sc=document.getElementById('ps-results');if(!sc)return;
+    // if the event target is already inside the scroller and it can scroll natively, let it be
+    var t=e.target;
+    if(sc.contains(t)){
+      var atTop=sc.scrollTop<=0&&e.deltaY<0;
+      var atBot=(sc.scrollTop+sc.clientHeight>=sc.scrollHeight-1)&&e.deltaY>0;
+      if(!atTop&&!atBot){return;} // native scroll is working — don't interfere
+    }
+    // otherwise drive the scroller manually
+    sc.scrollTop+=e.deltaY;
+    e.preventDefault();
+  },{passive:false});
+})();
+
+function buyRenderPerk(){
+  var box=document.getElementById('buy-perk');if(!box||!CU){if(box)box.innerHTML='';return;}
+  var l=loyalty();var ti=rbTier(l.points||0);
+  // Gold+ shoppers get a recognised perk (priority handling + a member offer)
+  if((l.points||0)>=300){
+    box.innerHTML='<div style="background:linear-gradient(135deg,#f59e0b,#db2777);color:#fff;border-radius:11px;padding:10px 12px;font-size:12px"><b>'+(ti.tier.n==='Diamond'?'💎':ti.tier.n==='Platinum'?'🏆':'🥇')+' '+ti.tier.n+' member perk</b><br><span style="opacity:.95">Priority delivery handling + a loyalty offer applied at the counter. Thanks for being a '+ti.tier.n+' shopper!</span></div>';
+  } else { box.innerHTML=''; }
 }
 </script></body></html>
