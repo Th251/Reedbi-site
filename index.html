@@ -869,6 +869,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .bulk-prev{border:1px solid var(--b);border-radius:9px;padding:9px;margin-top:9px;max-height:200px;overflow-y:auto}
 .bulk-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px solid var(--b)}
 .bulk-row .bad{color:#e23b3b;font-size:10px}
+.xls-drop{border:2px dashed var(--b2);border-radius:12px;padding:22px;text-align:center;cursor:pointer;background:var(--card2);transition:border-color .2s}
+.xls-drop:hover{border-color:var(--g)}
+.xls-drop i{font-size:30px;color:var(--g)}
+.xls-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:11px 0}
+.xls-sum .b{border-radius:11px;padding:11px;text-align:center}
+.xls-sum .b b{font-size:20px;display:block}.xls-sum .b small{font-size:10px}
+.xls-new{background:#ecfdf5;color:#166534}.xls-restock{background:#eff6ff;color:#1d4ed8}.xls-warn{background:#fff7ed;color:#c2410c}
+.xls-tbl{max-height:240px;overflow-y:auto;border:1px solid var(--b);border-radius:9px;margin-top:8px}
+.xls-tr{display:flex;justify-content:space-between;gap:8px;font-size:11px;padding:7px 9px;border-bottom:1px solid var(--b)}
+.xls-tag{font-size:9px;font-weight:800;border-radius:6px;padding:1px 6px}
+
 .bskt-item{border:1px solid var(--b);border-radius:11px;padding:11px;margin-bottom:9px}
 .bskt-item.na{opacity:.7;background:var(--card2)}
 .bskt-na-btn{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fn)}
@@ -1055,7 +1066,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v131</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v132</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1579,6 +1590,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <!-- three.js — activates the WebGL 3D product viewer (open3DThree). Loads window.THREE; falls back to CSS-3D if it fails. -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<!-- SheetJS (xlsx) — powers Excel bulk product import/export (openBulkExcel). Loads window.XLSX. -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 //---------------------------------------------------------------------
 //
@@ -5633,6 +5646,7 @@ function openAccountMenu(){
     shopInner=item('showMyProducts()','building-store','','My Shop','products, orders, sales')
       +item('openListProduct()','plus','#0a66c2','List a product','add a new item to sell')
       +item('openBulkList()','list-details','#0a66c2','Bulk add products','add many at once — paste a list')
+      +item('openBulkExcel()','file-spreadsheet','#16a34a','Import from Excel','vendor stock, invoices, expiry, photos')
       +item('openCounter()','cash-register','#0a66c2','Billing Counter','pick status · bill collected orders')
       +item('openBarcodeLabels()','barcode','#0a66c2','Barcode labels','print labels for items without a barcode')
       +item('openSupportDesk()','headset','#0a66c2','Support Desk','resolve customer tickets &amp; email them')
@@ -5721,7 +5735,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v131 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v132 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6360,6 +6374,7 @@ function showMyProducts(tab){
     +'</div>'
     +'<div style="display:flex;gap:8px;margin-top:11px"><button class="btn btnok" style="border-radius:18px;flex:1" onclick="closeOvl(\'seller-ovl\');openListProduct()"><i class="ti ti-plus"></i> List Product</button>'
     +'<button class="btn" style="border-radius:18px;flex:1;border:1px solid #0a66c2;color:#0a66c2;background:rgba(10,102,194,.08)" onclick="closeOvl(\'seller-ovl\');openBulkList()"><i class="ti ti-list-details"></i> Bulk add</button></div>'
+    +'<button class="btn" style="border-radius:18px;width:100%;margin-top:8px;border:1px solid #16a34a;color:#16a34a;background:rgba(22,163,74,.08)" onclick="closeOvl(\'seller-ovl\');openBulkExcel()"><i class="ti ti-file-spreadsheet"></i> Import from Excel (vendor stock + invoices)</button>'
     +'<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid var(--gold);background:var(--card2);color:var(--gold)" onclick="openDelivSettings()"><i class="ti ti-truck-delivery"></i> Delivery fees &amp; commission (geo-based)</button>'
     +(function(){var pg=(typeof myOwnedPage==='function')&&myOwnedPage();if(!pg)return '';return '<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="closeOvl(\'seller-ovl\');openPageTeam(\''+escJS(pg.name)+'\')"><i class="ti ti-users"></i> '+esc(pg.name)+' — manage page team (assign staff for listings)</button>';})()
     +'</div>';
@@ -10917,5 +10932,186 @@ function selectDeliver(v){
   __buyDeliver=v;window.__buyDeliver=v;
   ['asap','1h','2h','sched'].forEach(function(k){var b=document.getElementById('dlv-'+k);if(b)b.classList.toggle('sel',k===v);});
   var s=document.getElementById('buy-sched');if(s)s.style.display=(v==='sched')?'block':'none';
+}
+
+/* ===== v132: Excel bulk import with vendor/invoice/expiry + barcode cross-check =====
+   A vendor brings stock to the hypermarket → upload their list (Excel) + invoice.
+   Barcodes are cross-checked against existing stock: a known barcode RESTOCKS the
+   product (adds a batch, raises quantity); a new/blank barcode creates a product
+   (auto-barcode if none). No duplicate barcodes. Every batch records vendor, invoice
+   and expiry, so new stock is fully trackable. */
+var RB_BULK_COLS=[
+  {k:'title',  names:['title','product','name','item','description name','product name']},
+  {k:'brand',  names:['brand','make']},
+  {k:'category',names:['category','dept','department','type']},
+  {k:'price',  names:['price','mrp','selling price','sale price','retail']},
+  {k:'cost',   names:['cost','buy price','purchase price','cost price']},
+  {k:'offer',  names:['offer','offer price','discount price','special price']},
+  {k:'currency',names:['currency','cur']},
+  {k:'qty',    names:['quantity','qty','stock','units','count']},
+  {k:'barcode',names:['barcode','ean','upc','bar code','gtin']},
+  {k:'expiry', names:['expiry','expiry date','exp','exp date','best before']},
+  {k:'vendor', names:['vendor','supplier','vendor name','supplier name']},
+  {k:'invoiceNo',names:['invoice','invoice no','vendor invoice','invoice number','bill no']},
+  {k:'invoiceDate',names:['invoice date','bill date','po date']},
+  {k:'photo',  names:['photo','image','photo url','image url','picture','img']},
+  {k:'desc',   names:['description','desc','details','about']},
+  {k:'byWeight',names:['sold by weight','by weight','weight item']},
+  {k:'weightUnit',names:['weight unit','unit']},
+  {k:'vatPct', names:['vat','vat %','vat percent','tax']}
+];
+function bulkColKey(header){
+  var h=String(header||'').trim().toLowerCase();
+  for(var i=0;i<RB_BULK_COLS.length;i++){if(RB_BULK_COLS[i].names.indexOf(h)>=0)return RB_BULK_COLS[i].k;}
+  return null;
+}
+function mapBulkRow(rawRow){
+  var o={};
+  Object.keys(rawRow).forEach(function(hdr){var k=bulkColKey(hdr);if(k)o[k]=rawRow[hdr];});
+  return o;
+}
+function myBulkProducts(){
+  var mine=(typeof myStoreNames==='function')?myStoreNames():{};
+  return getProducts().filter(function(p){return p.sellerUid===CU.uid||(p.pageName&&mine[p.pageName]);});
+}
+// core: takes mapped rows + import options; cross-checks barcodes; returns summary; commits if apply
+function processBulkRows(rows,opts,apply){
+  opts=opts||{};
+  var prods=getProducts();
+  var myIdx={}; // barcode -> product (only my products)
+  var mineSet=(typeof myStoreNames==='function')?myStoreNames():{};
+  prods.forEach(function(p){if((p.sellerUid===CU.uid||(p.pageName&&mineSet[p.pageName]))&&p.barcode)myIdx[String(p.barcode)]=p;});
+  var seenThisImport={}; // barcode -> product created in THIS import (dedupe within file)
+  var results=[],nNew=0,nRestock=0,nWarn=0,nSkip=0;
+  var sellAs=opts.sellAs||'';var cur=opts.currency||'AED';
+  rows.forEach(function(r,idx){
+    var m=mapBulkRow(r);
+    var title=String(m.title||'').trim();
+    var qty=parseInt(String(m.qty||'0').replace(/[^0-9]/g,''),10)||0;
+    var price=String(m.price||'').replace(/[^0-9.]/g,'');
+    if(!title||qty<=0){nSkip++;results.push({status:'skip',name:title||'(no title)',note:'needs title & qty'});return;}
+    var bcRaw=String(m.barcode||'').trim();
+    var bc=bcRaw?normalizeBarcode(bcRaw):'';
+    var expiry=m.expiry?String(m.expiry).trim():'';
+    var batch={batchCode:'B-'+Date.now().toString(36).toUpperCase().slice(-4)+idx,qty:qty,
+      cost:String(m.cost||'').replace(/[^0-9.]/g,''),vendor:String(m.vendor||opts.vendor||'').trim(),
+      invoiceNo:String(m.invoiceNo||opts.invoiceNo||'').trim(),invoiceDate:String(m.invoiceDate||opts.invoiceDate||'').trim(),
+      expiry:expiry,brand:String(m.brand||'').trim(),received:Date.now(),date:Date.now()};
+    // existing barcode (old stock) OR already created in this import → RESTOCK
+    var existing=(bc&&(myIdx[bc]||seenThisImport[bc]))||null;
+    if(existing){
+      var titleDiff=existing.title&&title&&existing.title.trim().toLowerCase()!==title.trim().toLowerCase();
+      if(apply){
+        existing.batches=existing.batches||[];existing.batches.push(batch);
+        existing.qty=(parseInt(existing.qty,10)||0)+qty;
+        if(expiry)existing.expiry=expiry;
+        if(m.offer)existing.offer=String(m.offer).replace(/[^0-9.]/g,'');
+      }
+      nRestock++; if(titleDiff)nWarn++;
+      results.push({status:titleDiff?'warn':'restock',name:title,barcode:bc,qty:qty,note:titleDiff?('barcode already on “'+existing.title+'” — added as restock'):('restock +'+qty)});
+      return;
+    }
+    // NEW product
+    var prodNo=fmtProdNo(nextProdNoSeq());
+    var newBc=bc||genInternalBarcode(prodNo+'|'+title);
+    var prod={id:'prd'+Date.now()+idx+Math.floor(Math.random()*1000),prodNo:prodNo,barcodeAuto:!bc,barcode:newBc,
+      serialNo:'PRD-'+Date.now().toString(36).toUpperCase().slice(-5)+idx,
+      sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',brand:String(m.brand||'').trim(),
+      payOpts:'both',vatPct:parseFloat(m.vatPct)||0,sizes:[],colors:[],
+      byWeight:/^(yes|y|true|1)$/i.test(String(m.byWeight||'').trim()),weightUnit:String(m.weightUnit||'').trim()||'kg',
+      intlShip:'yes',title:title,desc:String(m.desc||'').trim(),price:price,cost:batch.cost,
+      offer:m.offer?String(m.offer).replace(/[^0-9.]/g,''):'',expiry:expiry,
+      currency:String(m.currency||cur).trim()||cur,qty:qty,sold:0,category:String(m.category||'Other').trim()||'Other',
+      location:(CU&&CU.location)||'',batches:[batch],interest:0,interestLog:[],
+      photos:(String(m.photo||'').trim()?[String(m.photo).trim()]:[]),
+      addr:(CU&&CU.location)||'',phone:(CU&&CU.phone)||'',map:'',ts:Date.now()+idx};
+    if(apply){prods.unshift(prod);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('products').doc(prod.id).set(prod).catch(function(){});}catch(e){}}}
+    if(bc)seenThisImport[bc]=prod; nNew++;
+    results.push({status:'new',name:title,barcode:newBc,qty:qty,note:bc?'new product':'new · auto-barcode'});
+  });
+  if(apply)saveProducts(prods);
+  return {results:results,counts:{new:nNew,restock:nRestock,warn:nWarn,skip:nSkip,total:rows.length}};
+}
+
+function openBulkExcel(){
+  if(!requireAuth('import products'))return;
+  var sellAs='';var pg=(typeof myOwnedPage==='function')?myOwnedPage():null;if(pg)sellAs=pg.name;
+  window.__bulkXlsSellAs=sellAs;window.__bulkXlsRows=null;
+  var ovl=document.getElementById('bulkxls-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='bulkxls-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:500px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-file-spreadsheet" style="color:#16a34a"></i> Import products from Excel</b><button class="modal-x" onclick="closeOvl(\'bulkxls-ovl\')"><i class="ti ti-x"></i></button></div><div id="bulkxls-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderBulkExcel();
+  ovl.classList.add('open');
+}
+function renderBulkExcel(){
+  var lib=(typeof XLSX!=='undefined');
+  var b='<div class="bulk-help"><b><i class="ti ti-list-check"></i> One row per product.</b> Columns: Title, Brand, Category, Price, Cost, Offer, Currency, Quantity, Barcode, Expiry Date, Vendor, Vendor Invoice, Invoice Date, Photo URL, VAT %, Sold By Weight.<br><span style="color:var(--mt2)">Barcodes are cross-checked: a known barcode <b>restocks</b> the product (no duplicates); blank gets a Reedbi barcode.</span></div>'
+    +'<button class="btn" style="width:100%;border:1px solid #16a34a;color:#16a34a;background:rgba(22,163,74,.08);margin-bottom:10px" onclick="downloadBulkTemplate()"><i class="ti ti-download"></i> Download Excel template</button>'
+    +'<div style="display:flex;gap:8px;margin-bottom:8px"><input id="xls-vendor" placeholder="Vendor name (applies to all)" style="flex:1"><input id="xls-invoice" placeholder="Invoice no" style="width:110px"></div>'
+    +'<input id="xls-invdate" type="date" style="width:100%;margin-bottom:10px" title="Invoice date">'
+    +(lib?'<label class="xls-drop" for="xls-file"><i class="ti ti-cloud-upload"></i><div style="font-weight:700;margin-top:6px">Tap to choose your Excel file</div><small style="color:var(--mt2)">.xlsx or .csv</small></label><input type="file" id="xls-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="bulkExcelHandleFile(this.files[0])">'
+        :'<div class="home-empty">Excel engine is loading… if this persists, check your connection (the SheetJS library loads from a CDN).</div>')
+    +'<div id="xls-preview" style="margin-top:11px"></div>';
+  document.getElementById('bulkxls-body').innerHTML=b;
+}
+function downloadBulkTemplate(){
+  var headers=['Title','Brand','Category','Price','Cost','Offer','Currency','Quantity','Barcode','Expiry Date','Vendor','Vendor Invoice','Invoice Date','Photo URL','VAT %','Sold By Weight','Weight Unit','Description'];
+  var ex1=['Basmati Rice 5kg','Royal','Grocery','35','24','29','AED','120','6299111222333','2026-12-31','Al Noor Foods','INV-5567','2026-06-15','https://example.com/rice.jpg','5','No','','Premium long grain'];
+  var ex2=['Bananas','','Fruits','6','4','','AED','80','','2026-06-25','Fresh Farms','INV-5568','2026-06-15','','0','Yes','kg','Sold per kg'];
+  if(typeof XLSX!=='undefined'){
+    var ws=XLSX.utils.aoa_to_sheet([headers,ex1,ex2]);
+    var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Products');
+    XLSX.writeFile(wb,'Reedbi-bulk-import-template.xlsx');
+    toast('Template downloaded','ok');
+  }else{ // CSV fallback
+    var csv=[headers,ex1,ex2].map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+    var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='Reedbi-bulk-import-template.csv';a.click();
+    toast('Template downloaded (CSV)','ok');
+  }
+}
+function bulkExcelHandleFile(file){
+  if(!file)return;
+  if(typeof XLSX==='undefined'){toast('Excel engine still loading — try again in a moment','err');return;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:'binary'});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(!rows.length){toast('No rows found in the file','err');return;}
+      window.__bulkXlsRows=rows;
+      bulkExcelPreview();
+    }catch(err){toast('Could not read the file — is it a valid Excel/CSV?','err');}
+  };
+  reader.readAsBinaryString(file);
+}
+function bulkExcelOpts(){
+  return {sellAs:window.__bulkXlsSellAs||'',vendor:(document.getElementById('xls-vendor')||{}).value||'',
+    invoiceNo:(document.getElementById('xls-invoice')||{}).value||'',invoiceDate:(document.getElementById('xls-invdate')||{}).value||'',
+    currency:(CU&&CU.currency)||'AED'};
+}
+function bulkExcelPreview(){
+  var rows=window.__bulkXlsRows;if(!rows){return;}
+  var sum=processBulkRows(rows,bulkExcelOpts(),false); // dry run
+  var c=sum.counts;
+  var box=document.getElementById('xls-preview');if(!box)return;
+  var h='<div class="xls-sum"><div class="b xls-new"><b>'+c.new+'</b><small>New products</small></div>'
+    +'<div class="b xls-restock"><b>'+c.restock+'</b><small>Restock (known barcode)</small></div>'
+    +'<div class="b xls-warn"><b>'+(c.warn+c.skip)+'</b><small>Need attention</small></div></div>';
+  h+='<div class="xls-tbl">'+sum.results.slice(0,200).map(function(r){
+    var tag=r.status==='new'?'<span class="xls-tag xls-new">NEW</span>':(r.status==='restock'?'<span class="xls-tag xls-restock">RESTOCK</span>':(r.status==='warn'?'<span class="xls-tag xls-warn">CHECK</span>':'<span class="xls-tag" style="background:var(--card2);color:var(--mt2)">SKIP</span>'));
+    return '<div class="xls-tr"><span style="flex:1;min-width:0">'+esc(r.name)+'<br><span style="color:var(--mt2);font-size:10px">'+esc(r.note||'')+(r.barcode?' · '+esc(r.barcode):'')+'</span></span>'+tag+'</div>';
+  }).join('')+'</div>';
+  h+='<button class="btn btnok" style="width:100%;margin-top:11px" onclick="bulkExcelCommit()"><i class="ti ti-database-import"></i> Import '+(c.new+c.restock)+' products</button>';
+  box.innerHTML=h;
+}
+function bulkExcelCommit(){
+  var rows=window.__bulkXlsRows;if(!rows){toast('Choose a file first','err');return;}
+  var sum=processBulkRows(rows,bulkExcelOpts(),true); // apply
+  var c=sum.counts;
+  closeOvl('bulkxls-ovl');
+  toast(c.new+' new · '+c.restock+' restocked ✓','ok');
+  try{showMyProducts();}catch(e){}
 }
 </script></body></html>
