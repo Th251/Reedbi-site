@@ -1101,7 +1101,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v136</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v137</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4142,8 +4142,10 @@ function fbListenCompanyApps(company){
     FB_LISTENERS[key]=FB.db.collection('applications').where('companyLower','==',company.toLowerCase())
       .onSnapshot(function(snap){
         var apps=getAllApps();var changed=false;
-        snap.forEach(function(doc){var d=doc.data();d.id=doc.id;var ex=apps.find(function(a){return a.id===d.id;});if(ex){Object.assign(ex,d);}else{apps.push(d);}changed=true;});
-        if(changed){saveAllApps(apps);if(document.getElementById('pg-ovl').classList.contains('open'))openCompanyPage(company);}
+        snap.forEach(function(doc){var d=doc.data();d.id=doc.id;var ex=apps.find(function(a){return a.id===d.id;});
+          if(ex){ if(ex.statusTs&&d.statusTs&&d.statusTs<ex.statusTs){ /* local change is newer — keep it */ } else { Object.assign(ex,d); changed=true; } }
+          else{apps.push(d);changed=true;}});
+        if(changed){saveAllApps(apps);if(document.getElementById('pg-ovl').classList.contains('open')&&!__hrBusy)openCompanyPage(company);}
       },function(err){if(fbIsPermErr(err))fbStopListener('apps_'+company.toLowerCase(),'perm');else console.warn('listen apps',err);});
   }catch(e){console.warn(e);}
 }
@@ -4155,7 +4157,9 @@ function fbListenMyApps(){
     FB_LISTENERS['myapps']=FB.db.collection('applications').where('uid','==',CU.uid)
       .onSnapshot(function(snap){
         var apps=getAllApps();var changed=false;
-        snap.forEach(function(doc){var d=doc.data();d.id=doc.id;var ex=apps.find(function(a){return a.id===d.id;});if(ex){if(ex.status!==d.status){toast('Status update: '+statusObj(d.status).label,d.status==='selected'||d.status==='interview'?'gold':'info');}Object.assign(ex,d);}else{apps.push(d);}changed=true;});
+        snap.forEach(function(doc){var d=doc.data();d.id=doc.id;var ex=apps.find(function(a){return a.id===d.id;});
+          if(ex){ if(ex.statusTs&&d.statusTs&&d.statusTs<ex.statusTs){return;} if(ex.status!==d.status){toast('Status update: '+statusObj(d.status).label,d.status==='selected'||d.status==='interview'?'gold':'info');}Object.assign(ex,d);changed=true;}
+          else{apps.push(d);changed=true;}});
         if(changed){saveAllApps(apps);if(activeTagId){var t=tags.find(function(x){return x.id===activeTagId;});if(t)renderMsgs(t);}if(document.getElementById('ma-ovl').classList.contains('open'))showMyApps();}
       },function(err){if(fbIsPermErr(err))fbStopListener('myapps','perm');else console.warn('listen myapps',err);});
   }catch(e){console.warn(e);}
@@ -4700,11 +4704,13 @@ function getAppsForCompany(co){return getAllApps().filter(function(a){return (a.
 function getAppsForPost(tagId,postId){return getAllApps().filter(function(a){return a.tagId===tagId&&String(a.postId)===String(postId);});}
 function countAppsForPost(tagId,postId){return getAppsForPost(tagId,postId).length;}
 function getMyApps(){var uid=CU?CU.uid:'';return getAllApps().filter(function(a){return a.uid===uid;});}
+var __hrBusy=false;
 function setAppStatus(appId,status){
   var apps=getAllApps();var a=apps.find(function(x){return x.id===appId;});
   if(!a)return;a.status=status;a.statusTs=Date.now();saveAllApps(apps);
   if(FB.ready){FB.db.collection('applications').doc(appId).set(a,{merge:true}).catch(function(){});}
   bcSend({type:'app_status',appId:appId,status:status});
+  __hrBusy=true;setTimeout(function(){__hrBusy=false;},1200);
 }
 
 /* ===== License key validation system =====
@@ -5781,7 +5787,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v136 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v137 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6828,7 +6834,7 @@ function showMyOrders(){
       +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'+(o.ts?'<div style="font-size:10px;color:var(--mt2)"><i class="ti ti-clock"></i> Received: '+fmtDT(o.ts)+'</div>':'')
       +'<div style="font-size:11px;color:var(--mt)">Seller: '+esc(o.sellerName)+'</div>'
       +trackStrip(o)
-      +(o.collectedConfirmed?'<div class="col-track">'+(o.byWeight?('<i class="ti ti-scale-outline" style="color:#0a8f5c"></i> <b>Weighed '+o.actualWeight+' '+weightUnitLabel(o.weightUnit||"kg")+'</b> (you ordered '+o.orderedWeight+')'+(o.weightExtraDue?' · <span style="color:#c2410c">extra '+esc(o.currency||"")+' '+o.weightExtraDue+(o.payMethod==="online"?" payable at delivery":"")+'</span>':'')+(o.refundDue?' · <span style="color:#16a34a">refund '+esc(o.currency||"")+' '+o.refundDue+'</span>':'')):('<i class="ti ti-clipboard-check" style="color:#16a34a"></i> <b>'+(o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty+' items confirmed</b> by agent'+(o.refundDue?' · <span style="color:#e23b3b">refund '+esc(o.currency||'')+' '+o.refundDue+' for '+o.collectedShort+' short</span>':'')))+'</div>':'')
+      +(o.notAvailable?'<div class="col-track" style="border-left:3px solid #e23b3b;padding-left:8px"><i class="ti ti-bag-x" style="color:#e23b3b"></i> <b>Item not available</b> — out of stock at the shop'+(o.refundDue?'<br><span style="color:#16a34a"><i class="ti ti-cash-banknote"></i> Refund started: '+esc(o.currency||'')+' '+o.refundDue+(o.refundStatus==='paid'?' (refunded)':' (processing)')+'</span>':(o.payMethod==='cod'?'<br><span style="color:var(--mt2)">Not charged (cash on delivery)</span>':''))+'</div>':'')+(o.collectedConfirmed&&!o.notAvailable?'<div class="col-track">'+(o.byWeight?('<i class="ti ti-scale-outline" style="color:#0a8f5c"></i> <b>Weighed '+o.actualWeight+' '+weightUnitLabel(o.weightUnit||"kg")+'</b> (you ordered '+o.orderedWeight+')'+(o.weightExtraDue?' · <span style="color:#c2410c">extra '+esc(o.currency||"")+' '+o.weightExtraDue+(o.payMethod==="online"?" payable at delivery":"")+'</span>':'')+(o.refundDue?' · <span style="color:#16a34a">refund '+esc(o.currency||"")+' '+o.refundDue+'</span>':'')):('<i class="ti ti-clipboard-check" style="color:#16a34a"></i> <b>'+(o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty+' items confirmed</b> by agent'+(o.refundDue?' · <span style="color:#e23b3b">refund '+esc(o.currency||'')+' '+o.refundDue+' for '+o.collectedShort+' short</span>':'')))+'</div>':'')
       +(o.agentName?'<div style="font-size:11px;color:var(--g)"><i class="ti ti-moped"></i> Agent: '+esc(o.agentName)+(o.agentPhone?' · <a href="https://wa.me/'+esc((o.agentPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(o.agentPhone)+'</a>':'')+'</div>':'')
       +((o.status==='out_delivery'&&o.deliveryOtp)?'<div class="otp-box"><i class="ti ti-shield-lock"></i> Delivery OTP: <b>'+esc(o.deliveryOtp)+'</b><div style="font-size:9px;color:var(--mt2);font-weight:400">Give this to the agent to confirm delivery</div></div>':'')
       +'<div style="font-size:11px;color:var(--g);font-weight:700;margin-top:3px"><i class="ti ti-'+so.icon+'"></i> '+so.label+'</div>'
