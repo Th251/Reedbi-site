@@ -1115,7 +1115,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v138</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v139</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5207,6 +5207,9 @@ function submitApply(){
   var t=tags.find(function(x){return x.id===curApplyPid.tagId;}),p=t&&t.posts.find(function(x){return x.id==curApplyPid.postId;});
   var rec={id:'app'+Date.now(),name:name,email:email,phone:document.getElementById('aph').value,loc:document.getElementById('al').value,note:document.getElementById('ano').value,skills:(document.getElementById('askills')?document.getElementById('askills').value:''),cvText:(selCV2&&selCV2.text?selCV2.text:''),cvId:selCVId||null,cvName:selCV2?selCV2.name:'',cvOwnerUid:uid,company:curApplyPid.company||(p?p.co:'')||'',companyLower:(curApplyPid.company||(p?p.co:'')||'').toLowerCase(),tagId:curApplyPid.tagId,postId:curApplyPid.postId,postTitle:(p?p.title||'':''),postBody:(p?p.body||'':''),ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
   try{var __kw=aiKeywordsFrom((rec.postBody||'')+' '+(rec.postTitle||''));var __sc=__kw.length?atsScore(rec,__kw.join(',')):null;rec.atsPct=__sc?__sc.pct:0;rec.atsMatched=__sc?__sc.matched:[];}catch(eA){rec.atsPct=0;}
+  // Attach the CV to the application itself so HR can open it via the applications
+  // collection they already read — no dependency on the separate cvs collection rule.
+  try{ if(selCVId){ var __cd=getCVData(uid,selCVId); if(__cd && __cd.length<600000){ rec.cvData=__cd; } } }catch(eCD){}
   var apps=getAllApps();apps.push(rec);saveAllApps(apps);
   try{if(typeof maybeScheduleAiInterview==='function')maybeScheduleAiInterview(rec);}catch(eAI){}
   if(FB.ready){FB.db.collection('applications').doc(rec.id).set(rec).catch(function(){});}
@@ -5224,6 +5227,7 @@ function submitApply(){
             return snap.ref.getDownloadURL();
           }).then(function(url){
             FB.db.collection('cvs').doc(uid+'_'+selCVId).set({url:url,name:cvFileName,uid:uid,ts:Date.now()}).catch(function(){});
+            try{var _as=getAllApps();var _a=_as.find(function(x){return x.id===rec.id;});if(_a){_a.cvUrl=url;saveAllApps(_as);if(FB.ready)FB.db.collection('applications').doc(rec.id).set({cvUrl:url},{merge:true}).catch(function(){});}}catch(eU){}
             console.log('CV uploaded to Firebase Storage');
           }).catch(function(e){console.warn('Storage upload failed, trying Firestore',e);cvToFirestore(uid,selCVId,cvData,cvFileName);});
         }catch(e){cvToFirestore(uid,selCVId,cvData,cvFileName);}
@@ -5802,7 +5806,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v138 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v139 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11211,6 +11215,9 @@ function bulkExcelCommit(){
 function hrViewCV(appId){
   var a=(typeof getAllApps==='function'?getAllApps():[]).find(function(x){return x.id===appId;});
   if(!a){toast('Application not found','err');return;}
+  // 0) CV attached to the application itself (most reliable — comes with the app HR already reads)
+  if(a.cvUrl){openCVUrl(a.cvUrl,a.cvName||'CV');return;}
+  if(a.cvData){openCVData(a.cvData,a.cvName||'CV');return;}
   // 1) file on this device
   var local=(a.cvOwnerUid&&a.cvId)?getCVData(a.cvOwnerUid,a.cvId):null;
   if(local){openCVData(local,a.cvName||'CV');return;}
@@ -11262,7 +11269,7 @@ function hrViewCVText(a){
     +(skills?'<h3 style="font-size:14px;color:#0a2540;margin:16px 0 6px;text-transform:uppercase;letter-spacing:.05em">Skills</h3><div style="font-size:13px;line-height:1.7">'+esc(skills)+'</div>':'')
     +(a.note?'<h3 style="font-size:14px;color:#0a2540;margin:16px 0 6px;text-transform:uppercase;letter-spacing:.05em">Cover note</h3><div style="font-size:13px;line-height:1.7;white-space:pre-wrap">'+esc(a.note)+'</div>':'')
     +(txt?'<h3 style="font-size:14px;color:#0a2540;margin:16px 0 6px;text-transform:uppercase;letter-spacing:.05em">Résumé</h3><div style="font-size:13px;line-height:1.7;white-space:pre-wrap">'+esc(txt)+'</div>'
-        :'<div style="margin-top:18px;padding:14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;font-family:var(--fn);font-size:12px;color:#9a3412">The original CV file isn\'t synced to the cloud yet, so only the details the applicant typed are shown. To view original CV files across devices, turn on cloud sync and allow signed-in reads on the <b>cvs</b> collection.</div>')
+        :'<div style="margin-top:18px;padding:14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;font-family:var(--fn);font-size:12px;color:#9a3412">This applicant applied before file-sync was enabled (or used a very large file), so their typed details are shown here. New applications attach the CV file to the application automatically, so it opens here directly.</div>')
     +'</div>';
   document.getElementById('cvview-frame').innerHTML=doc;
   document.getElementById('cvview-ovl').classList.add('open');
