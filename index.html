@@ -507,7 +507,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .sf-av{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;margin-bottom:8px}
 .sf-stats{display:flex;gap:14px;margin-top:8px;font-size:11px}
 .sf-stats b{display:block;font-size:15px}
-#ps-results{scroll-behavior:smooth;overscroll-behavior:contain}
+#ps-results{scroll-behavior:smooth;overscroll-behavior:contain;overflow-y:auto !important;touch-action:pan-y;-webkit-overflow-scrolling:touch}
 .vsh{position:fixed;inset:0;z-index:100000;display:none;background:radial-gradient(circle at 50% 40%,#13202e,#070b10);overflow:hidden}
 .vsh.open{display:block}
 .vsh-top{position:absolute;top:0;left:0;right:0;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;z-index:3;color:#fff}
@@ -567,7 +567,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .tcm-bag .ct{background:#fff;color:#0a8f5c;border-radius:12px;min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;padding:0 5px}
 .tcm-hint{text-align:center;color:#9fb3c8;font-size:11px;padding:4px 16px 14px}
 /* ===== Flipkart-style professional main store (v116) ===== */
-.fk-wrap{background:#f1f3f6;margin:-13px -16px 0;min-height:100%}
+.fk-wrap{background:#f1f3f6;margin:-13px -16px 0;min-height:auto}
 .fk-bar{background:#0a66c2;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:8;box-shadow:0 2px 6px rgba(0,0,0,.12)}
 .fk-bar .brand{color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .fk-bar .brand small{font-style:italic;color:#ffe500;font-weight:600;font-size:9px}
@@ -1055,7 +1055,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v129</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v131</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1353,6 +1353,15 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
       <button class="btn" onclick="detectBuyerLocation()" style="border:1px solid var(--b);background:var(--card2);color:var(--g);white-space:nowrap"><i class="ti ti-current-location"></i></button></div>
     </div>
     <div class="fg" style="margin-top:8px"><label>Your WhatsApp number</label><input type="text" id="buy-phone" placeholder="+1 234 567 8900"></div>
+    <div class="fg" style="margin-top:8px"><label>Delivery time</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="buy-deliver-opts">
+        <button type="button" class="pay-opt sel" id="dlv-asap" onclick="selectDeliver('asap')"><i class="ti ti-bolt"></i> ASAP</button>
+        <button type="button" class="pay-opt" id="dlv-1h" onclick="selectDeliver('1h')"><i class="ti ti-clock-hour-1"></i> Within 1 hr</button>
+        <button type="button" class="pay-opt" id="dlv-2h" onclick="selectDeliver('2h')"><i class="ti ti-clock-hour-2"></i> Within 2 hr</button>
+        <button type="button" class="pay-opt" id="dlv-sched" onclick="selectDeliver('sched')"><i class="ti ti-calendar"></i> Schedule</button>
+      </div>
+      <input type="datetime-local" id="buy-sched" style="width:100%;margin-top:6px;display:none">
+    </div>
     <div class="fg" style="margin-top:10px"><label>Payment method</label>
       <div class="pay-opts">
         <button type="button" class="pay-opt sel" id="pay-cod" onclick="selectPay('cod')"><i class="ti ti-cash"></i> Cash on Delivery</button>
@@ -4185,32 +4194,28 @@ function dataUriToBlobUrl(d){
   }catch(e){return null;}
 }
 function openCVData(d,name){
+  // Render the CV INSIDE the app (no window.open — popups get blocked after async cloud fetch)
   try{
-    // Chrome blocks data: URIs in new tabs — convert to a Blob URL first.
-    var bu=dataUriToBlobUrl(d);
-    if(bu){window.open(bu,'_blank');return;}
-    var isViewable=/^data:(application\/pdf|image\/)/.test(d);
-    if(isViewable){
-      var w=window.open();
-      if(w){
-        // Build the viewer via DOM (no string concat into document.write) so a crafted
-        // data URI cannot break out of the src attribute. Type is restricted above.
-        try{
-          w.document.title=name||'CV';
-          var el=w.document.createElement(d.indexOf('application/pdf')>=0?'iframe':'img');
-          el.setAttribute('src',d);
-          if(el.tagName==='IFRAME'){el.style.width='100%';el.style.height='100%';el.style.border='0';}
-          else{el.style.maxWidth='100%';}
-          w.document.body.style.margin='0';
-          w.document.body.appendChild(el);
-        }catch(e){var a=w.document.createElement('a');a.href=d;a.textContent='Open CV';w.document.body.appendChild(a);}
-      }else{ // popup blocked -> download
-        var a=document.createElement('a');a.href=d;a.download=name||'cv';a.click();
-      }
-    }else{
-      var a2=document.createElement('a');a2.href=d;a2.download=name||'cv';a2.click();
-    }
-  }catch(e){var a3=document.createElement('a');a3.href=d;a3.download=name||'cv';a3.click();}
+    var bu=dataUriToBlobUrl(d)||d;
+    var isImg=/^data:image\//.test(d);
+    var isPdf=/application\/pdf/.test(d);
+    var ovl=document.getElementById('cvview-ovl');
+    if(!ovl){ovl=document.createElement('div');ovl.id='cvview-ovl';ovl.className='overlay';
+      ovl.innerHTML='<div class="modal" style="max-width:760px;width:96vw;height:92vh;display:flex;flex-direction:column;padding:0">'
+        +'<div style="display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--b)"><i class="ti ti-file-cv" style="color:var(--g)"></i><b id="cvview-name" style="flex:1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CV</b>'
+        +'<a id="cvview-dl" download class="btn" style="border:1px solid var(--g);color:var(--g);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none"><i class="ti ti-download"></i> Download</a>'
+        +'<button class="modal-x" onclick="closeOvl(\'cvview-ovl\')"><i class="ti ti-x"></i></button></div>'
+        +'<div id="cvview-frame" style="flex:1;overflow:auto;background:#525659"></div></div>';
+      document.body.appendChild(ovl);}
+    document.getElementById('cvview-name').textContent=name||'CV';
+    var dl=document.getElementById('cvview-dl');dl.href=bu;dl.setAttribute('download',name||'cv');
+    var frame=document.getElementById('cvview-frame');
+    if(isImg){frame.innerHTML='<div style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:10px"><img src="'+bu+'" style="max-width:100%;height:auto;background:#fff"></div>';}
+    else{frame.innerHTML='<iframe src="'+bu+'" style="width:100%;height:100%;border:0;background:#fff"></iframe>';}
+    ovl.classList.add('open');
+  }catch(e){ // last-resort download
+    try{var a=document.createElement('a');a.href=d;a.download=name||'cv';a.click();}catch(_){toast('Could not open CV','err');}
+  }
 }
 function readB64(f){return new Promise(function(r,j){var fr=new FileReader();fr.onload=function(e){r(e.target.result);};fr.onerror=j;fr.readAsDataURL(f);});}
 
@@ -5716,7 +5721,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v129 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v131 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6680,6 +6685,7 @@ function buyProduct(productId){
   szRow.innerHTML=(curBuyProduct.sizes&&curBuyProduct.sizes.length)?'<div class="fg" style="margin-top:8px"><label>Size / variant</label><select id="buy-size">'+curBuyProduct.sizes.map(function(s){return '<option>'+esc(s)+'</option>';}).join('')+'</select></div>':'';
   var bm=document.getElementById('buy-map');if(bm)bm.value='';
   selectPay('cod');
+  try{selectDeliver('asap');}catch(e){}
   buyRenderSavedAddr();
   document.getElementById('buy-ovl').classList.add('open');
 }
@@ -6710,7 +6716,11 @@ function placeOrder(){
   var orderNo='RB-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
   ensureProdMeta(curBuyProduct);var o={id:'ord'+Date.now()+Math.floor(Math.random()*1000),orderNo:orderNo,prodNo:curBuyProduct.prodNo,barcode:curBuyProduct.barcode,byWeight:!!curBuyProduct.byWeight,weightUnit:curBuyProduct.weightUnit||'',orderedWeight:(curBuyProduct.byWeight?qty:0),productId:curBuyProduct.id,productTitle:curBuyProduct.title+(bSize?' ['+bSize+']':''),size:bSize,price:curBuyProduct.price,currency:curBuyProduct.currency,qty:qty,
     sellerUid:curBuyProduct.sellerUid,sellerName:curBuyProduct.sellerName,pageName:(curBuyProduct.pageName||''),buyerUid:CU.uid,buyerEmail:(CU.email||'').toLowerCase(),buyerName:CU.name,buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:map,
-    payMethod:selPayMethod,status:'placed',storeMap:(curBuyProduct.map||curBuyProduct.geo||''),storeAddr:(curBuyProduct.addr||''),ts:Date.now()};
+    payMethod:selPayMethod,status:'placed',storeMap:(curBuyProduct.map||curBuyProduct.geo||''),storeAddr:(curBuyProduct.addr||''),
+    deliverBy:(window.__buyDeliver||'asap'),
+    deliverByTs:(window.__buyDeliver==='1h'?Date.now()+3600000:(window.__buyDeliver==='2h'?Date.now()+7200000:0)),
+    scheduledTs:(window.__buyDeliver==='sched'&&document.getElementById('buy-sched')&&document.getElementById('buy-sched').value?new Date(document.getElementById('buy-sched').value).getTime():0),
+    ts:Date.now()};
   var orders=getOrders();orders.unshift(o);saveOrders(orders);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o).catch(function(){});}catch(e){}}
   closeOvl('buy-ovl');
@@ -7751,7 +7761,7 @@ function openMainStore(cat){
   var prods=cat?allProds.filter(function(p){return (p.category||'Other')===cat;}):allProds;
 
   // top bar + search
-  var bar='<div class="fk-bar"><div class="brand">⬡ Reedbi <small>Explore Plus</small></div>'
+  var bar='<div class="fk-bar"><button onclick="rbNavBack()" title="Back" style="background:none;border:none;color:#fff;cursor:pointer;font-size:20px;padding:2px 6px 2px 0"><i class="ti ti-arrow-left"></i></button><div class="brand">⬡ Reedbi <small>Explore Plus</small></div>'
     +'<div class="fk-search"><i class="ti ti-search"></i><input placeholder="Search for products, brands &amp; more" '
     +'onkeydown="if(event.key===\'Enter\'){document.getElementById(\'ps-q\').value=this.value;runProductSearch(this.value);}"></div>'
     +'<button onclick="rbSnapPush();openWishlist()" title="Wishlist" style="background:none;border:none;color:#fff;cursor:pointer;position:relative;padding:4px 6px"><i class="ti ti-heart" style="font-size:20px"></i>'+(getWishlist().length?'<span style="position:absolute;top:-2px;right:-2px;background:#ff4d67;color:#fff;font-size:9px;font-weight:800;border-radius:9px;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px">'+getWishlist().length+'</span>':'')+'</button></div>';
@@ -7999,6 +8009,17 @@ function orderCommission(o){
   return Math.round((AGENT_COMMISSION+km*perKm)*10)/10;
 }
 function commCurrency(o){return o.commCurrency||o.currency||'';}
+var __agentFilter='pending';
+function agentSetFilter(fil){__agentFilter=fil;showAgentDashboard();}
+function deliveryCountdown(o){
+  var placed=o.ts||0;
+  var deadline=o.deliverByTs||(o.deliverBy==='1h'?placed+3600000:(o.deliverBy==='2h'?placed+7200000:0));
+  var recAgo=placed?Math.max(0,Math.round((Date.now()-placed)/60000)):0;
+  var h='<div style="font-size:11px;color:var(--mt2);margin-top:3px"><i class="ti ti-clock-hour-4"></i> Received '+(recAgo<60?recAgo+'m':(Math.floor(recAgo/60)+'h '+(recAgo%60)+'m'))+' ago';
+  if(o.scheduledTs){h+=' · <span style="color:#7c3aed">🗓 '+fmtDT(o.scheduledTs)+'</span>';}
+  if(deadline&&o.status!=='delivered'){var left=Math.round((deadline-Date.now())/60000);var col=left<0?'#e23b3b':(left<20?'#f59e0b':'#16a34a');h+=' · <b style="color:'+col+'">'+(left<0?('OVERDUE '+Math.abs(left)+'m'):('deliver in '+(left<60?left+'m':(Math.floor(left/60)+'h '+(left%60)+'m'))))+'</b>';}
+  h+='</div>';return h;
+}
 function showAgentDashboard(){
   if(!requireAuth('view agent dashboard'))return;
   var p=getMyAgentProfile();
@@ -8013,9 +8034,9 @@ function showAgentDashboard(){
     +(p.photo?'<img src="'+p.photo+'" style="width:54px;height:54px;border-radius:50%;object-fit:cover;margin:0 auto 6px;display:block">':'')
     +'<div style="font-weight:700">'+esc(p.name)+'</div><div style="font-size:11px;color:var(--mt2)">'+esc(p.phone)+(rating?' · ⭐ '+rating:'')+'</div>'+(p.agentCode?'<div class="order-no" style="margin-top:4px">Your code: '+esc(p.agentCode)+'</div>':'')+'</div>';
   head+='<div class="dispatch-row">'
-    +'<div class="disp-box disp-done"><b>'+delivered.length+'</b><small>Delivered</small></div>'
-    +'<div class="disp-box disp-pend"><b>'+pending.length+'</b><small>Pending</small></div>'
-    +'<div class="disp-box disp-ship"><b>'+(delivered[0]?commCurrency(delivered[0])+' ':'')+earnings+'</b><small>Commission earned</small></div>'
+    +'<div class="disp-box disp-pend" style="cursor:pointer;'+(__agentFilter==='pending'?'outline:2px solid var(--gold)':'')+'" onclick="agentSetFilter(\'pending\')"><b>'+pending.length+'</b><small>Pending</small></div>'
+    +'<div class="disp-box disp-done" style="cursor:pointer;'+(__agentFilter==='delivered'?'outline:2px solid var(--g)':'')+'" onclick="agentSetFilter(\'delivered\')"><b>'+delivered.length+'</b><small>Delivered</small></div>'
+    +'<div class="disp-box disp-ship"><b>'+(delivered[0]?commCurrency(delivered[0])+' ':'')+earnings+'</b><small>Earned</small></div>'
     +'</div>';
   // performance tier — bonus for high performers
   var totalDel=p.deliveries||delivered.length;
@@ -8031,11 +8052,21 @@ function showAgentDashboard(){
     head+='<div style="font-size:11px;font-weight:700;color:var(--mt);margin:4px 0 7px;text-transform:uppercase">Stores I deliver for</div>';
     head+=storeKeys.map(function(k){var s=byStore[k];return '<div class="act-row"><div><b>'+esc(k)+'</b><small>'+s.del+' delivered · '+s.bal+' pending</small></div><span class="pay-badge pay-online-b">'+esc(s.cur)+' '+(Math.round(s.earned*10)/10)+'</span></div>';}).join('');
   }
-  var content=myOrders.length?myOrders.map(function(o){
+  var shown=__agentFilter==='delivered'?delivered:(__agentFilter==='all'?myOrders:pending);
+  var filterTabs='<div style="display:flex;gap:7px;margin:4px 0 10px">'
+    +['pending','delivered','all'].map(function(fl){var lbl=fl==='pending'?('Pending ('+pending.length+')'):(fl==='delivered'?('Delivered ('+delivered.length+')'):('All ('+myOrders.length+')'));return '<button onclick="agentSetFilter(\''+fl+'\')" style="flex:1;border:1px solid var(--b);background:'+(__agentFilter===fl?'var(--g)':'var(--card2)')+';color:'+(__agentFilter===fl?'#fff':'var(--tx)')+';border-radius:9px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fn)">'+lbl+'</button>';}).join('')+'</div>';
+  var content=shown.length?shown.map(function(o){
     var os=orderStatusObj(o.status);var si=orderStatusIndex(o.status);
     var next=si<ORDER_STATUS.length-1?ORDER_STATUS[si+1]:null;
-    return '<div class="appl-card"><div class="order-no">'+esc(o.orderNo||o.id)+'</div>'
+    var prod=getProducts().find(function(x){return x.id===o.productId;});
+    var photo=(prod&&prod.photos&&prod.photos[0])||'';
+    return '<div class="appl-card"><div style="display:flex;gap:9px;align-items:flex-start">'
+      +(photo?'<img src="'+esc(photo)+'" style="width:52px;height:52px;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--b)">':'')
+      +'<div style="flex:1;min-width:0"><div class="order-no">'+esc(o.orderNo||o.id)+(o.prodNo?' · '+esc(o.prodNo):'')+'</div>'
       +'<div style="font-size:12px;font-weight:600">'+esc(o.productTitle)+' ×'+o.qty+'</div>'
+      +(o.barcode?'<div style="font-size:10px;color:var(--mt2)"><i class="ti ti-barcode"></i> '+esc(o.barcode)+'</div>':'')
+      +'</div></div>'
+      +deliveryCountdown(o)
       +'<div style="font-size:11px;color:var(--mt)">To: '+esc(o.buyerName)+' · '+esc(o.buyerAddr||'')+'</div>'
       +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> Navigate</a></div>':'')
       +(typeof distancesHtml==='function'?distancesHtml(o):'')
@@ -8064,7 +8095,7 @@ function showAgentDashboard(){
           +'<button class="ord-next" style="background:var(--gold);color:#000" onclick="acceptPickup(\''+o.id+'\')"><i class="ti ti-hand-grab"></i> Accept this pickup</button></div>';
       }).join('');
   }
-  body.innerHTML=head+poolHtml+(myOrders.length?'<div style="font-size:11px;font-weight:700;color:var(--mt);margin:14px 0 7px;text-transform:uppercase">My deliveries</div>':'')+content;
+  body.innerHTML=head+poolHtml+(myOrders.length?('<div style="font-size:11px;font-weight:700;color:var(--mt);margin:14px 0 7px;text-transform:uppercase">My deliveries</div>'+filterTabs):'')+content;
   document.getElementById('agentdash-ovl').classList.add('open');
 }
 function agentUpdateStatus(orderId,idx){
@@ -9315,7 +9346,7 @@ function rbNavBack(){
   var box=document.getElementById('ps-results');if(!box)return;
   var s=__rbNav.pop();
   if(s){box.innerHTML=s.html;box.scrollTop=s.top||0;__rbView=s.view||null;try{fkInitMotion(box);}catch(e){}}
-  else { openMainStore(); }
+  else { closeOvl('prodsearch-ovl'); }  // nothing to go back to → close the store
 }
 function rbNavHome(){ __rbNav=[]; openMainStore(); }
 function rbRefresh(btn){
@@ -9735,6 +9766,27 @@ function jobSkillGap(profile,job){
   miss=miss.filter(function(v,i){return miss.indexOf(v)===i;}).slice(0,8);
   return {have:have,miss:miss};
 }
+var RB_SKILLS=['react','node','nodejs','javascript','typescript','python','java','sql','aws','azure','gcp','docker','kubernetes','git','html','css','php','laravel','django','flask','spring','go','rust','swift','kotlin','flutter','android','ios','figma','photoshop','illustrator','seo','marketing','excel','tableau','powerbi','accounting','sales','communication','leadership','devops','linux','mongodb','postgres','mysql','redis','graphql','rest','api','agile','scrum','testing','qa','machine','learning','ml','data','analytics','vue','angular','tailwind','wordpress','shopify','salesforce','sap','autocad','nursing','welding','driving','forklift','plumbing','electrical','hvac','cooking','barista','cashier','logistics','procurement','recruitment','payroll','bookkeeping'];
+function myLatestCV(){if(!CU)return null;var cvs=getCVs(CU.uid)||[];return cvs.length?cvs[cvs.length-1]:null;}
+function extractSkillsFromText(text){
+  var toks={};String(text||'').toLowerCase().replace(/[^a-z0-9+#]/g,' ').split(/\s+/).forEach(function(w){if(RB_SKILLS.indexOf(w)>=0)toks[w]=1;});
+  return Object.keys(toks);
+}
+function agentPullCVSkills(){
+  var cv=myLatestCV();
+  if(!cv){toast('No CV found — upload one when applying to a job, then try again','info');return;}
+  if(!cv.text){toast('This CV has no readable text (it may be an image/scan). Type your skills instead.','info');return;}
+  var sk=extractSkillsFromText(cv.text);
+  if(!sk.length){toast('Could not detect known skills in the CV — type them in','info');return;}
+  var ta=document.getElementById('ja-skills');
+  var cur=(ta&&ta.value?ta.value.split(/[,;]+/).map(function(s){return s.trim().toLowerCase();}):[]);
+  sk.forEach(function(s){if(cur.indexOf(s)<0)cur.push(s);});
+  var joined=cur.filter(Boolean).join(', ');
+  if(ta)ta.value=joined;
+  var cfg=getAgentCfg();cfg.skills=joined;saveAgentCfg(cfg);
+  toast('Added '+sk.length+' skills from your CV ✓','ok');
+  openJobAgent();
+}
 function openJobAgent(){
   if(!requireAuth('use the AI Job Agent'))return;
   var c=getAgentCfg();var prof=agentProfile();var ats=atsReadiness();
@@ -9748,6 +9800,16 @@ function openJobAgent(){
   var body=''
     +'<div class="ja-hero"><h3><i class="ti ti-robot"></i> Your 24/7 job hunter</h3>'
     +'<p>I read your CV &amp; skills, score every Reedbi job, and — with your permission — apply to strong matches automatically. I scan while Reedbi is open.</p></div>'
+    +(function(){var cv=myLatestCV();return '<div class="ja-row"><div style="flex:1"><b><i class="ti ti-file-cv" style="color:#7c3aed"></i> Connected CV</b><small>'+(cv?esc(cv.name||'CV uploaded'):'No CV yet — upload one when you apply to a job')+'</small></div>'+(cv&&cv.text?'<button class="ja-actbtn ja-apply" style="white-space:nowrap" onclick="agentPullCVSkills()"><i class="ti ti-download"></i> Use CV skills</button>':'')+'</div>';})()
+    +'<details class="acct-group" style="margin:8px 0"><summary><span class="gi" style="background:#7c3aed22;color:#7c3aed"><i class="ti ti-route"></i></span> How the agent works &amp; its priorities<i class="ti ti-chevron-right chev"></i></summary><div class="acct-body" style="font-size:11.5px;line-height:1.6;color:var(--mt)">'
+      +'<b>1. Reads you:</b> pulls skills from your uploaded CV + the skills box below.<br>'
+      +'<b>2. Scores jobs:</b> every Reedbi/Tag Talk job gets a match %, with a skill-gap (what to learn).<br>'
+      +'<b>3. Priority 1 — Reedbi:</b> auto-applies to Reedbi jobs at your threshold (≥70%).<br>'
+      +'<b>4. Priority 2 — outside Reedbi:</b> jobs on LinkedIn/Indeed at 70%+ — <span style="color:#f59e0b">needs the Reedbi cloud agent (backend) + those sites\' official APIs</span>.<br>'
+      +'<b>5. AI interview:</b> a practice interview from your CV — <span style="color:#f59e0b">a real evaluating AI needs the cloud agent</span>.<br>'
+      +'<b>6. Human interview:</b> if you pass, schedule with the employer — <span style="color:#f59e0b">needs calendar/email backend</span>.<br>'
+      +'<div style="margin-top:6px;color:var(--mt2)">✅ Live now: steps 1–3 inside Reedbi. The amber steps are the cloud-agent roadmap.</div>'
+      +'</div></details>'
     +'<div class="ja-row"><div><b>Enable AI Job Agent</b><small>Scan jobs &amp; notify me of matches</small></div><div onclick="agentSet(\'enabled\')">'+sw(c.enabled)+'</div></div>'
     +'<div class="ja-row"><div><b>Auto-apply (≥70% only)</b><small>Apply automatically without asking each time</small></div><div onclick="agentSet(\'autoApply\')">'+sw(c.autoApply)+'</div></div>'
     +'<div class="ja-row"><div><b>Mute agent sound</b><small>Still shows matches, no chime</small></div><div onclick="agentSet(\'muted\')">'+sw(c.muted)+'</div></div>'
@@ -10568,12 +10630,18 @@ function openBulkList(){
     document.body.appendChild(ovl);}
   var cur=(CU&&CU.currency)||'AED';
   document.getElementById('bulk-body').innerHTML=
-    '<div class="bulk-help"><b>One product per line:</b><br><code>Title | price | qty | category | barcode</code><br>Category &amp; barcode are optional. Example:<br><code>Red Apples 1kg | 12 | 50 | Fruits | 6299200048576</code><br><code>Loose Dates 1kg | 25 | 30 | Grocery</code></div>'
-    +'<div class="fg"><label>Currency</label><input type="text" id="bulk-cur" value="'+esc(cur)+'" style="width:90px"></div>'
+    '<div class="bulk-help"><b><i class="ti ti-bulb"></i> Add many products fast — one per line:</b><div style="margin-top:6px;font-family:monospace;background:var(--card);border-radius:7px;padding:7px 9px;font-size:11px">Title <span style="color:var(--mt2)">|</span> price <span style="color:var(--mt2)">|</span> qty <span style="color:var(--mt2)">|</span> category <span style="color:var(--mt2)">|</span> barcode</div><div style="margin-top:6px;font-size:11px;color:var(--mt2)">Only <b>Title, price &amp; qty</b> are required. No barcode? Reedbi makes one. Each product also gets a product number automatically.</div></div>'
+    +'<div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:8px"><div class="fg" style="margin:0"><label>Currency</label><input type="text" id="bulk-cur" value="'+esc(cur)+'" style="width:90px"></div><button type="button" class="care-opt" style="margin-left:auto;border-color:#0a66c2;color:#0a66c2" onclick="bulkFillSample()"><i class="ti ti-template"></i> Insert example</button></div>'
     +'<textarea class="bulk-ta" id="bulk-ta" placeholder="Red Apples 1kg | 12 | 50 | Fruits | 6299200048576&#10;Bananas | 6 | 80 | Fruits&#10;Tomatoes 1kg | 8 | 40 | Vegetables" oninput="bulkPreview()"></textarea>'
     +'<div id="bulk-prev"></div>'
     +'<button class="btn btnok" style="width:100%;margin-top:11px" onclick="bulkSubmit(\''+escJS(sellAs)+'\')"><i class="ti ti-circle-plus"></i> Add all products</button>';
   ovl.classList.add('open');
+}
+function bulkFillSample(){
+  var ta=document.getElementById('bulk-ta');if(!ta)return;
+  if(ta.value.trim()){ta.value+='\n';}
+  ta.value+='Red Apples 1kg | 12 | 50 | Fruits | 6299200048576\nBananas | 6 | 80 | Fruits\nTomatoes 1kg | 8 | 40 | Vegetables';
+  bulkPreview();
 }
 function bulkParse(){
   var ta=document.getElementById('bulk-ta');if(!ta)return [];
@@ -10842,5 +10910,12 @@ function renderHome(){
 
   box.innerHTML=hero+'<div class="home-body">'+attn+rvSec+picksSec+quick+'</div>';
   box.scrollTop=0;
+}
+
+var __buyDeliver='asap';
+function selectDeliver(v){
+  __buyDeliver=v;window.__buyDeliver=v;
+  ['asap','1h','2h','sched'].forEach(function(k){var b=document.getElementById('dlv-'+k);if(b)b.classList.toggle('sel',k===v);});
+  var s=document.getElementById('buy-sched');if(s)s.style.display=(v==='sched')?'block':'none';
 }
 </script></body></html>
