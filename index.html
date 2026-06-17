@@ -1148,7 +1148,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v146</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v147</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5843,7 +5843,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v146 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v147 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11750,20 +11750,20 @@ function learnCardHtml(){
    celebrate milestones — turning self-improvement into a satisfying daily ritual.
    Preset habits are framed positively and universally (no labels). */
 var RB_HABIT_PRESETS=[
+  {n:'Work on my business',ic:'briefcase',c:'#0a66c2',topic:'Growth'},
+  {n:'Practice speaking / talking to people',ic:'microphone',c:'#db2777',topic:'Growth'},
+  {n:'Learn something new',ic:'bulb',c:'#7c3aed',topic:'Growth'},
+  {n:'Read 10 pages',ic:'book',c:'#0d9488',topic:'Growth'},
+  {n:'Plan my day',ic:'list-check',c:'#f59e0b',topic:'Focus'},
+  {n:'Deep work — no distractions',ic:'target',c:'#475569',topic:'Focus'},
   {n:'Morning reflection',ic:'sunrise',c:'#f59e0b',topic:'Mind'},
-  {n:'Gratitude — 3 good things',ic:'heart',c:'#db2777',topic:'Mind'},
-  {n:'Read 10 pages',ic:'book',c:'#7c3aed',topic:'Growth'},
-  {n:'Learn one new thing',ic:'bulb',c:'#0a66c2',topic:'Growth'},
+  {n:'Gratitude — 3 good things',ic:'heart',c:'#e11d48',topic:'Mind'},
   {n:'Drink enough water',ic:'droplet',c:'#06b6d4',topic:'Health'},
   {n:'Walk 20 minutes',ic:'walk',c:'#16a34a',topic:'Health'},
-  {n:'Sleep early',ic:'moon',c:'#475569',topic:'Health'},
+  {n:'Exercise',ic:'barbell',c:'#16a34a',topic:'Health'},
+  {n:'Sleep early',ic:'moon',c:'#64748b',topic:'Health'},
   {n:'Help someone today',ic:'hand-love-you',c:'#e11d48',topic:'Kindness'},
-  {n:'Give a little (charity)',ic:'gift',c:'#0d9488',topic:'Kindness'},
-  {n:'Speak only kindly',ic:'message-heart',c:'#db2777',topic:'Kindness'},
-  {n:'Honest in all dealings',ic:'shield-check',c:'#0a66c2',topic:'Discipline'},
-  {n:'Avoid waste',ic:'recycle',c:'#16a34a',topic:'Discipline'},
-  {n:'No idle scrolling',ic:'device-mobile-off',c:'#475569',topic:'Discipline'},
-  {n:'Wake up on time',ic:'alarm',c:'#f59e0b',topic:'Discipline'}
+  {n:'Save a little money',ic:'coins',c:'#0d9488',topic:'Discipline'}
 ];
 var RB_HABIT_TOPICS=['Health','Mind','Growth','Kindness','Discipline'];
 function getHabits(){return LS.get('rb_habits',[])||[];}
@@ -11789,19 +11789,24 @@ function renderHabits(){
   var habits=getHabits();var box=document.getElementById('habits-body');if(!box)return;
   var h='<button class="btn btnok" style="width:100%;margin-bottom:12px" onclick="openAddHabit()"><i class="ti ti-plus"></i> Start a new habit</button>';
   if(!habits.length){
-    h+='<div class="home-empty" style="margin-bottom:12px">No habits yet. Start one above — pick a 40 or 90-day challenge and build a streak. 🌱</div>';
+    h+='<div class="home-empty" style="margin-bottom:12px">No habits yet. Start one above — set a goal, pick a length (7 days to 1 year), and build a streak. 🌱</div>';
   }
   h+=habits.map(function(hb){
     var p=habitProgress(hb);var doneToday=(hb.done||[]).indexOf(dayKey())>=0;var complete=p.done>=(hb.days||40);
-    var R=20,C=2*Math.PI*R,off=C*(1-p.pct/100);
+    var R=20,C=2*Math.PI*R,off=C*(1-p.pct/100);hb.notes=hb.notes||{};
+    var start=hb.startTs||Date.now();
     var grid='<div class="hab-grid">'+Array.from({length:hb.days||40}).map(function(_,i){
-      var on=i<p.done;return '<div class="hab-dot'+(on?' on':'')+(i===p.done&&!complete?' today':'')+'"></div>';
+      var dk=dayKey(start+i*86400000);var on=(hb.done||[]).indexOf(dk)>=0;var hasNote=!!hb.notes[dk];
+      return '<div class="hab-dot'+(on?' on':'')+(dk===dayKey()?' today':'')+'" title="day '+(i+1)+'" onclick="openHabitDay(\''+hb.id+'\','+i+')" style="cursor:pointer;position:relative">'+(hasNote&&!on?'<span style=\'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#e23b3b\'>✎</span>':'')+'</div>';
     }).join('')+'</div>';
     return '<div class="hab-card"><div class="hab-top"><div class="hab-ic" style="background:'+(hb.c||'#16a34a')+'"><i class="ti ti-'+(hb.ic||'check')+'"></i></div>'
-      +'<div style="flex:1;min-width:0"><div class="hab-name">'+esc(hb.n)+'</div><div class="hab-meta">'+esc(hb.topic||'')+' · '+(hb.days||40)+'-day challenge · 🔥 '+p.streak+'-day streak</div></div>'
+      +'<div style="flex:1;min-width:0"><div class="hab-name">'+esc(hb.n)+' <button style="background:none;border:none;color:var(--mt2);cursor:pointer;font-size:12px" onclick="openRenameHabit(\''+hb.id+'\')"><i class="ti ti-edit"></i></button></div><div class="hab-meta">'+esc(hb.topic||'')+' · '+((hb.days||40)===365?'1-year':(hb.days||40)+'-day')+' · 🔥 '+p.streak+'-day streak</div></div>'
       +'<div class="hab-ring"><svg width="46" height="46"><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="var(--card2)" stroke-width="4"/><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'"/></svg><div class="pc">'+p.pct+'%</div></div></div>'
+      +(hb.goal?'<div style="font-size:12px;margin-top:8px"><b>🎯 Goal:</b> '+esc(hb.goal)+'</div>':'')
+      +(hb.manifest?'<div style="font-size:12px;color:#0d9488;margin-top:3px;font-style:italic">✨ '+esc(hb.manifest)+'</div>':'')
+      +'<div style="font-size:10px;color:var(--mt2);margin-top:8px">Tap any day to add a reflection 📝</div>'
       +grid
-      +(complete?'<div class="learn-done" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;margin-top:11px"><i class="ti ti-trophy"></i> Challenge complete — '+(hb.days)+' days! 🎉</div>'
+      +(complete?'<div class="learn-done" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;margin-top:11px"><i class="ti ti-trophy"></i> Goal complete — '+(hb.days)+' days! 🎉</div>'
         :'<button class="hab-check'+(doneToday?' done':'')+'" onclick="toggleHabitToday(\''+hb.id+'\')">'+(doneToday?'<i class="ti ti-check"></i> Done today — '+p.left+' days to go':'<i class="ti ti-circle-check"></i> Mark done today')+'</button>')
       +'<div style="text-align:right;margin-top:6px"><button style="background:none;border:none;color:var(--mt2);font-size:11px;cursor:pointer" onclick="delHabit(\''+hb.id+'\')"><i class="ti ti-trash"></i> remove</button></div>'
       +'</div>';
@@ -11819,11 +11824,13 @@ function openAddHabit(){
     +'<div style="max-height:230px;overflow-y:auto">'+RB_HABIT_PRESETS.map(function(p,i){
       return '<div class="hab-preset" onclick="habPickPreset('+i+')" id="habp-'+i+'"><div class="ic" style="background:'+p.c+'"><i class="ti ti-'+p.ic+'"></i></div><div style="flex:1"><b style="font-size:13px">'+esc(p.n)+'</b><div style="font-size:10px;color:var(--mt2)">'+esc(p.topic)+'</div></div><i class="ti ti-circle-plus" style="color:#16a34a"></i></div>';
     }).join('')+'</div>'
+    +'<div class="fg" style="margin-top:12px"><label>🎯 Your goal (why this matters)</label><input id="hab-goal" placeholder="e.g. Start my business · Speak with confidence · Get fit"></div>'
+    +'<div class="fg" style="margin-top:7px"><label>✨ Your manifestation / affirmation</label><input id="hab-manifest" placeholder="e.g. I am becoming the person who shows up every day"></div>'
     +'<div style="font-size:12px;font-weight:700;margin:13px 0 7px">Challenge length</div>'
-    +'<div style="display:flex;gap:8px" id="hab-days-row">'+[40,90].map(function(d){return '<button class="hab-chip'+(d===40?' on':'')+'" onclick="habSetDays('+d+')" id="habd-'+d+'">'+d+' days</button>';}).join('')+'</div>'
-    +'<button class="btn btnok" style="width:100%;margin-top:14px" onclick="createHabit()"><i class="ti ti-rocket"></i> Begin challenge</button>';
+    +'<div style="display:flex;gap:7px;flex-wrap:wrap" id="hab-days-row">'+[7,30,40,50,90,365].map(function(d){return '<button class="hab-chip'+(d===40?' on':'')+'" onclick="habSetDays('+d+')" id="habd-'+d+'">'+(d===365?'1 year':d+' days')+'</button>';}).join('')+'</div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:14px" onclick="createHabit()"><i class="ti ti-rocket"></i> Begin my journey</button>';
 }
-function habSetDays(d){__habNewDays=d;[40,90].forEach(function(x){var b=document.getElementById('habd-'+x);if(b)b.className='hab-chip'+(x===d?' on':'');});}
+function habSetDays(d){__habNewDays=d;[7,30,40,50,90,365].forEach(function(x){var b=document.getElementById('habd-'+x);if(b)b.className='hab-chip'+(x===d?' on':'');});}
 function habPickPreset(i){__habPreset=i;document.querySelectorAll('.hab-preset').forEach(function(el,idx){el.style.borderColor=(idx===i?'#16a34a':'var(--b)');el.style.background=(idx===i?'rgba(22,163,74,.08)':'transparent');});var ci=document.getElementById('hab-custom');if(ci)ci.value='';}
 function createHabit(){
   var custom=((document.getElementById('hab-custom')||{}).value||'').trim();
@@ -11831,10 +11838,12 @@ function createHabit(){
   if(custom){hb={id:'hab'+Date.now(),n:custom,ic:'star',c:'#0a66c2',topic:'Custom'};}
   else if(__habPreset!=null){var p=RB_HABIT_PRESETS[__habPreset];hb={id:'hab'+Date.now(),n:p.n,ic:p.ic,c:p.c,topic:p.topic};}
   else{toast('Type a habit or pick one','err');return;}
-  hb.days=__habNewDays;hb.startTs=Date.now();hb.done=[];
+  hb.days=__habNewDays;hb.startTs=Date.now();hb.done=[];hb.notes={};
+  hb.goal=((document.getElementById('hab-goal')||{}).value||'').trim();
+  hb.manifest=((document.getElementById('hab-manifest')||{}).value||'').trim();
   var habits=getHabits();habits.unshift(hb);saveHabits(habits);
   try{rbConfetti(70);}catch(e){}
-  toast('Challenge started — see you tomorrow! 🌱','ok');
+  toast('Your journey has begun — see you tomorrow! 🌱','ok');
   renderHabits();
 }
 function toggleHabitToday(id){
@@ -11844,13 +11853,55 @@ function toggleHabitToday(id){
   hb.done.push(k);saveHabits(habits);
   var l=loyalty();l.points=(l.points||0)+3;saveLoyalty(l);
   var p=habitProgress(hb);
-  var milestone=(p.done===hb.days)||(p.done%10===0);
-  try{rbConfetti(milestone?140:60);if(!getNotifCfg().muted)playTune('reedbi');}catch(e){}
-  if(p.done>=hb.days){toast('🏆 '+hb.days+'-day challenge complete! Amazing!','ok');}
-  else if(p.done%10===0){toast('🔥 '+p.done+' days! +3 points · keep going','ok');}
-  else{toast('+3 points · day '+p.done+' of '+hb.days+' 🌱','ok');}
+  var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
+  var mileMsg=null;
+  if(p.done>=hb.days)mileMsg='🏆 '+nm+', you completed your '+(hb.days===365?'1-year':hb.days+'-day')+' goal: '+hb.n+'! Incredible journey.';
+  else if(p.done===7)mileMsg='🌟 '+nm+', a full week of '+hb.n+'! You are building something real.';
+  else if(p.done===30)mileMsg='🔥 '+nm+', 30 days strong! Keep going — your future self thanks you.';
+  else if(p.done===50)mileMsg='💪 '+nm+', 50 days! You are unstoppable. Continue your journey.';
+  else if(p.done===100)mileMsg='👑 '+nm+', 100 days! This is who you are now.';
+  else if(p.done%10===0)mileMsg='🔥 '+nm+', '+p.done+' days! Keep going.';
+  var milestone=!!mileMsg && p.done>=7;
+  try{rbConfetti(milestone?150:60);if(!getNotifCfg().muted)playTune('reedbi');}catch(e){}
+  toast(mileMsg?mileMsg:('+3 points · day '+p.done+' of '+((hb.days||40)===365?365:hb.days)+' 🌱'),'ok');
   renderHabits();
   if(document.getElementById('home-scroll'))renderHome();
 }
 function delHabit(id){if(!confirm('Remove this habit and its progress?'))return;saveHabits(getHabits().filter(function(x){return x.id!==id;}));renderHabits();}
+
+/* ===== v147: habit per-day reflection journal + rename ===== */
+function openHabitDay(id,idx){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;hb.notes=hb.notes||{};
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+  var done=(hb.done||[]).indexOf(dk)>=0;
+  var ovl=document.getElementById('habday-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='habday-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:360px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b id="habday-title" style="font-size:14px"></b><button class="modal-x" onclick="closeOvl(\'habday-ovl\')"><i class="ti ti-x"></i></button></div><div id="habday-body"></div></div>';
+    document.body.appendChild(ovl);}
+  document.getElementById('habday-title').textContent='Day '+(idx+1)+' · '+hb.n;
+  document.getElementById('habday-body').innerHTML=
+    '<div style="display:flex;gap:8px;margin-bottom:10px"><button class="hab-chip'+(done?' on':'')+'" style="flex:1" onclick="habDaySet(\''+id+'\','+idx+',true)"><i class="ti ti-check"></i> Achieved</button>'
+    +'<button class="hab-chip'+(!done?' on':'')+'" style="flex:1" onclick="habDaySet(\''+id+'\','+idx+',false)"><i class="ti ti-x"></i> Missed</button></div>'
+    +'<div class="fg"><label>'+(done?'Reflection — how did it go?':'What got in the way? (be kind to yourself)')+'</label><textarea id="habday-note" rows="3" placeholder="Write a line for your future self...">'+esc(hb.notes[dk]||'')+'</textarea></div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:10px" onclick="habDaySaveNote(\''+id+'\','+idx+')"><i class="ti ti-device-floppy"></i> Save reflection</button>';
+  ovl.classList.add('open');
+}
+function habDaySet(id,idx,achieved){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;hb.done=hb.done||[];
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);var i=hb.done.indexOf(dk);
+  if(achieved&&i<0){hb.done.push(dk);}else if(!achieved&&i>=0){hb.done.splice(i,1);}
+  saveHabits(habits);openHabitDay(id,idx);renderHabits();
+}
+function habDaySaveNote(id,idx){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;hb.notes=hb.notes||{};
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+  hb.notes[dk]=((document.getElementById('habday-note')||{}).value||'').trim();
+  saveHabits(habits);closeOvl('habday-ovl');renderHabits();
+  toast('Reflection saved 📝','ok');
+}
+function openRenameHabit(id){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  var nn=prompt('Rename this habit / goal:',hb.n);if(nn===null)return;nn=nn.trim();if(!nn)return;
+  hb.n=nn;saveHabits(habits);renderHabits();
+}
 </script></body></html>
