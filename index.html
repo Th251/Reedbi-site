@@ -825,7 +825,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .col-track{background:var(--card2);border-radius:9px;padding:9px 11px;font-size:11px;margin-top:7px}
 .col-track b{color:var(--tx)}
 /* yellow AI care */
-.care-fab{position:fixed;right:16px;bottom:74px;z-index:7200;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#ffd23f,#ffb800);color:#3a2a00;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(255,184,0,.5);display:flex;align-items:center;justify-content:center;font-size:24px}
+.care-fab{position:fixed;right:14px;bottom:120px;z-index:7200;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#ffd23f,#ffb800);color:#3a2a00;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(255,184,0,.5);display:flex;align-items:center;justify-content:center;font-size:24px}
 .care-modal{max-width:430px}
 .care-hero{background:linear-gradient(135deg,#ffe169,#ffb800);border-radius:14px;padding:15px;margin-bottom:12px;color:#3a2a00}
 .care-hero h3{font-size:16px;font-weight:800;display:flex;align-items:center;gap:7px}
@@ -851,7 +851,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .acct-group .acct-body{padding:7px 9px 9px}
 .acct-group .acct-item{border-radius:9px;margin-bottom:4px}
 .acct-locked{font-size:11px;color:var(--mt2);padding:9px 11px;line-height:1.5}
-.scroll-btns{position:fixed;right:14px;bottom:140px;z-index:7100;display:flex;flex-direction:column;gap:8px;opacity:0;pointer-events:none;transition:opacity .2s}
+.scroll-btns{position:fixed;right:14px;bottom:182px;z-index:7100;display:flex;flex-direction:column;gap:8px;opacity:0;pointer-events:none;transition:opacity .2s}
 .scroll-btns.show{opacity:1;pointer-events:auto}
 .scroll-btns button{width:42px;height:42px;border-radius:50%;border:none;background:var(--sf);color:var(--tx);box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;border:1px solid var(--b)}
 .scroll-btns button:active{transform:scale(.92)}
@@ -1148,7 +1148,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v145</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v146</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5843,7 +5843,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v145 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v146 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6787,11 +6787,67 @@ function showCart(){
   document.getElementById('cart-ovl').classList.add('open');
 }
 function checkoutCart(){
+  var cart=getCart();if(!cart.length){toast('Your bag is empty','info');return;}
+  if(!requireAuth('place an order'))return;
+  closeOvl('cart-ovl');
+  var ovl=document.getElementById('cartco-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='cartco-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:440px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:15px"><i class="ti ti-shopping-cart"></i> Place Order ('+cart.length+' items)</b><button class="modal-x" onclick="closeOvl(\'cartco-ovl\')"><i class="ti ti-x"></i></button></div><div id="cartco-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderCartCheckout();
+  ovl.classList.add('open');
+}
+function cartTotals(){
+  var cart=getCart();var byCur={};var n=0;
+  cart.forEach(function(it){var p=getProducts().find(function(x){return x.id===it.productId;});if(!p)return;
+    var unit=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0;var cur=p.currency||'';
+    byCur[cur]=(byCur[cur]||0)+unit*(it.qty||1);n+=(it.qty||1);});
+  return {byCur:byCur,n:n};
+}
+function renderCartCheckout(){
+  var cart=getCart();var box=document.getElementById('cartco-body');if(!box)return;
+  var items=cart.map(function(it){var p=getProducts().find(function(x){return x.id===it.productId;});if(!p)return '';
+    return '<div style="display:flex;gap:9px;align-items:center;padding:7px 0;border-bottom:1px solid var(--b)"><img src="'+esc((p.photos&&p.photos[0])||'')+'" style="width:40px;height:40px;border-radius:8px;object-fit:cover;background:var(--card2)"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">'+esc(p.title)+'</div><div style="font-size:11px;color:var(--mt2)">'+esc(p.currency||'')+' '+esc(p.price)+' × '+(it.qty||1)+'</div></div></div>';
+  }).join('');
+  var t=cartTotals();var totalStr=Object.keys(t.byCur).map(function(cur){return esc(cur)+' '+Math.round(t.byCur[cur]*100)/100;}).join(' + ');
+  box.innerHTML=items
+    +'<div style="display:flex;justify-content:space-between;font-weight:800;margin:10px 0 12px"><span>Total</span><span style="color:var(--g)">'+totalStr+'</span></div>'
+    +'<div id="cartco-saved" style="margin-bottom:8px"></div>'
+    +'<div class="fg"><label>Delivery address</label><textarea id="cartco-addr" rows="2" placeholder="Full delivery address"></textarea></div>'
+    +'<div class="fg" style="margin-top:7px"><label>Your WhatsApp number</label><input id="cartco-phone" placeholder="+1 234 567 8900"></div>'
+    +'<div class="fg" style="margin-top:7px"><label>Payment</label><div class="pay-row" id="cartco-pay"><button type="button" class="pay-opt sel" data-m="cod" onclick="cartcoPay(\'cod\')"><i class="ti ti-cash"></i> Cash on Delivery</button><button type="button" class="pay-opt" data-m="upi" onclick="cartcoPay(\'upi\')"><i class="ti ti-qrcode"></i> UPI / GPay</button></div></div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:13px;padding:13px" onclick="confirmCartOrder()"><i class="ti ti-circle-check"></i> Place Order — '+t.n+' item'+(t.n!==1?'s':'')+'</button>';
+  try{var sa=getAddresses();if(sa&&sa.length){document.getElementById('cartco-saved').innerHTML='<div style="font-size:11px;color:var(--mt2);margin-bottom:4px">Saved addresses</div>'+sa.map(function(a,i){return '<button class="hab-chip" style="margin:0 6px 6px 0" onclick="cartcoUseAddr('+i+')">'+esc(a.label||('Address '+(i+1)))+'</button>';}).join('');}}catch(e){}
+}
+var __cartcoPay='cod';
+function cartcoPay(m){__cartcoPay=m;document.querySelectorAll('#cartco-pay .pay-opt').forEach(function(b){b.className='pay-opt'+(b.getAttribute('data-m')===m?' sel':'');});}
+function cartcoUseAddr(i){var a=getAddresses()[i];if(!a)return;document.getElementById('cartco-addr').value=a.addr||'';document.getElementById('cartco-phone').value=a.phone||'';}
+function confirmCartOrder(){
   var cart=getCart();if(!cart.length)return;
-  // place an order per item (reuses existing order flow), then clear cart
-  var first=cart[0];var p=getProducts().find(function(x){return x.id===first.productId;});
-  if(p){closeOvl('cart-ovl');buyProduct(p.id);} // opens the buy/checkout for the first; full multi-checkout would need backend
-  toast('Proceeding to checkout','info');
+  var addr=(document.getElementById('cartco-addr')||{}).value||'';addr=addr.trim();
+  var phone=(document.getElementById('cartco-phone')||{}).value||'';phone=phone.trim();
+  if(!addr||!phone){toast('Enter delivery address and WhatsApp number','err');return;}
+  var orders=getOrders();var created=[];
+  cart.forEach(function(it){
+    var p=getProducts().find(function(x){return x.id===it.productId;});if(!p)return;
+    ensureProdMeta(p);
+    var orderNo='RB-'+Date.now().toString(36).toUpperCase().slice(-5)+Math.floor(Math.random()*90+10);
+    var o={id:'ord'+Date.now()+Math.floor(Math.random()*100000),orderNo:orderNo,prodNo:p.prodNo,barcode:p.barcode,
+      byWeight:!!p.byWeight,weightUnit:p.weightUnit||'',orderedWeight:(p.byWeight?(it.qty||1):0),
+      productId:p.id,productTitle:p.title+(it.size?' ['+it.size+']':''),size:it.size||'',price:p.price,currency:p.currency,qty:(it.qty||1),
+      sellerUid:p.sellerUid,sellerName:p.sellerName,pageName:(p.pageName||''),buyerUid:CU.uid,buyerEmail:(CU.email||'').toLowerCase(),buyerName:CU.name,
+      buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:'',payMethod:__cartcoPay,status:'placed',
+      storeMap:(p.map||p.geo||''),storeAddr:(p.addr||''),deliverBy:'asap',deliverByTs:0,scheduledTs:0,ts:Date.now()};
+    orders.unshift(o);created.push(o);
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o).catch(function(){});}catch(e){}}
+  });
+  saveOrders(orders);
+  saveCart([]);
+  if(typeof updateCartBadge==='function'){try{updateCartBadge();}catch(e){}}
+  closeOvl('cartco-ovl');
+  try{rbConfetti(120);}catch(e){}
+  if(__cartcoPay==='upi'&&created.length){showUpiPayment(created[0]);toast(created.length+' orders placed — pay each shop via UPI','ok');}
+  else{toast(created.length+' orders placed! Track them in My Orders.','ok');try{showMyOrders();}catch(e){}}
 }
 function buyProduct(productId){
   if(!requireAuth('place an order'))return;
