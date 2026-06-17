@@ -332,7 +332,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .buy-gallery::-webkit-scrollbar{display:none}
 .buy-gimg{width:100%;flex:0 0 100%;height:200px;object-fit:cover;border-radius:10px;scroll-snap-align:center}
 .overlay.open{display:flex}
-.modal{background:var(--sf);border:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;display:flex;flex-direction:column;max-height:92vh}
+.modal{background:var(--sf);border:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
 .mhd{padding:13px 16px 10px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .mhd h3{font-size:14px;font-weight:700}
 .mbd{padding:13px 16px;overflow-y:auto;flex:1}
@@ -937,6 +937,22 @@ body.dark .spin-wheel{border-color:#2a333f}
 .hab-preset .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
 .hab-chip{border:1px solid var(--b);background:var(--card2);border-radius:18px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;color:var(--tx)}
 .hab-chip.on{background:var(--g);color:#fff;border-color:var(--g)}
+/* ===== v150: daily goals sheet ===== */
+.gs-daystrip{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 8px;-webkit-overflow-scrolling:touch}
+.gs-day{flex:0 0 auto;width:44px;text-align:center;cursor:pointer}
+.gs-day .ring{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:2px solid var(--b);background:var(--card2);color:var(--mt)}
+.gs-day.done .ring{background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;border-color:transparent}
+.gs-day.partial .ring{background:#fff7ed;color:#c2410c;border-color:#fdba74}
+.gs-day.miss .ring{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+.gs-day.today .ring{outline:2px solid var(--gold);outline-offset:1px}
+.gs-day small{font-size:9px;color:var(--mt2);display:block;margin-top:2px}
+.gs-goal{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--b)}
+.gs-goal .nm{flex:1;font-size:13px;font-weight:600}
+.gs-mk{width:34px;height:34px;border-radius:9px;border:1px solid var(--b);background:var(--card2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px}
+.gs-mk.don{background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;border-color:transparent}
+.gs-mk.mis{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+.gs-score{font-size:34px;font-weight:800;text-align:center}
+
 
 
 .ach-badge{display:inline-flex;flex-direction:column;align-items:center;gap:3px;width:72px;text-align:center}
@@ -1148,7 +1164,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v147</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v150</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5736,6 +5752,7 @@ function openAccountMenu(){
     +item('showMyOrders()','package','','My Orders','track &amp; manage purchases')
     +item('openSpin()','gift','#7c3aed','Daily Spin &amp; Rewards','free points · your shopper level')
     +item('openHabits()','checkup-list','#16a34a','Habit Tracker','40 &amp; 90-day challenges · build streaks')
+    +item('openGoalSheet()','checklist','#0d9488','Daily Goals Sheet','tick your goals every day · score')
     +item('rbOnboard(true)','help-circle','#0a8f5c','How Reedbi works','quick tour of the app')
     +item('openCareAi()','headset','#ffb800','Reedbi Care','orders, delivery, returns &amp; refunds')
     +item('openMyTickets()','ticket','#ffb800','My Support Tickets','status &amp; emailed decisions')
@@ -5843,7 +5860,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v147 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v150 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11787,7 +11804,13 @@ function openHabits(){
 }
 function renderHabits(){
   var habits=getHabits();var box=document.getElementById('habits-body');if(!box)return;
-  var h='<button class="btn btnok" style="width:100%;margin-bottom:12px" onclick="openAddHabit()"><i class="ti ti-plus"></i> Start a new habit</button>';
+  var remOn=habRemindOn();
+  var h='<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
+    +'<div style="font-size:20px">'+(remOn?'🔔':'🔕')+'</div><div style="flex:1"><div style="font-size:13px;font-weight:800">Daily reminders</div><div style="font-size:10px;color:var(--mt2)">A gentle nudge at 5:00 AM &amp; 9:30 PM</div></div>'
+    +(remOn?'<button class="hab-chip on" onclick="disableHabitReminders()">On</button>':'<button class="hab-chip" onclick="enableHabitReminders()">Turn on</button>')+'</div>'
+    +(remOn?'<div style="display:flex;align-items:center;gap:8px;margin:-4px 0 11px;font-size:12px"><span style="color:var(--mt2)">Motivational tune</span><select id="hab-tune" onchange="habSetTune(this.value)" style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--b);background:var(--sf);color:var(--tx)">'+habTuneOptions()+'</select><button class="hab-chip" onclick="habPreviewTune()"><i class="ti ti-player-play"></i></button></div>':'');
+  h+='<button class="btn" style="width:100%;margin-bottom:9px;border:1.5px solid #16a34a;color:#16a34a;font-weight:800" onclick="closeOvl(\'habits-ovl\');openGoalSheet()"><i class="ti ti-checklist"></i> Open my Daily Goals Sheet (tick each goal daily)</button>';
+  h+='<button class="btn btnok" style="width:100%;margin-bottom:12px" onclick="openAddHabit()"><i class="ti ti-plus"></i> Start a single-habit challenge</button>';
   if(!habits.length){
     h+='<div class="home-empty" style="margin-bottom:12px">No habits yet. Start one above — set a goal, pick a length (7 days to 1 year), and build a streak. 🌱</div>';
   }
@@ -11904,4 +11927,150 @@ function openRenameHabit(id){
   var nn=prompt('Rename this habit / goal:',hb.n);if(nn===null)return;nn=nn.trim();if(!nn)return;
   hb.n=nn;saveHabits(habits);renderHabits();
 }
+
+/* ===== v148: daily habit reminders + warm dopamine messages =====
+   Opt-in reminders at ~5:00 AM and ~9:30 PM with a sound and a different
+   heart-touching message each time. HONEST: these fire while Reedbi is open or
+   backgrounded in the browser. True "ring even when fully closed" (like WhatsApp)
+   needs Web Push + a service worker + a push server (Firebase Cloud Messaging) —
+   a backend step. This gives the real in-app experience now. */
+var RB_WELCOMES_AM=[
+  'Good morning, %s! 🌅 A fresh day, a fresh page. What will you achieve today?',
+  'Rise and shine, %s! ☀️ Your goals are waiting. One small step today.',
+  'Morning, %s! 🌱 Tiny actions, repeated daily, become your destiny.',
+  'Hey %s! 🌞 The best time to grow is now. Set your intention for today.',
+  'Wake up, %s! 💪 Today is yours to shape. Show up for your future self.',
+  'Good morning, %s! ✨ You are one day closer to the person you want to be.',
+  'Hello %s! 🌷 Breathe, be grateful, and take one step toward your goal.',
+  'Morning, champion %s! 🏆 Consistency beats intensity. Begin gently.',
+  'Rise, %s! 🌄 Your dreams don\'t work unless you do — and you will.',
+  'Good morning %s! 🪴 Water your goals today. Small care, big growth.'
+];
+var RB_WELCOMES_PM=[
+  'Evening, %s! 🌙 How did today go? Take a moment to reflect and track.',
+  'Hey %s! ⭐ Before you rest, honour your progress. Mark your day.',
+  'Good evening, %s! 🌃 Every day you show up is a victory. Log it.',
+  'Wind down, %s! 💫 Reflect kindly — wins and lessons both count.',
+  'Evening, %s! 🕯️ You did your best today, and that is enough. Track it.',
+  'Hi %s! 🌌 A quiet moment to note today\'s journey. You\'re growing.',
+  'Good night soon, %s! 😌 Celebrate one thing you did well today.',
+  'Evening, %s! 🌠 Progress, not perfection. Update your tracker and rest.',
+  'Hey %s! 🛌 Reflect, breathe, be proud. Tomorrow is a new chance.',
+  'Evening %s! 🌙 Your consistency is quietly building something beautiful.'
+];
+function habRemindOn(){return LS.get('rb_habit_remind',false);}
+function habWelcome(am){
+  var pool=am?RB_WELCOMES_AM:RB_WELCOMES_PM;
+  var d=new Date();var seed=d.getFullYear()*366+(d.getMonth()*31)+d.getDate()+(am?0:200);
+  var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
+  return pool[seed%pool.length].replace('%s',nm);
+}
+function enableHabitReminders(){
+  function arm(){LS.set('rb_habit_remind',true);renderHabits&&document.getElementById('habits-body')&&renderHabits();toast('Daily reminders on — 5:00 AM & 9:30 PM 🌱','ok');}
+  if(typeof Notification!=='undefined'){
+    if(Notification.permission==='granted'){arm();}
+    else if(Notification.permission!=='denied'){Notification.requestPermission().then(function(p){if(p==='granted'){arm();}else{LS.set('rb_habit_remind',true);renderHabits&&document.getElementById('habits-body')&&renderHabits();toast('Reminders on (in-app). Allow notifications for pop-ups.','info');}});}
+    else{LS.set('rb_habit_remind',true);if(document.getElementById('habits-body'))renderHabits();toast('Notifications are blocked in your browser settings. In-app reminders are on.','info');}
+  } else {arm();}
+}
+function disableHabitReminders(){LS.set('rb_habit_remind',false);if(document.getElementById('habits-body'))renderHabits();toast('Daily reminders off','info');}
+function fireHabitReminder(am){
+  var msg=habWelcome(am);
+  try{if(!getNotifCfg().muted)playTune(LS.get('rb_habit_tune','melody'));}catch(e){}
+  try{if(typeof Notification!=='undefined'&&Notification.permission==='granted'){new Notification('Reedbi — '+(am?'Set your goal ☀️':'Track your day 🌙'),{body:msg,icon:'',tag:'rb-habit-'+(am?'am':'pm')});}}catch(e){}
+  try{toast(msg,'ok');}catch(e){}
+}
+// scheduler: checks every minute; fires once per slot per day when within the window
+(function(){
+  function check(){
+    if(!habRemindOn())return;
+    var now=new Date();var hm=now.getHours()*60+now.getMinutes();var today=dayKey();
+    var st=LS.get('rb_habit_remind_state',{am:'',pm:''})||{am:'',pm:''};
+    // AM window 5:00–5:10, PM window 21:30–21:40
+    if(hm>=300&&hm<=310&&st.am!==today){st.am=today;LS.set('rb_habit_remind_state',st);fireHabitReminder(true);}
+    if(hm>=1290&&hm<=1300&&st.pm!==today){st.pm=today;LS.set('rb_habit_remind_state',st);fireHabitReminder(false);}
+  }
+  setInterval(check,60000);setTimeout(check,3000);
+})();
+
+function habTuneOptions(){var cur=LS.get('rb_habit_tune','melody');return ['melody','reedbi','bell','ding','pop'].map(function(t){return '<option value="'+t+'"'+(cur===t?' selected':'')+'>'+t+'</option>';}).join('');}
+function habSetTune(t){LS.set('rb_habit_tune',t);try{playTune(t);}catch(e){}}
+function habPreviewTune(){try{playTune(LS.get('rb_habit_tune','melody'));}catch(e){}}
+
+/* ===== v150: Daily Goals Sheet =====
+   One tracker, your own list of goals set once. Each day you tick every goal
+   Achieved or Missed, note why you missed, and get a daily score (e.g. 9/10) in
+   green. Matches the classic paper habit sheet — for any life goal you choose. */
+function getSheet(){return LS.get('rb_goalsheet',{name:'My Daily Goals',goals:[],days:{},startTs:Date.now()})||{name:'My Daily Goals',goals:[],days:{},startTs:Date.now()};}
+function saveSheet(s){LS.set('rb_goalsheet',s);}
+function sheetDayScore(s,dk){
+  var d=s.days[dk];if(!d||!s.goals.length)return {done:0,total:s.goals.length,pct:0,state:'none'};
+  var done=0;s.goals.forEach(function(g){if(d.marks&&d.marks[g.id]==='done')done++;});
+  var pct=Math.round(done/s.goals.length*100);
+  var state=pct>=100?'done':(pct>=30?'partial':'miss');
+  return {done:done,total:s.goals.length,pct:pct,state:state};
+}
+function openGoalSheet(){
+  if(!requireAuth('use your goals sheet'))return;
+  var ovl=document.getElementById('gsheet-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='gsheet-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:460px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b id="gs-title" style="font-size:15px"></b><button class="modal-x" onclick="closeOvl(\'gsheet-ovl\')"><i class="ti ti-x"></i></button></div><div id="gsheet-body"></div></div>';
+    document.body.appendChild(ovl);}
+  __gsDay=dayKey();
+  renderGoalSheet();
+  ovl.classList.add('open');
+}
+var __gsDay=null;
+function renderGoalSheet(){
+  var s=getSheet();var box=document.getElementById('gsheet-body');if(!box)return;
+  document.getElementById('gs-title').innerHTML='<i class="ti ti-checklist" style="color:#16a34a"></i> '+esc(s.name)+' <button style="background:none;border:none;color:var(--mt2);cursor:pointer" onclick="renameSheet()"><i class="ti ti-edit"></i></button>';
+  // day strip: last 21 days
+  var strip='';var todayK=dayKey();
+  for(var i=20;i>=0;i--){var t=Date.now()-i*86400000;var dk=dayKey(t);var sc=sheetDayScore(s,dk);
+    var d=new Date(t);
+    strip+='<div class="gs-day '+sc.state+(dk===todayK?' today':'')+(dk===__gsDay?'':'')+'" onclick="gsPickDay(\''+dk+'\')"><div class="ring">'+(s.goals.length?sc.done+'/'+sc.total:'–')+'</div><small>'+(['S','M','T','W','T','F','S'][d.getDay()])+' '+d.getDate()+'</small></div>';
+  }
+  if(!s.goals.length){
+    box.innerHTML='<div class="home-empty" style="margin:6px 0 12px">Set your daily goals once. Each day, tick the ones you achieved — and get a score. 🌱</div>'+gsGoalEditor(s);
+    return;
+  }
+  var sel=__gsDay||todayK;var dsc=sheetDayScore(s,sel);var day=s.days[sel]||{marks:{},note:''};
+  var dd=new Date(); // header for selected day
+  box.innerHTML='<div class="gs-daystrip">'+strip+'</div>'
+    +'<div style="background:var(--card2);border-radius:12px;padding:12px;margin:8px 0 12px;text-align:center">'
+      +'<div class="gs-score" style="color:'+(dsc.state==='done'?'#16a34a':(dsc.state==='partial'?'#c2410c':'#dc2626'))+'">'+dsc.done+'/'+dsc.total+'</div>'
+      +'<div style="font-size:12px;color:var(--mt2)">'+(sel===todayK?'Today':sel)+' · '+dsc.pct+'%'+(dsc.state==='done'?' — all done! 🎉':(dsc.state==='miss'&&dsc.total?' — tough day, be kind to yourself':''))+'</div></div>'
+    +s.goals.map(function(g){var mk=(day.marks&&day.marks[g.id])||'';
+      return '<div class="gs-goal"><div class="nm">'+esc(g.name)+'</div>'
+        +'<button class="gs-mk '+(mk==='done'?'don':'')+'" onclick="markSheetGoal(\''+sel+'\',\''+g.id+'\',\'done\')" title="Achieved"><i class="ti ti-check"></i></button>'
+        +'<button class="gs-mk '+(mk==='miss'?'mis':'')+'" onclick="markSheetGoal(\''+sel+'\',\''+g.id+'\',\'miss\')" title="Missed"><i class="ti ti-x"></i></button></div>';
+    }).join('')
+    +'<div class="fg" style="margin-top:11px"><label>📝 Reflection — what went well, or why you missed</label><textarea id="gs-note" rows="2" placeholder="A line for your future self...">'+esc(day.note||'')+'</textarea></div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:8px" onclick="saveSheetNote(\''+sel+'\')"><i class="ti ti-device-floppy"></i> Save reflection</button>'
+    +'<div style="margin-top:14px">'+gsGoalEditor(s)+'</div>';
+}
+function gsGoalEditor(s){
+  return '<div style="font-size:12px;font-weight:800;margin:6px 0 7px">Your goals ('+s.goals.length+')</div>'
+    +s.goals.map(function(g){return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0"><span style="flex:1;font-size:13px">'+esc(g.name)+'</span><button style="background:none;border:none;color:var(--mt2);cursor:pointer" onclick="renameGoalItem(\''+g.id+'\')"><i class="ti ti-edit"></i></button><button style="background:none;border:none;color:#dc2626;cursor:pointer" onclick="delGoalItem(\''+g.id+'\')"><i class="ti ti-trash"></i></button></div>';}).join('')
+    +'<div style="display:flex;gap:7px;margin-top:7px"><input id="gs-newgoal" placeholder="Add a goal (e.g. Work on business, Speak to someone new)" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--b);background:var(--sf);color:var(--tx)"><button class="btn btnok" onclick="addGoalItem()"><i class="ti ti-plus"></i></button></div>';
+}
+function gsPickDay(dk){__gsDay=dk;renderGoalSheet();}
+function addGoalItem(){
+  var v=((document.getElementById('gs-newgoal')||{}).value||'').trim();if(!v)return;
+  var s=getSheet();s.goals.push({id:'g'+Date.now()+Math.floor(Math.random()*999),name:v});saveSheet(s);renderGoalSheet();
+}
+function renameGoalItem(id){var s=getSheet();var g=s.goals.find(function(x){return x.id===id;});if(!g)return;var nn=prompt('Rename goal:',g.name);if(nn===null)return;nn=nn.trim();if(nn){g.name=nn;saveSheet(s);renderGoalSheet();}}
+function delGoalItem(id){if(!confirm('Remove this goal?'))return;var s=getSheet();s.goals=s.goals.filter(function(x){return x.id!==id;});saveSheet(s);renderGoalSheet();}
+function renameSheet(){var s=getSheet();var nn=prompt('Rename your goals sheet:',s.name);if(nn===null)return;nn=nn.trim();if(nn){s.name=nn;saveSheet(s);renderGoalSheet();}}
+function markSheetGoal(dk,goalId,status){
+  var s=getSheet();s.days[dk]=s.days[dk]||{marks:{},note:''};s.days[dk].marks=s.days[dk].marks||{};
+  // toggle off if same status tapped again
+  if(s.days[dk].marks[goalId]===status)delete s.days[dk].marks[goalId];else s.days[dk].marks[goalId]=status;
+  saveSheet(s);
+  var sc=sheetDayScore(s,dk);
+  var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
+  if(sc.pct>=100&&sc.total){try{rbConfetti(130);if(!getNotifCfg().muted)playTune(LS.get('rb_habit_tune','melody'));}catch(e){}toast('🎉 '+nm+', '+sc.done+'/'+sc.total+' — goal completed today! Keep going!','ok');}
+  renderGoalSheet();
+}
+function saveSheetNote(dk){var s=getSheet();s.days[dk]=s.days[dk]||{marks:{},note:''};s.days[dk].note=((document.getElementById('gs-note')||{}).value||'').trim();saveSheet(s);toast('Reflection saved 📝','ok');}
 </script></body></html>
