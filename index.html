@@ -1164,7 +1164,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v150</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v152</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5751,8 +5751,7 @@ function openAccountMenu(){
   var act=item('showMyActivity()','layout-dashboard','var(--g)','My Activity','your jobs, orders, shop &amp; license in one place')
     +item('showMyOrders()','package','','My Orders','track &amp; manage purchases')
     +item('openSpin()','gift','#7c3aed','Daily Spin &amp; Rewards','free points · your shopper level')
-    +item('openHabits()','checkup-list','#16a34a','Habit Tracker','40 &amp; 90-day challenges · build streaks')
-    +item('openGoalSheet()','checklist','#0d9488','Daily Goals Sheet','tick your goals every day · score')
+    +item('openGoalSheet()','checklist','#16a34a','Habit &amp; Goal Tracker','set goals once · tick daily · 70%+ = done')
     +item('rbOnboard(true)','help-circle','#0a8f5c','How Reedbi works','quick tour of the app')
     +item('openCareAi()','headset','#ffb800','Reedbi Care','orders, delivery, returns &amp; refunds')
     +item('openMyTickets()','ticket','#ffb800','My Support Tickets','status &amp; emailed decisions')
@@ -5860,7 +5859,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v150 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v152 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11126,7 +11125,7 @@ function renderHome(){
   // quick actions
   var quick='<div class="home-sec"><div class="home-sec-h"><b>Jump to</b></div><div class="home-attn">'
     +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openMainStore()"><div class="ic" style="background:#0a8f5c"><i class="ti ti-building-store"></i></div><div class="lbl">Shop the store</div><small>all sellers &amp; deals</small></div>'
-    +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openHabits()"><div class="ic" style="background:#16a34a"><i class="ti ti-checkup-list"></i></div><div class="lbl">Habit Tracker</div><small>'+(function(){var hs=getHabits();if(!hs.length)return '40 &amp; 90-day challenges';var pend=hs.filter(function(h){return (h.done||[]).indexOf(dayKey())<0&&(h.done||[]).length<(h.days||40);}).length;return pend?pend+' to do today':'all done today ✓';})()+'</small></div>'
+    +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openGoalSheet()"><div class="ic" style="background:#16a34a"><i class="ti ti-checklist"></i></div><div class="lbl">Habit Tracker</div><small>'+(function(){try{var s=getSheet();if(!s.goals.length)return 'set goals · tick daily';var sc=sheetDayScore(s,dayKey());return sc.done+'/'+sc.total+' today';}catch(e){return 'set goals · tick daily';}})()+'</small></div>'
     +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openTouchCollect()"><div class="ic" style="background:#7c3aed"><i class="ti ti-hand-finger"></i></div><div class="lbl">Touch &amp; Collect</div><small>pick in 3D</small></div>'
     +'</div></div>';
 
@@ -12007,7 +12006,7 @@ function sheetDayScore(s,dk){
   var d=s.days[dk];if(!d||!s.goals.length)return {done:0,total:s.goals.length,pct:0,state:'none'};
   var done=0;s.goals.forEach(function(g){if(d.marks&&d.marks[g.id]==='done')done++;});
   var pct=Math.round(done/s.goals.length*100);
-  var state=pct>=100?'done':(pct>=30?'partial':'miss');
+  var state=pct>=70?'done':(pct>=30?'partial':'miss');
   return {done:done,total:s.goals.length,pct:pct,state:state};
 }
 function openGoalSheet(){
@@ -12024,20 +12023,32 @@ var __gsDay=null;
 function renderGoalSheet(){
   var s=getSheet();var box=document.getElementById('gsheet-body');if(!box)return;
   document.getElementById('gs-title').innerHTML='<i class="ti ti-checklist" style="color:#16a34a"></i> '+esc(s.name)+' <button style="background:none;border:none;color:var(--mt2);cursor:pointer" onclick="renameSheet()"><i class="ti ti-edit"></i></button>';
-  // day strip: last 21 days
+  // all-in-one header: reminders + tune + motivational music
+  var remOn=habRemindOn();
+  var hdr='<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:9px 11px;margin-bottom:9px;background:var(--card2)">'
+    +'<div style="font-size:18px">'+(remOn?'🔔':'🔕')+'</div><div style="flex:1"><div style="font-size:12px;font-weight:800">Daily reminders</div><div style="font-size:10px;color:var(--mt2)">5:00 AM &amp; 9:30 PM</div></div>'
+    +(remOn?'<button class="hab-chip on" onclick="disableHabitReminders()">On</button>':'<button class="hab-chip" onclick="enableHabitReminders()">On</button>')+'</div>';
+  if(remOn)hdr+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:12px"><span style="color:var(--mt2)">Tune</span><select onchange="habSetTune(this.value)" style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--b);background:var(--sf);color:var(--tx)">'+habTuneOptions()+'</select><button class="hab-chip" onclick="habPreviewTune()"><i class="ti ti-player-play"></i></button></div>';
+  hdr+=gsMusicBar();
+  // day strip
   var strip='';var todayK=dayKey();
   for(var i=20;i>=0;i--){var t=Date.now()-i*86400000;var dk=dayKey(t);var sc=sheetDayScore(s,dk);
     var d=new Date(t);
     strip+='<div class="gs-day '+sc.state+(dk===todayK?' today':'')+(dk===__gsDay?'':'')+'" onclick="gsPickDay(\''+dk+'\')"><div class="ring">'+(s.goals.length?sc.done+'/'+sc.total:'–')+'</div><small>'+(['S','M','T','W','T','F','S'][d.getDay()])+' '+d.getDate()+'</small></div>';
   }
   if(!s.goals.length){
-    box.innerHTML='<div class="home-empty" style="margin:6px 0 12px">Set your daily goals once. Each day, tick the ones you achieved — and get a score. 🌱</div>'+gsGoalEditor(s);
+    box.innerHTML=hdr+'<div class="home-empty" style="margin:6px 0 12px">Set your daily goals once — they apply to every day automatically. Tick what you achieve; 70%+ marks the day done. Add more goals anytime. 🌱</div>'+gsGoalEditor(s);
     return;
   }
   var sel=__gsDay||todayK;var dsc=sheetDayScore(s,sel);var day=s.days[sel]||{marks:{},note:''};
   var dd=new Date(); // header for selected day
-  box.innerHTML='<div class="gs-daystrip">'+strip+'</div>'
-    +'<div style="background:var(--card2);border-radius:12px;padding:12px;margin:8px 0 12px;text-align:center">'
+  var ov=sheetStats(s);
+  box.innerHTML=hdr+'<div class="gs-daystrip">'+strip+'</div>'
+    +'<div style="display:flex;gap:8px;margin:6px 0 10px"><div style="flex:1;border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:800;color:#16a34a">'+ov.pct+'%</div><div style="font-size:10px;color:var(--mt2)">overall achieved</div></div>'
+    +'<div style="flex:1;border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:800;color:#0d9488">🔥 '+ov.streak+'</div><div style="font-size:10px;color:var(--mt2)">day streak</div></div>'
+    +'<div style="flex:1;border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:800">'+ov.achieved+'</div><div style="font-size:10px;color:var(--mt2)">days won</div></div></div>'
+    +'<button class="btn" style="width:100%;margin-bottom:10px;border:1px solid #0a66c2;color:#0a66c2;font-weight:700" onclick="shareTrackerLink()"><i class="ti ti-share"></i> Share my progress (view-only link)</button>'
+    +'<div style="background:var(--card2);border-radius:12px;padding:12px;margin:0 0 12px;text-align:center">'
       +'<div class="gs-score" style="color:'+(dsc.state==='done'?'#16a34a':(dsc.state==='partial'?'#c2410c':'#dc2626'))+'">'+dsc.done+'/'+dsc.total+'</div>'
       +'<div style="font-size:12px;color:var(--mt2)">'+(sel===todayK?'Today':sel)+' · '+dsc.pct+'%'+(dsc.state==='done'?' — all done! 🎉':(dsc.state==='miss'&&dsc.total?' — tough day, be kind to yourself':''))+'</div></div>'
     +s.goals.map(function(g){var mk=(day.marks&&day.marks[g.id])||'';
@@ -12047,7 +12058,8 @@ function renderGoalSheet(){
     }).join('')
     +'<div class="fg" style="margin-top:11px"><label>📝 Reflection — what went well, or why you missed</label><textarea id="gs-note" rows="2" placeholder="A line for your future self...">'+esc(day.note||'')+'</textarea></div>'
     +'<button class="btn btnok" style="width:100%;margin-top:8px" onclick="saveSheetNote(\''+sel+'\')"><i class="ti ti-device-floppy"></i> Save reflection</button>'
-    +'<div style="margin-top:14px">'+gsGoalEditor(s)+'</div>';
+    +'<div style="margin-top:14px">'+gsGoalEditor(s)+'</div>'
+    +'<button class="btn" style="width:100%;margin-top:12px;border:1px solid var(--b);color:var(--mt)" onclick="closeOvl(\'gsheet-ovl\');openHabits()"><i class="ti ti-flame"></i> Single-habit streak challenges</button>';
 }
 function gsGoalEditor(s){
   return '<div style="font-size:12px;font-weight:800;margin:6px 0 7px">Your goals ('+s.goals.length+')</div>'
@@ -12055,6 +12067,7 @@ function gsGoalEditor(s){
     +'<div style="display:flex;gap:7px;margin-top:7px"><input id="gs-newgoal" placeholder="Add a goal (e.g. Work on business, Speak to someone new)" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--b);background:var(--sf);color:var(--tx)"><button class="btn btnok" onclick="addGoalItem()"><i class="ti ti-plus"></i></button></div>';
 }
 function gsPickDay(dk){__gsDay=dk;renderGoalSheet();}
+function sheetStats(s){var tracked=0,achieved=0;var keys=Object.keys(s.days||{});keys.forEach(function(k){var sc=sheetDayScore(s,k);if(sc.total&&(sc.done>0||(s.days[k].marks&&Object.keys(s.days[k].marks).length))){tracked++;if(sc.state==='done')achieved++;}});var streak=0;var d=Date.now();var todayDone=sheetDayScore(s,dayKey()).state==='done';if(!todayDone)d-=86400000;while(sheetDayScore(s,dayKey(d)).state==='done'){streak++;d-=86400000;}return {tracked:tracked,achieved:achieved,pct:tracked?Math.round(achieved/tracked*100):0,streak:streak,goals:(s.goals||[]).length};}
 function addGoalItem(){
   var v=((document.getElementById('gs-newgoal')||{}).value||'').trim();if(!v)return;
   var s=getSheet();s.goals.push({id:'g'+Date.now()+Math.floor(Math.random()*999),name:v});saveSheet(s);renderGoalSheet();
@@ -12063,6 +12076,8 @@ function renameGoalItem(id){var s=getSheet();var g=s.goals.find(function(x){retu
 function delGoalItem(id){if(!confirm('Remove this goal?'))return;var s=getSheet();s.goals=s.goals.filter(function(x){return x.id!==id;});saveSheet(s);renderGoalSheet();}
 function renameSheet(){var s=getSheet();var nn=prompt('Rename your goals sheet:',s.name);if(nn===null)return;nn=nn.trim();if(nn){s.name=nn;saveSheet(s);renderGoalSheet();}}
 function markSheetGoal(dk,goalId,status){
+  var __pp=String(dk).split('-');var __dd=new Date(+__pp[0],+__pp[1],+__pp[2]);__dd.setHours(0,0,0,0);var __tt=new Date();__tt.setHours(0,0,0,0);
+  if(__dd.getTime()>__tt.getTime()){toast('You can only track today — come back tomorrow! 🌱','info');return;}
   var s=getSheet();s.days[dk]=s.days[dk]||{marks:{},note:''};s.days[dk].marks=s.days[dk].marks||{};
   // toggle off if same status tapped again
   if(s.days[dk].marks[goalId]===status)delete s.days[dk].marks[goalId];else s.days[dk].marks[goalId]=status;
@@ -12073,4 +12088,71 @@ function markSheetGoal(dk,goalId,status){
   renderGoalSheet();
 }
 function saveSheetNote(dk){var s=getSheet();s.days[dk]=s.days[dk]||{marks:{},note:''};s.days[dk].note=((document.getElementById('gs-note')||{}).value||'').trim();saveSheet(s);toast('Reflection saved 📝','ok');}
+
+/* ===== v151: motivational music in the all-in-one tracker =====
+   Pick a local audio file (plays this session) or paste a direct audio/stream
+   URL that persists. HONEST: a single web file can't pull audio out of an
+   Instagram/YouTube link (that needs their APIs) — but you can paste a direct
+   MP3/stream URL, or upload your own MP3, and it plays for motivation. */
+var __gsAudio=null;
+function gsGetMusicUrl(){return LS.get('rb_motiv_music','')||'';}
+function gsMusicBar(){
+  var u=gsGetMusicUrl();
+  return '<div style="border:1px solid var(--b);border-radius:12px;padding:9px 11px;margin-bottom:11px;background:var(--card2)">'
+    +'<div style="display:flex;align-items:center;gap:8px"><div style="font-size:18px">🎵</div><div style="flex:1"><div style="font-size:12px;font-weight:800">Motivational music</div><div style="font-size:10px;color:var(--mt2)">Play your own track while you track</div></div>'
+    +'<button class="hab-chip" onclick="gsPlayMusic()"><i class="ti ti-player-play"></i></button>'
+    +(__gsAudio?'<button class="hab-chip" onclick="gsStopMusic()"><i class="ti ti-player-stop"></i></button>':'')+'</div>'
+    +'<div style="display:flex;gap:6px;margin-top:8px"><label class="hab-chip" style="cursor:pointer"><i class="ti ti-upload"></i> Upload MP3<input type="file" accept="audio/*" style="display:none" onchange="gsUploadMusic(this)"></label>'
+    +'<input id="gs-musicurl" placeholder="or paste a direct audio URL (.mp3)" value="'+esc(u)+'" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--b);background:var(--sf);color:var(--tx);font-size:12px"><button class="hab-chip" onclick="gsSaveMusicUrl()">Save</button></div></div>';
+}
+function gsSaveMusicUrl(){var v=((document.getElementById('gs-musicurl')||{}).value||'').trim();LS.set('rb_motiv_music',v);toast(v?'Music link saved':'Music link cleared','ok');renderGoalSheet&&document.getElementById('gsheet-body')&&renderGoalSheet();}
+function gsUploadMusic(input){
+  var file=input.files&&input.files[0];if(!file)return;
+  try{var url=URL.createObjectURL(file);__gsMusicSession=url;gsPlayMusic();toast('Playing your track 🎵','ok');}catch(e){toast('Could not load that file','err');}
+}
+var __gsMusicSession='';
+function gsPlayMusic(){
+  var src=__gsMusicSession||gsGetMusicUrl();
+  if(!src){toast('Upload an MP3 or paste an audio URL first','info');return;}
+  try{if(__gsAudio){__gsAudio.pause();}__gsAudio=new Audio(src);__gsAudio.loop=true;__gsAudio.volume=0.7;__gsAudio.play().catch(function(){toast('Tap play again — browser needs a tap to start audio','info');});}catch(e){toast('Could not play that source','err');}
+  if(document.getElementById('gsheet-body'))renderGoalSheet();
+}
+function gsStopMusic(){try{if(__gsAudio){__gsAudio.pause();__gsAudio=null;}}catch(e){}if(document.getElementById('gsheet-body'))renderGoalSheet();}
+
+/* ===== v152: shareable read-only tracker link =====
+   Builds a compact snapshot of progress encoded in the URL (no backend needed),
+   so loved ones can open the link and SEE your journey — read-only, no editing. */
+function b64enc(o){try{return btoa(unescape(encodeURIComponent(JSON.stringify(o))));}catch(e){return '';}}
+function b64dec(s){try{return JSON.parse(decodeURIComponent(escape(atob(s))));}catch(e){return null;}}
+function shareTrackerLink(){
+  var s=getSheet();var st=sheetStats(s);
+  var snap={v:1,nm:(CU&&CU.name)||'A friend',sn:s.name,g:(s.goals||[]).map(function(x){return x.name;}).slice(0,20),
+    pct:st.pct,streak:st.streak,won:st.achieved,tracked:st.tracked,gc:st.goals,today:sheetDayScore(s,dayKey()).done+'/'+sheetDayScore(s,dayKey()).total};
+  var link=location.origin+location.pathname+'#t='+b64enc(snap);
+  var txt=snap.nm+'\'s goal journey on Reedbi — '+st.pct+'% achieved, '+st.streak+'-day streak 🔥\n'+link;
+  if(navigator.share){navigator.share({title:'My Reedbi goal journey',text:snap.nm+'\'s goal journey',url:link}).catch(function(){});}
+  else{try{navigator.clipboard.writeText(txt);toast('View-only progress link copied! 🔗','ok');}catch(e){prompt('Copy your share link:',link);}}
+}
+function openSharedTracker(snap){
+  if(!snap)return;
+  var ovl=document.getElementById('shared-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='shared-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:400px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-eye" style="color:#0a66c2"></i> Goal Journey</b><button class="modal-x" onclick="closeOvl(\'shared-ovl\');location.hash=\'\'"><i class="ti ti-x"></i></button></div><div id="shared-body"></div></div>';
+    document.body.appendChild(ovl);}
+  document.getElementById('shared-body').innerHTML=
+    '<div style="text-align:center;margin-bottom:12px"><div style="font-size:17px;font-weight:800">'+esc(snap.nm||'A friend')+'</div><div style="font-size:12px;color:var(--mt2)">'+esc(snap.sn||'Daily Goals')+'</div></div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:12px"><div style="flex:1;border:1px solid var(--b);border-radius:12px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:800;color:#16a34a">'+(snap.pct||0)+'%</div><div style="font-size:10px;color:var(--mt2)">achieved</div></div>'
+    +'<div style="flex:1;border:1px solid var(--b);border-radius:12px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:800;color:#0d9488">🔥 '+(snap.streak||0)+'</div><div style="font-size:10px;color:var(--mt2)">day streak</div></div>'
+    +'<div style="flex:1;border:1px solid var(--b);border-radius:12px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:800">'+(snap.won||0)+'</div><div style="font-size:10px;color:var(--mt2)">days won</div></div></div>'
+    +'<div style="font-size:12px;font-weight:800;margin-bottom:6px">Goals ('+(snap.gc||(snap.g||[]).length)+')</div>'
+    +'<div style="border:1px solid var(--b);border-radius:12px;padding:6px 12px">'+((snap.g||[]).map(function(g){return '<div style="padding:6px 0;border-bottom:1px solid var(--b);font-size:13px"><i class="ti ti-target" style="color:#16a34a"></i> '+esc(g)+'</div>';}).join('')||'<div style="padding:8px 0;color:var(--mt2);font-size:12px">Private</div>')+'</div>'
+    +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-top:12px">Today: '+esc(snap.today||'–')+' · This is a view-only snapshot 💚</div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="closeOvl(\'shared-ovl\');location.hash=\'\'">Start my own tracker on Reedbi</button>';
+  ovl.classList.add('open');
+}
+(function(){
+  function checkHash(){var h=location.hash||'';if(h.indexOf('#t=')===0){var snap=b64dec(h.slice(3));if(snap)setTimeout(function(){openSharedTracker(snap);},800);}}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',checkHash);else checkHash();
+  window.addEventListener('hashchange',checkHash);
+})();
 </script></body></html>
