@@ -906,6 +906,39 @@ body.dark .spin-wheel{border-color:#2a333f}
 .tier-bar{height:8px;border-radius:5px;background:rgba(255,255,255,.2);margin-top:9px;overflow:hidden}
 .tier-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#ffd23f,#ff9800)}
 .spin-tile{background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;border:none;cursor:pointer}
+/* ===== v144: Learn Something New — mind-stimulating wholesome daily knowledge ===== */
+.learn-card{background:linear-gradient(135deg,#0e7490,#0f766e);color:#fff;border-radius:16px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.learn-card::after{content:"";position:absolute;right:-24px;bottom:-24px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.08)}
+.learn-cat{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 11px;margin-bottom:9px}
+.learn-title{font-size:16px;font-weight:800;line-height:1.25;position:relative;z-index:1}
+.learn-text{font-size:13px;line-height:1.55;opacity:.95;margin-top:6px;position:relative;z-index:1}
+.learn-act{display:flex;gap:8px;margin-top:13px;position:relative;z-index:1}
+.learn-btn{flex:1;background:#fff;color:#0f766e;border:none;border-radius:20px;padding:10px;font-weight:800;font-size:13px;cursor:pointer;font-family:var(--fn)}
+.learn-btn.ghost{background:rgba(255,255,255,.15);color:#fff}
+.learn-done{background:rgba(255,255,255,.15);border-radius:20px;padding:10px;text-align:center;font-weight:700;font-size:13px;margin-top:13px;position:relative;z-index:1}
+.learn-streak{font-size:11px;opacity:.9;margin-top:8px;position:relative;z-index:1}
+/* ===== v145: habit tracker ===== */
+.hab-card{border:1px solid var(--b);border-radius:14px;padding:13px;margin-bottom:10px;background:var(--sf)}
+.hab-top{display:flex;align-items:center;gap:10px}
+.hab-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0}
+.hab-name{font-size:14px;font-weight:800}
+.hab-meta{font-size:11px;color:var(--mt2)}
+.hab-ring{position:relative;width:46px;height:46px;flex-shrink:0}
+.hab-ring svg{transform:rotate(-90deg)}
+.hab-ring .pc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+.hab-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;margin-top:11px}
+.hab-dot{aspect-ratio:1;border-radius:3px;background:var(--card2)}
+.hab-dot.on{background:linear-gradient(135deg,#16a34a,#0d9488)}
+.hab-dot.today{outline:2px solid var(--gold)}
+.hab-check{width:100%;margin-top:11px;border:none;border-radius:22px;padding:11px;font-weight:800;font-size:14px;cursor:pointer;font-family:var(--fn);background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff}
+.hab-check.done{background:var(--card2);color:var(--mt)}
+.hab-preset{display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:11px;padding:10px;margin-bottom:7px;cursor:pointer}
+.hab-preset:active{transform:scale(.99)}
+.hab-preset .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
+.hab-chip{border:1px solid var(--b);background:var(--card2);border-radius:18px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;color:var(--tx)}
+.hab-chip.on{background:var(--g);color:#fff;border-color:var(--g)}
+
+
 .ach-badge{display:inline-flex;flex-direction:column;align-items:center;gap:3px;width:72px;text-align:center}
 .ach-badge .ic{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--card2)}
 .ach-badge.got .ic{background:linear-gradient(135deg,#ffd23f,#ff9800);color:#fff}
@@ -1052,9 +1085,9 @@ body.dark .spin-wheel{border-color:#2a333f}
 ::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:var(--b);border-radius:3px}
 @media(max-width:700px){
   .shell{height:calc(100dvh - 60px);position:relative}
-  .left{width:100%;position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;height:auto;background:var(--sf)}
+  .left{width:100%;position:absolute;top:0;left:0;right:0;z-index:10;height:calc(100dvh - 60px);background:var(--sf)}
   .left.hidden{display:none}
-  .right{width:100%;position:absolute;top:0;left:0;right:0;bottom:0;height:auto;z-index:5}
+  .right{width:100%;position:absolute;top:0;left:0;right:0;height:calc(100dvh - 60px);z-index:5}
   .backbtn{display:flex!important}
   #cv-view{height:100dvh!important}
   #cv-view[style*="flex"]{display:flex!important;flex-direction:column}
@@ -1115,7 +1148,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v139</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v145</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1368,6 +1401,7 @@ body.dark .spin-wheel{border-color:#2a333f}
       </div>
       <div id="lp-barcode-prev" style="margin-top:6px"></div><div style="font-size:10px;color:var(--mt2);margin-top:3px">No barcode on the product? Tap <b>Auto</b> — Reedbi creates a scannable in-store barcode. A product number is added automatically.</div>
     </div>
+    <div class="fg" style="margin-top:8px"><label>UPI ID for payments <span style="color:var(--mt2);font-weight:400">(optional — e.g. yourname@oksbi, for UPI/GPay)</span></label><input type="text" id="lp-upi" placeholder="yourname@okhdfcbank" autocomplete="off"></div>
     <div class="fg" style="margin-top:8px">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="lp-byweight" onchange="lpWeightToggle()"> Sold by weight (variable — e.g. fruit, vegetables, meat)</label>
       <div id="lp-weight-row" style="display:none;margin-top:6px">
@@ -1426,6 +1460,7 @@ body.dark .spin-wheel{border-color:#2a333f}
       <div class="pay-opts">
         <button type="button" class="pay-opt sel" id="pay-cod" onclick="selectPay('cod')"><i class="ti ti-cash"></i> Cash on Delivery</button>
         <button type="button" class="pay-opt" id="pay-online" onclick="selectPay('online')"><i class="ti ti-credit-card"></i> Pay Online</button>
+        <button type="button" class="pay-opt" id="pay-upi" onclick="selectPay('upi')"><i class="ti ti-qrcode"></i> UPI / GPay</button>
       </div>
     </div>
     <button class="btn btnok" style="width:100%;margin-top:12px" onclick="placeOrder()"><i class="ti ti-check"></i> Confirm Order</button>
@@ -5700,6 +5735,7 @@ function openAccountMenu(){
   var act=item('showMyActivity()','layout-dashboard','var(--g)','My Activity','your jobs, orders, shop &amp; license in one place')
     +item('showMyOrders()','package','','My Orders','track &amp; manage purchases')
     +item('openSpin()','gift','#7c3aed','Daily Spin &amp; Rewards','free points · your shopper level')
+    +item('openHabits()','checkup-list','#16a34a','Habit Tracker','40 &amp; 90-day challenges · build streaks')
     +item('rbOnboard(true)','help-circle','#0a8f5c','How Reedbi works','quick tour of the app')
     +item('openCareAi()','headset','#ffb800','Reedbi Care','orders, delivery, returns &amp; refunds')
     +item('openMyTickets()','ticket','#ffb800','My Support Tickets','status &amp; emailed decisions')
@@ -5730,6 +5766,7 @@ function openAccountMenu(){
 
   // === ACCOUNT & SETTINGS (everyone) ===
   var acc=item('openEditAccount()','user-edit','var(--g)','Edit account details','name, WhatsApp, location, interests')
+    +item('openReceiveQR()','qrcode','#0a8f5c','Receive Payments','your QR to get paid — UPI/bank')
     +item('openAppearance()','adjustments','var(--g)','Appearance &amp; Accessibility','dark mode, text size')
     +item('openAddressBook()','map-pin','var(--g)','Saved addresses','faster checkout')
     +item('openNotifSettings()','bell','var(--gold)','Notifications','sound, tune, mute');
@@ -5806,7 +5843,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v139 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v145 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6316,7 +6353,7 @@ var listPhotos=[]; // base64 photos for the product being listed
 function openListProduct(){
   if(!requireAuth('list a product'))return;
   listPhotos=[];
-  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category','lp-location','lp-brand','lp-sizes','lp-colors','lp-barcode'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category','lp-location','lp-brand','lp-sizes','lp-colors','lp-barcode','lp-upi'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   var cs=document.getElementById('lp-cur');if(cs&&!cs.options.length){CURRENCIES.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o);});}
   // sell-as: my name or any page I own/admin
   var sa=document.getElementById('lp-as');
@@ -6387,12 +6424,13 @@ function submitProduct(){
   var sizes=((document.getElementById('lp-sizes')||{}).value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
   var colors=((document.getElementById('lp-colors')||{}).value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
   var barcode=normalizeBarcode((document.getElementById('lp-barcode')||{}).value||'');
+  var upiId=((document.getElementById('lp-upi')||{}).value||'').trim();
   var byWeight=!!(document.getElementById('lp-byweight')&&document.getElementById('lp-byweight').checked);
   var weightUnit=byWeight?((document.getElementById('lp-weightunit')||{}).value||'kg'):'';
   var vatPct=(function(L){L=L.toLowerCase();if(L.indexOf('uae')>=0||L.indexOf('dubai')>=0||L.indexOf('emirates')>=0)return 5;if(L.indexOf('saudi')>=0||L.indexOf('ksa')>=0)return 15;if(L.indexOf('india')>=0)return 18;if(L.indexOf('uk')>=0||L.indexOf('united kingdom')>=0)return 20;if(L.indexOf('bahrain')>=0||L.indexOf('oman')>=0)return 10;return 0;})(location||'');
   var prodNo=fmtProdNo(nextProdNoSeq());
   if(!barcode){barcode=genInternalBarcode(prodNo+'|'+title);var _bcAuto=true;}
-  var prod={id:'prd'+Date.now(),prodNo:prodNo,barcodeAuto:(typeof _bcAuto!=='undefined'),serialNo:serialNo,sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',brand:brand,payOpts:payOpts,vatPct:vatPct,sizes:sizes,colors:colors,barcode:barcode,byWeight:byWeight,weightUnit:weightUnit,intlShip:intlShip,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
+  var prod={id:'prd'+Date.now(),prodNo:prodNo,barcodeAuto:(typeof _bcAuto!=='undefined'),serialNo:serialNo,sellerUid:CU.uid,sellerName:sellAs||CU.name,pageName:sellAs||'',brand:brand,payOpts:payOpts,vatPct:vatPct,sizes:sizes,colors:colors,barcode:barcode,upiId:upiId,byWeight:byWeight,weightUnit:weightUnit,intlShip:intlShip,title:title,desc:desc,price:price,cost:cost,offer:offer,expiry:expiry,currency:cur,qty:qty,sold:0,category:category,location:location,
     batches:[{batchCode:'B-'+Date.now().toString(36).toUpperCase().slice(-4),qty:qty,cost:cost,vendor:'',vendorPhone:'',brand:'',date:Date.now()}],interest:0,interestLog:[],
     photos:listPhotos.slice(),addr:addr,phone:phone,map:map,ts:Date.now()};
   var prods=getProducts();prods.unshift(prod);saveProducts(prods);
@@ -6779,9 +6817,7 @@ function buyProduct(productId){
 var curBuyProduct=null;
 var selPayMethod='cod';
 function selectPay(m){selPayMethod=m;
-  var c=document.getElementById('pay-cod'),o=document.getElementById('pay-online');
-  if(c)c.className='pay-opt'+(m==='cod'?' sel':'');
-  if(o)o.className='pay-opt'+(m==='online'?' sel':'');
+  ['cod','online','upi'].forEach(function(k){var el=document.getElementById('pay-'+k);if(el)el.className='pay-opt'+(m===k?' sel':'');});
 }
 function detectBuyerLocation(){
   if(!navigator.geolocation){toast('Location not supported','err');return;}
@@ -6811,6 +6847,11 @@ function placeOrder(){
   var orders=getOrders();orders.unshift(o);saveOrders(orders);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o).catch(function(){});}catch(e){}}
   closeOvl('buy-ovl');
+  if(selPayMethod==='upi'){
+    closeOvl('buy-ovl');
+    showUpiPayment(o);
+    return;
+  }
   if(selPayMethod==='online'){
     closeOvl('buy-ovl');
     curCheckoutOrder=o;
@@ -11012,10 +11053,12 @@ function renderHome(){
   // quick actions
   var quick='<div class="home-sec"><div class="home-sec-h"><b>Jump to</b></div><div class="home-attn">'
     +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openMainStore()"><div class="ic" style="background:#0a8f5c"><i class="ti ti-building-store"></i></div><div class="lbl">Shop the store</div><small>all sellers &amp; deals</small></div>'
+    +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openHabits()"><div class="ic" style="background:#16a34a"><i class="ti ti-checkup-list"></i></div><div class="lbl">Habit Tracker</div><small>'+(function(){var hs=getHabits();if(!hs.length)return '40 &amp; 90-day challenges';var pend=hs.filter(function(h){return (h.done||[]).indexOf(dayKey())<0&&(h.done||[]).length<(h.days||40);}).length;return pend?pend+' to do today':'all done today ✓';})()+'</small></div>'
     +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openTouchCollect()"><div class="ic" style="background:#7c3aed"><i class="ti ti-hand-finger"></i></div><div class="lbl">Touch &amp; Collect</div><small>pick in 3D</small></div>'
     +'</div></div>';
 
-  box.innerHTML=hero+'<div class="home-body">'+funSec+attn+achSec+rvSec+picksSec+quick+'</div>';
+  var learnSec='<div class="home-sec"><div class="home-sec-h"><b>Learn something new today</b></div>'+learnCardHtml()+'</div>';
+  box.innerHTML=hero+'<div class="home-body">'+funSec+learnSec+attn+achSec+rvSec+picksSec+quick+'</div>';
   box.scrollTop=0;
 }
 
@@ -11455,4 +11498,303 @@ function rbOnboard(force){
 function rbOnboardDone(){LS.set('rb_onboarded',true);closeOvl('onboard-ovl');try{rbConfetti(50);}catch(e){}}
 // show once shortly after load (after auth settles)
 setTimeout(function(){try{if(!LS.get('rb_onboarded',false))rbOnboard();}catch(e){}},1400);
+
+/* ===== v141: UPI / GPay payment =====
+   Familiar one-tap payment used by hundreds of millions. We build a standard UPI
+   deep link (upi://pay) + a scannable QR that ANY UPI app reads (GPay, PhonePe,
+   Paytm, BHIM). HONEST SCOPE: the app initiates the payment; confirming the money
+   actually settled needs a payment gateway/webhook (Layer 7) — so the seller
+   confirms receipt, the same way a shop confirms a UPI transfer today. */
+function buildUpiLink(vpa,name,amount,note){
+  var p=[];
+  p.push('pa='+encodeURIComponent(vpa));
+  p.push('pn='+encodeURIComponent(name||'Reedbi Seller'));
+  if(amount)p.push('am='+encodeURIComponent(String(amount)));
+  p.push('cu=INR');
+  if(note)p.push('tn='+encodeURIComponent(note));
+  return 'upi://pay?'+p.join('&');
+}
+function upiQrSvg(text,size){
+  try{
+    var qr=qrcode(0,'M');qr.addData(text);qr.make();
+    var n=qr.getModuleCount();var cell=Math.floor((size||220)/n);var dim=cell*n;
+    var s='<svg width="'+dim+'" height="'+dim+'" viewBox="0 0 '+dim+' '+dim+'" xmlns="http://www.w3.org/2000/svg"><rect width="'+dim+'" height="'+dim+'" fill="#fff"/>';
+    for(var r=0;r<n;r++)for(var col=0;col<n;col++){if(qr.isDark(r,col))s+='<rect x="'+(col*cell)+'" y="'+(r*cell)+'" width="'+cell+'" height="'+cell+'" fill="#000"/>';}
+    return s+'</svg>';
+  }catch(e){return '<div style="font-size:12px;color:var(--mt2)">QR unavailable</div>';}
+}
+function showUpiPayment(o){
+  var vpa=(o&&getProducts().find(function(p){return p.id===o.productId;})||{}).upiId||'';
+  var sellerName=o.sellerName||'Reedbi Seller';
+  var unit=parseFloat(String(o.price).replace(/[^0-9.]/g,''))||0;var amount=Math.round(unit*(o.qty||1)*100)/100;
+  var ovl=document.getElementById('upi-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='upi-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:380px;text-align:center"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="font-size:15px"><i class="ti ti-qrcode" style="color:#0a8f5c"></i> UPI / GPay payment</b><button class="modal-x" onclick="closeOvl(\'upi-ovl\')"><i class="ti ti-x"></i></button></div><div id="upi-body"></div></div>';
+    document.body.appendChild(ovl);}
+  var body;
+  if(!vpa){
+    body='<div class="home-empty" style="margin:10px 0"><i class="ti ti-info-circle" style="font-size:22px;color:var(--gold)"></i><div style="margin-top:6px">This seller hasn\'t added a UPI ID yet, so UPI/GPay isn\'t available for this item.</div></div>'
+      +'<button class="btn btnok" style="width:100%" onclick="closeOvl(\'upi-ovl\');toast(\'Order saved — choose Cash on Delivery instead\',\'info\')">OK</button>';
+  } else {
+    var note='Reedbi '+(o.orderNo||o.id);
+    var link=buildUpiLink(vpa,sellerName,amount,note);
+    body='<div style="font-size:13px;color:var(--mt2);margin-bottom:8px">Pay <b style="color:var(--g)">₹'+amount+'</b> to <b>'+esc(sellerName)+'</b></div>'
+      +'<div style="display:inline-block;background:#fff;border:1px solid #e6e9ee;border-radius:12px;padding:12px">'+upiQrSvg(link,210)+'</div>'
+      +'<div style="font-size:12px;color:var(--mt2);margin:8px 0 4px">Scan with GPay, PhonePe, Paytm or any UPI app</div>'
+      +'<div style="font-size:12px;font-weight:700;margin-bottom:10px">'+esc(vpa)+'</div>'
+      +'<a href="'+esc(link)+'" class="btn btnok" style="width:100%;text-decoration:none;display:block;margin-bottom:8px"><i class="ti ti-device-mobile"></i> Open in my UPI app</a>'
+      +'<button class="btn" style="width:100%;border:1px solid var(--g);color:var(--g)" onclick="upiMarkPaid(\''+o.id+'\')"><i class="ti ti-check"></i> I\'ve paid — notify seller</button>'
+      +'<div style="font-size:10px;color:var(--mt2);margin-top:9px">The seller confirms receipt in their dashboard. Reedbi records this as a UPI payment.</div>';
+  }
+  document.getElementById('upi-body').innerHTML=body;
+  ovl.classList.add('open');
+}
+function upiMarkPaid(orderId){
+  var os=getOrders();var o=os.find(function(x){return x.id===orderId;});if(!o)return;
+  o.paymentStatus='upi_initiated';o.upiPaidClaimTs=Date.now();saveOrders(os);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set({paymentStatus:'upi_initiated',upiPaidClaimTs:Date.now()},{merge:true}).catch(function(){});}catch(e){}}
+  try{notifyEvent('upi','💸 Buyer marked UPI payment for order '+(o.orderNo||o.id)+' — please confirm receipt');}catch(e){}
+  closeOvl('upi-ovl');
+  try{rbConfetti(80);}catch(e){}
+  toast('Thanks! The seller will confirm your UPI payment.','ok');
+}
+
+/* ===== v142: Receive Payments — personal/shop payment QR =====
+   Every user & shop can publish a payment QR. They set their handle once (UPI ID
+   for India, or any payment handle / phone for their country's app), and Reedbi
+   renders a scannable QR + shareable link. Settlement happens in the payer's own
+   bank/UPI app — Reedbi only creates the QR (no money flows through Reedbi). */
+function getPayId(){return (CU&&(LS.get('rb_payid_'+CU.uid,null)||CU.payId))||null;}
+function savePayId(rec){if(CU)LS.set('rb_payid_'+CU.uid,rec);}
+function openReceiveQR(){
+  if(!requireAuth('set up receiving payments'))return;
+  var ovl=document.getElementById('rcv-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='rcv-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:380px;text-align:center"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="font-size:15px"><i class="ti ti-qrcode" style="color:#0a8f5c"></i> Receive Payments</b><button class="modal-x" onclick="closeOvl(\'rcv-ovl\')"><i class="ti ti-x"></i></button></div><div id="rcv-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderReceiveQR();
+  ovl.classList.add('open');
+}
+function renderReceiveQR(){
+  var rec=getPayId();var box=document.getElementById('rcv-body');if(!box)return;
+  if(!rec||!rec.handle){
+    box.innerHTML='<div style="font-size:12px;color:var(--mt2);margin-bottom:10px">Add your payment handle once. Anyone can then scan your QR to pay you straight into your bank, through their own app.</div>'
+      +'<div class="fg" style="text-align:left"><label>Your name / shop on the QR</label><input id="rcv-name" placeholder="e.g. Asha Store" value="'+esc((CU&&(CU.co||CU.name))||'')+'"></div>'
+      +'<div class="fg" style="text-align:left;margin-top:7px"><label>Payment handle</label><input id="rcv-handle" placeholder="UPI: name@okhdfcbank · or your pay ID/phone"></div>'
+      +'<div class="fg" style="text-align:left;margin-top:7px"><label>Type</label><select id="rcv-type" onchange="rcvTypeChange()"><option value="upi">UPI (India — GPay/PhonePe/Paytm)</option><option value="card">Card — Visa / Mastercard / RuPay / mada</option><option value="other">Other country / app</option></select></div>'
+      +'<div class="fg" id="rcv-card-row" style="text-align:left;margin-top:7px;display:none"><label>Your secure checkout link</label><input id="rcv-link" placeholder="https://your-gateway.com/pay/xxxx" autocomplete="off"><div style="font-size:10px;color:var(--mt2);margin-top:4px"><i class="ti ti-shield-lock" style="color:#16a34a"></i> Paste the payment LINK from your card gateway (Stripe, Razorpay, Checkout.com, PayTabs, mada…). <b>Never paste a card number</b> — the QR carries only this link, so no card or bank data is ever in it.</div></div>'
+      +'<button class="btn btnok" style="width:100%;margin-top:11px" onclick="saveReceiveQR()"><i class="ti ti-device-floppy"></i> Create my payment QR</button>'
+      +'<div style="font-size:10px;color:var(--mt2);margin-top:9px"><i class="ti ti-shield-check" style="color:#16a34a"></i> Money moves through the payer\'s own app/bank or your gateway\'s PCI-secure page. Reedbi never holds your money and never stores card or bank details.</div>';
+  } else {
+    var amt=(document.getElementById('rcv-amt')||{}).value||'';
+    var link;
+    if(rec.type==='upi')link=buildUpiLink(rec.handle,rec.name,amt||'','Pay '+(rec.name||''));
+    else if(rec.type==='card'){var u=rec.link||rec.handle;link=u+(u.indexOf('?')<0?'?':'&')+'rb='+encodeURIComponent((rec.name||'')) + (amt?('&amount='+encodeURIComponent(amt)):'');}
+    else link='reedbi:pay?to='+encodeURIComponent(rec.handle)+'&pn='+encodeURIComponent(rec.name||'')+(amt?'&am='+amt:'');
+    box.innerHTML='<div style="font-size:13px;margin-bottom:8px">Pay <b>'+esc(rec.name||CU.name)+'</b></div>'
+      +'<div id="rcv-qr" style="display:inline-block;background:#fff;border:1px solid #e6e9ee;border-radius:12px;padding:12px">'+upiQrSvg(link,210)+'</div>'
+      +(rec.type==='card'?'<div style="display:flex;gap:6px;justify-content:center;margin:8px 0 2px;flex-wrap:wrap">'+['VISA','Mastercard','RuPay','mada'].map(function(n){return '<span style="font-size:10px;font-weight:800;border:1px solid var(--b);border-radius:6px;padding:2px 7px;color:var(--mt)">'+n+'</span>';}).join('')+'</div>':'<div style="font-size:12px;font-weight:700;margin:8px 0 2px">'+esc(rec.handle)+'</div>')
+      +'<div style="font-size:11px;color:var(--mt2);margin-bottom:10px">'+(rec.type==='upi'?'Scan with GPay, PhonePe, Paytm or any UPI app':(rec.type==='card'?'<i class="ti ti-shield-lock" style="color:#16a34a"></i> Scan → opens a secure card checkout. No card/bank data in this QR.':'Scan / share to pay '+esc(rec.name||'')))+'</div>'
+      +'<div class="fg" style="text-align:left;margin-bottom:8px"><label>Request a specific amount (optional)</label><input id="rcv-amt" type="number" placeholder="e.g. 250" value="'+esc(amt)+'" oninput="renderReceiveQR()"></div>'
+      +(rec.type==='upi'?'<a href="'+esc(link)+'" class="btn btnok" style="width:100%;text-decoration:none;display:block;margin-bottom:8px"><i class="ti ti-device-mobile"></i> Test in my UPI app</a>':(rec.type==='card'?'<a href="'+esc(link)+'" target="_blank" rel="noopener" class="btn btnok" style="width:100%;text-decoration:none;display:block;margin-bottom:8px"><i class="ti ti-credit-card"></i> Open secure checkout</a>':''))
+      +'<button class="btn" style="width:100%;border:1px solid var(--g);color:var(--g);margin-bottom:7px" onclick="shareReceiveQR()"><i class="ti ti-share"></i> Share my payment link</button>'
+      +'<button class="btn" style="width:100%;border:1px solid var(--b)" onclick="savePayId(null);renderReceiveQR()"><i class="ti ti-edit"></i> Change handle</button>';
+  }
+}
+function rbLooksLikeCardNumber(s){
+  var d=String(s||'').replace(/[\s-]/g,'');
+  return /^\d{13,19}$/.test(d); // a raw PAN — must NEVER be allowed in a QR
+}
+function rcvTypeChange(){
+  var t=(document.getElementById('rcv-type')||{}).value;
+  var row=document.getElementById('rcv-card-row');if(row)row.style.display=(t==='card')?'block':'none';
+  var hRow=document.getElementById('rcv-handle');if(hRow)hRow.closest('.fg').style.display=(t==='card')?'none':'block';
+}
+function saveReceiveQR(){
+  var name=(document.getElementById('rcv-name')||{}).value||'';
+  var type=(document.getElementById('rcv-type')||{}).value||'upi';
+  var handle=((document.getElementById('rcv-handle')||{}).value||'').trim();
+  var link=((document.getElementById('rcv-link')||{}).value||'').trim();
+  // SECURITY: never accept anything that looks like a card/bank number anywhere
+  if(rbLooksLikeCardNumber(handle)||rbLooksLikeCardNumber(link)){
+    toast('For your safety, never enter a card or account number here. Use a UPI ID or a secure checkout link.','err');return;
+  }
+  if(type==='card'){
+    if(!/^https:\/\//i.test(link)){toast('Card payments need a secure https checkout link from your gateway (Stripe, Razorpay, PayTabs, mada…).','err');return;}
+    savePayId({name:name.trim()||CU.name,type:'card',link:link,handle:link,ts:Date.now()});
+  } else {
+    if(!handle){toast('Enter your payment handle','err');return;}
+    if(type==='upi'&&handle.indexOf('@')<0){toast('UPI ID looks like name@bank (e.g. asha@okaxis)','err');return;}
+    savePayId({name:name.trim()||CU.name,handle:handle,type:type,ts:Date.now()});
+  }
+  try{rbConfetti(90);}catch(e){}
+  toast('Your payment QR is ready! 🎉','ok');
+  renderReceiveQR();
+}
+function shareReceiveQR(){
+  var rec=getPayId();if(!rec)return;
+  var amt=(document.getElementById('rcv-amt')||{}).value||'';
+  var link=(rec.type==='upi')?buildUpiLink(rec.handle,rec.name,amt||'','Pay '+(rec.name||'')):rec.handle;
+  var txt='Pay '+(rec.name||CU.name)+(amt?(' ₹'+amt):'')+' on Reedbi: '+link;
+  if(navigator.share){navigator.share({title:'Reedbi payment',text:txt}).catch(function(){});}
+  else{try{navigator.clipboard.writeText(txt);toast('Payment link copied','ok');}catch(e){toast(link,'info');}}
+}
+
+/* ===== v144: Learn Something New =====
+   A daily, positive, wholesome knowledge nugget — honest trade, useful skills,
+   wellbeing, kindness, gratitude, productivity. It rewards curiosity (points +
+   a learning streak) so the app uplifts the mind instead of draining it. This is
+   what sets Reedbi apart from ordinary shopping/social apps. */
+var RB_LEARN=[
+  {cat:'Honest Trade',ic:'handshake',t:'Honesty is the best business strategy',x:'A trader known for truthfulness keeps customers for life. Describe your product exactly as it is — flaws and all. Trust compounds faster than any discount.'},
+  {cat:'Skill',ic:'bulb',t:'The 2-minute rule beats procrastination',x:'If a task takes under two minutes, do it now. Starting is the hardest part — once begun, most tasks finish themselves.'},
+  {cat:'Money',ic:'coins',t:'Pay yourself first',x:'Set aside a small share of every income the moment it arrives, before spending. Even 10% saved consistently builds real security over time.'},
+  {cat:'Wellbeing',ic:'heart-handshake',t:'Gratitude rewires the brain',x:'Writing down three things you are thankful for each night measurably lifts mood within weeks. Abundance starts with noticing what you already have.'},
+  {cat:'Kindness',ic:'gift',t:'A smile is charity',x:'Small good deeds — a kind word, helping someone carry a load, sharing food — cost nothing and ripple outward further than you will ever see.'},
+  {cat:'Skill',ic:'book',t:'Seek knowledge, always',x:'Learning one new thing daily — a word, a fact, a skill — adds up to mastery over a year. The mind grows only when it is stretched.'},
+  {cat:'Business',ic:'trending-up',t:'Serve before you sell',x:'Solve a real problem for people and the sale follows naturally. Customers remember how you made their life easier, not your sales pitch.'},
+  {cat:'Wellbeing',ic:'moon',t:'Sleep is a superpower',x:'Consistent sleep improves memory, mood and decisions more than any productivity hack. Protect it like you protect your income.'},
+  {cat:'Money',ic:'shield',t:'Avoid debt that grows',x:'Borrowing that piles on interest can trap you. Live within your means, save for what you want, and buy when you truly can afford it.'},
+  {cat:'Skill',ic:'target',t:'Tiny habits beat big goals',x:'One push-up, one page, one sale a day. Systems you repeat daily outperform bursts of motivation that fade.'},
+  {cat:'Kindness',ic:'users',t:'Lift others as you rise',x:'Teach what you learn, hire fairly, pay people on time. A community that prospers together is stronger than any one success.'},
+  {cat:'Wellbeing',ic:'walk',t:'Move your body daily',x:'A 20-minute walk clears the mind, sparks ideas and protects your health. The best thinking often happens on your feet.'},
+  {cat:'Business',ic:'star',t:'Quality is remembered, price is forgotten',x:'People forget what they paid long before they forget a product that lasted. Build things you would be proud to put your name on.'},
+  {cat:'Knowledge',ic:'world',t:'Waste nothing',x:'Use resources carefully, repair before replacing, share surplus. Mindful consumption is good for your wallet and the world you share.'},
+  {cat:'Wellbeing',ic:'brain',t:'Single-task to think deeply',x:'The mind does its best work on one thing at a time. Close the extra tabs — focus is the rarest and most valuable skill today.'}
+];
+function todaysLearning(){
+  var d=new Date();var seed=d.getFullYear()*1000+(d.getMonth()*31)+d.getDate();
+  return RB_LEARN[seed%RB_LEARN.length];
+}
+function learnState(){return LS.get('rb_learn',{streak:0,doneKey:'',total:0})||{streak:0,doneKey:'',total:0};}
+function markLearned(){
+  var s=learnState();var today=dayKey();
+  if(s.doneKey===today){toast('Already learned today — come back tomorrow!','info');return;}
+  var yest=dayKey(Date.now()-86400000);
+  s.streak=(s.doneKey===yest)?(s.streak||0)+1:1;s.doneKey=today;s.total=(s.total||0)+1;
+  LS.set('rb_learn',s);
+  var l=loyalty();l.points=(l.points||0)+5;saveLoyalty(l);
+  try{rbConfetti(60);if(!getNotifCfg().muted)playTune('reedbi');}catch(e){}
+  toast('+5 points · '+s.total+' things learned 🌱','ok');
+  if(document.getElementById('home-scroll'))renderHome();
+}
+function learnCardHtml(){
+  var k=todaysLearning();var s=learnState();var done=(s.doneKey===dayKey());
+  return '<div class="learn-card"><span class="learn-cat"><i class="ti ti-'+k.ic+'"></i> '+esc(k.cat)+'</span>'
+    +'<div class="learn-title">'+esc(k.t)+'</div><div class="learn-text">'+esc(k.x)+'</div>'
+    +(done?'<div class="learn-done"><i class="ti ti-circle-check"></i> Learned today — see you tomorrow 🌱</div>'
+          :'<div class="learn-act"><button class="learn-btn" onclick="markLearned()"><i class="ti ti-seedling"></i> I learned this (+5)</button></div>')
+    +(s.streak?'<div class="learn-streak">🌱 '+s.streak+'-day learning streak · '+(s.total||0)+' things learned</div>':'')
+    +'</div>';
+}
+
+/* ===== v145: Habit Tracker =====
+   Custom + curated wholesome habits, run as 40- or 90-day challenges. Daily
+   check-ins fill a progress grid, build streaks, earn points and confetti, and
+   celebrate milestones — turning self-improvement into a satisfying daily ritual.
+   Preset habits are framed positively and universally (no labels). */
+var RB_HABIT_PRESETS=[
+  {n:'Morning reflection',ic:'sunrise',c:'#f59e0b',topic:'Mind'},
+  {n:'Gratitude — 3 good things',ic:'heart',c:'#db2777',topic:'Mind'},
+  {n:'Read 10 pages',ic:'book',c:'#7c3aed',topic:'Growth'},
+  {n:'Learn one new thing',ic:'bulb',c:'#0a66c2',topic:'Growth'},
+  {n:'Drink enough water',ic:'droplet',c:'#06b6d4',topic:'Health'},
+  {n:'Walk 20 minutes',ic:'walk',c:'#16a34a',topic:'Health'},
+  {n:'Sleep early',ic:'moon',c:'#475569',topic:'Health'},
+  {n:'Help someone today',ic:'hand-love-you',c:'#e11d48',topic:'Kindness'},
+  {n:'Give a little (charity)',ic:'gift',c:'#0d9488',topic:'Kindness'},
+  {n:'Speak only kindly',ic:'message-heart',c:'#db2777',topic:'Kindness'},
+  {n:'Honest in all dealings',ic:'shield-check',c:'#0a66c2',topic:'Discipline'},
+  {n:'Avoid waste',ic:'recycle',c:'#16a34a',topic:'Discipline'},
+  {n:'No idle scrolling',ic:'device-mobile-off',c:'#475569',topic:'Discipline'},
+  {n:'Wake up on time',ic:'alarm',c:'#f59e0b',topic:'Discipline'}
+];
+var RB_HABIT_TOPICS=['Health','Mind','Growth','Kindness','Discipline'];
+function getHabits(){return LS.get('rb_habits',[])||[];}
+function saveHabits(h){LS.set('rb_habits',h);}
+function habitProgress(h){
+  var done=(h.done||[]).length;var pct=Math.min(100,Math.round(done/(h.days||40)*100));
+  // current streak
+  var set={};(h.done||[]).forEach(function(k){set[k]=1;});var streak=0;var d=Date.now();
+  if(set[dayKey()]){streak=1;d-=86400000;while(set[dayKey(d)]){streak++;d-=86400000;}}
+  else{d-=86400000;while(set[dayKey(d)]){streak++;d-=86400000;}}
+  return {done:done,pct:pct,streak:streak,left:Math.max(0,(h.days||40)-done)};
+}
+function openHabits(){
+  if(!requireAuth('track habits'))return;
+  var ovl=document.getElementById('habits-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='habits-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:460px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-checkup-list" style="color:#16a34a"></i> Habit Tracker</b><button class="modal-x" onclick="closeOvl(\'habits-ovl\')"><i class="ti ti-x"></i></button></div><div id="habits-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderHabits();
+  ovl.classList.add('open');
+}
+function renderHabits(){
+  var habits=getHabits();var box=document.getElementById('habits-body');if(!box)return;
+  var h='<button class="btn btnok" style="width:100%;margin-bottom:12px" onclick="openAddHabit()"><i class="ti ti-plus"></i> Start a new habit</button>';
+  if(!habits.length){
+    h+='<div class="home-empty" style="margin-bottom:12px">No habits yet. Start one above — pick a 40 or 90-day challenge and build a streak. 🌱</div>';
+  }
+  h+=habits.map(function(hb){
+    var p=habitProgress(hb);var doneToday=(hb.done||[]).indexOf(dayKey())>=0;var complete=p.done>=(hb.days||40);
+    var R=20,C=2*Math.PI*R,off=C*(1-p.pct/100);
+    var grid='<div class="hab-grid">'+Array.from({length:hb.days||40}).map(function(_,i){
+      var on=i<p.done;return '<div class="hab-dot'+(on?' on':'')+(i===p.done&&!complete?' today':'')+'"></div>';
+    }).join('')+'</div>';
+    return '<div class="hab-card"><div class="hab-top"><div class="hab-ic" style="background:'+(hb.c||'#16a34a')+'"><i class="ti ti-'+(hb.ic||'check')+'"></i></div>'
+      +'<div style="flex:1;min-width:0"><div class="hab-name">'+esc(hb.n)+'</div><div class="hab-meta">'+esc(hb.topic||'')+' · '+(hb.days||40)+'-day challenge · 🔥 '+p.streak+'-day streak</div></div>'
+      +'<div class="hab-ring"><svg width="46" height="46"><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="var(--card2)" stroke-width="4"/><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'"/></svg><div class="pc">'+p.pct+'%</div></div></div>'
+      +grid
+      +(complete?'<div class="learn-done" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;margin-top:11px"><i class="ti ti-trophy"></i> Challenge complete — '+(hb.days)+' days! 🎉</div>'
+        :'<button class="hab-check'+(doneToday?' done':'')+'" onclick="toggleHabitToday(\''+hb.id+'\')">'+(doneToday?'<i class="ti ti-check"></i> Done today — '+p.left+' days to go':'<i class="ti ti-circle-check"></i> Mark done today')+'</button>')
+      +'<div style="text-align:right;margin-top:6px"><button style="background:none;border:none;color:var(--mt2);font-size:11px;cursor:pointer" onclick="delHabit(\''+hb.id+'\')"><i class="ti ti-trash"></i> remove</button></div>'
+      +'</div>';
+  }).join('');
+  box.innerHTML=h;
+}
+var __habNewDays=40,__habPreset=null;
+function openAddHabit(){
+  __habNewDays=40;__habPreset=null;
+  var box=document.getElementById('habits-body');if(!box)return;
+  box.innerHTML='<button style="background:none;border:none;color:#0a66c2;font-weight:700;cursor:pointer;margin-bottom:8px" onclick="renderHabits()"><i class="ti ti-arrow-left"></i> Back</button>'
+    +'<div style="font-size:14px;font-weight:800;margin-bottom:8px">Start a new habit</div>'
+    +'<div class="fg"><label>Your own habit</label><input id="hab-custom" placeholder="e.g. Pray on time, Journal, Meditate"></div>'
+    +'<div style="font-size:12px;font-weight:700;margin:12px 0 7px">Or pick a wholesome one:</div>'
+    +'<div style="max-height:230px;overflow-y:auto">'+RB_HABIT_PRESETS.map(function(p,i){
+      return '<div class="hab-preset" onclick="habPickPreset('+i+')" id="habp-'+i+'"><div class="ic" style="background:'+p.c+'"><i class="ti ti-'+p.ic+'"></i></div><div style="flex:1"><b style="font-size:13px">'+esc(p.n)+'</b><div style="font-size:10px;color:var(--mt2)">'+esc(p.topic)+'</div></div><i class="ti ti-circle-plus" style="color:#16a34a"></i></div>';
+    }).join('')+'</div>'
+    +'<div style="font-size:12px;font-weight:700;margin:13px 0 7px">Challenge length</div>'
+    +'<div style="display:flex;gap:8px" id="hab-days-row">'+[40,90].map(function(d){return '<button class="hab-chip'+(d===40?' on':'')+'" onclick="habSetDays('+d+')" id="habd-'+d+'">'+d+' days</button>';}).join('')+'</div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:14px" onclick="createHabit()"><i class="ti ti-rocket"></i> Begin challenge</button>';
+}
+function habSetDays(d){__habNewDays=d;[40,90].forEach(function(x){var b=document.getElementById('habd-'+x);if(b)b.className='hab-chip'+(x===d?' on':'');});}
+function habPickPreset(i){__habPreset=i;document.querySelectorAll('.hab-preset').forEach(function(el,idx){el.style.borderColor=(idx===i?'#16a34a':'var(--b)');el.style.background=(idx===i?'rgba(22,163,74,.08)':'transparent');});var ci=document.getElementById('hab-custom');if(ci)ci.value='';}
+function createHabit(){
+  var custom=((document.getElementById('hab-custom')||{}).value||'').trim();
+  var hb;
+  if(custom){hb={id:'hab'+Date.now(),n:custom,ic:'star',c:'#0a66c2',topic:'Custom'};}
+  else if(__habPreset!=null){var p=RB_HABIT_PRESETS[__habPreset];hb={id:'hab'+Date.now(),n:p.n,ic:p.ic,c:p.c,topic:p.topic};}
+  else{toast('Type a habit or pick one','err');return;}
+  hb.days=__habNewDays;hb.startTs=Date.now();hb.done=[];
+  var habits=getHabits();habits.unshift(hb);saveHabits(habits);
+  try{rbConfetti(70);}catch(e){}
+  toast('Challenge started — see you tomorrow! 🌱','ok');
+  renderHabits();
+}
+function toggleHabitToday(id){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  hb.done=hb.done||[];var k=dayKey();var idx=hb.done.indexOf(k);
+  if(idx>=0){hb.done.splice(idx,1);saveHabits(habits);renderHabits();return;}
+  hb.done.push(k);saveHabits(habits);
+  var l=loyalty();l.points=(l.points||0)+3;saveLoyalty(l);
+  var p=habitProgress(hb);
+  var milestone=(p.done===hb.days)||(p.done%10===0);
+  try{rbConfetti(milestone?140:60);if(!getNotifCfg().muted)playTune('reedbi');}catch(e){}
+  if(p.done>=hb.days){toast('🏆 '+hb.days+'-day challenge complete! Amazing!','ok');}
+  else if(p.done%10===0){toast('🔥 '+p.done+' days! +3 points · keep going','ok');}
+  else{toast('+3 points · day '+p.done+' of '+hb.days+' 🌱','ok');}
+  renderHabits();
+  if(document.getElementById('home-scroll'))renderHome();
+}
+function delHabit(id){if(!confirm('Remove this habit and its progress?'))return;saveHabits(getHabits().filter(function(x){return x.id!==id;}));renderHabits();}
 </script></body></html>
