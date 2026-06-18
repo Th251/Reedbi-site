@@ -1176,7 +1176,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v156</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v159</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5871,7 +5871,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v156 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v159 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11931,7 +11931,10 @@ function openHabitDay(id,idx){
 }
 function habDaySet(id,idx,achieved){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;hb.done=hb.done||[];
-  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);var i=hb.done.indexOf(dk);
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+  if(achieved){var pp=String(dk).split('-');var dd=new Date(+pp[0],+pp[1],+pp[2]);dd.setHours(0,0,0,0);var tt=new Date();tt.setHours(0,0,0,0);
+    if(dd.getTime()>tt.getTime()){toast('That day hasn\'t arrived yet — only today can be marked ✅','info');return;}}
+  var i=hb.done.indexOf(dk);
   if(achieved&&i<0){hb.done.push(dk);}else if(!achieved&&i>=0){hb.done.splice(i,1);}
   saveHabits(habits);openHabitDay(id,idx);renderHabits();
 }
@@ -12217,7 +12220,7 @@ function habitSnap(hb){
   var p=habitProgress(hb);var start=hb.startTs||Date.now();var grid=[];
   for(var i=0;i<(hb.days||40);i++){grid.push((hb.done||[]).indexOf(dayKey(start+i*86400000))>=0?1:0);}
   return {v:1,nm:(CU&&CU.name)||'A friend',t:hb.n,goal:hb.goal||'',aff:hb.manifest||'',days:hb.days||40,
-    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),c:hb.c||'#16a34a'};
+    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),c:hb.c||'#16a34a'};
 }
 function shareHabitLink(habitId){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===habitId;});if(!hb)return;
@@ -12254,7 +12257,10 @@ function openSharedHabit(snap,views){
     +(snap.aff?'<div style="text-align:center;font-style:italic;color:#0d9488;margin-top:12px;font-size:14px">✨ '+esc(snap.aff)+'</div>':'')
     +(snap.music?'<button class="btn" style="width:100%;margin-top:11px;border:1px solid #0d9488;color:#0d9488;font-weight:700" onclick="shPlayMusic(\''+encodeURIComponent(snap.music)+'\')"><i class="ti ti-music"></i> Play their motivation track</button>':'')
     +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-top:12px">A view-only journey — cheer them on! 💚</div>'
-    +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="closeOvl(\'shhabit-ovl\');location.hash=\'\';openHabits()"><i class="ti ti-rocket"></i> Start my own — it\'s free</button>';
+    +'<button class="btn" style="width:100%;margin-top:10px;border:1px solid #7c3aed;color:#7c3aed;font-weight:700" onclick="downloadHabitImage()"><i class="ti ti-photo-down"></i> Save status image</button>'
+    +'<button class="btn" style="width:100%;margin-top:8px;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800" onclick="makeHabitVideo(30)"><i class="ti ti-video"></i> Make 30s video (with music) for status</button>'
+    +'<button class="btn btnok" style="width:100%;margin-top:10px" onclick="closeOvl(\'shhabit-ovl\');location.hash=\'\';openHabits()"><i class="ti ti-rocket"></i> Start my own — it\'s free</button>';
+  __shhSnap=snap;
   ovl.classList.add('open');
 }
 (function(){
@@ -12281,15 +12287,20 @@ function editHabitGoal(id){
     '<div style="font-size:13px;font-weight:800;margin-bottom:8px">'+esc(hb.n)+'</div>'
     +'<div class="fg"><label>🎯 Your goal — why this habit matters</label><input id="hg-goal" placeholder="e.g. Build an emergency fund" value="'+esc(hb.goal||'')+'"></div>'
     +'<div class="fg" style="margin-top:8px"><label>✨ Your affirmation / manifestation</label><input id="hg-aff" placeholder="e.g. I am disciplined and consistent" value="'+esc(hb.manifest||'')+'"></div>'
-    +'<div class="fg" style="margin-top:8px"><label>🎵 Motivational music for this habit (plays on your shared chart)</label><div style="display:flex;gap:6px;margin-top:4px"><label class="hab-chip" style="cursor:pointer"><i class="ti ti-upload"></i> MP3<input type="file" accept="audio/*" style="display:none" onchange="hgUploadMusic(this,\''+id+'\')"></label><input id="hg-music" placeholder="or paste a direct audio URL (.mp3)" value="'+esc(hb.music||'')+'" style="flex:1"></div></div>'
+    +'<div class="fg" style="margin-top:8px"><label>🎵 Motivational music / voice (plays on your shared chart &amp; video)</label><div style="display:flex;gap:6px;margin-top:4px"><label class="hab-chip" style="cursor:pointer"><i class="ti ti-upload"></i> MP3<input type="file" accept="audio/*" style="display:none" onchange="hgUploadMusic(this,\''+id+'\')"></label><input id="hg-music" placeholder="or paste a direct audio URL (.mp3)" value="'+esc(hb.music||'')+'" style="flex:1"></div></div>'
+    +'<div class="fg" style="margin-top:8px"><label>🎤 Voice / track by (creator credit shown on the video)</label><input id="hg-by" placeholder="your name" value="'+esc(hb.musicBy||(CU&&CU.name)||'')+'"></div>'
+    +'<div id="hg-lib"></div>'
     +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveHabitGoal(\''+id+'\')"><i class="ti ti-device-floppy"></i> Save</button>';
   ovl.classList.add('open');
+  hgRenderLib(id);
 }
 function saveHabitGoal(id){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
   hb.goal=((document.getElementById('hg-goal')||{}).value||'').trim();
   hb.manifest=((document.getElementById('hg-aff')||{}).value||'').trim();
   hb.music=((document.getElementById('hg-music')||{}).value||'').trim();
+  hb.musicBy=((document.getElementById('hg-by')||{}).value||'').trim()||((CU&&CU.name)||'');
+  if(hb.music){registerTrack(hb.music,hb.musicBy,hb.n);}
   saveHabits(habits);closeOvl('habgoal-ovl');renderHabits();
   try{rbConfetti(50);}catch(e){}
   toast('Goal saved 🎯','ok');
@@ -12300,5 +12311,165 @@ function hgUploadMusic(input,id){
   var file=input.files&&input.files[0];if(!file)return;
   try{var url=URL.createObjectURL(file);var el=document.getElementById('hg-music');if(el)el.value=url;toast('Track attached — tap Save 🎵','ok');}
   catch(e){toast('Could not load that file','err');}
+}
+
+/* ===== v157: generate a real PNG of the habit dashboard for WhatsApp status =====
+   Draws the colorful dashboard onto a canvas and lets the user download/share it
+   as an image. They post the IMAGE to their status (curiosity) + the link in the
+   caption (music plays when a friend opens the link). */
+var __shhSnap=null;
+function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function drawDash(ctx,W,H,snap,frac){
+  if(frac==null)frac=1;
+  var g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,snap.c||'#16a34a');g.addColorStop(.6,'#0a66c2');g.addColorStop(1,'#7c3aed');
+  ctx.fillStyle=g;rrect(ctx,0,0,W,H,40);ctx.fill();
+  ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.92)';
+  ctx.font='28px system-ui,Arial';ctx.fillText((snap.nm||'A friend')+"'s "+(snap.days||40)+'-day journey',W/2,90);
+  ctx.fillStyle='#fff';ctx.font='800 52px system-ui,Arial';ctx.fillText(snap.t||'My habit',W/2,160);
+  var cx=W/2,cy=320,R=110,pct=snap.pct||0;var shown=Math.round(pct*frac);
+  ctx.lineWidth=22;ctx.lineCap='round';
+  ctx.strokeStyle='rgba(255,255,255,.28)';ctx.beginPath();ctx.arc(cx,cy,R,0,2*Math.PI);ctx.stroke();
+  ctx.strokeStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,R,-Math.PI/2,-Math.PI/2+2*Math.PI*(pct*frac/100));ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='800 72px system-ui,Arial';ctx.fillText(shown+'%',cx,cy+10);
+  ctx.font='24px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillText('achieved',cx,cy+50);
+  var tiles=[[(snap.done||0)+'/'+(snap.days||40),'days done'],['🔥 '+(snap.streak||0),'streak'],[((snap.days||40)-(snap.done||0))+'','days to go']];
+  var tw=200,th=120,gap=20,startX=(W-(tw*3+gap*2))/2,ty=470;
+  tiles.forEach(function(t,i){var x=startX+i*(tw+gap);ctx.fillStyle='rgba(255,255,255,.16)';rrect(ctx,x,ty,tw,th,18);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='800 40px system-ui,Arial';ctx.fillText(t[0],x+tw/2,ty+58);
+    ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillText(t[1],x+tw/2,ty+95);});
+  ctx.textAlign='left';ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='22px system-ui,Arial';ctx.fillText('Days completed',startX,ty+175);
+  var cols=10,cell=54,cg=8,gx=startX,gy=ty+195;var grid=snap.grid||[];
+  for(var k=0;k<grid.length;k++){var r=Math.floor(k/cols),cc=k%cols;var x=gx+cc*(cell+cg),y=gy+r*(cell+cg);
+    ctx.fillStyle=grid[k]?'#fff':'rgba(255,255,255,.2)';rrect(ctx,x,y,cell,cell,10);ctx.fill();}
+  ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='24px system-ui,Arial';
+  if(snap.aff)ctx.fillText('✨ '+snap.aff,W/2,H-90);
+  if(snap.by){ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.92)';ctx.fillText('🎤 voice by '+snap.by,W/2,H-78);}
+  ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillText('Track yours free on Reedbi',W/2,H-45);
+}
+function habitDashCanvas(snap){
+  var W=720,H=1100,cv=document.createElement('canvas');cv.width=W;cv.height=H;var ctx=cv.getContext('2d');
+  drawDash(ctx,W,H,snap,1);return cv;
+}
+function downloadHabitImage(){
+  if(!__shhSnap){toast('Open a shared chart first','info');return;}
+  try{
+    var cv=habitDashCanvas(__shhSnap);
+    cv.toBlob(function(blob){
+      if(!blob){toast('Could not create image','err');return;}
+      var file=null;try{file=new File([blob],'reedbi-journey.png',{type:'image/png'});}catch(e){}
+      if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:(__shhSnap.t||'My journey'),text:(__shhSnap.nm||'')+"'s journey on Reedbi"}).catch(function(){});
+      }else{
+        var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='reedbi-journey.png';document.body.appendChild(a);a.click();a.remove();
+        setTimeout(function(){URL.revokeObjectURL(url);},2000);
+        toast('Image saved — post it to your WhatsApp status 📸','ok');
+      }
+    },'image/png');
+  }catch(e){toast('Image generation not supported on this browser','err');}
+}
+
+/* ===== v158: auto-generate a short VIDEO (image + your music) for WhatsApp status =====
+   A video posted to WhatsApp status DOES play its embedded audio (a link can't).
+   Records the animated dashboard canvas + your MP3/audio into a compact webm/mp4.
+   Works best on Android Chrome; iOS Safari has limited recording support. */
+function shareVideoBlob(blob,mime){
+  var ext=mime.indexOf('mp4')>=0?'mp4':'webm';
+  var file=null;try{file=new File([blob],'reedbi-journey.'+ext,{type:mime});}catch(e){}
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:'My Reedbi journey'}).catch(function(){});
+  }else{
+    var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='reedbi-journey.'+ext;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},3000);
+  }
+  var note=ext==='webm'?'Video saved (webm). If WhatsApp won\'t accept it, use the image instead 📸':'Video saved — post it to your WhatsApp status 🎬';
+  toast(note,'ok');
+}
+function makeHabitVideo(seconds){
+  if(!__shhSnap){toast('Open a shared chart first','info');return;}
+  var snap=__shhSnap;seconds=seconds||30;
+  if(typeof MediaRecorder==='undefined'||!document.createElement('canvas').captureStream){
+    toast('This browser can\'t record video here — use Save image instead 📸','info');return;
+  }
+  var W=540,H=825,cv=document.createElement('canvas');cv.width=W;cv.height=H;var ctx=cv.getContext('2d');
+  var sc=W/720; // scale drawing (designed at 720 wide)
+  function frame(frac){ctx.save();ctx.scale(sc,sc);drawDash(ctx,720,1100,snap,frac);ctx.restore();}
+  frame(0);
+  var vstream=cv.captureStream(20);
+  function pickMime(){var opts=['video/mp4;codecs=h264,aac','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];for(var i=0;i<opts.length;i++){if(MediaRecorder.isTypeSupported(opts[i]))return opts[i];}return 'video/webm';}
+  function record(stream){
+    var mime=pickMime();var rec;try{rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:700000});}catch(e){rec=new MediaRecorder(stream);mime='video/webm';}
+    var chunks=[];rec.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data);};
+    rec.onstop=function(){shareVideoBlob(new Blob(chunks,{type:mime}),mime);};
+    rec.start();
+    var t0=Date.now();(function loop(){var el=Date.now()-t0;var p=Math.min(1,el/Math.min(2500,seconds*1000));frame(0.15+0.85*p);if(el<seconds*1000){requestAnimationFrame(loop);}})();
+    toast('Creating your '+seconds+'s video… keep this open ⏳','info');
+    setTimeout(function(){try{rec.stop();}catch(e){}if(window.__vidAudio){try{window.__vidAudio.pause();}catch(e){}}},seconds*1000+150);
+  }
+  var src=snap.music||'';
+  if(src){
+    try{
+      var actx=new (window.AudioContext||window.webkitAudioContext)();
+      var au=new Audio();au.crossOrigin='anonymous';au.loop=true;au.src=src;window.__vidAudio=au;
+      var asrc=actx.createMediaElementSource(au);var dest=actx.createMediaStreamDestination();
+      asrc.connect(dest);asrc.connect(actx.destination);
+      au.play().then(function(){
+        var combined=new MediaStream();vstream.getVideoTracks().forEach(function(t){combined.addTrack(t);});
+        dest.stream.getAudioTracks().forEach(function(t){combined.addTrack(t);});
+        record(combined);
+      }).catch(function(){toast('Couldn\'t load that audio (it may block embedding) — making a silent video','info');record(vstream);});
+    }catch(e){record(vstream);}
+  } else {
+    toast('No music set — add one via "set goal" for a video with sound','info');record(vstream);
+  }
+}
+
+/* ===== v159: shared motivational voice/track library =====
+   Tracks are USE-ONLY: you can preview and pick a track to make a video, but
+   there is NO download — the raw audio is never offered for saving. Each track
+   carries its creator's name, shown as "voice by …" on the generated video.
+   Cross-user sharing of direct-URL tracks needs cloud sync (Firebase) ON. */
+function getTracks(){return LS.get('rb_motiv_tracks',[])||[];}
+function saveTracks(a){LS.set('rb_motiv_tracks',a);}
+function registerTrack(url,by,title){
+  if(!url)return;
+  var tr=getTracks();
+  if(tr.some(function(t){return t.url===url;}))return; // de-dupe
+  var t={id:'tk'+Date.now().toString(36),url:url,by:by||((CU&&CU.name)||'Anonymous'),title:title||'Motivation track',ts:Date.now(),local:/^blob:/.test(url)};
+  tr.unshift(t);saveTracks(tr.slice(0,50));
+  // Cross-user library: only direct (non-blob) URLs can be shared via cloud
+  if(!t.local&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
+    try{FB.db.collection('tracks').doc(t.id).set({url:t.url,by:t.by,title:t.title,ts:t.ts,owner:(CU&&CU.uid)||''});}catch(e){}
+  }
+}
+function hgRenderLib(habitId){
+  var box=document.getElementById('hg-lib');if(!box)return;
+  var tr=getTracks();
+  function paint(list){
+    if(!list.length){box.innerHTML='<div style="font-size:11px;color:var(--mt2);margin-top:8px">No saved tracks yet. Attach one above — it joins your library with your name.</div>';return;}
+    box.innerHTML='<div style="font-size:11px;font-weight:800;color:var(--mt2);margin:10px 0 4px">🎚️ Choose from library (use-only — no download)</div>'
+      +'<div style="border:1px solid var(--b);border-radius:10px;max-height:150px;overflow:auto">'
+      +list.map(function(t){return '<div style="display:flex;align-items:center;gap:6px;padding:7px 9px;border-bottom:1px solid var(--b)">'
+        +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.title||'Track')+'</div><div style="font-size:10px;color:var(--mt2)">🎤 by '+esc(t.by||'Anonymous')+(t.local?' · only on your device':'')+'</div></div>'
+        +'<button class="hab-chip" onclick="hgPreview(\''+encodeURIComponent(t.url)+'\')"><i class="ti ti-player-play"></i></button>'
+        +'<button class="hab-chip on" onclick="hgUseTrack(\''+t.id+'\',\''+habitId+'\')">Use</button></div>';}).join('')+'</div>';
+  }
+  paint(tr);
+  // merge cloud tracks if available
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
+    try{FB.db.collection('tracks').orderBy('ts','desc').limit(30).get().then(function(qs){
+      var seen={};tr.forEach(function(t){seen[t.url]=1;});
+      qs.forEach(function(d){var x=d.data();if(x.url&&!seen[x.url]){seen[x.url]=1;tr.push({id:d.id,url:x.url,by:x.by,title:x.title,ts:x.ts,local:false});}});
+      paint(tr);
+    }).catch(function(){});}catch(e){}
+  }
+}
+var __hgPrev=null;
+function hgPreview(u){try{u=decodeURIComponent(u);if(__hgPrev)__hgPrev.pause();__hgPrev=new Audio(u);__hgPrev.play().catch(function(){toast('Tap again to preview','info');});}catch(e){toast('Cannot preview this track','err');}}
+function hgUseTrack(tid,habitId){
+  var t=getTracks().find(function(x){return x.id===tid;});
+  if(!t){toast('Track not found','err');return;}
+  var mEl=document.getElementById('hg-music');if(mEl)mEl.value=t.url;
+  var bEl=document.getElementById('hg-by');if(bEl)bEl.value=t.by||'';
+  toast('Selected "'+(t.title||'track')+'" by '+(t.by||'Anonymous')+' 🎤','ok');
 }
 </script></body></html>
