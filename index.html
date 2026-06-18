@@ -962,6 +962,14 @@ body.dark .spin-wheel{border-color:#2a333f}
 .shh-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:4px}
 .shh-dot{aspect-ratio:1;border-radius:4px;background:rgba(255,255,255,.18)}
 .shh-dot.on{background:#fff}
+.dopa{background:linear-gradient(120deg,#7c3aed,#0a66c2 50%,#0d9488);color:#fff;border-radius:16px;padding:15px 16px;margin-bottom:12px;position:relative;overflow:hidden}
+.dopa::after{content:"";position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 65%)}
+.dopa .msg{font-size:14px;font-weight:800;line-height:1.35;position:relative}
+.dopa .sub{font-size:11px;opacity:.92;margin-top:5px;position:relative;display:flex;gap:12px;flex-wrap:wrap}
+@keyphrase{}
+.dopa .pulse{display:inline-block;animation:dpulse 1.6s ease-in-out infinite}
+@keyframes dpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+
 
 
 
@@ -1176,7 +1184,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v159</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v163</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4467,6 +4475,7 @@ function fbLoadProfile(uid,email){
     FB.db.collection('users').doc(uid).get().then(function(doc){
       if(doc&&doc.exists){var d=doc.data();CU={uid:uid,name:d.name||CU.name,email:email||CU.email,co:d.co||'',avIdx:d.avIdx||0};LS.set('rb_user',CU);
         document.getElementById('uc-nm').textContent=CU.name;document.getElementById('uc-av').textContent=ini(CU.name);document.getElementById('uc-av').className='uchip-av '+avC(CU.avIdx);}
+      try{cloudLoadState(uid);}catch(e){}
     }).catch(function(e){console.warn('profile read blocked (check Firestore rules)',e);});
   }catch(e){}
 }
@@ -5871,7 +5880,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v159 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v163 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11046,7 +11055,7 @@ function pushRecentViewed(pid){
   var r=getRecentViewed().filter(function(x){return x!==pid;});r.unshift(pid);LS.set('rb_recent',r.slice(0,16));
 }
 function loyalty(){return LS.get('rb_loyalty',{points:0,streak:0,last:0})||{points:0,streak:0,last:0};}
-function saveLoyalty(l){LS.set('rb_loyalty',l);}
+function saveLoyalty(l){LS.set('rb_loyalty',l);cloudBumpTs();cloudSaveState();}
 function dayKey(ts){var d=new Date(ts||Date.now());return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();}
 function doCheckin(){
   var l=loyalty();var today=dayKey();
@@ -11795,7 +11804,33 @@ var RB_HABIT_PRESETS=[
 ];
 var RB_HABIT_TOPICS=['Health','Mind','Growth','Kindness','Discipline'];
 function getHabits(){return LS.get('rb_habits',[])||[];}
-function saveHabits(h){LS.set('rb_habits',h);}
+function saveHabits(h){LS.set('rb_habits',h);cloudBumpTs();cloudSaveState();}
+var __cloudSaveT=null;
+function cloudBumpTs(){LS.set('rb_state_ts',Date.now());}
+function cloudSaveState(){
+  if(!(FB.ready&&FB.db&&!FB_CLOUD_DISABLED))return;
+  if(!CU||CU.guest||!CU.uid)return;
+  clearTimeout(__cloudSaveT);
+  __cloudSaveT=setTimeout(function(){
+    try{FB.db.collection('users').doc(CU.uid).set({hbits:getHabits(),loy:loyalty(),gsheet:getSheet(),mtracks:getTracks(),stateTs:(LS.get('rb_state_ts',0)||Date.now())},{merge:true}).catch(function(){});}catch(e){}
+  },1200);
+}
+function cloudLoadState(uid){
+  if(!(FB.ready&&FB.db&&!FB_CLOUD_DISABLED))return;
+  try{FB.db.collection('users').doc(uid).get().then(function(doc){
+    if(!doc||!doc.exists)return;var d=doc.data();var cloudTs=d.stateTs||0;var localTs=LS.get('rb_state_ts',0)||0;
+    var localEmpty=(getHabits().length===0);
+    if(cloudTs>localTs||(localEmpty&&d.hbits&&d.hbits.length)){
+      if(d.hbits)LS.set('rb_habits',d.hbits);
+      if(d.loy)LS.set('rb_loyalty',d.loy);
+      if(d.gsheet)LS.set('rb_goalsheet',d.gsheet);
+      if(d.mtracks)LS.set('rb_motiv_tracks',d.mtracks);
+      LS.set('rb_state_ts',cloudTs||Date.now());
+      try{if(document.getElementById('habits-ovl')&&document.getElementById('habits-ovl').classList.contains('open')&&typeof renderHabits==='function')renderHabits();}catch(e){}
+      try{if(document.getElementById('gsheet-ovl')&&document.getElementById('gsheet-ovl').classList.contains('open')&&typeof renderGoalSheet==='function')renderGoalSheet();}catch(e){}
+    }
+  }).catch(function(){});}catch(e){}
+}
 function habitProgress(h){
   var done=(h.done||[]).length;var pct=Math.min(100,Math.round(done/(h.days||40)*100));
   // current streak
@@ -11816,7 +11851,7 @@ function openHabits(){
 function renderHabits(){
   var habits=getHabits();var box=document.getElementById('habits-body');if(!box)return;
   var remOn=habRemindOn();
-  var h='<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
+  var h=dopaBanner()+'<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
     +'<div style="font-size:20px">'+(remOn?'🔔':'🔕')+'</div><div style="flex:1"><div style="font-size:13px;font-weight:800">Daily reminders</div><div style="font-size:10px;color:var(--mt2)">A gentle nudge at 5:00 AM &amp; 9:30 PM</div></div>'
     +(remOn?'<button class="hab-chip on" onclick="disableHabitReminders()">On</button>':'<button class="hab-chip" onclick="enableHabitReminders()">Turn on</button>')+'</div>'
     +(remOn?'<div style="display:flex;align-items:center;gap:8px;margin:-4px 0 11px;font-size:12px"><span style="color:var(--mt2)">Motivational tune</span><select id="hab-tune" onchange="habSetTune(this.value)" style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--b);background:var(--sf);color:var(--tx)">'+habTuneOptions()+'</select><button class="hab-chip" onclick="habPreviewTune()"><i class="ti ti-player-play"></i></button></div>':'');
@@ -11834,9 +11869,10 @@ function renderHabits(){
       return '<div class="hab-dot'+(on?' on':'')+(dk===dayKey()?' today':'')+'" title="day '+(i+1)+'" onclick="habCellClick(\''+hb.id+'\','+i+')" style="cursor:pointer;position:relative">'+(hasNote&&!on?'<span style=\'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#e23b3b\'>✎</span>':'')+'</div>';
     }).join('')+'</div>';
     return '<div class="hab-card"><div class="hab-top"><div class="hab-ic" style="background:'+(hb.c||'#16a34a')+'"><i class="ti ti-'+(hb.ic||'check')+'"></i></div>'
-      +'<div style="flex:1;min-width:0"><div class="hab-name">'+esc(hb.n)+' <button style="background:none;border:none;color:var(--mt2);cursor:pointer;font-size:12px" onclick="openRenameHabit(\''+hb.id+'\')"><i class="ti ti-edit"></i></button></div><div class="hab-meta">'+esc(hb.topic||'')+' · '+((hb.days||40)===365?'1-year':(hb.days||40)+'-day')+' · 🔥 '+p.streak+'-day streak</div></div>'
+      +'<div style="flex:1;min-width:0"><div class="hab-name">'+esc(hb.n)+' <button style="background:none;border:none;color:var(--mt2);cursor:pointer;font-size:12px" onclick="openRenameHabit(\''+hb.id+'\')"><i class="ti ti-edit"></i></button></div><div class="hab-meta">'+esc(hb.topic||'')+' · '+((hb.days||40)===365?'1-year':(hb.days||40)+'-day')+' · 🔥 '+p.streak+'-day streak</div>'+(hb.music?'<div style="font-size:11px;color:#7c3aed;margin-top:2px">🎵 '+esc(hb.musicBy||'your track')+'</div>':'')+'</div>'
       +'<div class="hab-ring"><svg width="46" height="46"><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="var(--card2)" stroke-width="4"/><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'"/></svg><div class="pc">'+p.pct+'%</div></div></div>'
-      +'<div style="font-size:12px;margin-top:8px">'+(hb.goal?'<b>🎯 Goal:</b> '+esc(hb.goal):'<span style="color:var(--mt2)">No goal set yet</span>')+' <button style="background:none;border:none;color:#0a66c2;cursor:pointer;font-size:11px;font-weight:700" onclick="editHabitGoal(\''+hb.id+'\')"><i class="ti ti-edit"></i> set goal</button></div>'
+      +'<div style="font-size:12px;margin-top:8px">'+(hb.goal?'<b>🎯 Goal:</b> '+esc(hb.goal):'<span style="color:var(--mt2)">No goal set yet</span>')+' <button style="background:none;border:none;color:#0a66c2;cursor:pointer;font-size:11px;font-weight:700" onclick="editHabitGoal(\''+hb.id+'\')"><i class="ti ti-edit"></i> '+((hb.goals&&hb.goals.length)?'edit goals':'set goals')+'</button></div>'
+      +((hb.goals&&hb.goals.length)?'<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">'+hb.goals.slice(0,8).map(function(g){return '<span style="font-size:11px;background:rgba(22,163,74,.10);color:#16a34a;border:1px solid rgba(22,163,74,.25);border-radius:20px;padding:3px 9px">🎯 '+esc(g.name)+'</span>';}).join('')+(hb.goals.length>8?'<span style="font-size:11px;color:var(--mt2)">+'+(hb.goals.length-8)+' more</span>':'')+'</div>':'')
       +(hb.manifest?'<div style="font-size:12px;color:#0d9488;margin-top:3px;font-style:italic">✨ '+esc(hb.manifest)+'</div>':'')
       +'<div style="font-size:10px;color:var(--mt2);margin-top:8px">Tap any day to add a reflection 📝</div>'
       +grid
@@ -11855,7 +11891,7 @@ function openAddHabit(){
   var box=document.getElementById('habits-body');if(!box)return;
   box.innerHTML='<button style="background:none;border:none;color:#0a66c2;font-weight:700;cursor:pointer;margin-bottom:8px" onclick="renderHabits()"><i class="ti ti-arrow-left"></i> Back</button>'
     +'<div style="font-size:14px;font-weight:800;margin-bottom:8px">Start a new habit</div>'
-    +'<div class="fg"><label>Your own habit</label><input id="hab-custom" placeholder="e.g. Pray on time, Journal, Meditate"></div>'
+    +'<div class="fg"><label>Your own habit</label><input id="hab-custom" placeholder="e.g. Save money, Journal, Wake early" autocapitalize="sentences" enterkeyhint="go" onkeydown="if(event.keyCode===13){event.preventDefault();createHabit();}"></div>'
     +'<div style="font-size:12px;font-weight:700;margin:12px 0 7px">Or pick a wholesome one:</div>'
     +'<div style="max-height:230px;overflow-y:auto">'+RB_HABIT_PRESETS.map(function(p,i){
       return '<div class="hab-preset" onclick="habPickPreset('+i+')" id="habp-'+i+'"><div class="ic" style="background:'+p.c+'"><i class="ti ti-'+p.ic+'"></i></div><div style="flex:1"><b style="font-size:13px">'+esc(p.n)+'</b><div style="font-size:10px;color:var(--mt2)">'+esc(p.topic)+'</div></div><i class="ti ti-circle-plus" style="color:#16a34a"></i></div>';
@@ -11967,7 +12003,11 @@ var RB_WELCOMES_AM=[
   'Hello %s! 🌷 Breathe, be grateful, and take one step toward your goal.',
   'Morning, champion %s! 🏆 Consistency beats intensity. Begin gently.',
   'Rise, %s! 🌄 Your dreams don\'t work unless you do — and you will.',
-  'Good morning %s! 🪴 Water your goals today. Small care, big growth.'
+  'Good morning %s! 🪴 Water your goals today. Small care, big growth.',
+  'Let\'s go, %s! 🚀 Future-you is cheering. One goal at a time — you\'ve got this.',
+  'Morning, %s! 🧠 Your brain loves small wins. Stack one now and feel the spark.',
+  'Hey %s! 🔥 Streaks are built one morning at a time. Keep the fire alive.',
+  'Good morning, %s! 🌟 Imagine ticking every goal today. That feeling? Go earn it.'
 ];
 var RB_WELCOMES_PM=[
   'Evening, %s! 🌙 How did today go? Take a moment to reflect and track.',
@@ -11979,7 +12019,11 @@ var RB_WELCOMES_PM=[
   'Good night soon, %s! 😌 Celebrate one thing you did well today.',
   'Evening, %s! 🌠 Progress, not perfection. Update your tracker and rest.',
   'Hey %s! 🛌 Reflect, breathe, be proud. Tomorrow is a new chance.',
-  'Evening %s! 🌙 Your consistency is quietly building something beautiful.'
+  'Evening %s! 🌙 Your consistency is quietly building something beautiful.',
+  'Hey %s! 🏅 Each tick today is a vote for the person you\'re becoming.',
+  'Evening, %s! 💎 Don\'t break the chain — finish strong and feel the pride.',
+  'Almost there, %s! ⚡ A few taps to complete today. Your future self says thanks.',
+  'Good evening %s! 🌈 Reflect, tick, and watch your streak glow brighter.'
 ];
 function habRemindOn(){return LS.get('rb_habit_remind',false);}
 function habWelcome(am){
@@ -11997,11 +12041,27 @@ function enableHabitReminders(){
   } else {arm();}
 }
 function disableHabitReminders(){LS.set('rb_habit_remind',false);if(document.getElementById('habits-body'))renderHabits();toast('Daily reminders off','info');}
+var RB_GOAL_NUDGES=['🎯 %g — one small step now. You\'ll feel amazing after.','%g is calling, %s! Tick it and feel the dopamine. ⚡','Tiny push: %g. Done beats perfect. 💪','%g — your future self is watching with pride. 🌟','Make %g happen today, %s. Momentum loves you. 🔥','%g: 2 minutes of effort = 1 day of progress. 🧠','Don\'t skip %g today — keep your streak glowing. ✨'];
+function goalNudge(name){var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';return RB_GOAL_NUDGES[Math.floor(Math.random()*RB_GOAL_NUDGES.length)].replace('%g',name).replace('%s',nm);}
+function fireGoalReminders(am){
+  var s=getSheet();if(!s||!s.goals||!s.goals.length)return;
+  var today=dayKey();var day=s.days[today]||{marks:{}};
+  var pending=s.goals.filter(function(g){return !(day.marks&&day.marks[g.id]==='done');});
+  pending.slice(0,12).forEach(function(g,i){
+    setTimeout(function(){
+      try{if(!getNotifCfg().muted)playTune(LS.get('rb_habit_tune','melody'));}catch(e){}
+      var line=goalNudge(g.name);
+      try{if(typeof Notification!=='undefined'&&Notification.permission==='granted'){new Notification('🎯 '+g.name,{body:line,tag:'rb-goal-'+g.id});}}catch(e){}
+    },(i+1)*1600);
+  });
+}
 function fireHabitReminder(am){
   var msg=habWelcome(am);
   try{if(!getNotifCfg().muted)playTune(LS.get('rb_habit_tune','melody'));}catch(e){}
-  try{if(typeof Notification!=='undefined'&&Notification.permission==='granted'){new Notification('Reedbi — '+(am?'Set your goal ☀️':'Track your day 🌙'),{body:msg,icon:'',tag:'rb-habit-'+(am?'am':'pm')});}}catch(e){}
+  try{if(typeof Notification!=='undefined'&&Notification.permission==='granted'){new Notification('Reedbi — '+(am?'Set your goals ☀️':'Track your day 🌙'),{body:msg,icon:'',tag:'rb-habit-'+(am?'am':'pm')});}}catch(e){}
   try{toast(msg,'ok');}catch(e){}
+  try{fireGoalReminders(am);}catch(e){}  // sheet goals
+  try{fireHabitGoalReminders(am);}catch(e){}  // a nudge + sound for EACH goal under each habit
 }
 // scheduler: checks every minute; fires once per slot per day when within the window
 (function(){
@@ -12025,7 +12085,7 @@ function habPreviewTune(){try{playTune(LS.get('rb_habit_tune','melody'));}catch(
    Achieved or Missed, note why you missed, and get a daily score (e.g. 9/10) in
    green. Matches the classic paper habit sheet — for any life goal you choose. */
 function getSheet(){return LS.get('rb_goalsheet',{name:'My Daily Goals',goals:[],days:{},startTs:Date.now()})||{name:'My Daily Goals',goals:[],days:{},startTs:Date.now()};}
-function saveSheet(s){LS.set('rb_goalsheet',s);}
+function saveSheet(s){LS.set('rb_goalsheet',s);cloudBumpTs();cloudSaveState();}
 function sheetDayScore(s,dk){
   var d=s.days[dk];if(!d||!s.goals.length)return {done:0,total:s.goals.length,pct:0,state:'none'};
   var done=0;s.goals.forEach(function(g){if(d.marks&&d.marks[g.id]==='done')done++;});
@@ -12076,12 +12136,13 @@ function renderGoalSheet(){
     +'<div style="background:var(--card2);border-radius:12px;padding:12px;margin:0 0 12px;text-align:center">'
       +'<div class="gs-score" style="color:'+(dsc.state==='done'?'#16a34a':(dsc.state==='partial'?'#c2410c':'#dc2626'))+'">'+dsc.done+'/'+dsc.total+'</div>'
       +'<div style="font-size:12px;color:var(--mt2)">'+(sel===todayK?'Today':sel)+' · '+dsc.pct+'%'+(dsc.state==='done'?' — all done! 🎉':(dsc.state==='miss'&&dsc.total?' — tough day, be kind to yourself':''))+'</div></div>'
-    +s.goals.map(function(g){var mk=(day.marks&&day.marks[g.id])||'';
+    +s.goals.map(function(g){var mk=(day.marks&&day.marks[g.id])||'';var gn=(day.gnotes&&day.gnotes[g.id])||'';
       return '<div class="gs-goal"><div class="nm">'+esc(g.name)+'</div>'
         +'<button class="gs-mk '+(mk==='done'?'don':'')+'" onclick="markSheetGoal(\''+sel+'\',\''+g.id+'\',\'done\')" title="Achieved"><i class="ti ti-check"></i></button>'
-        +'<button class="gs-mk '+(mk==='miss'?'mis':'')+'" onclick="markSheetGoal(\''+sel+'\',\''+g.id+'\',\'miss\')" title="Missed"><i class="ti ti-x"></i></button></div>';
+        +'<button class="gs-mk '+(mk==='miss'?'mis':'')+'" onclick="markSheetGoal(\''+sel+'\',\''+g.id+'\',\'miss\')" title="Missed"><i class="ti ti-x"></i></button></div>'
+        +'<input class="gs-gnote" placeholder="✎ note for this goal…" value="'+esc(gn)+'" onchange="saveGoalNote(\''+sel+'\',\''+g.id+'\',this.value)" style="width:100%;margin:2px 0 9px;padding:6px 9px;border:1px solid var(--b);border-radius:8px;background:var(--sf);color:var(--tx);font-size:12px">';
     }).join('')
-    +'<div class="fg" style="margin-top:11px"><label>📝 Reflection — what went well, or why you missed</label><textarea id="gs-note" rows="2" placeholder="A line for your future self...">'+esc(day.note||'')+'</textarea></div>'
+    +'<div class="fg" style="margin-top:11px"><label>📝 Overall day reflection (optional)</label><textarea id="gs-note" rows="2" placeholder="A line for your future self...">'+esc(day.note||'')+'</textarea></div>'
     +'<button class="btn btnok" style="width:100%;margin-top:8px" onclick="saveSheetNote(\''+sel+'\')"><i class="ti ti-device-floppy"></i> Save reflection</button>'
     +'<div style="margin-top:14px">'+gsGoalEditor(s)+'</div>'
     +'<button class="btn" style="width:100%;margin-top:12px;border:1px solid var(--b);color:var(--mt)" onclick="closeOvl(\'gsheet-ovl\');openHabitChallenges()"><i class="ti ti-flame"></i> Single-habit streak challenges</button>';
@@ -12287,6 +12348,9 @@ function editHabitGoal(id){
     '<div style="font-size:13px;font-weight:800;margin-bottom:8px">'+esc(hb.n)+'</div>'
     +'<div class="fg"><label>🎯 Your goal — why this habit matters</label><input id="hg-goal" placeholder="e.g. Build an emergency fund" value="'+esc(hb.goal||'')+'"></div>'
     +'<div class="fg" style="margin-top:8px"><label>✨ Your affirmation / manifestation</label><input id="hg-aff" placeholder="e.g. I am disciplined and consistent" value="'+esc(hb.manifest||'')+'"></div>'
+    +'<div style="margin-top:10px"><label style="font-size:12px;font-weight:700;color:var(--mt2)">🎯 Goals under this habit (each one nudges you with sound)</label>'
+      +'<div id="hg-goals">'+habGoalsList(hb)+'</div>'
+      +'<div style="display:flex;gap:6px;margin-top:6px"><input id="hg-newgoal" placeholder="Add a goal e.g. Save \u00a45 today" onkeydown="if(event.keyCode===13){event.preventDefault();habAddGoal(\''+id+'\');}" style="flex:1"><button class="hab-chip on" onclick="habAddGoal(\''+id+'\')">Add</button></div></div>'
     +'<div class="fg" style="margin-top:8px"><label>🎵 Motivational music / voice (plays on your shared chart &amp; video)</label><div style="display:flex;gap:6px;margin-top:4px"><label class="hab-chip" style="cursor:pointer"><i class="ti ti-upload"></i> MP3<input type="file" accept="audio/*" style="display:none" onchange="hgUploadMusic(this,\''+id+'\')"></label><input id="hg-music" placeholder="or paste a direct audio URL (.mp3)" value="'+esc(hb.music||'')+'" style="flex:1"></div></div>'
     +'<div class="fg" style="margin-top:8px"><label>🎤 Voice / track by (creator credit shown on the video)</label><input id="hg-by" placeholder="your name" value="'+esc(hb.musicBy||(CU&&CU.name)||'')+'"></div>'
     +'<div id="hg-lib"></div>'
@@ -12401,9 +12465,9 @@ function makeHabitVideo(seconds){
     var chunks=[];rec.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data);};
     rec.onstop=function(){shareVideoBlob(new Blob(chunks,{type:mime}),mime);};
     rec.start();
-    var t0=Date.now();(function loop(){var el=Date.now()-t0;var p=Math.min(1,el/Math.min(2500,seconds*1000));frame(0.15+0.85*p);if(el<seconds*1000){requestAnimationFrame(loop);}})();
-    toast('Creating your '+seconds+'s video… keep this open ⏳','info');
-    setTimeout(function(){try{rec.stop();}catch(e){}if(window.__vidAudio){try{window.__vidAudio.pause();}catch(e){}}},seconds*1000+150);
+    vidProg(0,snap);
+    var t0=Date.now();(function loop(){var el=Date.now()-t0;var fp=Math.min(1,el/Math.min(2500,seconds*1000));frame(0.15+0.85*fp);vidProg(Math.min(99,Math.round(el/(seconds*1000)*100)));if(el<seconds*1000){requestAnimationFrame(loop);}})();
+    setTimeout(function(){try{rec.stop();}catch(e){}if(window.__vidAudio){try{window.__vidAudio.pause();}catch(e){}}vidProg(100);setTimeout(vidProgHide,1200);},seconds*1000+150);
   }
   var src=snap.music||'';
   if(src){
@@ -12429,7 +12493,7 @@ function makeHabitVideo(seconds){
    carries its creator's name, shown as "voice by …" on the generated video.
    Cross-user sharing of direct-URL tracks needs cloud sync (Firebase) ON. */
 function getTracks(){return LS.get('rb_motiv_tracks',[])||[];}
-function saveTracks(a){LS.set('rb_motiv_tracks',a);}
+function saveTracks(a){LS.set('rb_motiv_tracks',a);cloudBumpTs();cloudSaveState();}
 function registerTrack(url,by,title){
   if(!url)return;
   var tr=getTracks();
@@ -12471,5 +12535,77 @@ function hgUseTrack(tid,habitId){
   var mEl=document.getElementById('hg-music');if(mEl)mEl.value=t.url;
   var bEl=document.getElementById('hg-by');if(bEl)bEl.value=t.by||'';
   toast('Selected "'+(t.title||'track')+'" by '+(t.by||'Anonymous')+' 🎤','ok');
+}
+
+var __vidSnap=null;
+/* v160: live progress indicator for video creation */
+function vidProg(pct,snap){
+  if(snap)__vidSnap=snap;snap=__vidSnap;
+  var el=document.getElementById('vidprog');
+  if(!el){el=document.createElement('div');el.id='vidprog';el.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:99999;background:#111;color:#fff;padding:12px 18px;border-radius:14px;font-size:14px;font-weight:800;box-shadow:0 8px 30px rgba(0,0,0,.4);text-align:center;min-width:200px';document.body.appendChild(el);}
+  var aud=(snap&&snap.music)?('🎤 '+(snap.by?('voice by '+snap.by):'with your track')):'(no music — silent)';
+  el.innerHTML='🎬 Creating video… '+pct+'%<div style="font-size:11px;font-weight:500;margin-top:3px;opacity:.85">'+aud+'</div><div style="height:6px;background:rgba(255,255,255,.2);border-radius:4px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#7c3aed,#0a66c2);transition:width .2s"></div></div>'+(pct>=100?'<div style="font-size:11px;font-weight:500;margin-top:6px;opacity:.85">Ready — opening share…</div>':'');
+}
+function vidProgHide(){var el=document.getElementById('vidprog');if(el)el.remove();}
+
+/* v161: per-goal reflections (separate note per goal per day) */
+function saveGoalNote(dk,goalId,val){
+  var s=getSheet();s.days[dk]=s.days[dk]||{marks:{},note:''};s.days[dk].gnotes=s.days[dk].gnotes||{};
+  s.days[dk].gnotes[goalId]=(val||'').trim();saveSheet(s);
+}
+
+/* v162: dopamine first-look banner — a brain-stimulating message + live stats */
+var RB_DOPA=['Small wins rewire your brain. Tick one goal and feel it. 🧠✨','You\'re building momentum. Don\'t break the chain today! 🔗🔥','Every tick is a vote for your future self. 🗳️🌟','Consistency beats intensity. Show up — that\'s the whole game. 💪','Your streak is your superpower. Keep it glowing. ⚡','Done is better than perfect. One step now. 🚀','Future-you is already proud. Give them a reason today. 🌈'];
+function dopaBanner(){
+  var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
+  var msg=RB_DOPA[(new Date().getDate()+new Date().getHours())%RB_DOPA.length];
+  var hs=getHabits();var best=0,doneToday=0;
+  hs.forEach(function(h){var p=habitProgress(h);if(p.streak>best)best=p.streak;if((h.done||[]).indexOf(dayKey())>=0)doneToday++;});
+  var s=getSheet();var gsc=s&&s.goals&&s.goals.length?sheetDayScore(s,dayKey()):null;
+  return '<div class="dopa"><div class="msg">'+esc(nm)+', '+msg+'</div>'
+    +'<div class="sub"><span class="pulse">🔥 '+best+'-day best streak</span>'
+    +(gsc?'<span>✅ today '+gsc.done+'/'+gsc.total+' goals</span>':'')
+    +(hs.length?'<span>🏅 '+doneToday+'/'+hs.length+' habits done</span>':'')+'</div></div>';
+}
+
+/* ===== v163: multiple goals under each habit, each with its own motivating nudge ===== */
+function habGoalsList(hb){
+  var gs=hb.goals||[];
+  if(!gs.length)return '<div style="font-size:11px;color:var(--mt2);padding:6px 0">No goals yet — add a few below. Each becomes a daily motivating nudge.</div>';
+  return '<div style="border:1px solid var(--b);border-radius:10px;margin-top:5px">'+gs.map(function(g){
+    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--b)"><i class="ti ti-target" style="color:#16a34a"></i><div style="flex:1;font-size:13px">'+esc(g.name)+'</div><button style="background:none;border:none;color:#dc2626;cursor:pointer" onclick="habDelGoal(\''+hb.id+'\',\''+g.id+'\')"><i class="ti ti-trash"></i></button></div>';
+  }).join('')+'</div>';
+}
+function habAddGoal(id){
+  var inp=document.getElementById('hg-newgoal');var v=((inp||{}).value||'').trim();if(!v)return;
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  hb.goals=hb.goals||[];hb.goals.push({id:'hg'+Date.now().toString(36),name:v});
+  saveHabits(habits);
+  var box=document.getElementById('hg-goals');if(box)box.innerHTML=habGoalsList(hb);
+  if(inp){inp.value='';inp.focus();}
+  try{rbConfetti(20);}catch(e){}
+}
+function habDelGoal(id,gid){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  hb.goals=(hb.goals||[]).filter(function(g){return g.id!==gid;});saveHabits(habits);
+  var box=document.getElementById('hg-goals');if(box)box.innerHTML=habGoalsList(hb);
+}
+/* fire one motivating, dopamine-style notification per goal under each active habit */
+function fireHabitGoalReminders(am){
+  var habits=getHabits();if(!habits.length)return;
+  var i=0;
+  habits.forEach(function(hb){
+    var done=(hb.done||[]).indexOf(dayKey())>=0;var complete=(habitProgress(hb).done)>=(hb.days||40);
+    if(complete)return;
+    (hb.goals||[]).slice(0,12).forEach(function(g){
+      i++;(function(idx,goalName,habitName){
+        setTimeout(function(){
+          try{if(!getNotifCfg().muted)playTune(LS.get('rb_habit_tune','melody'));}catch(e){}
+          var line=goalNudge(goalName);
+          try{if(typeof Notification!=='undefined'&&Notification.permission==='granted'){new Notification('🎯 '+goalName+' · '+habitName,{body:line,tag:'rb-hg-'+g.id});}}catch(e){}
+        },idx*1600);
+      })(i,g.name,hb.n);
+    });
+  });
 }
 </script></body></html>
