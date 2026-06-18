@@ -1184,7 +1184,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v163</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v164</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5880,7 +5880,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v163 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v164 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12319,7 +12319,8 @@ function openSharedHabit(snap,views){
     +(snap.music?'<button class="btn" style="width:100%;margin-top:11px;border:1px solid #0d9488;color:#0d9488;font-weight:700" onclick="shPlayMusic(\''+encodeURIComponent(snap.music)+'\')"><i class="ti ti-music"></i> Play their motivation track</button>':'')
     +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-top:12px">A view-only journey — cheer them on! 💚</div>'
     +'<button class="btn" style="width:100%;margin-top:10px;border:1px solid #7c3aed;color:#7c3aed;font-weight:700" onclick="downloadHabitImage()"><i class="ti ti-photo-down"></i> Save status image</button>'
-    +'<button class="btn" style="width:100%;margin-top:8px;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800" onclick="makeHabitVideo(30)"><i class="ti ti-video"></i> Make 30s video (with music) for status</button>'
+    +'<div style="display:flex;gap:8px;margin-top:8px"><button class="btn" style="flex:1;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800" onclick="makeHabitVideo(30)"><i class="ti ti-video"></i> 30s video</button>'
+    +'<button class="btn" style="flex:1;background:linear-gradient(135deg,#0a66c2,#0d9488);color:#fff;font-weight:800" onclick="makeHabitVideo(60)"><i class="ti ti-video"></i> 60s video</button></div>'
     +'<button class="btn btnok" style="width:100%;margin-top:10px" onclick="closeOvl(\'shhabit-ovl\');location.hash=\'\';openHabits()"><i class="ti ti-rocket"></i> Start my own — it\'s free</button>';
   __shhSnap=snap;
   ovl.classList.add('open');
@@ -12351,7 +12352,7 @@ function editHabitGoal(id){
     +'<div style="margin-top:10px"><label style="font-size:12px;font-weight:700;color:var(--mt2)">🎯 Goals under this habit (each one nudges you with sound)</label>'
       +'<div id="hg-goals">'+habGoalsList(hb)+'</div>'
       +'<div style="display:flex;gap:6px;margin-top:6px"><input id="hg-newgoal" placeholder="Add a goal e.g. Save \u00a45 today" onkeydown="if(event.keyCode===13){event.preventDefault();habAddGoal(\''+id+'\');}" style="flex:1"><button class="hab-chip on" onclick="habAddGoal(\''+id+'\')">Add</button></div></div>'
-    +'<div class="fg" style="margin-top:8px"><label>🎵 Motivational music / voice (plays on your shared chart &amp; video)</label><div style="display:flex;gap:6px;margin-top:4px"><label class="hab-chip" style="cursor:pointer"><i class="ti ti-upload"></i> MP3<input type="file" accept="audio/*" style="display:none" onchange="hgUploadMusic(this,\''+id+'\')"></label><input id="hg-music" placeholder="or paste a direct audio URL (.mp3)" value="'+esc(hb.music||'')+'" style="flex:1"></div></div>'
+    +'<div class="fg" style="margin-top:8px"><label>🎵 Motivational music / voice (plays on your shared chart &amp; video)</label><div style="display:flex;gap:6px;margin-top:4px"><label class="hab-chip" style="cursor:pointer"><i class="ti ti-upload"></i> MP3<input type="file" accept="audio/*" style="display:none" onchange="hgUploadMusic(this,\''+id+'\')"></label><input id="hg-music" placeholder="or paste a direct audio URL (.mp3)" value="'+esc(hb.music||'')+'" style="flex:1"></div><div id="hg-upprog" style="display:none;font-size:11px;margin-top:6px;color:var(--mt)"></div></div>'
     +'<div class="fg" style="margin-top:8px"><label>🎤 Voice / track by (creator credit shown on the video)</label><input id="hg-by" placeholder="your name" value="'+esc(hb.musicBy||(CU&&CU.name)||'')+'"></div>'
     +'<div id="hg-lib"></div>'
     +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveHabitGoal(\''+id+'\')"><i class="ti ti-device-floppy"></i> Save</button>';
@@ -12373,8 +12374,24 @@ function saveHabitGoal(id){
 /* v156: per-habit music upload (session objectURL into the URL field) */
 function hgUploadMusic(input,id){
   var file=input.files&&input.files[0];if(!file)return;
-  try{var url=URL.createObjectURL(file);var el=document.getElementById('hg-music');if(el)el.value=url;toast('Track attached — tap Save 🎵','ok');}
-  catch(e){toast('Could not load that file','err');}
+  var prog=document.getElementById('hg-upprog');
+  function setProg(p,txt){if(!prog)return;prog.style.display='block';prog.innerHTML=(txt||('⬆️ Uploading… '+p+'%'))+'<div style="height:5px;background:var(--b);border-radius:3px;margin-top:4px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:#16a34a;transition:width .2s"></div></div>';}
+  function localCopy(msg){try{var url=URL.createObjectURL(file);var el=document.getElementById('hg-music');if(el)el.value=url;}catch(e){}if(prog){setProg(100,msg||'Attached on this device');setTimeout(function(){if(prog)prog.style.display='none';},1800);}toast(msg||'Track attached — tap Save 🎵','info');}
+  if(file.size>15*1024*1024){toast('That file is large (>15MB). Try a shorter clip.','info');}
+  // Upload to cloud storage for a real shareable link that plays for everyone
+  if(FB.ready&&FB.storage&&CU&&CU.uid&&!FB_CLOUD_DISABLED){
+    try{
+      var safe=(file.name||'track.mp3').replace(/[^a-zA-Z0-9._-]/g,'_');
+      var ref=FB.storage.ref('motiv/'+CU.uid+'/'+Date.now()+'_'+safe);
+      var task=ref.put(file);setProg(0);
+      task.on('state_changed',
+        function(s){setProg(Math.round((s.bytesTransferred/s.totalBytes)*100));},
+        function(err){localCopy('Cloud upload blocked — saved on this device only');},
+        function(){task.snapshot.ref.getDownloadURL().then(function(url){var el=document.getElementById('hg-music');if(el)el.value=url;var byEl=document.getElementById('hg-by');setProg(100,'✓ Uploaded — shareable link ready');if(prog)setTimeout(function(){if(prog)prog.style.display='none';},2000);toast('Uploaded 🎵 plays for everyone via your link','ok');}).catch(function(){localCopy('Saved on this device only');});});
+      return;
+    }catch(e){}
+  }
+  localCopy();
 }
 
 /* ===== v157: generate a real PNG of the habit dashboard for WhatsApp status =====
