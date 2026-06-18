@@ -1176,7 +1176,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v155</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v156</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5871,7 +5871,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v155 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v156 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11831,7 +11831,7 @@ function renderHabits(){
     var start=hb.startTs||Date.now();
     var grid='<div class="hab-grid">'+Array.from({length:hb.days||40}).map(function(_,i){
       var dk=dayKey(start+i*86400000);var on=(hb.done||[]).indexOf(dk)>=0;var hasNote=!!hb.notes[dk];
-      return '<div class="hab-dot'+(on?' on':'')+(dk===dayKey()?' today':'')+'" title="day '+(i+1)+'" onclick="openHabitDay(\''+hb.id+'\','+i+')" style="cursor:pointer;position:relative">'+(hasNote&&!on?'<span style=\'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#e23b3b\'>✎</span>':'')+'</div>';
+      return '<div class="hab-dot'+(on?' on':'')+(dk===dayKey()?' today':'')+'" title="day '+(i+1)+'" onclick="habCellClick(\''+hb.id+'\','+i+')" style="cursor:pointer;position:relative">'+(hasNote&&!on?'<span style=\'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#e23b3b\'>✎</span>':'')+'</div>';
     }).join('')+'</div>';
     return '<div class="hab-card"><div class="hab-top"><div class="hab-ic" style="background:'+(hb.c||'#16a34a')+'"><i class="ti ti-'+(hb.ic||'check')+'"></i></div>'
       +'<div style="flex:1;min-width:0"><div class="hab-name">'+esc(hb.n)+' <button style="background:none;border:none;color:var(--mt2);cursor:pointer;font-size:12px" onclick="openRenameHabit(\''+hb.id+'\')"><i class="ti ti-edit"></i></button></div><div class="hab-meta">'+esc(hb.topic||'')+' · '+((hb.days||40)===365?'1-year':(hb.days||40)+'-day')+' · 🔥 '+p.streak+'-day streak</div></div>'
@@ -11906,6 +11906,12 @@ function toggleHabitToday(id){
 function delHabit(id){if(!confirm('Remove this habit and its progress?'))return;saveHabits(getHabits().filter(function(x){return x.id!==id;}));renderHabits();}
 
 /* ===== v147: habit per-day reflection journal + rename ===== */
+function habCellClick(id,idx){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+  if(dk===dayKey()){openGoalSheet();return;}  // today -> daily goals sheet
+  openHabitDay(id,idx);
+}
 function openHabitDay(id,idx){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;hb.notes=hb.notes||{};
   var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
@@ -11919,7 +11925,8 @@ function openHabitDay(id,idx){
     '<div style="display:flex;gap:8px;margin-bottom:10px"><button class="hab-chip'+(done?' on':'')+'" style="flex:1" onclick="habDaySet(\''+id+'\','+idx+',true)"><i class="ti ti-check"></i> Achieved</button>'
     +'<button class="hab-chip'+(!done?' on':'')+'" style="flex:1" onclick="habDaySet(\''+id+'\','+idx+',false)"><i class="ti ti-x"></i> Missed</button></div>'
     +'<div class="fg"><label>'+(done?'Reflection — how did it go?':'What got in the way? (be kind to yourself)')+'</label><textarea id="habday-note" rows="3" placeholder="Write a line for your future self...">'+esc(hb.notes[dk]||'')+'</textarea></div>'
-    +'<button class="btn btnok" style="width:100%;margin-top:10px" onclick="habDaySaveNote(\''+id+'\','+idx+')"><i class="ti ti-device-floppy"></i> Save reflection</button>';
+    +'<button class="btn btnok" style="width:100%;margin-top:10px" onclick="habDaySaveNote(\''+id+'\','+idx+')"><i class="ti ti-device-floppy"></i> Save reflection</button>'
+    +'<button class="btn" style="width:100%;margin-top:8px;border:1px solid #16a34a;color:#16a34a;font-weight:700" onclick="closeOvl(\'habday-ovl\');openGoalSheet()"><i class="ti ti-checklist"></i> Open my Daily Goals Sheet</button>';
   ovl.classList.add('open');
 }
 function habDaySet(id,idx,achieved){
@@ -12210,7 +12217,7 @@ function habitSnap(hb){
   var p=habitProgress(hb);var start=hb.startTs||Date.now();var grid=[];
   for(var i=0;i<(hb.days||40);i++){grid.push((hb.done||[]).indexOf(dayKey(start+i*86400000))>=0?1:0);}
   return {v:1,nm:(CU&&CU.name)||'A friend',t:hb.n,goal:hb.goal||'',aff:hb.manifest||'',days:hb.days||40,
-    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:gsGetMusicUrl()||'',c:hb.c||'#16a34a'};
+    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),c:hb.c||'#16a34a'};
 }
 function shareHabitLink(habitId){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===habitId;});if(!hb)return;
@@ -12274,6 +12281,7 @@ function editHabitGoal(id){
     '<div style="font-size:13px;font-weight:800;margin-bottom:8px">'+esc(hb.n)+'</div>'
     +'<div class="fg"><label>🎯 Your goal — why this habit matters</label><input id="hg-goal" placeholder="e.g. Build an emergency fund" value="'+esc(hb.goal||'')+'"></div>'
     +'<div class="fg" style="margin-top:8px"><label>✨ Your affirmation / manifestation</label><input id="hg-aff" placeholder="e.g. I am disciplined and consistent" value="'+esc(hb.manifest||'')+'"></div>'
+    +'<div class="fg" style="margin-top:8px"><label>🎵 Motivational music for this habit (plays on your shared chart)</label><div style="display:flex;gap:6px;margin-top:4px"><label class="hab-chip" style="cursor:pointer"><i class="ti ti-upload"></i> MP3<input type="file" accept="audio/*" style="display:none" onchange="hgUploadMusic(this,\''+id+'\')"></label><input id="hg-music" placeholder="or paste a direct audio URL (.mp3)" value="'+esc(hb.music||'')+'" style="flex:1"></div></div>'
     +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveHabitGoal(\''+id+'\')"><i class="ti ti-device-floppy"></i> Save</button>';
   ovl.classList.add('open');
 }
@@ -12281,8 +12289,16 @@ function saveHabitGoal(id){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
   hb.goal=((document.getElementById('hg-goal')||{}).value||'').trim();
   hb.manifest=((document.getElementById('hg-aff')||{}).value||'').trim();
+  hb.music=((document.getElementById('hg-music')||{}).value||'').trim();
   saveHabits(habits);closeOvl('habgoal-ovl');renderHabits();
   try{rbConfetti(50);}catch(e){}
   toast('Goal saved 🎯','ok');
+}
+
+/* v156: per-habit music upload (session objectURL into the URL field) */
+function hgUploadMusic(input,id){
+  var file=input.files&&input.files[0];if(!file)return;
+  try{var url=URL.createObjectURL(file);var el=document.getElementById('hg-music');if(el)el.value=url;toast('Track attached — tap Save 🎵','ok');}
+  catch(e){toast('Could not load that file','err');}
 }
 </script></body></html>
