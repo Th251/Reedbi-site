@@ -1184,7 +1184,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v164</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v165</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5880,7 +5880,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v164 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v165 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12287,6 +12287,7 @@ function shareHabitLink(habitId){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===habitId;});if(!hb)return;
   var snap=habitSnap(hb);
   function finish(link){
+    __lastHabitShareLink=link;
     var txt=snap.nm+' is on a '+snap.days+'-day "'+snap.t+'" journey — '+snap.pct+'% done, '+snap.streak+'-day streak 🔥 Watch & cheer me on:\n'+link;
     if(navigator.share){navigator.share({title:snap.t,text:snap.nm+'\'s '+snap.t+' journey',url:link}).catch(function(){});}
     else{try{navigator.clipboard.writeText(txt);toast('Link copied — paste to WhatsApp status! 🔗','ok');}catch(e){prompt('Copy link:',link);}}
@@ -12453,17 +12454,29 @@ function downloadHabitImage(){
    A video posted to WhatsApp status DOES play its embedded audio (a link can't).
    Records the animated dashboard canvas + your MP3/audio into a compact webm/mp4.
    Works best on Android Chrome; iOS Safari has limited recording support. */
+var __pendingVideo=null,__lastHabitShareLink='';
 function shareVideoBlob(blob,mime){
+  __pendingVideo={blob:blob,mime:mime};
   var ext=mime.indexOf('mp4')>=0?'mp4':'webm';
+  // navigator.share needs a fresh user tap — show a button instead of auto-sharing
+  var el=document.getElementById('vidprog');
+  if(!el){el=document.createElement('div');el.id='vidprog';el.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:99999;background:#111;color:#fff;padding:14px 18px;border-radius:14px;font-size:14px;font-weight:800;box-shadow:0 8px 30px rgba(0,0,0,.4);text-align:center;min-width:230px';document.body.appendChild(el);}
+  el.innerHTML='🎬 Your video is ready!'
+    +'<button onclick="doShareVideo()" style="display:block;width:100%;margin-top:10px;padding:11px;border:none;border-radius:10px;background:linear-gradient(135deg,#25D366,#0a66c2);color:#fff;font-weight:800;font-size:14px;cursor:pointer">📲 Share to WhatsApp / Save</button>'
+    +(ext==='webm'?'<div style="font-size:10px;font-weight:500;margin-top:7px;opacity:.85">webm format — if WhatsApp rejects it, use the image instead</div>':'<div style="font-size:10px;font-weight:500;margin-top:7px;opacity:.85">Posts with sound to your status 🎵</div>')
+    +'<button onclick="vidProgHide()" style="display:block;width:100%;margin-top:7px;padding:7px;border:none;border-radius:8px;background:rgba(255,255,255,.15);color:#fff;font-size:12px;cursor:pointer">Close</button>';
+}
+function doShareVideo(){
+  if(!__pendingVideo)return;var blob=__pendingVideo.blob,mime=__pendingVideo.mime;var ext=mime.indexOf('mp4')>=0?'mp4':'webm';
   var file=null;try{file=new File([blob],'reedbi-journey.'+ext,{type:mime});}catch(e){}
+  var link=__lastHabitShareLink||(__shhSnap?(location.origin+location.pathname+'#h='+b64enc(__shhSnap)):'');
   if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
-    navigator.share({files:[file],title:'My Reedbi journey'}).catch(function(){});
-  }else{
-    var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='reedbi-journey.'+ext;document.body.appendChild(a);a.click();a.remove();
-    setTimeout(function(){URL.revokeObjectURL(url);},3000);
-  }
-  var note=ext==='webm'?'Video saved (webm). If WhatsApp won\'t accept it, use the image instead 📸':'Video saved — post it to your WhatsApp status 🎬';
-  toast(note,'ok');
+    var payload={files:[file],title:'My Reedbi journey'};if(link)payload.text='Watch my journey on Reedbi 🔥 '+link;
+    navigator.share(payload).then(function(){vidProgHide();}).catch(function(){downloadVideo(blob,ext);});
+  }else{downloadVideo(blob,ext);}
+}
+function downloadVideo(blob,ext){
+  try{var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='reedbi-journey.'+ext;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},3000);toast('Video saved 🎬 share it from your gallery','ok');vidProgHide();}catch(e){toast('Could not save the video','err');}
 }
 function makeHabitVideo(seconds){
   if(!__shhSnap){toast('Open a shared chart first','info');return;}
@@ -12478,7 +12491,9 @@ function makeHabitVideo(seconds){
   var vstream=cv.captureStream(20);
   function pickMime(){var opts=['video/mp4;codecs=h264,aac','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];for(var i=0;i<opts.length;i++){if(MediaRecorder.isTypeSupported(opts[i]))return opts[i];}return 'video/webm';}
   function record(stream){
-    var mime=pickMime();var rec;try{rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:700000});}catch(e){rec=new MediaRecorder(stream);mime='video/webm';}
+    var mime=pickMime();var rec;
+    try{rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:700000});}
+    catch(e){try{rec=new MediaRecorder(stream);mime=(rec&&rec.mimeType)||'video/webm';}catch(e2){vidProgHide();toast('This browser can\'t record video — use Save image 📸','info');return;}}
     var chunks=[];rec.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data);};
     rec.onstop=function(){shareVideoBlob(new Blob(chunks,{type:mime}),mime);};
     rec.start();
