@@ -959,6 +959,10 @@ body.dark .spin-wheel{border-color:#2a333f}
 .sh-stat{flex:1;background:rgba(255,255,255,.14);border-radius:13px;padding:12px 6px;text-align:center}
 .sh-stat b{font-size:22px;display:block}
 .sh-stat small{font-size:10px;opacity:.9}
+.shh-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:4px}
+.shh-dot{aspect-ratio:1;border-radius:4px;background:rgba(255,255,255,.18)}
+.shh-dot.on{background:#fff}
+
 
 
 
@@ -1172,7 +1176,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v153</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v154</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5759,7 +5763,7 @@ function openAccountMenu(){
   var act=item('showMyActivity()','layout-dashboard','var(--g)','My Activity','your jobs, orders, shop &amp; license in one place')
     +item('showMyOrders()','package','','My Orders','track &amp; manage purchases')
     +item('openSpin()','gift','#7c3aed','Daily Spin &amp; Rewards','free points · your shopper level')
-    +item('openGoalSheet()','checklist','#16a34a','Habit &amp; Goal Tracker','set goals once · tick daily · 70%+ = done')
+    +item('openHabits()','checkup-list','#16a34a','Habit Tracker','90-day challenges · share with friends')
     +item('rbOnboard(true)','help-circle','#0a8f5c','How Reedbi works','quick tour of the app')
     +item('openCareAi()','headset','#ffb800','Reedbi Care','orders, delivery, returns &amp; refunds')
     +item('openMyTickets()','ticket','#ffb800','My Support Tickets','status &amp; emailed decisions')
@@ -5867,7 +5871,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v153 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v154 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11133,7 +11137,7 @@ function renderHome(){
   // quick actions
   var quick='<div class="home-sec"><div class="home-sec-h"><b>Jump to</b></div><div class="home-attn">'
     +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openMainStore()"><div class="ic" style="background:#0a8f5c"><i class="ti ti-building-store"></i></div><div class="lbl">Shop the store</div><small>all sellers &amp; deals</small></div>'
-    +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openGoalSheet()"><div class="ic" style="background:#16a34a"><i class="ti ti-checklist"></i></div><div class="lbl">Habit Tracker</div><small>'+(function(){try{var s=getSheet();if(!s.goals.length)return 'set goals · tick daily';var sc=sheetDayScore(s,dayKey());return sc.done+'/'+sc.total+' today';}catch(e){return 'set goals · tick daily';}})()+'</small></div>'
+    +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openHabits()"><div class="ic" style="background:#16a34a"><i class="ti ti-checkup-list"></i></div><div class="lbl">Habit Tracker</div><small>'+(function(){try{var s=getSheet();if(!s.goals.length)return 'set goals · tick daily';var sc=sheetDayScore(s,dayKey());return sc.done+'/'+sc.total+' today';}catch(e){return 'set goals · tick daily';}})()+'</small></div>'
     +'<div class="home-tile" onclick="closeOvl(\'home-ovl\');openTouchCollect()"><div class="ic" style="background:#7c3aed"><i class="ti ti-hand-finger"></i></div><div class="lbl">Touch &amp; Collect</div><small>pick in 3D</small></div>'
     +'</div></div>';
 
@@ -11800,8 +11804,7 @@ function habitProgress(h){
   else{d-=86400000;while(set[dayKey(d)]){streak++;d-=86400000;}}
   return {done:done,pct:pct,streak:streak,left:Math.max(0,(h.days||40)-done)};
 }
-function openHabits(){ openGoalSheet(); }
-function openHabitChallenges(){
+function openHabits(){
   if(!requireAuth('track habits'))return;
   var ovl=document.getElementById('habits-ovl');
   if(!ovl){ovl=document.createElement('div');ovl.id='habits-ovl';ovl.className='overlay';
@@ -11839,7 +11842,9 @@ function renderHabits(){
       +grid
       +(complete?'<div class="learn-done" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;margin-top:11px"><i class="ti ti-trophy"></i> Goal complete — '+(hb.days)+' days! 🎉</div>'
         :'<button class="hab-check'+(doneToday?' done':'')+'" onclick="toggleHabitToday(\''+hb.id+'\')">'+(doneToday?'<i class="ti ti-check"></i> Done today — '+p.left+' days to go':'<i class="ti ti-circle-check"></i> Mark done today')+'</button>')
-      +'<div style="text-align:right;margin-top:6px"><button style="background:none;border:none;color:var(--mt2);font-size:11px;cursor:pointer" onclick="delHabit(\''+hb.id+'\')"><i class="ti ti-trash"></i> remove</button></div>'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-top:9px"><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:8px" onclick="shareHabitLink(\''+hb.id+'\')"><i class="ti ti-share"></i> Share with friends</button>'
+      +'<span style="font-size:12px;color:var(--mt2)">👁️ '+(hb.views||0)+'</span>'
+      +'<button style="background:none;border:none;color:var(--mt2);font-size:11px;cursor:pointer" onclick="delHabit(\''+hb.id+'\')"><i class="ti ti-trash"></i></button></div>'
       +'</div>';
   }).join('');
   box.innerHTML=h;
@@ -12027,6 +12032,7 @@ function openGoalSheet(){
   __gsDay=dayKey();
   renderGoalSheet();
   ovl.classList.add('open');
+  setTimeout(gsScrollToday,60);
 }
 var __gsDay=null;
 function renderGoalSheet(){
@@ -12076,6 +12082,7 @@ function gsGoalEditor(s){
     +'<div style="display:flex;gap:7px;margin-top:7px"><input id="gs-newgoal" placeholder="Add a goal (e.g. Work on business, Speak to someone new)" style="flex:1;padding:9px;border-radius:9px;border:1px solid var(--b);background:var(--sf);color:var(--tx)"><button class="btn btnok" onclick="addGoalItem()"><i class="ti ti-plus"></i></button></div>';
 }
 function gsPickDay(dk){__gsDay=dk;renderGoalSheet();}
+function gsScrollToday(){try{var st=document.querySelector('#gsheet-body .gs-daystrip');if(st)st.scrollLeft=st.scrollWidth;}catch(e){}}
 function sheetStats(s){var tracked=0,achieved=0;var keys=Object.keys(s.days||{});keys.forEach(function(k){var sc=sheetDayScore(s,k);if(sc.total&&(sc.done>0||(s.days[k].marks&&Object.keys(s.days[k].marks).length))){tracked++;if(sc.state==='done')achieved++;}});var streak=0;var d=Date.now();var todayDone=sheetDayScore(s,dayKey()).state==='done';if(!todayDone)d-=86400000;while(sheetDayScore(s,dayKey(d)).state==='done'){streak++;d-=86400000;}return {tracked:tracked,achieved:achieved,pct:tracked?Math.round(achieved/tracked*100):0,streak:streak,goals:(s.goals||[]).length};}
 function addGoalItem(){
   var v=((document.getElementById('gs-newgoal')||{}).value||'').trim();if(!v)return;
@@ -12193,5 +12200,64 @@ function shPlayMusic(u){try{u=decodeURIComponent(u);if(__shAudio)__shAudio.pause
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',checkHash);else checkHash();
   window.addEventListener('hashchange',checkHash);
+})();
+
+/* ===== v154: per-habit shareable colorful page + view count =====
+   Each single-habit challenge (e.g. "Save a little money") gets its own link.
+   Viewers see ONLY which days were completed, the title, the affirmation, the %
+   and a colorful theme + music — never the private daily goals. */
+function habitSnap(hb){
+  var p=habitProgress(hb);var start=hb.startTs||Date.now();var grid=[];
+  for(var i=0;i<(hb.days||40);i++){grid.push((hb.done||[]).indexOf(dayKey(start+i*86400000))>=0?1:0);}
+  return {v:1,nm:(CU&&CU.name)||'A friend',t:hb.n,goal:hb.goal||'',aff:hb.manifest||'',days:hb.days||40,
+    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:gsGetMusicUrl()||'',c:hb.c||'#16a34a'};
+}
+function shareHabitLink(habitId){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===habitId;});if(!hb)return;
+  var snap=habitSnap(hb);
+  function finish(link){
+    var txt=snap.nm+' is on a '+snap.days+'-day "'+snap.t+'" journey — '+snap.pct+'% done, '+snap.streak+'-day streak 🔥 Watch & cheer me on:\n'+link;
+    if(navigator.share){navigator.share({title:snap.t,text:snap.nm+'\'s '+snap.t+' journey',url:link}).catch(function(){});}
+    else{try{navigator.clipboard.writeText(txt);toast('Link copied — paste to WhatsApp status! 🔗','ok');}catch(e){prompt('Copy link:',link);}}
+  }
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
+    var id='h'+(CU&&CU.uid?CU.uid.slice(-5):'')+Date.now().toString(36).slice(-5);
+    try{FB.db.collection('shared').doc(id).set({hsnap:snap,views:0,ts:Date.now(),owner:(CU&&CU.uid)||'',habitId:habitId}).then(function(){
+      hb.shareId=id;saveHabits(habits);finish(location.origin+location.pathname+'#habit='+id);
+    }).catch(function(){finish(location.origin+location.pathname+'#h='+b64enc(snap));});}catch(e){finish(location.origin+location.pathname+'#h='+b64enc(snap));}
+  } else { finish(location.origin+location.pathname+'#h='+b64enc(snap)); }
+}
+function openSharedHabit(snap,views){
+  if(!snap)return;
+  var ovl=document.getElementById('shhabit-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='shhabit-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:400px"><div id="shhabit-body"></div></div>';
+    document.body.appendChild(ovl);}
+  var watch=(typeof views==='number')?('<div style="font-size:12px;opacity:.92;margin-top:8px">👁️ '+views+' '+(views===1?'watch':'watches')+'</div>'):'';
+  var grid='<div class="shh-grid">'+(snap.grid||[]).map(function(x){return '<div class="shh-dot'+(x?' on':'')+'"></div>';}).join('')+'</div>';
+  document.getElementById('shhabit-body').innerHTML=
+    '<div class="sh-hero" style="background:linear-gradient(135deg,'+esc(snap.c||'#16a34a')+',#0a66c2 70%,#7c3aed)">'
+    +'<div style="font-size:13px;opacity:.9;position:relative">'+esc(snap.nm||'A friend')+'\'s journey</div>'
+    +'<div style="font-size:22px;font-weight:900;position:relative;margin-top:2px">'+esc(snap.t||'My habit')+'</div>'
+    +'<div class="sh-big" style="font-size:40px;margin-top:6px">'+(snap.pct||0)+'%</div>'
+    +'<div style="font-size:12px;opacity:.95;position:relative">'+(snap.done||0)+' of '+(snap.days||40)+' days · 🔥 '+(snap.streak||0)+'-day streak</div>'
+    +'<div style="position:relative;margin-top:12px">'+grid+'</div>'+watch+'</div>'
+    +(snap.aff?'<div style="text-align:center;font-style:italic;color:#0d9488;margin-top:12px;font-size:14px">✨ '+esc(snap.aff)+'</div>':'')
+    +(snap.music?'<button class="btn" style="width:100%;margin-top:11px;border:1px solid #0d9488;color:#0d9488;font-weight:700" onclick="shPlayMusic(\''+encodeURIComponent(snap.music)+'\')"><i class="ti ti-music"></i> Play their motivation track</button>':'')
+    +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-top:12px">A view-only journey — cheer them on! 💚</div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="closeOvl(\'shhabit-ovl\');location.hash=\'\';openHabits()"><i class="ti ti-rocket"></i> Start my own — it\'s free</button>';
+  ovl.classList.add('open');
+}
+(function(){
+  function checkHabitHash(){
+    var h=location.hash||'';
+    if(h.indexOf('#h=')===0){var snap=b64dec(h.slice(3));if(snap)setTimeout(function(){openSharedHabit(snap);},700);return;}
+    if(h.indexOf('#habit=')===0){var id=h.slice(7);
+      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{var ref=FB.db.collection('shared').doc(id);
+        ref.get().then(function(d){if(!d.exists)return;var data=d.data();var v=(data.views||0)+1;try{ref.update({views:v});}catch(e){}setTimeout(function(){openSharedHabit(data.hsnap,v);},700);}).catch(function(){});}catch(e){}}
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',checkHabitHash);else checkHabitHash();
+  window.addEventListener('hashchange',checkHabitHash);
 })();
 </script></body></html>
