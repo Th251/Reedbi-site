@@ -1176,7 +1176,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v154</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v155</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5871,7 +5871,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v154 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v155 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11836,7 +11836,7 @@ function renderHabits(){
     return '<div class="hab-card"><div class="hab-top"><div class="hab-ic" style="background:'+(hb.c||'#16a34a')+'"><i class="ti ti-'+(hb.ic||'check')+'"></i></div>'
       +'<div style="flex:1;min-width:0"><div class="hab-name">'+esc(hb.n)+' <button style="background:none;border:none;color:var(--mt2);cursor:pointer;font-size:12px" onclick="openRenameHabit(\''+hb.id+'\')"><i class="ti ti-edit"></i></button></div><div class="hab-meta">'+esc(hb.topic||'')+' · '+((hb.days||40)===365?'1-year':(hb.days||40)+'-day')+' · 🔥 '+p.streak+'-day streak</div></div>'
       +'<div class="hab-ring"><svg width="46" height="46"><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="var(--card2)" stroke-width="4"/><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'"/></svg><div class="pc">'+p.pct+'%</div></div></div>'
-      +(hb.goal?'<div style="font-size:12px;margin-top:8px"><b>🎯 Goal:</b> '+esc(hb.goal)+'</div>':'')
+      +'<div style="font-size:12px;margin-top:8px">'+(hb.goal?'<b>🎯 Goal:</b> '+esc(hb.goal):'<span style="color:var(--mt2)">No goal set yet</span>')+' <button style="background:none;border:none;color:#0a66c2;cursor:pointer;font-size:11px;font-weight:700" onclick="editHabitGoal(\''+hb.id+'\')"><i class="ti ti-edit"></i> set goal</button></div>'
       +(hb.manifest?'<div style="font-size:12px;color:#0d9488;margin-top:3px;font-style:italic">✨ '+esc(hb.manifest)+'</div>':'')
       +'<div style="font-size:10px;color:var(--mt2);margin-top:8px">Tap any day to add a reflection 📝</div>'
       +grid
@@ -12233,15 +12233,17 @@ function openSharedHabit(snap,views){
   if(!ovl){ovl=document.createElement('div');ovl.id='shhabit-ovl';ovl.className='overlay';
     ovl.innerHTML='<div class="modal" style="max-width:400px"><div id="shhabit-body"></div></div>';
     document.body.appendChild(ovl);}
-  var watch=(typeof views==='number')?('<div style="font-size:12px;opacity:.92;margin-top:8px">👁️ '+views+' '+(views===1?'watch':'watches')+'</div>'):'';
+  var watch=(typeof views==='number')?('<div style="font-size:13px;opacity:.95;margin-top:10px;font-weight:700;position:relative">👁️ '+views+' '+(views===1?'person watching':'people watching')+'</div>'):'';
   var grid='<div class="shh-grid">'+(snap.grid||[]).map(function(x){return '<div class="shh-dot'+(x?' on':'')+'"></div>';}).join('')+'</div>';
+  var pct=snap.pct||0;var R=46,CIRC=2*Math.PI*R,off=CIRC*(1-pct/100);
+  var ring='<div style="position:relative;width:120px;height:120px;margin:6px auto 4px"><svg width="120" height="120" style="transform:rotate(-90deg)"><circle cx="60" cy="60" r="'+R+'" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="10"/><circle cx="60" cy="60" r="'+R+'" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+CIRC+'" stroke-dashoffset="'+off+'"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:30px;font-weight:900;line-height:1">'+pct+'%</div><div style="font-size:10px;opacity:.9">achieved</div></div></div>';
   document.getElementById('shhabit-body').innerHTML=
     '<div class="sh-hero" style="background:linear-gradient(135deg,'+esc(snap.c||'#16a34a')+',#0a66c2 70%,#7c3aed)">'
-    +'<div style="font-size:13px;opacity:.9;position:relative">'+esc(snap.nm||'A friend')+'\'s journey</div>'
-    +'<div style="font-size:22px;font-weight:900;position:relative;margin-top:2px">'+esc(snap.t||'My habit')+'</div>'
-    +'<div class="sh-big" style="font-size:40px;margin-top:6px">'+(snap.pct||0)+'%</div>'
-    +'<div style="font-size:12px;opacity:.95;position:relative">'+(snap.done||0)+' of '+(snap.days||40)+' days · 🔥 '+(snap.streak||0)+'-day streak</div>'
-    +'<div style="position:relative;margin-top:12px">'+grid+'</div>'+watch+'</div>'
+    +'<div style="font-size:13px;opacity:.9;position:relative">'+esc(snap.nm||'A friend')+'\'s '+(snap.days||40)+'-day journey</div>'
+    +'<div style="font-size:23px;font-weight:900;position:relative;margin-top:2px">'+esc(snap.t||'My habit')+'</div>'
+    +ring
+    +'<div style="display:flex;gap:8px;margin-top:6px;position:relative"><div class="sh-stat"><b>'+(snap.done||0)+'/'+(snap.days||40)+'</b><small>days done</small></div><div class="sh-stat"><b>🔥 '+(snap.streak||0)+'</b><small>streak</small></div><div class="sh-stat"><b>'+((snap.days||40)-(snap.done||0))+'</b><small>days to go</small></div></div>'
+    +'<div style="position:relative;margin-top:14px"><div style="font-size:10px;opacity:.85;text-align:left;margin-bottom:4px">Days completed</div>'+grid+'</div>'+watch+'</div>'
     +(snap.aff?'<div style="text-align:center;font-style:italic;color:#0d9488;margin-top:12px;font-size:14px">✨ '+esc(snap.aff)+'</div>':'')
     +(snap.music?'<button class="btn" style="width:100%;margin-top:11px;border:1px solid #0d9488;color:#0d9488;font-weight:700" onclick="shPlayMusic(\''+encodeURIComponent(snap.music)+'\')"><i class="ti ti-music"></i> Play their motivation track</button>':'')
     +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-top:12px">A view-only journey — cheer them on! 💚</div>'
@@ -12260,4 +12262,27 @@ function openSharedHabit(snap,views){
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',checkHabitHash);else checkHabitHash();
   window.addEventListener('hashchange',checkHabitHash);
 })();
+
+/* ===== v155: link each habit to goal + affirmation setting ===== */
+function editHabitGoal(id){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  var ovl=document.getElementById('habgoal-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='habgoal-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:380px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px"><i class="ti ti-target" style="color:#16a34a"></i> Set your goal</b><button class="modal-x" onclick="closeOvl(\'habgoal-ovl\')"><i class="ti ti-x"></i></button></div><div id="habgoal-body"></div></div>';
+    document.body.appendChild(ovl);}
+  document.getElementById('habgoal-body').innerHTML=
+    '<div style="font-size:13px;font-weight:800;margin-bottom:8px">'+esc(hb.n)+'</div>'
+    +'<div class="fg"><label>🎯 Your goal — why this habit matters</label><input id="hg-goal" placeholder="e.g. Build an emergency fund" value="'+esc(hb.goal||'')+'"></div>'
+    +'<div class="fg" style="margin-top:8px"><label>✨ Your affirmation / manifestation</label><input id="hg-aff" placeholder="e.g. I am disciplined and consistent" value="'+esc(hb.manifest||'')+'"></div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveHabitGoal(\''+id+'\')"><i class="ti ti-device-floppy"></i> Save</button>';
+  ovl.classList.add('open');
+}
+function saveHabitGoal(id){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  hb.goal=((document.getElementById('hg-goal')||{}).value||'').trim();
+  hb.manifest=((document.getElementById('hg-aff')||{}).value||'').trim();
+  saveHabits(habits);closeOvl('habgoal-ovl');renderHabits();
+  try{rbConfetti(50);}catch(e){}
+  toast('Goal saved 🎯','ok');
+}
 </script></body></html>
