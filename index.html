@@ -1201,7 +1201,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v169</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v170</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5897,7 +5897,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v169 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v170 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12299,7 +12299,7 @@ function habitSnap(hb){
   var p=habitProgress(hb);var start=hb.startTs||Date.now();var grid=[];
   for(var i=0;i<(hb.days||40);i++){grid.push((hb.done||[]).indexOf(dayKey(start+i*86400000))>=0?1:0);}
   return {v:1,nm:(CU&&CU.name)||'A friend',t:hb.n,goal:hb.goal||'',aff:hb.manifest||'',days:hb.days||40,
-    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),c:hb.c||'#16a34a'};
+    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),cap:(hb.vidText||''),c:hb.c||'#16a34a'};
 }
 function shareHabitLink(habitId){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===habitId;});if(!hb)return;
@@ -12399,16 +12399,18 @@ function hgUploadMusic(input,id){
   function setProg(p,txt){if(!prog)return;prog.style.display='block';prog.innerHTML=(txt||('⬆️ Uploading… '+p+'%'))+'<div style="height:5px;background:var(--b);border-radius:3px;margin-top:4px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:#16a34a;transition:width .2s"></div></div>';}
   function localCopy(msg){try{var url=URL.createObjectURL(file);var el=document.getElementById('hg-music');if(el)el.value=url;}catch(e){}if(prog){setProg(100,msg||'Attached on this device');setTimeout(function(){if(prog)prog.style.display='none';},1800);}toast(msg||'Track attached — tap Save 🎵','info');}
   if(file.size>15*1024*1024){toast('That file is large (>15MB). Try a shorter clip.','info');}
-  // Upload to cloud storage for a real shareable link that plays for everyone
+  // 1) attach the LOCAL copy instantly so the user can select & make a video right away
+  try{var lurl=URL.createObjectURL(file);var le=document.getElementById('hg-music');if(le)le.value=lurl;if(typeof vsStudioOpen==='function'&&vsStudioOpen())vsSyncMusic(id);}catch(e){}
+  // 2) upload to cloud in the BACKGROUND for a shareable link (doesn't block selection)
   if(FB.ready&&FB.storage&&CU&&CU.uid&&!FB_CLOUD_DISABLED){
     try{
       var safe=(file.name||'track.mp3').replace(/[^a-zA-Z0-9._-]/g,'_');
       var ref=FB.storage.ref('motiv/'+CU.uid+'/'+Date.now()+'_'+safe);
-      var task=ref.put(file);setProg(0);
+      var task=ref.put(file);setProg(0,'⬆️ Saving to library… (you can continue now)');
       task.on('state_changed',
         function(s){setProg(Math.round((s.bytesTransferred/s.totalBytes)*100));},
         function(err){localCopy('Cloud upload blocked — saved on this device only');},
-        function(){task.snapshot.ref.getDownloadURL().then(function(url){var el=document.getElementById('hg-music');if(el)el.value=url;var byEl=document.getElementById('hg-by');setProg(100,'✓ Uploaded — shareable link ready');if(prog)setTimeout(function(){if(prog)prog.style.display='none';},2000);toast('Uploaded 🎵 plays for everyone via your link','ok');}).catch(function(){localCopy('Saved on this device only');});});
+        function(){task.snapshot.ref.getDownloadURL().then(function(url){var el=document.getElementById('hg-music');if(el)el.value=url;if(typeof vsStudioOpen==='function'&&vsStudioOpen())vsSyncMusic(id);setProg(100,'✓ Saved to library — shareable');if(prog)setTimeout(function(){if(prog)prog.style.display='none';},2000);}).catch(function(){});});
       return;
     }catch(e){}
   }
@@ -12443,10 +12445,11 @@ function drawDash(ctx,W,H,snap,frac){
   var cols=10,cell=54,cg=8,gx=startX,gy=ty+195;var grid=snap.grid||[];
   for(var k=0;k<grid.length;k++){var r=Math.floor(k/cols),cc=k%cols;var x=gx+cc*(cell+cg),y=gy+r*(cell+cg);
     ctx.fillStyle=grid[k]?'#fff':'rgba(255,255,255,.2)';rrect(ctx,x,y,cell,cell,10);ctx.fill();}
-  ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='24px system-ui,Arial';
-  if(snap.aff)ctx.fillText('✨ '+snap.aff,W/2,H-90);
-  if(snap.by){ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.92)';ctx.fillText('🎤 voice by '+snap.by,W/2,H-78);}
-  ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillText('Track yours free on Reedbi',W/2,H-45);
+  ctx.textAlign='center';
+  if(snap.cap){ctx.fillStyle='#fff';ctx.font='800 30px system-ui,Arial';ctx.fillText(snap.cap.slice(0,40),W/2,H-138);}
+  if(snap.aff){ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='24px system-ui,Arial';ctx.fillText('✨ '+snap.aff,W/2,H-100);}
+  if(snap.by){ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillText('🎤 voice by '+snap.by,W/2,H-66);}
+  ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillText('Track yours free on Reedbi',W/2,H-34);
 }
 function habitDashCanvas(snap){
   var W=720,H=1100,cv=document.createElement('canvas');cv.width=W;cv.height=H;var ctx=cv.getContext('2d');
@@ -12478,20 +12481,31 @@ var __pendingVideo=null,__lastHabitShareLink='';
 function shareVideoBlob(blob,mime){
   __pendingVideo={blob:blob,mime:mime};
   var ext=mime.indexOf('mp4')>=0?'mp4':'webm';
-  // navigator.share needs a fresh user tap — show a button instead of auto-sharing
-  var el=document.getElementById('vidprog');
-  if(!el){el=document.createElement('div');el.id='vidprog';el.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:99999;background:#111;color:#fff;padding:14px 18px;border-radius:14px;font-size:14px;font-weight:800;box-shadow:0 8px 30px rgba(0,0,0,.4);text-align:center;min-width:230px';document.body.appendChild(el);}
-  el.innerHTML='🎬 Your video is ready!'
-    +'<button onclick="doShareVideo()" style="display:block;width:100%;margin-top:10px;padding:11px;border:none;border-radius:10px;background:linear-gradient(135deg,#25D366,#0a66c2);color:#fff;font-weight:800;font-size:14px;cursor:pointer">📲 Share to WhatsApp / Save</button>'
-    +(ext==='webm'?'<div style="font-size:10px;font-weight:500;margin-top:7px;opacity:.85">webm format — if WhatsApp rejects it, use the image instead</div>':'<div style="font-size:10px;font-weight:500;margin-top:7px;opacity:.85">Posts with sound to your status 🎵</div>')
-    +'<button onclick="vidProgHide()" style="display:block;width:100%;margin-top:7px;padding:7px;border:none;border-radius:8px;background:rgba(255,255,255,.15);color:#fff;font-size:12px;cursor:pointer">Close</button>';
+  vidProgHide();
+  var link=__lastHabitShareLink||(__shhSnap?(location.origin+location.pathname+'#h='+b64enc(__shhSnap)):'');
+  __lastHabitShareLink=link;
+  var vurl='';try{vurl=URL.createObjectURL(blob);}catch(e){}
+  var ovl=document.getElementById('vidresult-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='vidresult-ovl';ovl.className='overlay';document.body.appendChild(ovl);}
+  ovl.innerHTML='<div class="modal" style="max-width:380px;text-align:center">'
+    +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">🎬 Your video is ready!</div>'
+    +'<div style="font-size:12px;color:var(--mt2);margin-bottom:10px">Preview it, then post it to your WhatsApp status</div>'
+    +(vurl?'<video src="'+vurl+'" controls autoplay playsinline style="width:100%;max-height:420px;border-radius:14px;background:#000"></video>':'')
+    +'<button onclick="doShareVideo()" style="display:block;width:100%;margin-top:12px;padding:13px;border:none;border-radius:12px;background:#25D366;color:#fff;font-weight:800;font-size:15px;cursor:pointer"><i class="ti ti-brand-whatsapp"></i> Share to WhatsApp status</button>'
+    +'<button onclick="downloadVideo(__pendingVideo.blob,\''+ext+'\')" style="display:block;width:100%;margin-top:8px;padding:11px;border:1px solid var(--b);border-radius:12px;background:var(--sf);color:var(--tx);font-weight:700;font-size:14px;cursor:pointer"><i class="ti ti-download"></i> Save video to phone</button>'
+    +(link?'<div style="margin-top:12px;text-align:left"><div style="font-size:11px;font-weight:700;color:var(--mt2);margin-bottom:4px">🔗 Your shareable link (paste in the status caption)</div><div style="display:flex;gap:6px"><input id="vid-link" readonly value="'+esc(link)+'" style="flex:1;font-size:11px;padding:8px;border:1px solid var(--b);border-radius:8px;background:var(--card2);color:var(--tx)"><button onclick="vidCopyLink()" class="hab-chip on">Copy</button></div></div>':'')
+    +(ext==='webm'?'<div style="font-size:10px;color:var(--mt2);margin-top:9px">Format: webm. If WhatsApp won\'t accept it, tap Save then upload from your gallery, or use the status image instead.</div>':'<div style="font-size:10px;color:var(--mt2);margin-top:9px">Plays with sound in your status 🎵</div>')
+    +'<button onclick="closeOvl(\'vidresult-ovl\')" style="display:block;width:100%;margin-top:10px;padding:9px;border:none;border-radius:8px;background:transparent;color:var(--mt2);font-size:13px;cursor:pointer">Close</button>'
+    +'</div>';
+  ovl.classList.add('open');
 }
+function vidCopyLink(){var el=document.getElementById('vid-link');if(!el)return;try{el.select();}catch(e){}try{navigator.clipboard.writeText(el.value).then(function(){toast('Link copied 🔗 paste it in your status','ok');});}catch(e){toast('Select & copy the link','info');}}
 function doShareVideo(){
   if(!__pendingVideo)return;var blob=__pendingVideo.blob,mime=__pendingVideo.mime;var ext=mime.indexOf('mp4')>=0?'mp4':'webm';
   var file=null;try{file=new File([blob],'reedbi-journey.'+ext,{type:mime});}catch(e){}
   var link=__lastHabitShareLink||(__shhSnap?(location.origin+location.pathname+'#h='+b64enc(__shhSnap)):'');
   if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
-    var payload={files:[file],title:'My Reedbi journey'};if(link)payload.text='Watch my journey on Reedbi 🔥 '+link;
+    var cap=(__shhSnap&&__shhSnap.cap)?(__shhSnap.cap+' '):'';var payload={files:[file],title:'My Reedbi journey'};payload.text=cap+(link?('Watch my journey on Reedbi 🔥 '+link):'Watch my journey on Reedbi 🔥');
     navigator.share(payload).then(function(){vidProgHide();}).catch(function(){downloadVideo(blob,ext);});
   }else{downloadVideo(blob,ext);}
 }
@@ -12779,7 +12793,7 @@ function renderVStudio(id){
   var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
   var box=document.getElementById('vstudio-body');if(!box)return;
   var has=!!hb.music;
-  var sel='<div style="font-size:12px;margin-top:9px;padding:8px 11px;border-radius:10px;background:'+(has?'rgba(22,163,74,.10)':'rgba(0,0,0,.04)')+';color:'+(has?'#16a34a':'var(--mt2)')+';font-weight:700">'+(has?('\u2713 Voiceover ready'+(hb.musicBy?(' \u00b7 \ud83c\udfa4 '+esc(hb.musicBy)):'')):'No voiceover yet \u2014 the video will be silent (still fine!)')+'</div>';
+  var sel='<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-top:9px;padding:8px 11px;border-radius:10px;background:'+(has?'rgba(22,163,74,.10)':'rgba(0,0,0,.04)')+';color:'+(has?'#16a34a':'var(--mt2)')+';font-weight:700"><span style="flex:1">'+(has?('\u2713 Voiceover ready'+(hb.musicBy?(' \u00b7 \ud83c\udfa4 '+esc(hb.musicBy)):'')):'No voiceover yet \u2014 the video will be silent (still fine!)')+'</span>'+(has?'<button onclick="vsClearVoice(\''+id+'\')" style="border:none;background:rgba(220,38,38,.12);color:#dc2626;font-weight:700;border-radius:8px;padding:5px 9px;cursor:pointer;font-size:11px">\u2715 Remove</button>':'')+'</div>';
   var fields='<input type="hidden" id="hg-music" value="'+esc(hb.music||'')+'"><input type="hidden" id="hg-by" value="'+esc(hb.musicBy||(CU&&CU.name)||'')+'"><input type="hidden" id="hg-lang" value="'+esc(hb.musicLang||'')+'">';
   var tabUI='';
   if(__vsTab==='record'){
@@ -12795,10 +12809,12 @@ function renderVStudio(id){
       +'<button class="'+(__vsTab==='upload'?'sel':'')+'" onclick="vsTab(\'upload\',\''+id+'\')"><i class="ti ti-upload"></i>Upload MP3</button>'
       +'<button class="'+(__vsTab==='library'?'sel':'')+'" onclick="vsTab(\'library\',\''+id+'\')"><i class="ti ti-music"></i>Library</button></div>'
       +tabUI+sel+'</div>'
-    +'<div class="vstep"><div class="ttl"><span class="num">2</span> Choose length</div>'
+    +'<div class="vstep"><div class="ttl"><span class="num">2</span> Add a message <span style="font-weight:500;color:var(--mt2);margin-left:5px">(optional)</span></div>'
+      +'<input id="vs-cap" maxlength="60" placeholder="e.g. Day 12 — never giving up 💪" value="'+esc(hb.vidText||'')+'" oninput="vsSetCap(\''+id+'\',this.value)" style="width:100%;padding:10px;border:1px solid var(--b);border-radius:10px;background:var(--sf);color:var(--tx)"><div style="font-size:10px;color:var(--mt2);margin-top:5px">This appears on your video.</div></div>'
+    +'<div class="vstep"><div class="ttl"><span class="num">3</span> Choose length</div>'
       +'<div class="vlen" style="display:flex;gap:8px"><button class="'+(__vsLen===30?'sel':'')+'" onclick="vsSetLen(30,\''+id+'\')">30 seconds</button><button class="'+(__vsLen===60?'sel':'')+'" onclick="vsSetLen(60,\''+id+'\')">60 seconds</button></div></div>'
     +'<button class="btn btnok" style="width:100%;font-size:15px;padding:14px" onclick="vsCreate(\''+id+'\')"><i class="ti ti-sparkles"></i> Create &amp; share my video</button>'
-    +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-top:8px">Step 3: when it\'s ready, tap <b>Share to WhatsApp</b> \ud83c\udfac</div>';
+    +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-top:8px">Last step: when it\'s ready, tap <b>Share to WhatsApp status</b> \ud83c\udfac</div>';
   if(__vsTab==='library')hgRenderLib(id);
 }
 function vsTab(t,id){__vsTab=(__vsTab===t?'':t);renderVStudio(id);}
@@ -12830,5 +12846,18 @@ function testHabitSound(){
     playTune(LS.get('rb_habit_tune','melody'));
     toast('🔔 That\'s your reminder sound','ok');
   }catch(e){toast('Could not play sound on this device','err');}
+}
+
+/* v170: studio — remove voiceover, and a custom on-video message */
+function vsClearVoice(id){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  hb.music='';hb.musicBy='';hb.musicLang='';saveHabits(habits);
+  var m=document.getElementById('hg-music');if(m)m.value='';
+  __vsTab='';renderVStudio(id);
+  toast('Voiceover removed — add another or make a silent video','info');
+}
+function vsSetCap(id,v){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  hb.vidText=(v||'').slice(0,60);saveHabits(habits);
 }
 </script></body></html>
