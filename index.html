@@ -1209,7 +1209,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v175</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v177</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4677,7 +4677,7 @@ function fmtC(ts){var d=new Date(ts);return d.getHours().toString().padStart(2,'
 function fmtB(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(2)+'MB';}
 function toast(msg,type){var s=document.getElementById('tstack');var d=document.createElement('div');var tc={ok:'tok',err:'terr',info:'t-inf',live:'tlv',gold:'tgld'};var ic={ok:'check',err:'alert-circle',info:'info-circle',live:'activity',gold:'sparkles'};d.className='toast '+(tc[type]||'tok');d.innerHTML='<i class="ti ti-'+(ic[type]||'check')+'"></i> '+msg;s.appendChild(d);setTimeout(function(){d.style.opacity='0';d.style.transition='opacity .3s';setTimeout(function(){d.remove();},300);},2700);}
 function setTick(h){var e=document.getElementById('ttxt');if(e)e.innerHTML=h;}
-function closeOvl(id){var el=document.getElementById(id);if(el)el.classList.remove('open');if(id==='prodsearch-ovl'&&typeof fkStop3DHero==='function')fkStop3DHero();}
+function closeOvl(id){var el=document.getElementById(id);if(el){el.classList.remove('open');try{el.querySelectorAll('audio,video').forEach(function(m){try{if(!m.paused)m.pause();}catch(e){}});}catch(e){}}if((id==='vidresult-ovl'||id==='shhabit-ovl'||id==='mani-ovl')&&typeof stopAllAudio==='function')stopAllAudio();if(id==='prodsearch-ovl'&&typeof fkStop3DHero==='function')fkStop3DHero();}
 function isAdActive(p){return p&&p.boosted&&p.boostExpiry&&Date.now()<p.boostExpiry;}
 function extractAT(title,body){
   var text=((title||'')+' '+(body||'')).toLowerCase();
@@ -5907,7 +5907,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v175 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v177 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11891,7 +11891,7 @@ function openHabits(){
 function renderHabits(){
   var habits=getHabits();var box=document.getElementById('habits-body');if(!box)return;
   var remOn=habRemindOn();
-  var h=stratCard()+'<button class="btn" style="width:100%;margin-bottom:11px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;padding:11px;border:none" onclick="openManifest()">✨ Manifestation &amp; affirmation — train your brain for success</button>'+dopaBanner()+'<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
+  var h=stratCard()+'<button class="btn" style="width:100%;margin-bottom:11px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;padding:11px;border:none" onclick="openManifest()">✨ Manifestation &amp; affirmation — train your brain for success</button>'+'<div style="display:flex;gap:8px;margin-bottom:11px"><button class="btn" style="flex:1;border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:9px" onclick="openVoiceLibrary()"><i class="ti ti-microphone"></i> Voice library</button><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:9px" onclick="openGoalSheet()"><i class="ti ti-checklist"></i> Daily goals</button></div>'+'<button class="btn" style="width:100%;margin-bottom:11px;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;padding:9px" onclick="openFrameExtractor(\'\')"><i class="ti ti-photo-video"></i> Frame &amp; screenshot extractor (from your video)</button>'+dopaBanner()+'<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
     +'<div style="font-size:20px">'+(remOn?'🔔':'🔕')+'</div><div style="flex:1"><div style="font-size:13px;font-weight:800">Daily reminders</div><div style="font-size:10px;color:var(--mt2)">A gentle nudge at 5:00 AM &amp; 9:30 PM</div></div>'
     +(remOn?'<button class="hab-chip on" onclick="disableHabitReminders()">On</button>':'<button class="hab-chip" onclick="enableHabitReminders()">Turn on</button>')+'<button class="hab-chip" style="margin-left:5px" onclick="testHabitSound()" title="Hear the reminder sound"><i class="ti ti-volume"></i></button></div>'
     +(remOn?'<div style="display:flex;align-items:center;gap:8px;margin:-4px 0 11px;font-size:12px"><span style="color:var(--mt2)">Motivational tune</span><select id="hab-tune" onchange="habSetTune(this.value)" style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--b);background:var(--sf);color:var(--tx)">'+habTuneOptions()+'</select><button class="hab-chip" onclick="habPreviewTune()"><i class="ti ti-player-play"></i></button></div>':'');
@@ -12243,7 +12243,7 @@ var __gsMusicSession='';
 function gsPlayMusic(){
   var src=__gsMusicSession||gsGetMusicUrl();
   if(!src){toast('Upload an MP3 or paste an audio URL first','info');return;}
-  try{if(__gsAudio){__gsAudio.pause();}__gsAudio=new Audio(src);__gsAudio.loop=true;__gsAudio.volume=0.7;__gsAudio.play().catch(function(){toast('Tap play again — browser needs a tap to start audio','info');});}catch(e){toast('Could not play that source','err');}
+  try{stopAllAudio();__gsAudio=new Audio(src);__gsAudio.loop=true;__gsAudio.volume=0.7;__gsAudio.play().catch(function(){toast('Tap play again — browser needs a tap to start audio','info');});}catch(e){toast('Could not play that source','err');}
   if(document.getElementById('gsheet-body'))renderGoalSheet();
 }
 function gsStopMusic(){try{if(__gsAudio){__gsAudio.pause();__gsAudio=null;}}catch(e){}if(document.getElementById('gsheet-body'))renderGoalSheet();}
@@ -12295,7 +12295,7 @@ function openSharedTracker(snap,views){
   ovl.classList.add('open');
 }
 var __shAudio=null;
-function shPlayMusic(u){try{u=decodeURIComponent(u);if(__shAudio)__shAudio.pause();__shAudio=new Audio(u);__shAudio.loop=true;__shAudio.play().catch(function(){toast('Tap again to start the music','info');});}catch(e){}}
+function shPlayMusic(u){try{u=decodeURIComponent(u);if(__shAudio&&!__shAudio.paused){stopAllAudio();return;}stopAllAudio();__shAudio=new Audio(u);__shAudio.loop=true;__shAudio.play().catch(function(){toast('Tap again to start the music','info');});}catch(e){}}
 (function(){
   function checkHash(){
     var h=location.hash||'';
@@ -12534,6 +12534,7 @@ function shareVideoBlob(blob,mime){
   __pendingVideo={blob:blob,mime:mime};
   var ext=mime.indexOf('mp4')>=0?'mp4':'webm';
   vidProgHide();
+  stopAllAudio(); // ensure ONLY the preview video plays (no overlapping voice)
   var link=__lastHabitShareLink||(__shhSnap?(location.origin+location.pathname+'#h='+b64enc(__shhSnap)):'');
   __lastHabitShareLink=link;
   var vurl='';try{vurl=URL.createObjectURL(blob);}catch(e){}
@@ -12555,12 +12556,26 @@ function shareVideoBlob(blob,mime){
 function vidCopyLink(){var el=document.getElementById('vid-link');if(!el)return;try{el.select();}catch(e){}try{navigator.clipboard.writeText(el.value).then(function(){toast('Link copied 🔗 paste it in your status','ok');});}catch(e){toast('Select & copy the link','info');}}
 function doShareVideo(){
   if(!__pendingVideo)return;var blob=__pendingVideo.blob,mime=__pendingVideo.mime;var ext=mime.indexOf('mp4')>=0?'mp4':'webm';
+  stopAllAudio();
   var file=null;try{file=new File([blob],'reedbi-journey.'+ext,{type:mime});}catch(e){}
   var link=__lastHabitShareLink||(__shhSnap?(location.origin+location.pathname+'#h='+b64enc(__shhSnap)):'');
   if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
     var cap=(__shhSnap&&__shhSnap.cap)?(__shhSnap.cap+' '):'';var payload={files:[file],title:'My Reedbi journey'};payload.text=cap+(link?('Watch my journey on Reedbi 🔥 '+link):'Watch my journey on Reedbi 🔥');
-    navigator.share(payload).then(function(){vidProgHide();}).catch(function(){downloadVideo(blob,ext);});
-  }else{downloadVideo(blob,ext);}
+    navigator.share(payload).then(function(){vidProgHide();}).catch(function(){videoShareFallback(blob,ext,link);});
+  }else{ videoShareFallback(blob,ext,link); }
+}
+/* when the phone can't share the file directly: save it + copy the link + show steps */
+function videoShareFallback(blob,ext,link){
+  try{if(link&&navigator.clipboard)navigator.clipboard.writeText(link);}catch(e){}
+  downloadVideo(blob,ext);
+  var ovl=document.getElementById('vidhelp-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='vidhelp-ovl';ovl.className='overlay';document.body.appendChild(ovl);}
+  ovl.innerHTML='<div class="modal" style="max-width:380px"><div style="font-size:16px;font-weight:800;margin-bottom:8px">✅ Video saved + link copied</div>'
+    +'<div style="font-size:13px;color:var(--tx);line-height:1.6">Your phone can\'t post straight to WhatsApp from a web app, so here\'s the 10-second way:</div>'
+    +'<ol style="font-size:13px;color:var(--tx);line-height:1.7;margin:10px 0 0;padding-left:20px"><li>The video just saved to your <b>gallery / downloads</b>.</li><li>Open <b>WhatsApp → Status → ➕</b> and pick that video.</li><li><b>Paste the link</b> (already copied) in the caption.</li><li>Post! 🎉</li></ol>'
+    +(link?'<div style="display:flex;gap:6px;margin-top:11px"><input readonly value="'+esc(link)+'" id="vh-link" style="flex:1;font-size:11px;padding:8px;border:1px solid var(--b);border-radius:8px;background:var(--card2);color:var(--tx)"><button class="hab-chip on" onclick="(function(){var e=document.getElementById(\'vh-link\');try{e.select();navigator.clipboard.writeText(e.value);}catch(x){}toast(\'Link copied\',\'ok\');})()">Copy</button></div>':'')
+    +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="closeOvl(\'vidhelp-ovl\')">Got it</button></div>';
+  ovl.classList.add('open');
 }
 function downloadVideo(blob,ext){
   try{var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='reedbi-journey.'+ext;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},3000);toast('Video saved 🎬 share it from your gallery','ok');vidProgHide();}catch(e){toast('Could not save the video','err');}
@@ -12652,7 +12667,7 @@ function hgRenderLib(habitId){
   }
 }
 var __hgPrev=null,__hgLang='All';
-function hgPreview(u){try{u=decodeURIComponent(u);if(__hgPrev)__hgPrev.pause();__hgPrev=new Audio(u);__hgPrev.play().catch(function(){toast('Tap again to preview','info');});}catch(e){toast('Cannot preview this track','err');}}
+function hgPreview(u){try{u=decodeURIComponent(u);if(__hgPrev&&!__hgPrev.paused){stopAllAudio();return;}stopAllAudio();__hgPrev=new Audio(u);__hgPrev.play().catch(function(){toast('Tap again to preview','info');});toast('Playing… tap again to stop','info');}catch(e){toast('Cannot preview this track','err');}}
 function hgUseTrack(tid,habitId){
   var t=getTracks().find(function(x){return x.id===tid;});
   if(!t){toast('Track not found','err');return;}
@@ -12870,6 +12885,7 @@ function renderVStudio(id){
     +'<div class="vstep"><div class="ttl"><span class="num">2</span> Add a message <span style="font-weight:500;color:var(--mt2);margin-left:5px">(optional)</span></div>'
       +'<input id="vs-cap" maxlength="60" placeholder="e.g. Day 12 — never giving up 💪" value="'+esc(hb.vidText||'')+'" oninput="vsSetCap(\''+id+'\',this.value)" style="width:100%;padding:10px;border:1px solid var(--b);border-radius:10px;background:var(--sf);color:var(--tx)"><div style="font-size:10px;color:var(--mt2);margin-top:5px">This appears on your video.</div>'+'<div style="display:flex;align-items:center;gap:7px;margin-top:9px"><span style="font-size:11px;color:var(--mt2)">Text colour:</span>'+['#ffffff','#ffe600','#00e5ff','#ff3b3b','#000000'].map(function(C){var onsel=((hb.vidTextCol||'#ffffff')===C);return '<button onclick="vsSetTextCol(\''+id+'\',\''+C+'\')" style="width:24px;height:24px;border-radius:50%;cursor:pointer;background:'+C+';border:'+(onsel?'3px solid #0a66c2':'1px solid var(--b)')+'"></button>';}).join('')+'</div>'
       +'<div style="display:flex;gap:8px;align-items:center;margin-top:10px"><label class="btn" style="flex:1;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;cursor:pointer;text-align:center;padding:9px"><i class="ti ti-photo"></i> '+(hb.vidImg?'Change photo':'Add a photo')+'<input type="file" accept="image/*" style="display:none" onchange="vsAddImage(this,\''+id+'\')"></label>'+(hb.vidImg?'<button onclick="vsClearImage(\''+id+'\')" style="border:none;background:rgba(220,38,38,.12);color:#dc2626;font-weight:700;border-radius:10px;padding:9px 12px;cursor:pointer">✕</button>':'')+'</div>'
+      +'<button class="btn" style="width:100%;margin-top:8px;border:1px solid var(--b);color:var(--mt);font-weight:600;padding:8px;font-size:12px" onclick="closeOvl(\'vstudio-ovl\');openFrameExtractor(\''+id+'\')"><i class="ti ti-photo-video"></i> …or grab a frame from a video</button>'
       +(hb.vidImg?'<div style="margin-top:8px;text-align:center"><img src="'+hb.vidImg+'" style="max-height:120px;border-radius:10px;border:1px solid var(--b)"><div style="font-size:10px;color:var(--mt2);margin-top:4px">Your photo becomes the video background</div></div>':'')+'</div>'
     +'<div class="vstep"><div class="ttl"><span class="num">3</span> Choose length</div>'
       +'<div class="vlen" style="display:flex;gap:8px"><button class="'+(__vsLen===30?'sel':'')+'" onclick="vsSetLen(30,\''+id+'\')">30 seconds</button><button class="'+(__vsLen===60?'sel':'')+'" onclick="vsSetLen(60,\''+id+'\')">60 seconds</button></div></div>'
@@ -13154,6 +13170,7 @@ function saveVoiceToLibrary(id){
   try{registerTrack(__lastVoiceUrl, by, 'Voice by '+by, lang);}catch(e){}
   try{hgUploadBlob(__lastVoiceBlob,id,'voiceover.'+(((__lastVoiceBlob.type||'').indexOf('mp4')>=0)?'m4a':'webm'));}catch(e){}
   toast('Saved to library 🎙️ pick it anytime under Library. Record more if you like!','ok');
+  try{if(document.getElementById('vlib-ovl')&&document.getElementById('vlib-ovl').classList.contains('open'))renderVoiceLibrary();}catch(e){}
 }
 
 /* ===== v175: Manifestation technique — affirmation + scripting + gratitude =====
@@ -13217,5 +13234,153 @@ function saveManifestDay(){
   var dk=dayKey();var m=getManifest();
   m[dk]={script:(document.getElementById('mani-script')||{}).value||'',grat:(document.getElementById('mani-grat')||{}).value||'',wish:(document.getElementById('mani-369')||{}).value||'',ts:Date.now()};
   saveManifest(m);closeOvl('mani-ovl');try{rbConfetti(60);}catch(e){}toast('Practice saved ✨ keep showing up','ok');
+}
+
+/* ===== v176: one-sound-at-a-time — fixes double audio + makes everything pausable ===== */
+function stopAllAudio(){
+  try{['__gsAudio','__shAudio','__vidAudio','__hgPrev','__voicePrev'].forEach(function(k){var a=window[k];if(a&&a.pause){try{a.pause();a.currentTime=0;}catch(e){}}});}catch(e){}
+  try{document.querySelectorAll('audio,video').forEach(function(m){try{if(!m.paused)m.pause();}catch(e){}});}catch(e){}
+  try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
+}
+
+/* ===== v176: standalone Voice Library in the habit tracker =====
+   Browse every motivational voiceover (yours + community), play/pause each,
+   and record a new one — all without opening a specific video. */
+function openVoiceLibrary(){
+  if(typeof requireAuth==='function'&&!requireAuth('use the voice library'))return;
+  var ovl=document.getElementById('vlib-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='vlib-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:430px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:16px">🎙️ Voice library</b><button class="modal-x" onclick="closeOvl(\'vlib-ovl\')"><i class="ti ti-x"></i></button></div><div id="vlib-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderVoiceLibrary();ovl.classList.add('open');
+}
+var __vlibLang='All',__vlibPlaying='';
+function renderVoiceLibrary(){
+  var box=document.getElementById('vlib-body');if(!box)return;
+  var list=getTracks();
+  var langs=['All'].concat(list.map(function(x){return x.lang;}).filter(function(v,i,a){return v&&a.indexOf(v)===i;}));
+  var shown=(__vlibLang&&__vlibLang!=='All')?list.filter(function(x){return x.lang===__vlibLang;}):list;
+  var rows=shown.length?shown.map(function(t){
+    var playing=(__vlibPlaying===t.url);
+    return '<div style="display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--b);border-radius:11px;margin-bottom:7px;background:var(--card2)">'
+      +'<button onclick="vlibPlay(\''+encodeURIComponent(t.url)+'\')" style="flex:none;width:38px;height:38px;border-radius:50%;border:none;background:'+(playing?'#dc2626':'#16a34a')+';color:#fff;cursor:pointer;font-size:16px"><i class="ti ti-player-'+(playing?'pause':'play')+'-filled"></i></button>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.title||'Voice')+(t.lang?' <span style="font-size:9px;background:rgba(10,102,194,.12);color:#0a66c2;border-radius:10px;padding:1px 6px">'+esc(t.lang)+'</span>':'')+'</div><div style="font-size:10px;color:var(--mt2)">🎤 by '+esc(t.by||'Anonymous')+(t.local?' · only on your device':'')+'</div></div>'
+    +'</div>';
+  }).join(''):'<div style="text-align:center;color:var(--mt2);font-size:13px;padding:18px">No voiceovers yet. Record the first one below! 🎙️</div>';
+  box.innerHTML=(langs.length>1?'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px">'+langs.map(function(L){return '<button class="hab-chip'+((__vlibLang||'All')===L?' on':'')+'" onclick="__vlibLang=\''+L+'\';renderVoiceLibrary()">'+esc(L)+'</button>';}).join('')+'</div>':'')
+    +rows
+    +'<div style="border-top:1px solid var(--b);margin-top:8px;padding-top:11px"><button id="vlib-recbtn" class="btn" style="width:100%;background:#dc2626;color:#fff;font-weight:800;padding:12px" onclick="vlibRecord()"><i class="ti ti-microphone"></i> Record a new voiceover</button>'
+    +'<div id="vlib-by" style="margin-top:8px;display:none"><input id="vlib-byname" placeholder="Your name (credit)" value="'+esc((CU&&CU.name)||'')+'" style="width:100%"></div>'
+    +'<div id="hg-upprog" style="display:none;font-size:11px;margin-top:6px;color:var(--mt)"></div><div id="hg-review" style="display:none"></div></div>';
+}
+function vlibPlay(u){
+  var url=decodeURIComponent(u);
+  if(__vlibPlaying===url){stopAllAudio();__vlibPlaying='';renderVoiceLibrary();return;}
+  stopAllAudio();
+  try{window.__voicePrev=new Audio(url);window.__voicePrev.onended=function(){__vlibPlaying='';renderVoiceLibrary();};window.__voicePrev.play().catch(function(){toast('Tap play again to start','info');});__vlibPlaying=url;renderVoiceLibrary();}
+  catch(e){toast('Cannot play this voice','err');}
+}
+/* record straight into the library (no video needed) */
+function vlibRecord(){
+  // reuse the recorder; it writes to hg-music/hg-review which exist in this modal
+  if(!document.getElementById('hg-music')){var i=document.createElement('input');i.type='hidden';i.id='hg-music';document.body.appendChild(i);}
+  if(!document.getElementById('hg-by')){var b=document.createElement('input');b.type='hidden';b.id='hg-by';b.value=(document.getElementById('vlib-byname')||{}).value||((CU&&CU.name)||'');document.body.appendChild(b);}
+  document.getElementById('vlib-by').style.display='block';
+  var btn=document.getElementById('vlib-recbtn');
+  // map the record button id the engine expects
+  var rb=document.getElementById('hg-recbtn');if(!rb){var s=document.createElement('button');s.id='hg-recbtn';s.style.display='none';document.body.appendChild(s);}
+  var recordingNow=(window.__voiceRec&&window.__voiceRec.state==='recording');
+  if(btn){btn.innerHTML=recordingNow?'<i class="ti ti-microphone"></i> Record a new voiceover':'<i class="ti ti-player-stop-filled"></i> Stop recording';btn.style.background=recordingNow?'#dc2626':'#111';}
+  hgRecordVoice('lib');
+}
+
+/* ===== v177: Frame / screenshot extractor =====
+   Works on a video the user UPLOADS (or a direct .mp4 URL they own). It cannot
+   process YouTube / Instagram / TikTok links — those streams are DRM/CORS
+   protected and downloading them violates copyright; no web app can do it.
+   For an uploaded video we pull N evenly-spaced frames via canvas, and can also
+   reuse the video's own audio track as a voiceover. */
+var __feUrl='',__feFrames=[],__feHabit='';
+function openFrameExtractor(habitId){
+  if(typeof requireAuth==='function'&&!requireAuth('extract frames'))return;
+  __feHabit=habitId||'';__feUrl='';__feFrames=[];
+  var ovl=document.getElementById('fe-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='fe-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:440px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:16px">🎞️ Frame &amp; screenshot extractor</b><button class="modal-x" onclick="closeOvl(\'fe-ovl\')"><i class="ti ti-x"></i></button></div><div id="fe-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderFE();ovl.classList.add('open');
+}
+function renderFE(){
+  var box=document.getElementById('fe-body');if(!box)return;
+  box.innerHTML='<div style="font-size:12px;color:var(--mt2);margin-bottom:10px">Upload a video from your phone to pull <b>screenshots / frames</b> from it. Use them as your habit photo or save them.</div>'
+    +'<label class="btn" style="width:100%;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;cursor:pointer;display:block;text-align:center;padding:12px"><i class="ti ti-upload"></i> Choose a video file<input type="file" accept="video/*" style="display:none" onchange="feLoad(this)"></label>'
+    +'<div style="font-size:11px;color:var(--mt2);margin-top:6px">⚠️ YouTube / Instagram / TikTok links can\'t be used — those videos are protected and can\'t be processed by any app. Upload your own video instead.</div>'
+    +'<div id="fe-stage" style="margin-top:12px"></div>'
+    +'<div id="fe-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:11px"></div>';
+}
+function feLoad(input){
+  var f=input.files&&input.files[0];if(!f)return;
+  try{if(__feUrl)URL.revokeObjectURL(__feUrl);}catch(e){}
+  __feUrl=URL.createObjectURL(f);__feFrames=[];
+  var stage=document.getElementById('fe-stage');
+  stage.innerHTML='<video id="fe-vid" src="'+__feUrl+'" controls playsinline style="width:100%;max-height:300px;border-radius:12px;background:#000"></video>'
+    +'<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap"><button class="hab-chip on" onclick="feGrab(6)">📸 Grab 6 frames</button><button class="hab-chip on" onclick="feGrab(9)">Grab 9</button><button class="hab-chip" onclick="feGrabNow()">⭐ Grab current frame</button></div>'
+    +'<button class="btn" style="width:100%;margin-top:9px;border:1px solid #16a34a;color:#16a34a;font-weight:700" onclick="feUseAudio()"><i class="ti ti-volume"></i> Use this video\'s audio as voiceover</button>'
+    +'<div id="fe-msg" style="font-size:11px;color:var(--mt2);margin-top:6px"></div>';
+  document.getElementById('fe-grid').innerHTML='';
+}
+function feMsg(t){var m=document.getElementById('fe-msg');if(m)m.textContent=t;}
+/* grab n evenly-spaced frames */
+function feGrab(n){
+  var v=document.getElementById('fe-vid');if(!v||!v.duration||!isFinite(v.duration)){feMsg('Let the video load first, then try again.');return;}
+  feMsg('Grabbing '+n+' frames…');
+  var dur=v.duration,i=0;var times=[];for(var k=0;k<n;k++)times.push(Math.max(0.05,dur*(k+0.5)/n));
+  var cv=document.createElement('canvas');var W=cv.width=Math.min(720,v.videoWidth||720);var H=cv.height=Math.round(W*((v.videoHeight||1280)/(v.videoWidth||720)));var ctx=cv.getContext('2d');
+  function next(){
+    if(i>=times.length){feMsg('Done! Tap a frame to use or save it.');return;}
+    var seekHandler=function(){
+      v.removeEventListener('seeked',seekHandler);
+      try{ctx.drawImage(v,0,0,W,H);var data=cv.toDataURL('image/jpeg',0.85);feAddFrame(data);}catch(e){feMsg('This video can\'t be read for frames (protected source).');return;}
+      i++;setTimeout(next,60);
+    };
+    v.addEventListener('seeked',seekHandler);
+    try{v.currentTime=times[i];}catch(e){feMsg('Could not seek this video.');}
+  }
+  next();
+}
+function feGrabNow(){
+  var v=document.getElementById('fe-vid');if(!v){return;}
+  var cv=document.createElement('canvas');var W=cv.width=Math.min(720,v.videoWidth||720);var H=cv.height=Math.round(W*((v.videoHeight||1280)/(v.videoWidth||720)));
+  try{cv.getContext('2d').drawImage(v,0,0,W,H);feAddFrame(cv.toDataURL('image/jpeg',0.85));feMsg('Captured the current frame.');}catch(e){feMsg('This video can\'t be read for frames (protected source).');}
+}
+function feAddFrame(data){
+  __feFrames.push(data);
+  var grid=document.getElementById('fe-grid');if(!grid)return;
+  var idx=__feFrames.length-1;
+  var cell=document.createElement('div');cell.style.cssText='position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--b)';
+  cell.innerHTML='<img src="'+data+'" style="width:100%;display:block;aspect-ratio:9/16;object-fit:cover" onclick="feUseFrame('+idx+')">'
+    +'<div style="display:flex"><button onclick="feUseFrame('+idx+')" style="flex:1;border:none;background:#16a34a;color:#fff;font-size:10px;font-weight:700;padding:5px;cursor:pointer">Use</button><button onclick="feSaveFrame('+idx+')" style="flex:none;border:none;background:#0a66c2;color:#fff;font-size:10px;padding:5px 8px;cursor:pointer">⬇</button></div>';
+  grid.appendChild(cell);
+}
+function feUseFrame(idx){
+  var data=__feFrames[idx];if(!data)return;
+  if(__feHabit){
+    var habits=getHabits();var hb=habits.find(function(x){return x.id===__feHabit;});
+    if(hb){hb.vidImg=data;saveHabits(habits);toast('Set as your video background 🖼️','ok');closeOvl('fe-ovl');if(typeof vsStudioOpen==='function'&&vsStudioOpen())renderVStudio(__feHabit);return;}
+  }
+  // no habit context: copy/download
+  feSaveFrame(idx);
+}
+function feSaveFrame(idx){
+  var data=__feFrames[idx];if(!data)return;
+  try{var a=document.createElement('a');a.href=data;a.download='frame-'+(idx+1)+'.jpg';document.body.appendChild(a);a.click();a.remove();toast('Frame saved 📸','ok');}catch(e){toast('Could not save','err');}
+}
+function feUseAudio(){
+  if(!__feUrl){return;}
+  if(__feHabit){
+    var habits=getHabits();var hb=habits.find(function(x){return x.id===__feHabit;});
+    if(hb){hb.music=__feUrl;hb.musicBy=hb.musicBy||((CU&&CU.name)||'');saveHabits(habits);toast('Using this video\'s audio as your voiceover 🎵','ok');closeOvl('fe-ovl');if(typeof vsStudioOpen==='function'&&vsStudioOpen())renderVStudio(__feHabit);return;}
+  }
+  toast('Open the extractor from a habit\'s video to use its audio','info');
 }
 </script></body></html>
