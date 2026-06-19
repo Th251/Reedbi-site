@@ -1201,7 +1201,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v170</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v171</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5897,7 +5897,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v170 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v171 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12299,7 +12299,7 @@ function habitSnap(hb){
   var p=habitProgress(hb);var start=hb.startTs||Date.now();var grid=[];
   for(var i=0;i<(hb.days||40);i++){grid.push((hb.done||[]).indexOf(dayKey(start+i*86400000))>=0?1:0);}
   return {v:1,nm:(CU&&CU.name)||'A friend',t:hb.n,goal:hb.goal||'',aff:hb.manifest||'',days:hb.days||40,
-    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),cap:(hb.vidText||''),c:hb.c||'#16a34a'};
+    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),cap:(hb.vidText||''),img:(hb.vidImg||''),c:hb.c||'#16a34a'};
 }
 function shareHabitLink(habitId){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===habitId;});if(!hb)return;
@@ -12425,8 +12425,19 @@ var __shhSnap=null;
 function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function drawDash(ctx,W,H,snap,frac){
   if(frac==null)frac=1;
-  var g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,snap.c||'#16a34a');g.addColorStop(.6,'#0a66c2');g.addColorStop(1,'#7c3aed');
-  ctx.fillStyle=g;rrect(ctx,0,0,W,H,40);ctx.fill();
+  rrect(ctx,0,0,W,H,40);ctx.save();ctx.clip();
+  var hasImg=(typeof __vidImgEl!=='undefined'&&__vidImgEl&&__vidImgEl.complete&&__vidImgEl.naturalWidth>0);
+  if(hasImg){
+    // cover-fit the user photo, then a gradient veil on top so text stays readable
+    var iw=__vidImgEl.naturalWidth,ih=__vidImgEl.naturalHeight,s=Math.max(W/iw,H/ih);
+    var dw=iw*s,dh=ih*s;ctx.drawImage(__vidImgEl,(W-dw)/2,(H-dh)/2,dw,dh);
+    var g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,snap.c||'#16a34a');g.addColorStop(.6,'#0a66c2');g.addColorStop(1,'#7c3aed');
+    ctx.globalAlpha=0.72;ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
+  }else{
+    var g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,snap.c||'#16a34a');g.addColorStop(.6,'#0a66c2');g.addColorStop(1,'#7c3aed');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  }
+  ctx.restore();
   ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.92)';
   ctx.font='28px system-ui,Arial';ctx.fillText((snap.nm||'A friend')+"'s "+(snap.days||40)+'-day journey',W/2,90);
   ctx.fillStyle='#fff';ctx.font='800 52px system-ui,Arial';ctx.fillText(snap.t||'My habit',W/2,160);
@@ -12451,12 +12462,29 @@ function drawDash(ctx,W,H,snap,frac){
   if(snap.by){ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillText('🎤 voice by '+snap.by,W/2,H-66);}
   ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillText('Track yours free on Reedbi',W/2,H-34);
 }
+var __vidImgEl=null;
+/* v171: preload the user's photo so drawDash can paint it into the video/image */
+function preloadVidImg(snap,cb){
+  __vidImgEl=null;
+  var src=snap&&snap.img;
+  if(!src){cb&&cb();return;}
+  try{
+    var im=new Image();
+    im.onload=function(){__vidImgEl=im;cb&&cb();};
+    im.onerror=function(){__vidImgEl=null;cb&&cb();};
+    im.src=src;
+    if(im.complete&&im.naturalWidth>0){__vidImgEl=im;cb&&cb();}
+  }catch(e){cb&&cb();}
+}
 function habitDashCanvas(snap){
   var W=720,H=1100,cv=document.createElement('canvas');cv.width=W;cv.height=H;var ctx=cv.getContext('2d');
   drawDash(ctx,W,H,snap,1);return cv;
 }
 function downloadHabitImage(){
   if(!__shhSnap){toast('Open a shared chart first','info');return;}
+  preloadVidImg(__shhSnap,function(){ _downloadHabitImage(); });
+}
+function _downloadHabitImage(){
   try{
     var cv=habitDashCanvas(__shhSnap);
     cv.toBlob(function(blob){
@@ -12493,6 +12521,7 @@ function shareVideoBlob(blob,mime){
     +(vurl?'<video src="'+vurl+'" controls autoplay playsinline style="width:100%;max-height:420px;border-radius:14px;background:#000"></video>':'')
     +'<button onclick="doShareVideo()" style="display:block;width:100%;margin-top:12px;padding:13px;border:none;border-radius:12px;background:#25D366;color:#fff;font-weight:800;font-size:15px;cursor:pointer"><i class="ti ti-brand-whatsapp"></i> Share to WhatsApp status</button>'
     +'<button onclick="downloadVideo(__pendingVideo.blob,\''+ext+'\')" style="display:block;width:100%;margin-top:8px;padding:11px;border:1px solid var(--b);border-radius:12px;background:var(--sf);color:var(--tx);font-weight:700;font-size:14px;cursor:pointer"><i class="ti ti-download"></i> Save video to phone</button>'
+    +'<button onclick="editThisVideo()" style="display:block;width:100%;margin-top:8px;padding:11px;border:1px solid #7c3aed;border-radius:12px;background:var(--sf);color:#7c3aed;font-weight:700;font-size:14px;cursor:pointer"><i class="ti ti-edit"></i> Edit this video (voice · text · photo)</button>'
     +(link?'<div style="margin-top:12px;text-align:left"><div style="font-size:11px;font-weight:700;color:var(--mt2);margin-bottom:4px">🔗 Your shareable link (paste in the status caption)</div><div style="display:flex;gap:6px"><input id="vid-link" readonly value="'+esc(link)+'" style="flex:1;font-size:11px;padding:8px;border:1px solid var(--b);border-radius:8px;background:var(--card2);color:var(--tx)"><button onclick="vidCopyLink()" class="hab-chip on">Copy</button></div></div>':'')
     +(ext==='webm'?'<div style="font-size:10px;color:var(--mt2);margin-top:9px">Format: webm. If WhatsApp won\'t accept it, tap Save then upload from your gallery, or use the status image instead.</div>':'<div style="font-size:10px;color:var(--mt2);margin-top:9px">Plays with sound in your status 🎵</div>')
     +'<button onclick="closeOvl(\'vidresult-ovl\')" style="display:block;width:100%;margin-top:10px;padding:9px;border:none;border-radius:8px;background:transparent;color:var(--mt2);font-size:13px;cursor:pointer">Close</button>'
@@ -12515,6 +12544,9 @@ function downloadVideo(blob,ext){
 function makeHabitVideo(seconds){
   if(!__shhSnap){toast('Open a shared chart first','info');return;}
   var snap=__shhSnap;seconds=seconds||30;
+  preloadVidImg(snap,function(){ _makeHabitVideo(snap,seconds); });
+}
+function _makeHabitVideo(snap,seconds){
   if(typeof MediaRecorder==='undefined'||!document.createElement('canvas').captureStream){
     toast('This browser can\'t record video here — use Save image instead 📸','info');return;
   }
@@ -12780,6 +12812,7 @@ var __vsLen=30, __vsTab='';
 function vsStudioOpen(){var o=document.getElementById('vstudio-ovl');return o&&o.classList.contains('open');}
 function openVideoStudio(id){
   if(typeof requireAuth==='function'&&!requireAuth('make a video'))return;
+  __vsLastId=id;
   var hb=getHabits().find(function(x){return x.id===id;});if(!hb){toast('Habit not found','err');return;}
   __vsLen=__vsLen||30;__vsTab='';
   var ovl=document.getElementById('vstudio-ovl');
@@ -12810,7 +12843,9 @@ function renderVStudio(id){
       +'<button class="'+(__vsTab==='library'?'sel':'')+'" onclick="vsTab(\'library\',\''+id+'\')"><i class="ti ti-music"></i>Library</button></div>'
       +tabUI+sel+'</div>'
     +'<div class="vstep"><div class="ttl"><span class="num">2</span> Add a message <span style="font-weight:500;color:var(--mt2);margin-left:5px">(optional)</span></div>'
-      +'<input id="vs-cap" maxlength="60" placeholder="e.g. Day 12 — never giving up 💪" value="'+esc(hb.vidText||'')+'" oninput="vsSetCap(\''+id+'\',this.value)" style="width:100%;padding:10px;border:1px solid var(--b);border-radius:10px;background:var(--sf);color:var(--tx)"><div style="font-size:10px;color:var(--mt2);margin-top:5px">This appears on your video.</div></div>'
+      +'<input id="vs-cap" maxlength="60" placeholder="e.g. Day 12 — never giving up 💪" value="'+esc(hb.vidText||'')+'" oninput="vsSetCap(\''+id+'\',this.value)" style="width:100%;padding:10px;border:1px solid var(--b);border-radius:10px;background:var(--sf);color:var(--tx)"><div style="font-size:10px;color:var(--mt2);margin-top:5px">This appears on your video.</div>'
+      +'<div style="display:flex;gap:8px;align-items:center;margin-top:10px"><label class="btn" style="flex:1;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;cursor:pointer;text-align:center;padding:9px"><i class="ti ti-photo"></i> '+(hb.vidImg?'Change photo':'Add a photo')+'<input type="file" accept="image/*" style="display:none" onchange="vsAddImage(this,\''+id+'\')"></label>'+(hb.vidImg?'<button onclick="vsClearImage(\''+id+'\')" style="border:none;background:rgba(220,38,38,.12);color:#dc2626;font-weight:700;border-radius:10px;padding:9px 12px;cursor:pointer">✕</button>':'')+'</div>'
+      +(hb.vidImg?'<div style="margin-top:8px;text-align:center"><img src="'+hb.vidImg+'" style="max-height:120px;border-radius:10px;border:1px solid var(--b)"><div style="font-size:10px;color:var(--mt2);margin-top:4px">Your photo becomes the video background</div></div>':'')+'</div>'
     +'<div class="vstep"><div class="ttl"><span class="num">3</span> Choose length</div>'
       +'<div class="vlen" style="display:flex;gap:8px"><button class="'+(__vsLen===30?'sel':'')+'" onclick="vsSetLen(30,\''+id+'\')">30 seconds</button><button class="'+(__vsLen===60?'sel':'')+'" onclick="vsSetLen(60,\''+id+'\')">60 seconds</button></div></div>'
     +'<button class="btn btnok" style="width:100%;font-size:15px;padding:14px" onclick="vsCreate(\''+id+'\')"><i class="ti ti-sparkles"></i> Create &amp; share my video</button>'
@@ -12859,5 +12894,45 @@ function vsClearVoice(id){
 function vsSetCap(id,v){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
   hb.vidText=(v||'').slice(0,60);saveHabits(habits);
+}
+
+/* ===== v171: add/replace/remove a photo for the video (downscaled to keep storage small) ===== */
+function vsAddImage(input,id){
+  var file=input.files&&input.files[0];if(!file)return;
+  if(!/^image\//.test(file.type||'')){toast('Please choose an image','info');return;}
+  var fr=new FileReader();
+  fr.onload=function(e){
+    var im=new Image();
+    im.onload=function(){
+      try{
+        var max=720,w=im.naturalWidth,h=im.naturalHeight,s=Math.min(1,max/Math.max(w,h));
+        var cw=Math.round(w*s),ch=Math.round(h*s);
+        var cv=document.createElement('canvas');cv.width=cw;cv.height=ch;
+        cv.getContext('2d').drawImage(im,0,0,cw,ch);
+        var data=cv.toDataURL('image/jpeg',0.72);
+        var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+        hb.vidImg=data;saveHabits(habits);
+        if(typeof vsStudioOpen==='function'&&vsStudioOpen())renderVStudio(id);
+        toast('Photo added 📷 it becomes your video background','ok');
+      }catch(err){toast('Could not use that image','err');}
+    };
+    im.onerror=function(){toast('Could not read that image','err');};
+    im.src=e.target.result;
+  };
+  fr.onerror=function(){toast('Could not read that image','err');};
+  fr.readAsDataURL(file);
+}
+function vsClearImage(id){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  hb.vidImg='';saveHabits(habits);
+  if(typeof vsStudioOpen==='function'&&vsStudioOpen())renderVStudio(id);
+  toast('Photo removed','info');
+}
+/* reopen the editor on the last habit to change voice / text / photo, then re-generate */
+var __vsLastId='';
+function editThisVideo(){
+  closeOvl('vidresult-ovl');
+  if(__vsLastId){openVideoStudio(__vsLastId);}
+  else toast('Open a habit and tap Make video','info');
 }
 </script></body></html>
