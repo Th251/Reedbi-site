@@ -968,6 +968,23 @@ body.dark .spin-wheel{border-color:#2a333f}
 .dopa .sub{font-size:11px;opacity:.92;margin-top:5px;position:relative;display:flex;gap:12px;flex-wrap:wrap}
 @keyphrase{}
 .dopa .pulse{display:inline-block;animation:dpulse 1.6s ease-in-out infinite}
+.strat{background:linear-gradient(120deg,#0f766e,#0a66c2 55%,#6d28d9);color:#fff;border-radius:16px;padding:15px 16px;margin-bottom:11px;position:relative;overflow:hidden}
+.strat::before{content:"🌅";position:absolute;right:10px;top:8px;font-size:38px;opacity:.25}
+.strat .k{font-size:10px;font-weight:800;letter-spacing:1.2px;opacity:.9;text-transform:uppercase}
+.strat .t{font-size:15px;font-weight:800;margin-top:4px;line-height:1.3;position:relative}
+.strat .d{font-size:12px;opacity:.95;margin-top:6px;line-height:1.45;position:relative}
+.strat .act{font-size:11px;font-weight:700;margin-top:9px;background:rgba(255,255,255,.16);display:inline-block;padding:5px 11px;border-radius:20px}
+.vstep{border:1px solid var(--b);border-radius:14px;padding:13px;margin-bottom:11px;background:var(--card2)}
+.vstep .num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#0a66c2;color:#fff;font-size:12px;font-weight:800;margin-right:7px}
+.vstep .ttl{font-size:13px;font-weight:800;display:flex;align-items:center;margin-bottom:9px}
+.vbtn3{display:flex;gap:8px}
+.vbtn3 button{flex:1;border:1px solid var(--b);background:var(--sf);color:var(--tx);border-radius:12px;padding:11px 4px;font-size:12px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px}
+.vbtn3 button.sel{border-color:#16a34a;background:rgba(22,163,74,.08);color:#16a34a}
+.vbtn3 button i{font-size:20px}
+.vlen button{flex:1;border:1px solid var(--b);background:var(--sf);color:var(--tx);border-radius:12px;padding:12px;font-size:14px;font-weight:800;cursor:pointer}
+.vlen button.sel{border-color:#0a66c2;background:#0a66c2;color:#fff}
+
+
 @keyframes dpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 
 
@@ -1184,7 +1201,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v165</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v169</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5880,7 +5897,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v165 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v169 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11851,9 +11868,9 @@ function openHabits(){
 function renderHabits(){
   var habits=getHabits();var box=document.getElementById('habits-body');if(!box)return;
   var remOn=habRemindOn();
-  var h=dopaBanner()+'<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
+  var h=stratCard()+dopaBanner()+'<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
     +'<div style="font-size:20px">'+(remOn?'🔔':'🔕')+'</div><div style="flex:1"><div style="font-size:13px;font-weight:800">Daily reminders</div><div style="font-size:10px;color:var(--mt2)">A gentle nudge at 5:00 AM &amp; 9:30 PM</div></div>'
-    +(remOn?'<button class="hab-chip on" onclick="disableHabitReminders()">On</button>':'<button class="hab-chip" onclick="enableHabitReminders()">Turn on</button>')+'</div>'
+    +(remOn?'<button class="hab-chip on" onclick="disableHabitReminders()">On</button>':'<button class="hab-chip" onclick="enableHabitReminders()">Turn on</button>')+'<button class="hab-chip" style="margin-left:5px" onclick="testHabitSound()" title="Hear the reminder sound"><i class="ti ti-volume"></i></button></div>'
     +(remOn?'<div style="display:flex;align-items:center;gap:8px;margin:-4px 0 11px;font-size:12px"><span style="color:var(--mt2)">Motivational tune</span><select id="hab-tune" onchange="habSetTune(this.value)" style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--b);background:var(--sf);color:var(--tx)">'+habTuneOptions()+'</select><button class="hab-chip" onclick="habPreviewTune()"><i class="ti ti-player-play"></i></button></div>':'');
   h+='<button class="btn" style="width:100%;margin-bottom:9px;border:1.5px solid #16a34a;color:#16a34a;font-weight:800" onclick="closeOvl(\'habits-ovl\');openGoalSheet()"><i class="ti ti-checklist"></i> Open my Daily Goals Sheet (tick each goal daily)</button>';
   h+='<button class="btn btnok" style="width:100%;margin-bottom:12px" onclick="openAddHabit()"><i class="ti ti-plus"></i> Start a single-habit challenge</button>';
@@ -11879,6 +11896,7 @@ function renderHabits(){
       +(complete?'<div class="learn-done" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;margin-top:11px"><i class="ti ti-trophy"></i> Goal complete — '+(hb.days)+' days! 🎉</div>'
         :'<button class="hab-check'+(doneToday?' done':'')+'" onclick="toggleHabitToday(\''+hb.id+'\')">'+(doneToday?'<i class="ti ti-check"></i> Done today — '+p.left+' days to go':'<i class="ti ti-circle-check"></i> Mark done today')+'</button>')
       +'<div style="display:flex;align-items:center;gap:10px;margin-top:9px"><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:8px" onclick="shareHabitLink(\''+hb.id+'\')"><i class="ti ti-share"></i> Share with friends</button>'
+      +'<button class="btn" style="flex:1;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800;padding:8px" onclick="openVideoStudio(\''+hb.id+'\')"><i class="ti ti-video"></i> Make video</button>'
       +'<span style="font-size:12px;color:var(--mt2)">👁️ '+(hb.views||0)+'</span>'
       +'<button style="background:none;border:none;color:var(--mt2);font-size:11px;cursor:pointer" onclick="delHabit(\''+hb.id+'\')"><i class="ti ti-trash"></i></button></div>'
       +'</div>';
@@ -12353,8 +12371,9 @@ function editHabitGoal(id){
     +'<div style="margin-top:10px"><label style="font-size:12px;font-weight:700;color:var(--mt2)">🎯 Goals under this habit (each one nudges you with sound)</label>'
       +'<div id="hg-goals">'+habGoalsList(hb)+'</div>'
       +'<div style="display:flex;gap:6px;margin-top:6px"><input id="hg-newgoal" placeholder="Add a goal e.g. Save \u00a45 today" onkeydown="if(event.keyCode===13){event.preventDefault();habAddGoal(\''+id+'\');}" style="flex:1"><button class="hab-chip on" onclick="habAddGoal(\''+id+'\')">Add</button></div></div>'
-    +'<div class="fg" style="margin-top:8px"><label>🎵 Motivational music / voice (plays on your shared chart &amp; video)</label><div style="display:flex;gap:6px;margin-top:4px"><label class="hab-chip" style="cursor:pointer"><i class="ti ti-upload"></i> MP3<input type="file" accept="audio/*" style="display:none" onchange="hgUploadMusic(this,\''+id+'\')"></label><input id="hg-music" placeholder="or paste a direct audio URL (.mp3)" value="'+esc(hb.music||'')+'" style="flex:1"></div><div id="hg-upprog" style="display:none;font-size:11px;margin-top:6px;color:var(--mt)"></div></div>'
+    +'<div class="fg" style="margin-top:8px"><label>🎵 Motivational music / voice (plays on your shared chart &amp; video)</label><div style="display:flex;gap:6px;margin-top:4px"><label class="hab-chip" style="cursor:pointer"><i class="ti ti-upload"></i> MP3<input type="file" accept="audio/*" style="display:none" onchange="hgUploadMusic(this,\''+id+'\')"></label><button id="hg-recbtn" class="hab-chip" onclick="hgRecordVoice(\''+id+'\')"><i class="ti ti-microphone"></i> Record voice</button></div><input id="hg-music" placeholder="or paste a direct audio URL (.mp3)" value="'+esc(hb.music||'')+'" style="width:100%;margin-top:6px"><div id="hg-upprog" style="display:none;font-size:11px;margin-top:6px;color:var(--mt)"></div></div>'
     +'<div class="fg" style="margin-top:8px"><label>🎤 Voice / track by (creator credit shown on the video)</label><input id="hg-by" placeholder="your name" value="'+esc(hb.musicBy||(CU&&CU.name)||'')+'"></div>'
+    +'<div class="fg" style="margin-top:8px"><label>🌐 Language of this track</label><select id="hg-lang" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--b);background:var(--sf);color:var(--tx)">'+['','English','Malayalam','Hindi','Urdu','Arabic','Tamil','Other'].map(function(L){return '<option value="'+L+'"'+((hb.musicLang||'')===L?' selected':'')+'>'+(L||'— select —')+'</option>';}).join('')+'</select></div>'
     +'<div id="hg-lib"></div>'
     +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveHabitGoal(\''+id+'\')"><i class="ti ti-device-floppy"></i> Save</button>';
   ovl.classList.add('open');
@@ -12366,7 +12385,8 @@ function saveHabitGoal(id){
   hb.manifest=((document.getElementById('hg-aff')||{}).value||'').trim();
   hb.music=((document.getElementById('hg-music')||{}).value||'').trim();
   hb.musicBy=((document.getElementById('hg-by')||{}).value||'').trim()||((CU&&CU.name)||'');
-  if(hb.music){registerTrack(hb.music,hb.musicBy,hb.n);}
+  hb.musicLang=((document.getElementById('hg-lang')||{}).value||hb.musicLang||'');
+  if(hb.music){registerTrack(hb.music,hb.musicBy,hb.n,hb.musicLang);}
   saveHabits(habits);closeOvl('habgoal-ovl');renderHabits();
   try{rbConfetti(50);}catch(e){}
   toast('Goal saved 🎯','ok');
@@ -12505,7 +12525,7 @@ function makeHabitVideo(seconds){
   if(src){
     try{
       var actx=new (window.AudioContext||window.webkitAudioContext)();
-      var au=new Audio();au.crossOrigin='anonymous';au.loop=true;au.src=src;window.__vidAudio=au;
+      var au=new Audio();if(/^https?:/.test(src))au.crossOrigin='anonymous';au.loop=true;au.src=src;window.__vidAudio=au;
       var asrc=actx.createMediaElementSource(au);var dest=actx.createMediaStreamDestination();
       asrc.connect(dest);asrc.connect(actx.destination);
       au.play().then(function(){
@@ -12526,26 +12546,28 @@ function makeHabitVideo(seconds){
    Cross-user sharing of direct-URL tracks needs cloud sync (Firebase) ON. */
 function getTracks(){return LS.get('rb_motiv_tracks',[])||[];}
 function saveTracks(a){LS.set('rb_motiv_tracks',a);cloudBumpTs();cloudSaveState();}
-function registerTrack(url,by,title){
+function registerTrack(url,by,title,lang){
   if(!url)return;
   var tr=getTracks();
   if(tr.some(function(t){return t.url===url;}))return; // de-dupe
-  var t={id:'tk'+Date.now().toString(36),url:url,by:by||((CU&&CU.name)||'Anonymous'),title:title||'Motivation track',ts:Date.now(),local:/^blob:/.test(url)};
+  var t={id:'tk'+Date.now().toString(36),url:url,by:by||((CU&&CU.name)||'Anonymous'),title:title||'Motivation track',lang:lang||'',ts:Date.now(),local:/^blob:/.test(url)};
   tr.unshift(t);saveTracks(tr.slice(0,50));
-  // Cross-user library: only direct (non-blob) URLs can be shared via cloud
   if(!t.local&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
-    try{FB.db.collection('tracks').doc(t.id).set({url:t.url,by:t.by,title:t.title,ts:t.ts,owner:(CU&&CU.uid)||''});}catch(e){}
+    try{FB.db.collection('tracks').doc(t.id).set({url:t.url,by:t.by,title:t.title,lang:t.lang,ts:t.ts,owner:(CU&&CU.uid)||''});}catch(e){}
   }
 }
 function hgRenderLib(habitId){
   var box=document.getElementById('hg-lib');if(!box)return;
   var tr=getTracks();
-  function paint(list){
+  function paint(all){
+    var list=(__hgLang&&__hgLang!=='All')?all.filter(function(x){return x.lang===__hgLang;}):all;
     if(!list.length){box.innerHTML='<div style="font-size:11px;color:var(--mt2);margin-top:8px">No saved tracks yet. Attach one above — it joins your library with your name.</div>';return;}
+    var langs=['All'].concat(list.map(function(x){return x.lang;}).filter(function(v,i,a){return v&&a.indexOf(v)===i;}));
     box.innerHTML='<div style="font-size:11px;font-weight:800;color:var(--mt2);margin:10px 0 4px">🎚️ Choose from library (use-only — no download)</div>'
+      +hgLangBar(langs,habitId)
       +'<div style="border:1px solid var(--b);border-radius:10px;max-height:150px;overflow:auto">'
       +list.map(function(t){return '<div style="display:flex;align-items:center;gap:6px;padding:7px 9px;border-bottom:1px solid var(--b)">'
-        +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.title||'Track')+'</div><div style="font-size:10px;color:var(--mt2)">🎤 by '+esc(t.by||'Anonymous')+(t.local?' · only on your device':'')+'</div></div>'
+        +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.title||'Track')+(t.lang?' <span style=\'font-size:9px;background:rgba(10,102,194,.12);color:#0a66c2;border-radius:10px;padding:1px 6px;font-weight:700\'>'+esc(t.lang)+'</span>':'')+'</div><div style="font-size:10px;color:var(--mt2)">🎤 by '+esc(t.by||'Anonymous')+(t.local?' · only on your device':'')+'</div></div>'
         +'<button class="hab-chip" onclick="hgPreview(\''+encodeURIComponent(t.url)+'\')"><i class="ti ti-player-play"></i></button>'
         +'<button class="hab-chip on" onclick="hgUseTrack(\''+t.id+'\',\''+habitId+'\')">Use</button></div>';}).join('')+'</div>';
   }
@@ -12554,19 +12576,21 @@ function hgRenderLib(habitId){
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
     try{FB.db.collection('tracks').orderBy('ts','desc').limit(30).get().then(function(qs){
       var seen={};tr.forEach(function(t){seen[t.url]=1;});
-      qs.forEach(function(d){var x=d.data();if(x.url&&!seen[x.url]){seen[x.url]=1;tr.push({id:d.id,url:x.url,by:x.by,title:x.title,ts:x.ts,local:false});}});
+      qs.forEach(function(d){var x=d.data();if(x.url&&!seen[x.url]){seen[x.url]=1;tr.push({id:d.id,url:x.url,by:x.by,title:x.title,lang:x.lang||'',ts:x.ts,local:false});}});
       paint(tr);
     }).catch(function(){});}catch(e){}
   }
 }
-var __hgPrev=null;
+var __hgPrev=null,__hgLang='All';
 function hgPreview(u){try{u=decodeURIComponent(u);if(__hgPrev)__hgPrev.pause();__hgPrev=new Audio(u);__hgPrev.play().catch(function(){toast('Tap again to preview','info');});}catch(e){toast('Cannot preview this track','err');}}
 function hgUseTrack(tid,habitId){
   var t=getTracks().find(function(x){return x.id===tid;});
   if(!t){toast('Track not found','err');return;}
   var mEl=document.getElementById('hg-music');if(mEl)mEl.value=t.url;
   var bEl=document.getElementById('hg-by');if(bEl)bEl.value=t.by||'';
+  var lEl=document.getElementById('hg-lang');if(lEl)lEl.value=t.lang||'';
   toast('Selected "'+(t.title||'track')+'" by '+(t.by||'Anonymous')+' 🎤','ok');
+  if(typeof vsStudioOpen==='function'&&vsStudioOpen()){vsSyncMusic(habitId);}
 }
 
 var __vidSnap=null;
@@ -12639,5 +12663,172 @@ function fireHabitGoalReminders(am){
       })(i,g.name,hb.n);
     });
   });
+}
+
+/* ===== v166: record your own voice as the video's voiceover =====
+   Records mic audio via MediaRecorder, sets it as the habit's voiceover.
+   The recorded voice gets baked into the video (the video file carries the
+   audio), so it plays everywhere — even from a local recording. */
+var __voiceRec=null,__voiceChunks=[],__voiceStream=null;
+function hgRecordVoice(id){
+  var btn=document.getElementById('hg-recbtn');
+  if(__voiceRec&&__voiceRec.state==='recording'){try{__voiceRec.stop();}catch(e){}return;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Voice recording isn\'t supported on this browser','info');return;}
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    __voiceStream=stream;__voiceChunks=[];
+    var mime=(typeof MediaRecorder!=='undefined'&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported('audio/mp4'))?'audio/mp4':(MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'');
+    try{__voiceRec=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);}catch(e){__voiceRec=new MediaRecorder(stream);}
+    __voiceRec.ondataavailable=function(e){if(e.data&&e.data.size)__voiceChunks.push(e.data);};
+    __voiceRec.onstop=function(){
+      try{__voiceStream.getTracks().forEach(function(t){t.stop();});}catch(e){}
+      var blob=new Blob(__voiceChunks,{type:(__voiceRec.mimeType||mime||'audio/webm')});var url=URL.createObjectURL(blob);
+      var el=document.getElementById('hg-music');if(el)el.value=url;
+      var by=document.getElementById('hg-by');if(by&&!by.value)by.value=(CU&&CU.name)||'';
+      if(typeof vsStudioOpen==='function'&&vsStudioOpen()){try{vsSyncMusic(id);}catch(e){}}
+      if(btn){btn.innerHTML='<i class="ti ti-microphone"></i> Record voice';btn.classList.remove('on');}
+      // also upload the recording to cloud so the audio link is shareable beyond this device
+      try{hgUploadBlob(blob,id,'voiceover.'+((__voiceRec.mimeType||'').indexOf('mp4')>=0?'m4a':'webm'));}catch(e){}
+      toast('Voice recorded 🎙️ it\'s now your video voiceover','ok');
+    };
+    __voiceRec.start();
+    if(btn){btn.innerHTML='<i class="ti ti-player-stop-filled"></i> Stop recording';btn.classList.add('on');}
+    toast('Recording… speak now, tap Stop when done 🎙️','info');
+  }).catch(function(){toast('Allow microphone access to record your voice','info');});
+}
+/* upload an arbitrary audio blob (e.g. a recording) to storage, with progress */
+function hgUploadBlob(blob,id,filename){
+  var prog=document.getElementById('hg-upprog');
+  function setProg(p,txt){if(!prog)return;prog.style.display='block';prog.innerHTML=(txt||('⬆️ Saving voice… '+p+'%'))+'<div style="height:5px;background:var(--b);border-radius:3px;margin-top:4px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:#16a34a;transition:width .2s"></div></div>';}
+  if(FB.ready&&FB.storage&&CU&&CU.uid&&!FB_CLOUD_DISABLED){
+    try{
+      var ref=FB.storage.ref('motiv/'+CU.uid+'/'+Date.now()+'_'+(filename||'voice.webm'));
+      var task=ref.put(blob);setProg(0);
+      task.on('state_changed',
+        function(s){setProg(Math.round((s.bytesTransferred/s.totalBytes)*100));},
+        function(){if(prog){setProg(100,'Saved on this device');setTimeout(function(){if(prog)prog.style.display='none';},1500);}},
+        function(){task.snapshot.ref.getDownloadURL().then(function(url){var el=document.getElementById('hg-music');if(el)el.value=url;setProg(100,'✓ Voice saved — shareable');if(prog)setTimeout(function(){if(prog)prog.style.display='none';},1800);}).catch(function(){});});
+    }catch(e){}
+  }
+}
+
+/* ===== v168: Morning Success Strategy — one brain-stimulating life/business
+   strategy each day, deterministic by date so it's fresh each morning. ===== */
+var RB_LIFE_STRATEGY=[
+ {t:'Win the first hour',d:'How you spend the first hour sets the tone for the whole day. Move your body, set 1 clear intention, avoid the phone.',a:'Pick your ONE thing for today'},
+ {t:'Small wins compound',d:'A 1% improvement each day makes you ~37x better in a year. Tiny consistent action beats rare bursts of effort.',a:'Do one small rep now'},
+ {t:'Decide, then adjust',d:'A good decision today beats a perfect one next week. Momentum teaches you more than planning.',a:'Make one decision you\u2019ve delayed'},
+ {t:'Protect your energy',d:'Your focus is your most valuable currency. Guard your mornings, batch distractions, say no on purpose.',a:'Block 30 mins of deep focus'},
+ {t:'Money: pay yourself first',d:'Before you spend, save a slice. Wealth is built by what you keep, not what you earn.',a:'Move a little to savings today'},
+ {t:'Serve before you sell',d:'In business, value first builds trust. Help people win and they bring you their friends.',a:'Help one person today, no strings'},
+ {t:'Track to grow',d:'What gets measured gets improved. A number you watch quietly bends in the right direction.',a:'Tick today\u2019s goals honestly'},
+ {t:'Discipline = freedom',d:'Doing the boring rep on the hard day is what separates dreamers from builders. Show up anyway.',a:'Do the rep you don\u2019t feel like'},
+ {t:'Talk to one new person',d:'Opportunities travel through people. One honest conversation can change a whole year.',a:'Reach out to someone new'},
+ {t:'Gratitude rewires you',d:'Naming 3 good things shifts the brain from threat to growth. Start grateful, act bigger.',a:'Write 3 things you\u2019re grateful for'},
+ {t:'Done beats perfect',d:'Ship it, learn, improve. Perfectionism is fear wearing a nice suit.',a:'Finish something at 80%'},
+ {t:'Invest in skills',d:'The highest-return asset is a sharper you. 20 focused minutes a day becomes a superpower.',a:'Learn for 20 minutes'},
+ {t:'Mind your inputs',d:'You become the average of what you consume. Feed your mind builders, not noise.',a:'Swap 10 mins of scroll for a book'},
+ {t:'Solve a real problem',d:'Business is just a useful solution someone will pay for. Find a pain, ease it.',a:'List one problem you could solve'},
+ {t:'Rest is part of the work',d:'Recovery is where growth happens. Sleep, water, and a walk are performance tools.',a:'Plan one real rest today'},
+ {t:'Keep your word to you',d:'Self-trust is built by doing what you said you would. Start with promises you can keep.',a:'Keep one promise to yourself'},
+ {t:'Follow up = magic',d:'Most people never follow up. A simple second message wins deals and friendships.',a:'Follow up with one person'},
+ {t:'Cut one thing',d:'Focus is saying no. Remove a task, a tab, a worry that doesn\u2019t serve today.',a:'Drop one thing from your list'},
+ {t:'Speak to your future self',d:'Write a line for the person you\u2019re becoming. Direction beats speed.',a:'Note one line for future-you'},
+ {t:'Celebrate the streak',d:'Your brain repeats what it rewards. Notice the win, feel it, and it sticks.',a:'Celebrate one thing you did'},
+ {t:'Action cures anxiety',d:'You can\u2019t think your way out of a rut \u2014 you act your way out. Start tiny, start now.',a:'Take one 2-minute action'},
+ {t:'Build assets, not just income',d:'Trade time for skills and things that work while you sleep \u2014 content, products, systems.',a:'Spend 15 mins on something that lasts'},
+ {t:'Your network is net worth',d:'Be the person who shows up, adds value, and remembers names. Reputation compounds.',a:'Thank or praise someone today'},
+ {t:'Reflect to improve',d:'A 2-minute review of what worked turns experience into wisdom. Look back to leap forward.',a:'Write why a goal went well/missed'},
+ {t:'Patience + persistence',d:'Most overnight success took years. Stay in the game long enough to get lucky.',a:'Recommit to your 90-day goal'}
+];
+function todayStrategy(){var n=new Date();var idx=(n.getFullYear()*372+n.getMonth()*31+n.getDate())%RB_LIFE_STRATEGY.length;return RB_LIFE_STRATEGY[idx];}
+function stratCard(){
+  var s=todayStrategy();var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
+  return '<div class="strat"><div class="k">🌅 Morning strategy · '+esc(nm)+'</div>'
+    +'<div class="t">'+esc(s.t)+'</div><div class="d">'+esc(s.d)+'</div>'
+    +'<div class="act">✅ '+esc(s.a)+'</div></div>';
+}
+
+/* v168: language filter bar for the track library */
+function hgLangBar(langs,habitId){
+  if(!langs||langs.length<=1)return '';
+  var cur=__hgLang||'All';
+  return '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px">'+langs.map(function(L){
+    var on=(cur===L)?' on':'';
+    return '<button class="hab-chip'+on+'" onclick="__hgLang=\''+L+'\';hgRenderLib(\''+habitId+'\')">'+esc(L)+'</button>';
+  }).join('')+'</div>';
+}
+
+/* ===== v169: simple stepped Video Studio =====
+   ONE clear place to make a video: 1) add a voiceover (record / upload / library),
+   2) pick a length, 3) create & share. Reuses the hg-* field ids so the existing
+   record/upload/library engines work unchanged. */
+var __vsLen=30, __vsTab='';
+function vsStudioOpen(){var o=document.getElementById('vstudio-ovl');return o&&o.classList.contains('open');}
+function openVideoStudio(id){
+  if(typeof requireAuth==='function'&&!requireAuth('make a video'))return;
+  var hb=getHabits().find(function(x){return x.id===id;});if(!hb){toast('Habit not found','err');return;}
+  __vsLen=__vsLen||30;__vsTab='';
+  var ovl=document.getElementById('vstudio-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='vstudio-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b style="font-size:16px"><i class="ti ti-video" style="color:#7c3aed"></i> Make a video</b><button class="modal-x" onclick="closeOvl(\'vstudio-ovl\')"><i class="ti ti-x"></i></button></div><div id="vstudio-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderVStudio(id);
+  ovl.classList.add('open');
+}
+function renderVStudio(id){
+  var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
+  var box=document.getElementById('vstudio-body');if(!box)return;
+  var has=!!hb.music;
+  var sel='<div style="font-size:12px;margin-top:9px;padding:8px 11px;border-radius:10px;background:'+(has?'rgba(22,163,74,.10)':'rgba(0,0,0,.04)')+';color:'+(has?'#16a34a':'var(--mt2)')+';font-weight:700">'+(has?('\u2713 Voiceover ready'+(hb.musicBy?(' \u00b7 \ud83c\udfa4 '+esc(hb.musicBy)):'')):'No voiceover yet \u2014 the video will be silent (still fine!)')+'</div>';
+  var fields='<input type="hidden" id="hg-music" value="'+esc(hb.music||'')+'"><input type="hidden" id="hg-by" value="'+esc(hb.musicBy||(CU&&CU.name)||'')+'"><input type="hidden" id="hg-lang" value="'+esc(hb.musicLang||'')+'">';
+  var tabUI='';
+  if(__vsTab==='record'){
+    tabUI='<div style="margin-top:10px"><button id="hg-recbtn" class="btn" style="width:100%;border:1px solid #dc2626;color:#dc2626;font-weight:700" onclick="vsRecord(\''+id+'\')"><i class="ti ti-microphone"></i> Tap to record your voice</button><div id="hg-upprog" style="display:none;font-size:11px;margin-top:6px;color:var(--mt)"></div><div style="font-size:11px;color:var(--mt2);margin-top:6px">Speak your motivation, then tap Stop. Your name is credited on the video.</div></div>';
+  } else if(__vsTab==='upload'){
+    tabUI='<div style="margin-top:10px"><label class="btn" style="width:100%;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;cursor:pointer;display:block;text-align:center"><i class="ti ti-upload"></i> Choose an MP3 file<input type="file" accept="audio/*" style="display:none" onchange="vsUpload(this,\''+id+'\')"></label><div id="hg-upprog" style="display:none;font-size:11px;margin-top:6px;color:var(--mt)"></div><input id="hg-musicurl2" placeholder="\u2026or paste a direct .mp3 URL" style="width:100%;margin-top:7px" onchange="vsPasteUrl(this.value,\''+id+'\')"></div>';
+  } else if(__vsTab==='library'){
+    tabUI='<div style="font-size:11px;color:var(--mt2);margin:8px 0 2px">Pick any voiceover \u2014 yours or one shared by the community.</div><div id="hg-lib" style="margin-top:4px"></div>';
+  }
+  box.innerHTML=fields
+    +'<div class="vstep"><div class="ttl"><span class="num">1</span> Add a voiceover <span style="font-weight:500;color:var(--mt2);margin-left:5px">(optional)</span></div>'
+      +'<div class="vbtn3"><button class="'+(__vsTab==='record'?'sel':'')+'" onclick="vsTab(\'record\',\''+id+'\')"><i class="ti ti-microphone"></i>Record</button>'
+      +'<button class="'+(__vsTab==='upload'?'sel':'')+'" onclick="vsTab(\'upload\',\''+id+'\')"><i class="ti ti-upload"></i>Upload MP3</button>'
+      +'<button class="'+(__vsTab==='library'?'sel':'')+'" onclick="vsTab(\'library\',\''+id+'\')"><i class="ti ti-music"></i>Library</button></div>'
+      +tabUI+sel+'</div>'
+    +'<div class="vstep"><div class="ttl"><span class="num">2</span> Choose length</div>'
+      +'<div class="vlen" style="display:flex;gap:8px"><button class="'+(__vsLen===30?'sel':'')+'" onclick="vsSetLen(30,\''+id+'\')">30 seconds</button><button class="'+(__vsLen===60?'sel':'')+'" onclick="vsSetLen(60,\''+id+'\')">60 seconds</button></div></div>'
+    +'<button class="btn btnok" style="width:100%;font-size:15px;padding:14px" onclick="vsCreate(\''+id+'\')"><i class="ti ti-sparkles"></i> Create &amp; share my video</button>'
+    +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-top:8px">Step 3: when it\'s ready, tap <b>Share to WhatsApp</b> \ud83c\udfac</div>';
+  if(__vsTab==='library')hgRenderLib(id);
+}
+function vsTab(t,id){__vsTab=(__vsTab===t?'':t);renderVStudio(id);}
+function vsSetLen(n,id){__vsLen=n;renderVStudio(id);}
+function vsRecord(id){ hgRecordVoice(id); }
+function vsUpload(input,id){ hgUploadMusic(input,id); setTimeout(function(){vsSyncMusic(id);},400); }
+function vsPasteUrl(v,id){ var el=document.getElementById('hg-music'); if(el)el.value=(v||'').trim(); vsSyncMusic(id); }
+function vsSyncMusic(id){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  var m=(document.getElementById('hg-music')||{}).value||'';
+  var by=(document.getElementById('hg-by')||{}).value||'';
+  if(m&&m!==hb.music){hb.music=m;hb.musicBy=by||hb.musicBy||((CU&&CU.name)||'');saveHabits(habits);if(vsStudioOpen())renderVStudio(id);}
+  else if(m){hb.music=m;hb.musicBy=by||hb.musicBy;saveHabits(habits);}
+}
+function vsCreate(id){
+  vsSyncMusic(id);
+  var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
+  try{shareHabitLink(id);}catch(e){}
+  __shhSnap=habitSnap(hb);
+  closeOvl('vstudio-ovl');
+  setTimeout(function(){ makeHabitVideo(__vsLen); }, 200);
+}
+
+/* v169: let the user confirm the reminder sound works on their device */
+function testHabitSound(){
+  try{
+    var cfg=getNotifCfg();
+    if(cfg.muted){toast('Sound is muted in Notification settings — unmute to hear reminders','info');return;}
+    playTune(LS.get('rb_habit_tune','melody'));
+    toast('🔔 That\'s your reminder sound','ok');
+  }catch(e){toast('Could not play sound on this device','err');}
 }
 </script></body></html>
