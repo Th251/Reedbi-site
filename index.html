@@ -983,6 +983,14 @@ body.dark .spin-wheel{border-color:#2a333f}
 .vbtn3 button i{font-size:20px}
 .vlen button{flex:1;border:1px solid var(--b);background:var(--sf);color:var(--tx);border-radius:12px;padding:12px;font-size:14px;font-weight:800;cursor:pointer}
 .vlen button.sel{border-color:#0a66c2;background:#0a66c2;color:#fff}
+.mani-hero{background:linear-gradient(135deg,#7c3aed,#db2777 55%,#f59e0b);color:#fff;border-radius:18px;padding:18px;text-align:center;position:relative;overflow:hidden}
+.mani-hero .aff{font-size:18px;font-weight:800;line-height:1.35;margin-top:6px}
+.mani-card{border:1px solid var(--b);border-radius:14px;padding:13px;margin-top:11px;background:var(--card2)}
+.mani-card h4{font-size:13px;font-weight:800;margin:0 0 4px;display:flex;align-items:center;gap:6px}
+.mani-card .hint{font-size:11px;color:var(--mt2);margin-bottom:7px}
+.mani-step{display:flex;gap:9px;align-items:flex-start;margin-top:8px}
+.mani-step .n{flex:none;width:24px;height:24px;border-radius:50%;background:#7c3aed;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+
 
 
 @keyframes dpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
@@ -1201,7 +1209,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v172</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v175</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1731,6 +1739,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://pay.google.com/gp/p/js/pay.js" async></script>
 <!-- three.js — activates the WebGL 3D product viewer (open3DThree). Loads window.THREE; falls back to CSS-3D if it fails. -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <!-- SheetJS (xlsx) — powers Excel bulk product import/export (openBulkExcel). Loads window.XLSX. -->
@@ -5821,6 +5830,7 @@ function openAccountMenu(){
   // === ACCOUNT & SETTINGS (everyone) ===
   var acc=item('openEditAccount()','user-edit','var(--g)','Edit account details','name, WhatsApp, location, interests')
     +item('openReceiveQR()','qrcode','#0a8f5c','Receive Payments','your QR to get paid — UPI/bank')
+    +item('openGpaySettings()','brand-google','#4285F4','Google Pay setup','accept card payments via Google Pay')
     +item('openAppearance()','adjustments','var(--g)','Appearance &amp; Accessibility','dark mode, text size')
     +item('openAddressBook()','map-pin','var(--g)','Saved addresses','faster checkout')
     +item('openNotifSettings()','bell','var(--gold)','Notifications','sound, tune, mute');
@@ -5897,7 +5907,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v172 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v175 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6869,10 +6879,11 @@ function renderCartCheckout(){
     +'<div id="cartco-saved" style="margin-bottom:8px"></div>'
     +'<div class="fg"><label>Delivery address</label><textarea id="cartco-addr" rows="2" placeholder="Full delivery address"></textarea></div>'
     +'<div class="fg" style="margin-top:7px"><label>Your WhatsApp number</label><input id="cartco-phone" placeholder="+1 234 567 8900"></div>'
-    +'<div class="fg" style="margin-top:7px"><label>Payment</label><div class="pay-row" id="cartco-pay"><button type="button" class="pay-opt sel" data-m="cod" onclick="cartcoPay(\'cod\')"><i class="ti ti-cash"></i> Cash on Delivery</button><button type="button" class="pay-opt" data-m="upi" onclick="cartcoPay(\'upi\')"><i class="ti ti-qrcode"></i> UPI / GPay</button></div></div>'
+    +'<div class="fg" style="margin-top:7px"><label>Payment</label><div class="pay-row" id="cartco-pay"><button type="button" class="pay-opt sel" data-m="cod" onclick="cartcoPay(\'cod\')"><i class="ti ti-cash"></i> Cash on Delivery</button><button type="button" class="pay-opt" data-m="upi" onclick="cartcoPay(\'upi\')"><i class="ti ti-qrcode"></i> UPI</button><button type="button" class="pay-opt gpay-opt" data-m="gpay" id="cartco-gpay" onclick="cartcoPay(\'gpay\')" style="display:none"><span style="color:#4285F4;font-weight:800">G</span> Pay</button></div></div>'
     +'<button class="btn btnok" style="width:100%;margin-top:13px;padding:13px" onclick="confirmCartOrder()"><i class="ti ti-circle-check"></i> Place Order — '+t.n+' item'+(t.n!==1?'s':'')+'</button>';
   try{var sa=getAddresses();if(sa&&sa.length){document.getElementById('cartco-saved').innerHTML='<div style="font-size:11px;color:var(--mt2);margin-bottom:4px">Saved addresses</div>'+sa.map(function(a,i){return '<button class="hab-chip" style="margin:0 6px 6px 0" onclick="cartcoUseAddr('+i+')">'+esc(a.label||('Address '+(i+1)))+'</button>';}).join('');}}catch(e){}
 }
+  try{setTimeout(gpayDetect,200);}catch(e){}
 var __cartcoPay='cod';
 function cartcoPay(m){__cartcoPay=m;document.querySelectorAll('#cartco-pay .pay-opt').forEach(function(b){b.className='pay-opt'+(b.getAttribute('data-m')===m?' sel':'');});}
 function cartcoUseAddr(i){var a=getAddresses()[i];if(!a)return;document.getElementById('cartco-addr').value=a.addr||'';document.getElementById('cartco-phone').value=a.phone||'';}
@@ -6881,6 +6892,17 @@ function confirmCartOrder(){
   var addr=(document.getElementById('cartco-addr')||{}).value||'';addr=addr.trim();
   var phone=(document.getElementById('cartco-phone')||{}).value||'';phone=phone.trim();
   if(!addr||!phone){toast('Enter delivery address and WhatsApp number','err');return;}
+  // Google Pay path: launch the GPay sheet first, then place orders as paid online
+  if(__cartcoPay==='gpay'){
+    var total=0;cart.forEach(function(it){var p=getProducts().find(function(x){return x.id===it.productId;});if(p)total+=(p.price||0)*(it.qty||1);});
+    var cur=(function(){var p=getProducts().find(function(x){return x.id===(cart[0]||{}).productId;});return (p&&p.currency)||'AED';})();
+    gpayCheckout(total,cur,'Reedbi order',function(pd){ _placeCartOrders(addr,phone,'online',pd); });
+    return;
+  }
+  _placeCartOrders(addr,phone,__cartcoPay,null);
+}
+function _placeCartOrders(addr,phone,payMethod,gpayData){
+  var cart=getCart();if(!cart.length)return;
   var orders=getOrders();var created=[];
   cart.forEach(function(it){
     var p=getProducts().find(function(x){return x.id===it.productId;});if(!p)return;
@@ -6890,7 +6912,7 @@ function confirmCartOrder(){
       byWeight:!!p.byWeight,weightUnit:p.weightUnit||'',orderedWeight:(p.byWeight?(it.qty||1):0),
       productId:p.id,productTitle:p.title+(it.size?' ['+it.size+']':''),size:it.size||'',price:p.price,currency:p.currency,qty:(it.qty||1),
       sellerUid:p.sellerUid,sellerName:p.sellerName,pageName:(p.pageName||''),buyerUid:CU.uid,buyerEmail:(CU.email||'').toLowerCase(),buyerName:CU.name,
-      buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:'',payMethod:__cartcoPay,status:'placed',
+      buyerPhone:phone,buyerWhatsapp:phone,buyerAddr:addr,buyerMap:'',payMethod:payMethod,paidOnline:(payMethod==='online'),status:'placed',
       storeMap:(p.map||p.geo||''),storeAddr:(p.addr||''),deliverBy:'asap',deliverByTs:0,scheduledTs:0,ts:Date.now()};
     orders.unshift(o);created.push(o);
     if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('orders').doc(o.id).set(o).catch(function(){});}catch(e){}}
@@ -6900,7 +6922,8 @@ function confirmCartOrder(){
   if(typeof updateCartBadge==='function'){try{updateCartBadge();}catch(e){}}
   closeOvl('cartco-ovl');
   try{rbConfetti(120);}catch(e){}
-  if(__cartcoPay==='upi'&&created.length){showUpiPayment(created[0]);toast(created.length+' orders placed — pay each shop via UPI','ok');}
+  if(payMethod==='upi'&&created.length){showUpiPayment(created[0]);toast(created.length+' orders placed — pay each shop via UPI','ok');}
+  else if(payMethod==='online'){toast('Paid with Google Pay 🟢 '+created.length+' orders placed!','ok');try{showMyOrders();}catch(e){}}
   else{toast(created.length+' orders placed! Track them in My Orders.','ok');try{showMyOrders();}catch(e){}}
 }
 function buyProduct(productId){
@@ -11868,7 +11891,7 @@ function openHabits(){
 function renderHabits(){
   var habits=getHabits();var box=document.getElementById('habits-body');if(!box)return;
   var remOn=habRemindOn();
-  var h=stratCard()+dopaBanner()+'<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
+  var h=stratCard()+'<button class="btn" style="width:100%;margin-bottom:11px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;padding:11px;border:none" onclick="openManifest()">✨ Manifestation &amp; affirmation — train your brain for success</button>'+dopaBanner()+'<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
     +'<div style="font-size:20px">'+(remOn?'🔔':'🔕')+'</div><div style="flex:1"><div style="font-size:13px;font-weight:800">Daily reminders</div><div style="font-size:10px;color:var(--mt2)">A gentle nudge at 5:00 AM &amp; 9:30 PM</div></div>'
     +(remOn?'<button class="hab-chip on" onclick="disableHabitReminders()">On</button>':'<button class="hab-chip" onclick="enableHabitReminders()">Turn on</button>')+'<button class="hab-chip" style="margin-left:5px" onclick="testHabitSound()" title="Hear the reminder sound"><i class="ti ti-volume"></i></button></div>'
     +(remOn?'<div style="display:flex;align-items:center;gap:8px;margin:-4px 0 11px;font-size:12px"><span style="color:var(--mt2)">Motivational tune</span><select id="hab-tune" onchange="habSetTune(this.value)" style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--b);background:var(--sf);color:var(--tx)">'+habTuneOptions()+'</select><button class="hab-chip" onclick="habPreviewTune()"><i class="ti ti-player-play"></i></button></div>':'');
@@ -12300,7 +12323,7 @@ function habitSnap(hb){
   var p=habitProgress(hb);var start=hb.startTs||Date.now();var grid=[];
   for(var i=0;i<(hb.days||40);i++){grid.push((hb.done||[]).indexOf(dayKey(start+i*86400000))>=0?1:0);}
   return {v:1,nm:(CU&&CU.name)||'A friend',t:hb.n,goal:hb.goal||'',aff:hb.manifest||'',days:hb.days||40,
-    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),cap:(hb.vidText||''),img:(hb.vidImg||''),c:hb.c||'#16a34a'};
+    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),cap:(hb.vidText||''),capCol:(hb.vidTextCol||'#ffffff'),img:(hb.vidImg||''),c:hb.c||'#16a34a'};
 }
 function shareHabitLink(habitId){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===habitId;});if(!hb)return;
@@ -12458,7 +12481,7 @@ function drawDash(ctx,W,H,snap,frac){
   for(var k=0;k<grid.length;k++){var r=Math.floor(k/cols),cc=k%cols;var x=gx+cc*(cell+cg),y=gy+r*(cell+cg);
     ctx.fillStyle=grid[k]?'#fff':'rgba(255,255,255,.2)';rrect(ctx,x,y,cell,cell,10);ctx.fill();}
   ctx.textAlign='center';
-  if(snap.cap){ctx.fillStyle='#fff';ctx.font='800 30px system-ui,Arial';ctx.fillText(snap.cap.slice(0,40),W/2,H-138);}
+  if(snap.cap){var cc=snap.capCol||'#ffffff';if(cc!=='#ffffff'){ctx.save();ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=8;}ctx.fillStyle=cc;ctx.font='800 32px system-ui,Arial';ctx.fillText(snap.cap.slice(0,40),W/2,H-138);if(cc!=='#ffffff')ctx.restore();}
   if(snap.aff){ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='24px system-ui,Arial';ctx.fillText('✨ '+snap.aff,W/2,H-100);}
   if(snap.by){ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillText('🎤 voice by '+snap.by,W/2,H-66);}
   ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillText('Track yours free on Reedbi',W/2,H-34);
@@ -12729,13 +12752,14 @@ function hgRecordVoice(id){
     __voiceRec.onstop=function(){
       try{__voiceStream.getTracks().forEach(function(t){t.stop();});}catch(e){}
       var blob=new Blob(__voiceChunks,{type:(__voiceRec.mimeType||mime||'audio/webm')});var url=URL.createObjectURL(blob);
+      __lastVoiceBlob=blob;__lastVoiceUrl=url;__lastVoiceId=id;
       var el=document.getElementById('hg-music');if(el)el.value=url;
       var by=document.getElementById('hg-by');if(by&&!by.value)by.value=(CU&&CU.name)||'';
       if(typeof vsStudioOpen==='function'&&vsStudioOpen()){try{vsSyncMusic(id);}catch(e){}}
-      if(btn){btn.innerHTML='<i class="ti ti-microphone"></i> Record voice';btn.classList.remove('on');}
-      // also upload the recording to cloud so the audio link is shareable beyond this device
-      try{hgUploadBlob(blob,id,'voiceover.'+((__voiceRec.mimeType||'').indexOf('mp4')>=0?'m4a':'webm'));}catch(e){}
-      toast('Voice recorded 🎙️ it\'s now your video voiceover','ok');
+      if(btn){btn.innerHTML='<i class="ti ti-microphone"></i> Record again';btn.classList.remove('on');}
+      // show a REVIEW player (play / pause / stop) — user decides when to save to library
+      renderVoiceReview(id,url);
+      toast('Voice recorded 🎙️ play it below, then Save to library if you like it','ok');
     };
     __voiceRec.start();
     if(btn){btn.innerHTML='<i class="ti ti-player-stop-filled"></i> Stop recording';btn.classList.add('on');}
@@ -12831,7 +12855,7 @@ function renderVStudio(id){
   var fields='<input type="hidden" id="hg-music" value="'+esc(hb.music||'')+'"><input type="hidden" id="hg-by" value="'+esc(hb.musicBy||(CU&&CU.name)||'')+'"><input type="hidden" id="hg-lang" value="'+esc(hb.musicLang||'')+'">';
   var tabUI='';
   if(__vsTab==='record'){
-    tabUI='<div style="margin-top:10px"><button id="hg-recbtn" class="btn" style="width:100%;border:1px solid #dc2626;color:#dc2626;font-weight:700" onclick="vsRecord(\''+id+'\')"><i class="ti ti-microphone"></i> Tap to record your voice</button><div id="hg-upprog" style="display:none;font-size:11px;margin-top:6px;color:var(--mt)"></div><div style="font-size:11px;color:var(--mt2);margin-top:6px">Speak your motivation, then tap Stop. Your name is credited on the video.</div></div>';
+    tabUI='<div style="margin-top:10px"><button id="hg-recbtn" class="btn" style="width:100%;border:1px solid #dc2626;color:#dc2626;font-weight:700" onclick="vsRecord(\''+id+'\')"><i class="ti ti-microphone"></i> Tap to record your voice</button><div id="hg-upprog" style="display:none;font-size:11px;margin-top:6px;color:var(--mt)"></div><div id="hg-review" style="display:none"></div><div style="font-size:11px;color:var(--mt2);margin-top:6px">Speak your motivation, then tap Stop. Your name is credited on the video.</div></div>';
   } else if(__vsTab==='upload'){
     tabUI='<div style="margin-top:10px"><label class="btn" style="width:100%;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;cursor:pointer;display:block;text-align:center"><i class="ti ti-upload"></i> Choose an MP3 file<input type="file" accept="audio/*" style="display:none" onchange="vsUpload(this,\''+id+'\')"></label><div id="hg-upprog" style="display:none;font-size:11px;margin-top:6px;color:var(--mt)"></div><input id="hg-musicurl2" placeholder="\u2026or paste a direct .mp3 URL" style="width:100%;margin-top:7px" onchange="vsPasteUrl(this.value,\''+id+'\')"></div>';
   } else if(__vsTab==='library'){
@@ -12844,7 +12868,7 @@ function renderVStudio(id){
       +'<button class="'+(__vsTab==='library'?'sel':'')+'" onclick="vsTab(\'library\',\''+id+'\')"><i class="ti ti-music"></i>Library</button></div>'
       +tabUI+sel+'</div>'
     +'<div class="vstep"><div class="ttl"><span class="num">2</span> Add a message <span style="font-weight:500;color:var(--mt2);margin-left:5px">(optional)</span></div>'
-      +'<input id="vs-cap" maxlength="60" placeholder="e.g. Day 12 — never giving up 💪" value="'+esc(hb.vidText||'')+'" oninput="vsSetCap(\''+id+'\',this.value)" style="width:100%;padding:10px;border:1px solid var(--b);border-radius:10px;background:var(--sf);color:var(--tx)"><div style="font-size:10px;color:var(--mt2);margin-top:5px">This appears on your video.</div>'
+      +'<input id="vs-cap" maxlength="60" placeholder="e.g. Day 12 — never giving up 💪" value="'+esc(hb.vidText||'')+'" oninput="vsSetCap(\''+id+'\',this.value)" style="width:100%;padding:10px;border:1px solid var(--b);border-radius:10px;background:var(--sf);color:var(--tx)"><div style="font-size:10px;color:var(--mt2);margin-top:5px">This appears on your video.</div>'+'<div style="display:flex;align-items:center;gap:7px;margin-top:9px"><span style="font-size:11px;color:var(--mt2)">Text colour:</span>'+['#ffffff','#ffe600','#00e5ff','#ff3b3b','#000000'].map(function(C){var onsel=((hb.vidTextCol||'#ffffff')===C);return '<button onclick="vsSetTextCol(\''+id+'\',\''+C+'\')" style="width:24px;height:24px;border-radius:50%;cursor:pointer;background:'+C+';border:'+(onsel?'3px solid #0a66c2':'1px solid var(--b)')+'"></button>';}).join('')+'</div>'
       +'<div style="display:flex;gap:8px;align-items:center;margin-top:10px"><label class="btn" style="flex:1;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;cursor:pointer;text-align:center;padding:9px"><i class="ti ti-photo"></i> '+(hb.vidImg?'Change photo':'Add a photo')+'<input type="file" accept="image/*" style="display:none" onchange="vsAddImage(this,\''+id+'\')"></label>'+(hb.vidImg?'<button onclick="vsClearImage(\''+id+'\')" style="border:none;background:rgba(220,38,38,.12);color:#dc2626;font-weight:700;border-radius:10px;padding:9px 12px;cursor:pointer">✕</button>':'')+'</div>'
       +(hb.vidImg?'<div style="margin-top:8px;text-align:center"><img src="'+hb.vidImg+'" style="max-height:120px;border-radius:10px;border:1px solid var(--b)"><div style="font-size:10px;color:var(--mt2);margin-top:4px">Your photo becomes the video background</div></div>':'')+'</div>'
     +'<div class="vstep"><div class="ttl"><span class="num">3</span> Choose length</div>'
@@ -13015,4 +13039,183 @@ function shareTextCard(){
   },'image/png');
 }
 function tcardDownload(blob){try{var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='reedbi-quote.png';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},2500);toast('Image saved 🖼️ post it to your status','ok');}catch(e){toast('Could not save the image','err');}}
+
+/* v173: on-video text colour */
+function vsSetTextCol(id,col){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  hb.vidTextCol=col;saveHabits(habits);renderVStudio(id);
+}
+
+/* ===== v174: Google Pay — official Google Pay API integration =====
+   Adds a "Google Pay" option at checkout. Uses Google's real pay.js sheet.
+   In TEST mode it runs without charging (safe to demo). To go LIVE and actually
+   collect money you must: (1) get a Google Pay merchant ID from the Google Pay &
+   Wallet Business Console, (2) connect a payment processor/PSP (Stripe, Razorpay,
+   Adyen, etc.) and put its gateway name + gateway merchant id below, then the
+   token returned here is sent to YOUR server to charge. Set those in Settings. */
+function gpayCfg(){
+  return {
+    merchantId: LS.get('rb_gpay_merchant',''),
+    merchantName: LS.get('rb_gpay_name','Reedbi'),
+    gateway: LS.get('rb_gpay_gateway','example'),
+    gatewayMerchantId: LS.get('rb_gpay_gwmid','exampleGatewayMerchantId'),
+    country: LS.get('rb_gpay_country','AE')
+  };
+}
+function gpayEnv(){ return LS.get('rb_gpay_merchant','') ? 'PRODUCTION' : 'TEST'; }
+function gpayClient(){
+  if(typeof google==='undefined'||!google.payments||!google.payments.api)return null;
+  try{ if(!window.__gpc)window.__gpc=new google.payments.api.PaymentsClient({environment:gpayEnv()}); }catch(e){return null;}
+  return window.__gpc;
+}
+function gpayCardMethod(){
+  var cfg=gpayCfg();
+  return {type:'CARD',
+    parameters:{allowedAuthMethods:['PAN_ONLY','CRYPTOGRAM_3DS'], allowedCardNetworks:['VISA','MASTERCARD','AMEX','DISCOVER','RUPAY']},
+    tokenizationSpecification:{type:'PAYMENT_GATEWAY', parameters:{gateway:cfg.gateway, gatewayMerchantId:cfg.gatewayMerchantId}}};
+}
+/* show the GPay buttons only when the device/browser actually supports Google Pay */
+function gpayDetect(){
+  var c=gpayClient(); if(!c)return;
+  try{
+    c.isReadyToPay({apiVersion:2,apiVersionMinor:0,allowedPaymentMethods:[gpayCardMethod()]})
+     .then(function(r){ if(r&&r.result){ ['cartco-gpay'].forEach(function(idd){var b=document.getElementById(idd);if(b)b.style.display='';}); document.querySelectorAll('.gpay-opt').forEach(function(b){b.style.display='';}); } })
+     .catch(function(){});
+  }catch(e){}
+}
+function gpayCheckout(amount, cur, label, onSuccess){
+  var c=gpayClient();
+  if(!c){toast('Google Pay isn\'t available on this device. Use UPI or Cash.','info');return;}
+  var cfg=gpayCfg();
+  var req={apiVersion:2,apiVersionMinor:0,
+    allowedPaymentMethods:[gpayCardMethod()],
+    merchantInfo:{merchantName:cfg.merchantName},
+    transactionInfo:{totalPriceStatus:'FINAL', totalPriceLabel:(label||'Total'), totalPrice:(Math.round(amount*100)/100).toFixed(2), currencyCode:(cur||'AED'), countryCode:cfg.country}};
+  if(cfg.merchantId)req.merchantInfo.merchantId=cfg.merchantId;
+  c.loadPaymentData(req).then(function(pd){
+    if(gpayEnv()==='TEST'){ toast('Google Pay (TEST mode) — no real charge. Add a merchant ID to go live.','info'); }
+    if(onSuccess)onSuccess(pd);
+  }).catch(function(err){
+    if(err&&(err.statusCode==='CANCELED'||/cancel/i.test(err.statusMessage||'')))return;
+    toast('Google Pay didn\'t complete. Try again or use another method.','info');
+  });
+}
+/* settings: let the merchant make Google Pay LIVE */
+function openGpaySettings(){
+  var ovl=document.getElementById('gpayset-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='gpayset-ovl';ovl.className='overlay';document.body.appendChild(ovl);}
+  var cfg=gpayCfg();
+  ovl.innerHTML='<div class="modal" style="max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:16px"><span style="color:#4285F4;font-weight:800">G</span> Pay setup</b><button class="modal-x" onclick="closeOvl(\'gpayset-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div style="font-size:12px;color:var(--mt2);margin-bottom:10px">Currently: <b>'+gpayEnv()+'</b> mode. To accept real payments, add your Google Pay merchant ID and your payment processor (PSP) details. Until then it runs in safe TEST mode.</div>'
+    +'<div class="fg"><label>Google Pay Merchant ID <span style="color:var(--mt2)">(Business Console)</span></label><input id="gp-mid" value="'+esc(cfg.merchantId)+'" placeholder="e.g. BCR2DN…"></div>'
+    +'<div class="fg" style="margin-top:7px"><label>Business name shown in the sheet</label><input id="gp-name" value="'+esc(cfg.merchantName)+'"></div>'
+    +'<div class="fg" style="margin-top:7px"><label>Payment processor / gateway</label><input id="gp-gw" value="'+esc(cfg.gateway)+'" placeholder="stripe / razorpay / adyen…"></div>'
+    +'<div class="fg" style="margin-top:7px"><label>Gateway merchant ID (from your PSP)</label><input id="gp-gwmid" value="'+esc(cfg.gatewayMerchantId)+'"></div>'
+    +'<div class="fg" style="margin-top:7px"><label>Country code</label><input id="gp-country" value="'+esc(cfg.country)+'" maxlength="2" style="text-transform:uppercase"></div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="saveGpaySettings()">Save</button>'
+    +'<div style="font-size:11px;color:var(--mt2);margin-top:9px">Note: a real charge also needs a small server that takes the Google Pay token and calls your PSP. That\'s the backend step.</div></div>';
+  ovl.classList.add('open');
+}
+function saveGpaySettings(){
+  LS.set('rb_gpay_merchant',(document.getElementById('gp-mid')||{}).value||'');
+  LS.set('rb_gpay_name',(document.getElementById('gp-name')||{}).value||'Reedbi');
+  LS.set('rb_gpay_gateway',(document.getElementById('gp-gw')||{}).value||'example');
+  LS.set('rb_gpay_gwmid',(document.getElementById('gp-gwmid')||{}).value||'exampleGatewayMerchantId');
+  LS.set('rb_gpay_country',((document.getElementById('gp-country')||{}).value||'AE').toUpperCase());
+  window.__gpc=null; // re-init with new env
+  closeOvl('gpayset-ovl');toast('Google Pay settings saved','ok');setTimeout(gpayDetect,300);
+}
+/* try detecting GPay availability once the page + pay.js have loaded */
+try{ if(document.readyState!=='loading'){setTimeout(gpayDetect,1200);} else {window.addEventListener('load',function(){setTimeout(gpayDetect,1200);});} }catch(e){}
+
+/* ===== v175: voice review (play/pause/stop) + explicit Save to library =====
+   After recording, the user reviews with native audio controls, can re-record
+   as many times as they like, and only saves to the shared library when happy.
+   Each saved take is a separate library track they can pick for any video. */
+var __lastVoiceBlob=null,__lastVoiceUrl='',__lastVoiceId='';
+function renderVoiceReview(id,url){
+  var box=document.getElementById('hg-review');if(!box)return;
+  box.style.display='block';
+  box.innerHTML='<div style="border:1px solid var(--b);border-radius:12px;padding:10px;margin-top:9px;background:var(--card2)">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--mt2);margin-bottom:6px">🎧 Your recording — play, pause or stop</div>'
+    +'<audio src="'+url+'" controls preload="metadata" style="width:100%"></audio>'
+    +'<div style="display:flex;gap:7px;margin-top:9px">'
+      +'<button class="btn" style="flex:1;background:#16a34a;color:#fff;font-weight:700;padding:9px" onclick="saveVoiceToLibrary(\''+id+'\')"><i class="ti ti-cloud-upload"></i> Save to library</button>'
+      +'<button class="btn" style="flex:1;border:1px solid #dc2626;color:#dc2626;font-weight:700;padding:9px" onclick="vsRecord(\''+id+'\')"><i class="ti ti-microphone"></i> Record again</button>'
+    +'</div>'
+    +'<div style="font-size:10px;color:var(--mt2);margin-top:6px">✓ This take is set as your video voiceover. Save it to the library to reuse it or share with others. You can record more.</div>'
+    +'</div>';
+}
+function saveVoiceToLibrary(id){
+  if(!__lastVoiceBlob){toast('Record a voice first','info');return;}
+  var by=(document.getElementById('hg-by')||{}).value||((CU&&CU.name)||'Anonymous');
+  var lang=(document.getElementById('hg-lang')||{}).value||'';
+  // register locally right away (so it's selectable instantly), then upload to cloud
+  try{registerTrack(__lastVoiceUrl, by, 'Voice by '+by, lang);}catch(e){}
+  try{hgUploadBlob(__lastVoiceBlob,id,'voiceover.'+(((__lastVoiceBlob.type||'').indexOf('mp4')>=0)?'m4a':'webm'));}catch(e){}
+  toast('Saved to library 🎙️ pick it anytime under Library. Record more if you like!','ok');
+}
+
+/* ===== v175: Manifestation technique — affirmation + scripting + gratitude =====
+   A brain-stimulating daily practice: read a powerful affirmation aloud, script
+   your success as if already achieved (reticular activating system primer),
+   list gratitude, and follow the 3-6-9 method. Stored per day in rb_manifest. */
+var RB_AFFIRM=[
+ 'I am becoming the person who achieves my biggest goals.',
+ 'Every day, in every way, I am getting better and stronger.',
+ 'Money and opportunity flow to me as I add real value.',
+ 'I am disciplined, focused, and unstoppable today.',
+ 'I deserve success and I am ready to receive it.',
+ 'My small daily actions are building a remarkable life.',
+ 'I attract the right people, ideas, and chances.',
+ 'I am calm, confident, and in control of my future.',
+ 'I turn setbacks into setups for my comeback.',
+ 'I am proof that consistency creates greatness.',
+ 'My mind is powerful and it works for my dreams.',
+ 'I show up fully — my future self is already proud.',
+ 'I am healthy, wealthy, and grateful for this day.',
+ 'I keep promises to myself, and my confidence grows.',
+ 'Success is my natural state; I claim it now.'
+];
+function getManifest(){return LS.get('rb_manifest',{});}
+function saveManifest(m){LS.set('rb_manifest',m);try{cloudBumpTs&&cloudBumpTs();cloudSaveState&&cloudSaveState();}catch(e){}}
+function todayAffirm(){var n=new Date();var i=(n.getFullYear()*372+n.getMonth()*31+n.getDate())%RB_AFFIRM.length;return RB_AFFIRM[i];}
+function openManifest(){
+  if(typeof requireAuth==='function'&&!requireAuth('use manifestation'))return;
+  var ovl=document.getElementById('mani-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='mani-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:440px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:16px">✨ Manifestation</b><button class="modal-x" onclick="closeOvl(\'mani-ovl\')"><i class="ti ti-x"></i></button></div><div id="mani-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderManifest();ovl.classList.add('open');
+}
+function renderManifest(){
+  var box=document.getElementById('mani-body');if(!box)return;
+  var dk=dayKey();var m=getManifest();var d=m[dk]||{};
+  var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
+  box.innerHTML='<div class="mani-hero"><div style="font-size:11px;font-weight:800;letter-spacing:1px;opacity:.92">TODAY\'S AFFIRMATION · '+esc(nm)+'</div><div class="aff">“'+esc(todayAffirm())+'”</div><button class="btn" style="margin-top:11px;background:rgba(255,255,255,.18);color:#fff;font-weight:700;border:none" onclick="maniSpeak()"><i class="ti ti-volume"></i> Say it aloud 3×</button></div>'
+    +'<div class="mani-card"><h4>📝 Script your success</h4><div class="hint">Write your goal as if it ALREADY happened. Feel it. This primes your brain to notice the paths toward it.</div><textarea id="mani-script" rows="3" placeholder="I am so happy and grateful now that…" style="width:100%">'+esc(d.script||'')+'</textarea></div>'
+    +'<div class="mani-card"><h4>🙏 3 things I\'m grateful for</h4><textarea id="mani-grat" rows="2" placeholder="1. …  2. …  3. …" style="width:100%">'+esc(d.grat||'')+'</textarea></div>'
+    +'<div class="mani-card"><h4>🔢 The 3-6-9 method</h4><div class="hint">A simple focusing ritual used by many. Write your single biggest desire:</div><input id="mani-369" placeholder="e.g. I run a successful business" value="'+esc(d.wish||'')+'" style="width:100%">'
+      +'<div class="mani-step"><div class="n">3</div><div style="font-size:12px">Write it <b>3×</b> every morning</div></div>'
+      +'<div class="mani-step"><div class="n">6</div><div style="font-size:12px">Write it <b>6×</b> during the day</div></div>'
+      +'<div class="mani-step"><div class="n">9</div><div style="font-size:12px">Write it <b>9×</b> before sleep</div></div></div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:13px;padding:13px" onclick="saveManifestDay()"><i class="ti ti-device-floppy"></i> Save today\'s practice</button>'
+    +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-top:8px">Do this daily — your brain starts working toward what you focus on.</div>';
+}
+function maniSpeak(){
+  var t=todayAffirm();
+  try{
+    if('speechSynthesis' in window){
+      var said=0;
+      function say(){if(said>=3)return;var u=new SpeechSynthesisUtterance(t);u.rate=.95;u.onend=function(){said++;setTimeout(say,250);};window.speechSynthesis.speak(u);}
+      window.speechSynthesis.cancel();say();
+      toast('Repeat it with feeling 🔊','ok');
+    } else { toast('Read it aloud 3 times with feeling 🔊','info'); }
+  }catch(e){ toast('Read it aloud 3 times with feeling 🔊','info'); }
+}
+function saveManifestDay(){
+  var dk=dayKey();var m=getManifest();
+  m[dk]={script:(document.getElementById('mani-script')||{}).value||'',grat:(document.getElementById('mani-grat')||{}).value||'',wish:(document.getElementById('mani-369')||{}).value||'',ts:Date.now()};
+  saveManifest(m);closeOvl('mani-ovl');try{rbConfetti(60);}catch(e){}toast('Practice saved ✨ keep showing up','ok');
+}
 </script></body></html>
