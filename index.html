@@ -333,6 +333,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .buy-gimg{width:100%;flex:0 0 100%;height:200px;object-fit:cover;border-radius:10px;scroll-snap-align:center}
 .overlay.open{display:flex}
 .modal{background:var(--sf);border:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.modal>*{flex-shrink:0}
 .mhd{padding:13px 16px 10px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .mhd h3{font-size:14px;font-weight:700}
 .mbd{padding:13px 16px;overflow-y:auto;flex:1}
@@ -493,7 +494,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .user-ad{position:relative;background:linear-gradient(135deg,rgba(10,102,194,.06),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:10px;padding:10px 11px;margin:8px 10px 0;font-size:12px}
 .ad-tag{position:absolute;top:7px;right:9px;font-size:8px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.5px}\n.bub{box-shadow:0 1px 3px rgba(0,0,0,.06)}\n.abtn{border-radius:10px;font-weight:600}\n.ps-card{box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:12px}\n.appl-card{box-shadow:0 1px 3px rgba(0,0,0,.05)}
 #prodsearch-ovl .modal{max-width:1320px;width:97vw;height:96vh;max-height:96vh;display:flex;flex-direction:column}
-#prodsearch-ovl .modal>div:last-child,#ps-results{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#prodsearch-ovl .modal>div:last-child,#ps-results{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
 @media(max-width:700px){#prodsearch-ovl .modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}}
 @media(min-width:701px){.sf-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}.sf-img{height:150px;object-fit:contain;background:#fff;padding:6px}.sf-hero{padding:26px 24px}.sf-hero .sf-av{width:68px;height:68px;font-size:30px}.sf-ttl{font-size:13px}}
 .p3d-ovl{position:fixed;inset:0;background:rgba(8,8,8,.92);z-index:100000;display:none;align-items:center;justify-content:center;flex-direction:column}
@@ -679,8 +680,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .fk-story .acts .p1{background:#fff;color:#0a2a52}
 .fk-story .acts .p2{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3)}
 /* real-time 3D stage */
-.fk-3dstage{position:relative;height:188px;margin:10px;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 35%,#14233d,#070d16 72%);box-shadow:0 10px 28px rgba(0,0,0,.3)}
-.fk-3dstage canvas{display:block;width:100%;height:100%}
+.fk-3dstage{position:relative;height:188px;margin:10px;border-radius:16px;overflow:hidden;touch-action:pan-y;background:radial-gradient(circle at 50% 35%,#14233d,#070d16 72%);box-shadow:0 10px 28px rgba(0,0,0,.3)}
+.fk-3dstage canvas{display:block;width:100%;height:100%;touch-action:pan-y}
 .fk-3dstage .lbl{position:absolute;top:10px;left:12px;z-index:2;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);color:#cfe0f2;font-size:10px;font-weight:700;border-radius:14px;padding:5px 11px;letter-spacing:.4px}
 .fk-3dstage .live{width:7px;height:7px;border-radius:50%;background:#06d6a0;box-shadow:0 0 0 0 rgba(6,214,160,.6);animation:fklive 1.6s infinite}
 @keyframes fklive{0%{box-shadow:0 0 0 0 rgba(6,214,160,.6)}70%{box-shadow:0 0 0 8px rgba(6,214,160,0)}100%{box-shadow:0 0 0 0 rgba(6,214,160,0)}}
@@ -1209,7 +1210,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v177</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v179</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5907,7 +5908,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v177 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v179 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11905,8 +11906,11 @@ function renderHabits(){
     var R=20,C=2*Math.PI*R,off=C*(1-p.pct/100);hb.notes=hb.notes||{};
     var start=hb.startTs||Date.now();
     var grid='<div class="hab-grid">'+Array.from({length:hb.days||40}).map(function(_,i){
-      var dk=dayKey(start+i*86400000);var on=(hb.done||[]).indexOf(dk)>=0;var hasNote=!!hb.notes[dk];
-      return '<div class="hab-dot'+(on?' on':'')+(dk===dayKey()?' today':'')+'" title="day '+(i+1)+'" onclick="habCellClick(\''+hb.id+'\','+i+')" style="cursor:pointer;position:relative">'+(hasNote&&!on?'<span style=\'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#e23b3b\'>✎</span>':'')+'</div>';
+      var dk=dayKey(start+i*86400000);var hasNote=!!hb.notes[dk];
+      var pct=habDayPct(hb,dk);var on=pct>=100;var partial=(pct>0&&pct<100);
+      var col=hb.c||'#16a34a';
+      var st='cursor:pointer;position:relative;'+(partial?('background:linear-gradient(to top,'+col+' '+pct+'%,var(--card2) '+pct+'%);border-color:'+col):'');
+      return '<div class="hab-dot'+(on?' on':'')+(dk===dayKey()?' today':'')+'" title="day '+(i+1)+' — '+pct+'% of goals" onclick="habCellClick(\''+hb.id+'\','+i+')" style="'+st+'">'+(partial?'<span style=\'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:800;text-shadow:0 1px 1px rgba(0,0,0,.5)\'>'+pct+'</span>':(hasNote&&pct===0?'<span style=\'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#e23b3b\'>✎</span>':''))+'</div>';
     }).join('')+'</div>';
     return '<div class="hab-card"><div class="hab-top"><div class="hab-ic" style="background:'+(hb.c||'#16a34a')+'"><i class="ti ti-'+(hb.ic||'check')+'"></i></div>'
       +'<div style="flex:1;min-width:0"><div class="hab-name">'+esc(hb.n)+' <button style="background:none;border:none;color:var(--mt2);cursor:pointer;font-size:12px" onclick="openRenameHabit(\''+hb.id+'\')"><i class="ti ti-edit"></i></button></div><div class="hab-meta">'+esc(hb.topic||'')+' · '+((hb.days||40)===365?'1-year':(hb.days||40)+'-day')+' · 🔥 '+p.streak+'-day streak</div>'+(hb.music?'<div style="font-size:11px;color:#7c3aed;margin-top:2px">🎵 '+esc(hb.musicBy||'your track')+'</div>':'')+'</div>'
@@ -11915,11 +11919,13 @@ function renderHabits(){
       +((hb.goals&&hb.goals.length)?'<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">'+hb.goals.slice(0,8).map(function(g){return '<span style="font-size:11px;background:rgba(22,163,74,.10);color:#16a34a;border:1px solid rgba(22,163,74,.25);border-radius:20px;padding:3px 9px">🎯 '+esc(g.name)+'</span>';}).join('')+(hb.goals.length>8?'<span style="font-size:11px;color:var(--mt2)">+'+(hb.goals.length-8)+' more</span>':'')+'</div>':'')
       +(hb.manifest?'<div style="font-size:12px;color:#0d9488;margin-top:3px;font-style:italic">✨ '+esc(hb.manifest)+'</div>':'')
       +'<div style="font-size:10px;color:var(--mt2);margin-top:8px">Tap any day to add a reflection 📝</div>'
+      +(function(){var g=(hb.goals||[]).length;if(!g)return '';var td=habDayGoalsDone(hb,dayKey());var p=habDayPct(hb,dayKey());var col=hb.c||'#16a34a';return '<div onclick="habCellClick(\''+hb.id+'\','+Math.max(0,Math.round((Date.now()-(hb.startTs||Date.now()))/86400000))+')" style="cursor:pointer;margin-top:9px;padding:9px 11px;border-radius:11px;background:'+(p>=100?'rgba(22,163,74,.12)':'var(--card2)')+';border:1px solid '+(p>=100?col:'var(--b)')+'"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:12px">📅 Today: '+td+'/'+g+' goals</b><span style="font-size:12px;font-weight:800;color:'+col+'">'+p+'%</span></div><div style="height:7px;background:var(--b);border-radius:5px;margin-top:6px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:'+col+';transition:width .25s"></div></div></div>';})()
       +grid
       +(complete?'<div class="learn-done" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;margin-top:11px"><i class="ti ti-trophy"></i> Goal complete — '+(hb.days)+' days! 🎉</div>'
         :'<button class="hab-check'+(doneToday?' done':'')+'" onclick="toggleHabitToday(\''+hb.id+'\')">'+(doneToday?'<i class="ti ti-check"></i> Done today — '+p.left+' days to go':'<i class="ti ti-circle-check"></i> Mark done today')+'</button>')
       +'<div style="display:flex;align-items:center;gap:10px;margin-top:9px"><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:8px" onclick="shareHabitLink(\''+hb.id+'\')"><i class="ti ti-share"></i> Share with friends</button>'
       +'<button class="btn" style="flex:1;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800;padding:8px" onclick="openVideoStudio(\''+hb.id+'\')"><i class="ti ti-video"></i> Make video</button>'
+      +'<button class="btn" style="flex:none;border:1px solid var(--b);color:var(--tx);font-weight:700;padding:8px 11px" onclick="openHabitMonitor(\''+hb.id+'\')" title="Monitor progress"><i class="ti ti-chart-bar"></i></button>'
       +'<button class="btn" style="flex:1;border:1px solid #db2777;color:#db2777;font-weight:700;padding:8px" onclick="openTextCard()"><i class="ti ti-quote"></i> Quote card</button>'
       +'<span style="font-size:12px;color:var(--mt2)">👁️ '+(hb.views||0)+'</span>'
       +'<button style="background:none;border:none;color:var(--mt2);font-size:11px;cursor:pointer" onclick="delHabit(\''+hb.id+'\')"><i class="ti ti-trash"></i></button></div>'
@@ -11987,24 +11993,57 @@ function delHabit(id){if(!confirm('Remove this habit and its progress?'))return;
 function habCellClick(id,idx){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
   var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
-  if(dk===dayKey()){openGoalSheet();return;}  // today -> daily goals sheet
-  openHabitDay(id,idx);
+  var pp=String(dk).split('-');var dd=new Date(+pp[0],+pp[1],+pp[2]);dd.setHours(0,0,0,0);var tt=new Date();tt.setHours(0,0,0,0);
+  if(dd.getTime()>tt.getTime()){toast('That day hasn\'t arrived yet 🗓️','info');return;}
+  openHabitDay(id,idx); // per-habit goal checklist for that day
+}
+/* per-habit, per-day goal helpers (each challenge has its OWN goals — never mixed) */
+function habDayGoalsDone(hb,dk){var dg=(hb.dayGoals||{})[dk];return dg?dg.length:0;}
+function habDayPct(hb,dk){
+  var n=(hb.goals||[]).length;
+  if(n>0){return Math.min(100,Math.round(habDayGoalsDone(hb,dk)/n*100));}
+  return (hb.done||[]).indexOf(dk)>=0?100:0;
+}
+function habToggleDayGoal(id,idx,gid){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+  var pp=String(dk).split('-');var dd=new Date(+pp[0],+pp[1],+pp[2]);dd.setHours(0,0,0,0);var tt=new Date();tt.setHours(0,0,0,0);
+  if(dd.getTime()>tt.getTime()){toast('That day hasn\'t arrived yet','info');return;}
+  hb.dayGoals=hb.dayGoals||{};var arr=(hb.dayGoals[dk]||[]).slice();
+  var i=arr.indexOf(gid);if(i>=0)arr.splice(i,1);else arr.push(gid);
+  hb.dayGoals[dk]=arr;
+  var total=(hb.goals||[]).length;hb.done=hb.done||[];var di=hb.done.indexOf(dk);
+  if(total>0&&arr.length>=total){if(di<0){hb.done.push(dk);try{rbConfetti(40);}catch(e){}}}
+  else{if(di>=0)hb.done.splice(di,1);}
+  saveHabits(habits);openHabitDay(id,idx);renderHabits();
 }
 function openHabitDay(id,idx){
-  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;hb.notes=hb.notes||{};
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;hb.notes=hb.notes||{};hb.dayGoals=hb.dayGoals||{};
   var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
-  var done=(hb.done||[]).indexOf(dk)>=0;
   var ovl=document.getElementById('habday-ovl');
   if(!ovl){ovl=document.createElement('div');ovl.id='habday-ovl';ovl.className='overlay';
-    ovl.innerHTML='<div class="modal" style="max-width:360px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b id="habday-title" style="font-size:14px"></b><button class="modal-x" onclick="closeOvl(\'habday-ovl\')"><i class="ti ti-x"></i></button></div><div id="habday-body"></div></div>';
+    ovl.innerHTML='<div class="modal" style="max-width:380px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b id="habday-title" style="font-size:14px"></b><button class="modal-x" onclick="closeOvl(\'habday-ovl\')"><i class="ti ti-x"></i></button></div><div id="habday-body"></div></div>';
     document.body.appendChild(ovl);}
   document.getElementById('habday-title').textContent='Day '+(idx+1)+' · '+hb.n;
-  document.getElementById('habday-body').innerHTML=
-    '<div style="display:flex;gap:8px;margin-bottom:10px"><button class="hab-chip'+(done?' on':'')+'" style="flex:1" onclick="habDaySet(\''+id+'\','+idx+',true)"><i class="ti ti-check"></i> Achieved</button>'
-    +'<button class="hab-chip'+(!done?' on':'')+'" style="flex:1" onclick="habDaySet(\''+id+'\','+idx+',false)"><i class="ti ti-x"></i> Missed</button></div>'
-    +'<div class="fg"><label>'+(done?'Reflection — how did it go?':'What got in the way? (be kind to yourself)')+'</label><textarea id="habday-note" rows="3" placeholder="Write a line for your future self...">'+esc(hb.notes[dk]||'')+'</textarea></div>'
-    +'<button class="btn btnok" style="width:100%;margin-top:10px" onclick="habDaySaveNote(\''+id+'\','+idx+')"><i class="ti ti-device-floppy"></i> Save reflection</button>'
-    +'<button class="btn" style="width:100%;margin-top:8px;border:1px solid #16a34a;color:#16a34a;font-weight:700" onclick="closeOvl(\'habday-ovl\');openGoalSheet()"><i class="ti ti-checklist"></i> Open my Daily Goals Sheet</button>';
+  var goals=hb.goals||[];var doneArr=hb.dayGoals[dk]||[];
+  var body='';
+  if(goals.length){
+    var pct=habDayPct(hb,dk);var col=hb.c||'#16a34a';
+    body+='<div style="text-align:center;margin-bottom:12px"><div style="font-size:26px;font-weight:800;color:'+col+'">'+doneArr.length+'/'+goals.length+'</div><div style="font-size:12px;color:var(--mt2)">goals done · '+pct+'% — tick the ones you completed</div><div style="height:8px;background:var(--card2);border-radius:5px;margin-top:7px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+col+';transition:width .25s"></div></div></div>';
+    body+=goals.map(function(g){var ck=doneArr.indexOf(g.id)>=0;
+      return '<div onclick="habToggleDayGoal(\''+id+'\','+idx+',\''+g.id+'\')" style="display:flex;align-items:center;gap:10px;padding:11px;border:1px solid '+(ck?col:'var(--b)')+';border-radius:11px;margin-bottom:7px;cursor:pointer;background:'+(ck?'rgba(22,163,74,.08)':'var(--card2)')+'"><div style="flex:none;width:24px;height:24px;border-radius:7px;border:2px solid '+(ck?col:'var(--mt2)')+';background:'+(ck?col:'transparent')+';display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px">'+(ck?'✓':'')+'</div><div style="flex:1;font-size:13px;font-weight:600'+(ck?';text-decoration:line-through;color:var(--mt2)':'')+'">🎯 '+esc(g.name)+'</div></div>';
+    }).join('');
+    body+='<button class="btn" style="width:100%;margin-top:6px;border:1px dashed var(--b);color:var(--mt);font-weight:600;font-size:12px" onclick="closeOvl(\'habday-ovl\');editHabitGoal(\''+id+'\')"><i class="ti ti-edit"></i> Edit this challenge\'s goals</button>';
+  } else {
+    var done=(hb.done||[]).indexOf(dk)>=0;
+    body+='<div style="font-size:12px;color:var(--mt2);margin-bottom:9px">No goals set for this challenge yet. Add goals so each day shows your progress, or mark the day:</div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:10px"><button class="hab-chip'+(done?' on':'')+'" style="flex:1" onclick="habDaySet(\''+id+'\','+idx+',true)"><i class="ti ti-check"></i> Achieved</button>'
+      +'<button class="hab-chip'+(!done?' on':'')+'" style="flex:1" onclick="habDaySet(\''+id+'\','+idx+',false)"><i class="ti ti-x"></i> Missed</button></div>'
+      +'<button class="btn btnok" style="width:100%" onclick="closeOvl(\'habday-ovl\');editHabitGoal(\''+id+'\')"><i class="ti ti-target"></i> Add goals to this challenge</button>';
+  }
+  body+='<div class="fg" style="margin-top:11px"><label>📝 Reflection for this day</label><textarea id="habday-note" rows="2" placeholder="A line for your future self...">'+esc(hb.notes[dk]||'')+'</textarea></div>'
+    +'<button class="btn" style="width:100%;margin-top:8px;border:1px solid var(--b);color:var(--tx);font-weight:600" onclick="habDaySaveNote(\''+id+'\','+idx+')"><i class="ti ti-device-floppy"></i> Save reflection</button>';
+  document.getElementById('habday-body').innerHTML=body;
   ovl.classList.add('open');
 }
 function habDaySet(id,idx,achieved){
@@ -12734,11 +12773,26 @@ function habDelGoal(id,gid){
 /* fire one motivating, dopamine-style notification per goal under each active habit */
 function fireHabitGoalReminders(am){
   var habits=getHabits();if(!habits.length)return;
+  var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
   var i=0;
   habits.forEach(function(hb){
-    var done=(hb.done||[]).indexOf(dayKey())>=0;var complete=(habitProgress(hb).done)>=(hb.days||40);
+    var complete=(habitProgress(hb).done)>=(hb.days||40);
     if(complete)return;
-    (hb.goals||[]).slice(0,12).forEach(function(g){
+    var goals=hb.goals||[];if(!goals.length)return;
+    var doneToday=habDayGoalsDone(hb,dayKey());var total=goals.length;var left=total-doneToday;
+    if(left<=0)return; // all done today — no nag
+    // 1) a per-CHALLENGE wake-up-call summary (name + habit + count + 2 hours)
+    i++;(function(idx,hname,d,t,lft){
+      setTimeout(function(){
+        try{if(!getNotifCfg().muted)playTune(LS.get('rb_habit_tune','melody'));}catch(e){}
+        var msg='⏰ '+nm+', your "'+hname+'" challenge: '+d+'/'+t+' done today. '+lft+' to go — finish within 2 hours and keep your momentum! 🔥';
+        try{if(typeof Notification!=='undefined'&&Notification.permission==='granted'){new Notification('🌟 '+hname+' — wake-up call',{body:msg,tag:'rb-hc-'+hb.id,renotify:true});}}catch(e){}
+        try{toast(msg,'ok');}catch(e){}
+      },idx*1600);
+    })(i,hb.n,doneToday,total,left);
+    // 2) then a gentle nudge for each unfinished goal of THIS challenge
+    goals.forEach(function(g){
+      if((((hb.dayGoals||{})[dayKey()])||[]).indexOf(g.id)>=0)return; // already done today
       i++;(function(idx,goalName,habitName){
         setTimeout(function(){
           try{if(!getNotifCfg().muted)playTune(LS.get('rb_habit_tune','melody'));}catch(e){}
@@ -13265,6 +13319,7 @@ function renderVoiceLibrary(){
     return '<div style="display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--b);border-radius:11px;margin-bottom:7px;background:var(--card2)">'
       +'<button onclick="vlibPlay(\''+encodeURIComponent(t.url)+'\')" style="flex:none;width:38px;height:38px;border-radius:50%;border:none;background:'+(playing?'#dc2626':'#16a34a')+';color:#fff;cursor:pointer;font-size:16px"><i class="ti ti-player-'+(playing?'pause':'play')+'-filled"></i></button>'
       +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.title||'Voice')+(t.lang?' <span style="font-size:9px;background:rgba(10,102,194,.12);color:#0a66c2;border-radius:10px;padding:1px 6px">'+esc(t.lang)+'</span>':'')+'</div><div style="font-size:10px;color:var(--mt2)">🎤 by '+esc(t.by||'Anonymous')+(t.local?' · only on your device':'')+'</div></div>'
+      +'<button onclick="delTrack(\''+t.id+'\')" title="Delete" style="flex:none;border:none;background:rgba(220,38,38,.10);color:#dc2626;border-radius:8px;padding:7px 9px;cursor:pointer"><i class="ti ti-trash"></i></button>'
     +'</div>';
   }).join(''):'<div style="text-align:center;color:var(--mt2);font-size:13px;padding:18px">No voiceovers yet. Record the first one below! 🎙️</div>';
   box.innerHTML=(langs.length>1?'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px">'+langs.map(function(L){return '<button class="hab-chip'+((__vlibLang||'All')===L?' on':'')+'" onclick="__vlibLang=\''+L+'\';renderVoiceLibrary()">'+esc(L)+'</button>';}).join('')+'</div>':'')
@@ -13325,7 +13380,7 @@ function feLoad(input){
   var stage=document.getElementById('fe-stage');
   stage.innerHTML='<video id="fe-vid" src="'+__feUrl+'" controls playsinline style="width:100%;max-height:300px;border-radius:12px;background:#000"></video>'
     +'<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap"><button class="hab-chip on" onclick="feGrab(6)">📸 Grab 6 frames</button><button class="hab-chip on" onclick="feGrab(9)">Grab 9</button><button class="hab-chip" onclick="feGrabNow()">⭐ Grab current frame</button></div>'
-    +'<button class="btn" style="width:100%;margin-top:9px;border:1px solid #16a34a;color:#16a34a;font-weight:700" onclick="feUseAudio()"><i class="ti ti-volume"></i> Use this video\'s audio as voiceover</button>'
+    +'<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap"><button class="btn" style="flex:1;border:1px solid #16a34a;color:#16a34a;font-weight:700;font-size:12px;padding:9px" onclick="feUseAudio()"><i class="ti ti-volume"></i> Use audio as voiceover</button><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;font-size:12px;padding:9px" onclick="feAudioToLibrary()"><i class="ti ti-cloud-upload"></i> Add audio to library</button></div><button class="btn" style="width:100%;margin-top:7px;border:1px solid var(--b);color:var(--mt);font-size:12px;padding:8px" onclick="feDownloadAudio()"><i class="ti ti-download"></i> Download the clip (audio playable)</button>'
     +'<div id="fe-msg" style="font-size:11px;color:var(--mt2);margin-top:6px"></div>';
   document.getElementById('fe-grid').innerHTML='';
 }
@@ -13382,5 +13437,69 @@ function feUseAudio(){
     if(hb){hb.music=__feUrl;hb.musicBy=hb.musicBy||((CU&&CU.name)||'');saveHabits(habits);toast('Using this video\'s audio as your voiceover 🎵','ok');closeOvl('fe-ovl');if(typeof vsStudioOpen==='function'&&vsStudioOpen())renderVStudio(__feHabit);return;}
   }
   toast('Open the extractor from a habit\'s video to use its audio','info');
+}
+
+/* v178: delete a track from the library */
+function delTrack(tid){
+  if(typeof confirm==='function'&&!confirm('Remove this voiceover from your library?'))return;
+  var tr=getTracks().filter(function(t){return t.id!==tid;});saveTracks(tr);
+  try{if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED)FB.db.collection('tracks').doc(tid).delete();}catch(e){}
+  try{if(document.getElementById('vlib-ovl')&&document.getElementById('vlib-ovl').classList.contains('open'))renderVoiceLibrary();}catch(e){}
+  toast('Removed from library','ok');
+}
+/* v178: download/save the extracted video's audio to the library */
+function feAudioToLibrary(){
+  if(!__feUrl){toast('Upload a video first','info');return;}
+  var by=(CU&&CU.name)||'Anonymous';
+  try{registerTrack(__feUrl,by,'Audio from video',(document.getElementById('hg-lang')||{}).value||'');toast('Added to your voice library 🎵 anyone can use it','ok');}catch(e){}
+}
+function feDownloadAudio(){
+  if(!__feUrl){return;}
+  // we can save the uploaded video file itself (its audio plays); true mp3 extraction needs a server
+  try{var a=document.createElement('a');a.href=__feUrl;a.download='clip-with-audio.mp4';document.body.appendChild(a);a.click();a.remove();toast('Saved — its audio can be used as a voiceover','ok');}catch(e){toast('Could not save','err');}
+}
+
+/* ===== v179: per-habit monitoring (7 / 30 / 90 / all days) ===== */
+function habRangeStats(hb,nDays){
+  var start=hb.startTs||Date.now();var total=hb.days||40;var n=Math.min(nDays,total);
+  var todayIdx=Math.max(0,Math.floor((Date.now()-start)/86400000));
+  var from=Math.max(0,Math.min(todayIdx,total-1)-n+1);
+  var sumPct=0,tracked=0,full=0,days=[];
+  for(var i=from;i<=Math.min(todayIdx,total-1);i++){
+    var dk=dayKey(start+i*86400000);var p=habDayPct(hb,dk);
+    days.push({i:i,pct:p});sumPct+=p;if(p>0)tracked++;if(p>=100)full++;
+  }
+  var cnt=days.length||1;
+  return {avg:Math.round(sumPct/cnt),tracked:tracked,full:full,count:days.length,days:days};
+}
+function openHabitMonitor(id){
+  var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
+  var ovl=document.getElementById('hmon-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='hmon-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:430px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px">📊 Monitor</b><button class="modal-x" onclick="closeOvl(\'hmon-ovl\')"><i class="ti ti-x"></i></button></div><div id="hmon-body"></div></div>';
+    document.body.appendChild(ovl);}
+  __hmonId=id;__hmonRange=__hmonRange||7;renderHabitMonitor();ovl.classList.add('open');
+}
+var __hmonId='',__hmonRange=7;
+function hmonSet(n){__hmonRange=n;renderHabitMonitor();}
+function renderHabitMonitor(){
+  var hb=getHabits().find(function(x){return x.id===__hmonId;});if(!hb)return;
+  var box=document.getElementById('hmon-body');if(!box)return;
+  var col=hb.c||'#16a34a';var p=habitProgress(hb);
+  var ranges=[7,30,40,50,90,180,365].filter(function(r){return r<=(hb.days||40)||r===7;});
+  if(ranges.indexOf(hb.days||40)<0)ranges.push(hb.days||40);
+  var st=habRangeStats(hb,__hmonRange);
+  var bars=st.days.map(function(d){var h=Math.max(3,Math.round(d.pct*0.5));return '<div title="day '+(d.i+1)+': '+d.pct+'%" style="flex:1;min-width:3px;display:flex;flex-direction:column;justify-content:flex-end;height:55px"><div style="height:'+h+'px;background:'+(d.pct>=100?col:(d.pct>0?col:'var(--b)'))+';opacity:'+(d.pct>0?1:.5)+';border-radius:3px 3px 0 0"></div></div>';}).join('');
+  box.innerHTML='<div style="font-weight:800;font-size:15px;margin-bottom:3px">'+esc(hb.n)+'</div>'
+    +'<div style="font-size:12px;color:var(--mt2);margin-bottom:11px">'+((hb.goals||[]).length)+' goals · '+(hb.days||40)+'-day challenge</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">'+ranges.map(function(r){var lbl=r>=365?'1 year':(r>=180?'6 mo':r+'d');return '<button class="hab-chip'+(__hmonRange===r?' on':'')+'" onclick="hmonSet('+r+')">'+lbl+'</button>';}).join('')+'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px">'
+      +'<div style="background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:11px;text-align:center"><div style="font-size:22px;font-weight:800;color:'+col+'">'+st.avg+'%</div><div style="font-size:10px;color:var(--mt2)">avg goals/day</div></div>'
+      +'<div style="background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:11px;text-align:center"><div style="font-size:22px;font-weight:800;color:'+col+'">'+st.full+'</div><div style="font-size:10px;color:var(--mt2)">100% days</div></div>'
+      +'<div style="background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:11px;text-align:center"><div style="font-size:22px;font-weight:800;color:'+col+'">'+p.streak+'</div><div style="font-size:10px;color:var(--mt2)">streak 🔥</div></div>'
+    +'</div>'
+    +'<div style="font-size:11px;font-weight:700;color:var(--mt2);margin-bottom:6px">Daily goal % — last '+st.count+' day(s)</div>'
+    +'<div style="display:flex;gap:2px;align-items:flex-end;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:8px">'+(bars||'<div style="color:var(--mt2);font-size:12px;padding:14px;text-align:center;width:100%">No tracked days yet</div>')+'</div>'
+    +'<div style="font-size:11px;color:var(--mt2);margin-top:10px;text-align:center">Overall: '+p.done+'/'+(hb.days||40)+' full days · '+p.pct+'% complete</div>';
 }
 </script></body></html>
