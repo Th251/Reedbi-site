@@ -991,6 +991,15 @@ body.dark .spin-wheel{border-color:#2a333f}
 .mani-card .hint{font-size:11px;color:var(--mt2);margin-bottom:7px}
 .mani-step{display:flex;gap:9px;align-items:flex-start;margin-top:8px}
 .mani-step .n{flex:none;width:24px;height:24px;border-radius:50%;background:#7c3aed;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+.hs-strip{display:flex;gap:7px;overflow-x:auto;padding:8px 2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.hs-strip::-webkit-scrollbar{display:none}
+.hs-day{flex:none;width:54px;text-align:center;cursor:pointer}
+.hs-circ{width:46px;height:46px;border-radius:50%;border:2px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin:0 auto;background:var(--card2);color:var(--mt)}
+.hs-day.sel .hs-circ{outline:3px solid #0a66c2;outline-offset:1px}
+.hs-day .dl{font-size:9px;color:var(--mt2);margin-top:3px}
+.hs-goal{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--b);border-radius:12px;margin-bottom:8px;background:var(--card2)}
+.hs-tick{flex:none;width:30px;height:30px;border-radius:9px;border:2px solid var(--mt2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;transition:all .15s}
+
 
 
 
@@ -1210,7 +1219,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v179</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v180</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5908,7 +5917,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v179 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v180 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11918,7 +11927,7 @@ function renderHabits(){
       +'<div style="font-size:12px;margin-top:8px">'+(hb.goal?'<b>🎯 Goal:</b> '+esc(hb.goal):'<span style="color:var(--mt2)">No goal set yet</span>')+' <button style="background:none;border:none;color:#0a66c2;cursor:pointer;font-size:11px;font-weight:700" onclick="editHabitGoal(\''+hb.id+'\')"><i class="ti ti-edit"></i> '+((hb.goals&&hb.goals.length)?'edit goals':'set goals')+'</button></div>'
       +((hb.goals&&hb.goals.length)?'<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">'+hb.goals.slice(0,8).map(function(g){return '<span style="font-size:11px;background:rgba(22,163,74,.10);color:#16a34a;border:1px solid rgba(22,163,74,.25);border-radius:20px;padding:3px 9px">🎯 '+esc(g.name)+'</span>';}).join('')+(hb.goals.length>8?'<span style="font-size:11px;color:var(--mt2)">+'+(hb.goals.length-8)+' more</span>':'')+'</div>':'')
       +(hb.manifest?'<div style="font-size:12px;color:#0d9488;margin-top:3px;font-style:italic">✨ '+esc(hb.manifest)+'</div>':'')
-      +'<div style="font-size:10px;color:var(--mt2);margin-top:8px">Tap any day to add a reflection 📝</div>'
+      +'<div style="font-size:10px;color:var(--mt2);margin-top:8px">👆 Tap any day to open this challenge\'s goals &amp; tick what you did 📝</div>'
       +(function(){var g=(hb.goals||[]).length;if(!g)return '';var td=habDayGoalsDone(hb,dayKey());var p=habDayPct(hb,dayKey());var col=hb.c||'#16a34a';return '<div onclick="habCellClick(\''+hb.id+'\','+Math.max(0,Math.round((Date.now()-(hb.startTs||Date.now()))/86400000))+')" style="cursor:pointer;margin-top:9px;padding:9px 11px;border-radius:11px;background:'+(p>=100?'rgba(22,163,74,.12)':'var(--card2)')+';border:1px solid '+(p>=100?col:'var(--b)')+'"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:12px">📅 Today: '+td+'/'+g+' goals</b><span style="font-size:12px;font-weight:800;color:'+col+'">'+p+'%</span></div><div style="height:7px;background:var(--b);border-radius:5px;margin-top:6px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:'+col+';transition:width .25s"></div></div></div>';})()
       +grid
       +(complete?'<div class="learn-done" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;margin-top:11px"><i class="ti ti-trophy"></i> Goal complete — '+(hb.days)+' days! 🎉</div>'
@@ -11995,7 +12004,7 @@ function habCellClick(id,idx){
   var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
   var pp=String(dk).split('-');var dd=new Date(+pp[0],+pp[1],+pp[2]);dd.setHours(0,0,0,0);var tt=new Date();tt.setHours(0,0,0,0);
   if(dd.getTime()>tt.getTime()){toast('That day hasn\'t arrived yet 🗓️','info');return;}
-  openHabitDay(id,idx); // per-habit goal checklist for that day
+  openHabitSheet(id,idx); // each habit opens its OWN daily-goals sheet
 }
 /* per-habit, per-day goal helpers (each challenge has its OWN goals — never mixed) */
 function habDayGoalsDone(hb,dk){var dg=(hb.dayGoals||{})[dk];return dg?dg.length:0;}
@@ -13501,5 +13510,83 @@ function renderHabitMonitor(){
     +'<div style="font-size:11px;font-weight:700;color:var(--mt2);margin-bottom:6px">Daily goal % — last '+st.count+' day(s)</div>'
     +'<div style="display:flex;gap:2px;align-items:flex-end;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:8px">'+(bars||'<div style="color:var(--mt2);font-size:12px;padding:14px;text-align:center;width:100%">No tracked days yet</div>')+'</div>'
     +'<div style="font-size:11px;color:var(--mt2);margin-top:10px;text-align:center">Overall: '+p.done+'/'+(hb.days||40)+' full days · '+p.pct+'% complete</div>';
+}
+
+/* ===== v180: each habit challenge gets its OWN full daily-goals sheet =====
+   Tapping a day opens a rich per-habit sheet (day strip + stats + that day's
+   goal checklist + reflection), scoped to THIS habit only. */
+var __hsId='',__hsIdx=0;
+function openHabitSheet(id,idx){
+  var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
+  __hsId=id;
+  var todayIdx=Math.max(0,Math.floor((Date.now()-(hb.startTs||Date.now()))/86400000));
+  __hsIdx=(typeof idx==='number')?idx:Math.min(todayIdx,(hb.days||40)-1);
+  var ovl=document.getElementById('hsheet-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='hsheet-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:440px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b id="hsheet-title" style="font-size:15px"></b><button class="modal-x" onclick="closeOvl(\'hsheet-ovl\')"><i class="ti ti-x"></i></button></div><div id="hsheet-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderHabitSheet();ovl.classList.add('open');
+  setTimeout(function(){var s=document.querySelector('#hsheet-strip .hs-day.sel');if(s&&s.scrollIntoView)try{s.scrollIntoView({inline:'center',block:'nearest'});}catch(e){}},60);
+}
+function hsSelDay(idx){__hsIdx=idx;renderHabitSheet();}
+function renderHabitSheet(){
+  var hb=getHabits().find(function(x){return x.id===__hsId;});if(!hb)return;hb.dayGoals=hb.dayGoals||{};hb.notes=hb.notes||{};
+  var col=hb.c||'#16a34a';var total=hb.days||40;var start=hb.startTs||Date.now();
+  var todayIdx=Math.max(0,Math.floor((Date.now()-start)/86400000));
+  document.getElementById('hsheet-title').innerHTML='<i class="ti ti-checklist" style="color:'+col+'"></i> '+esc(hb.n)+' — daily goals';
+  var goals=hb.goals||[];
+  // day strip
+  var strip='';for(var i=0;i<total;i++){var dk=dayKey(start+i*86400000);var p=habDayPct(hb,dk);var done=p>=100;var future=i>todayIdx;
+    strip+='<div class="hs-day'+(i===__hsIdx?' sel':'')+'" onclick="hsSelDay('+i+')"><div class="hs-circ" style="'+(done?('background:'+col+';color:#fff;border-color:'+col):(p>0?('border-color:'+col+';color:'+col):''))+(future?';opacity:.4':'')+'">'+(goals.length?(habDayGoalsDone(hb,dk)+'/'+goals.length):(done?'✓':'·'))+'</div><div class="dl">'+(i===todayIdx?'Today':('D'+(i+1)))+'</div></div>';
+  }
+  // stats
+  var p=habitProgress(hb);var st=habRangeStats(hb,total);
+  var dk=dayKey(start+__hsIdx*86400000);var doneArr=hb.dayGoals[dk]||[];var dayPct=habDayPct(hb,dk);
+  var future=__hsIdx>todayIdx;
+  var body='<div class="hs-strip" id="hsheet-strip">'+strip+'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 12px">'
+      +'<div style="background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:800;color:'+col+'">'+st.avg+'%</div><div style="font-size:10px;color:var(--mt2)">avg/day</div></div>'
+      +'<div style="background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:800;color:'+col+'">🔥 '+p.streak+'</div><div style="font-size:10px;color:var(--mt2)">streak</div></div>'
+      +'<div style="background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:800;color:'+col+'">'+st.full+'</div><div style="font-size:10px;color:var(--mt2)">100% days</div></div>'
+    +'</div>'
+    +'<div style="text-align:center;margin-bottom:10px"><div style="font-size:24px;font-weight:800;color:'+(dayPct>=100?col:(dayPct>0?col:'#dc2626'))+'">'+(goals.length?(doneArr.length+'/'+goals.length):(dayPct>=100?'Done':'—'))+'</div><div style="font-size:12px;color:var(--mt2)">'+(__hsIdx===todayIdx?'Today':'Day '+(__hsIdx+1))+' · '+dayPct+'%</div></div>';
+  if(!goals.length){
+    body+='<div style="text-align:center;padding:14px;border:1px dashed var(--b);border-radius:12px;color:var(--mt2);font-size:13px">No goals in this challenge yet.<div style="margin-top:9px"><button class="btn btnok" onclick="closeOvl(\'hsheet-ovl\');editHabitGoal(\''+hb.id+'\')"><i class="ti ti-target"></i> Add goals to "'+esc(hb.n)+'"</button></div></div>';
+  } else if(future){
+    body+='<div style="text-align:center;padding:16px;color:var(--mt2);font-size:13px">🗓️ This day hasn\'t arrived yet.</div>';
+  } else {
+    body+=goals.map(function(g){var ck=doneArr.indexOf(g.id)>=0;
+      return '<div class="hs-goal" style="border-color:'+(ck?col:'var(--b)')+';background:'+(ck?'rgba(22,163,74,.07)':'var(--card2)')+'"><div class="hs-tick" onclick="hsToggle(\''+g.id+'\')" style="border-color:'+(ck?col:'var(--mt2)')+';background:'+(ck?col:'transparent')+'">'+(ck?'✓':'')+'</div><div style="flex:1;font-size:13px;font-weight:600'+(ck?';text-decoration:line-through;color:var(--mt2)':'')+'">🎯 '+esc(g.name)+'</div></div>';
+    }).join('');
+    body+='<button class="btn" style="width:100%;margin-top:4px;border:1px dashed var(--b);color:var(--mt);font-size:12px;font-weight:600" onclick="closeOvl(\'hsheet-ovl\');editHabitGoal(\''+hb.id+'\')"><i class="ti ti-edit"></i> Edit this challenge\'s goals</button>';
+  }
+  body+='<div class="fg" style="margin-top:12px"><label>📝 Reflection for '+(__hsIdx===todayIdx?'today':'this day')+'</label><textarea id="hsheet-note" rows="2" placeholder="A line for your future self...">'+esc(hb.notes[dk]||'')+'</textarea></div>'
+    +'<button class="btn" style="width:100%;margin-top:8px;border:1px solid var(--b);color:var(--tx);font-weight:600" onclick="hsSaveNote()"><i class="ti ti-device-floppy"></i> Save reflection</button>';
+  document.getElementById('hsheet-body').innerHTML=body;
+}
+function hsToggle(gid){
+  var hb=getHabits().find(function(x){return x.id===__hsId;});if(!hb)return;
+  habToggleDayGoalSilent(__hsId,__hsIdx,gid);
+  renderHabitSheet();
+}
+/* toggle without reopening the old modal (used by the sheet) */
+function habToggleDayGoalSilent(id,idx,gid){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+  var pp=String(dk).split('-');var dd=new Date(+pp[0],+pp[1],+pp[2]);dd.setHours(0,0,0,0);var tt=new Date();tt.setHours(0,0,0,0);
+  if(dd.getTime()>tt.getTime()){toast('That day hasn\'t arrived yet','info');return;}
+  hb.dayGoals=hb.dayGoals||{};var arr=(hb.dayGoals[dk]||[]).slice();
+  var i=arr.indexOf(gid);if(i>=0)arr.splice(i,1);else arr.push(gid);
+  hb.dayGoals[dk]=arr;
+  var total=(hb.goals||[]).length;hb.done=hb.done||[];var di=hb.done.indexOf(dk);
+  if(total>0&&arr.length>=total){if(di<0){hb.done.push(dk);try{rbConfetti(40);}catch(e){}}}else{if(di>=0)hb.done.splice(di,1);}
+  saveHabits(habits);try{renderHabits();}catch(e){}
+}
+function hsSaveNote(){
+  var hb=getHabits().find(function(x){return x.id===__hsId;});if(!hb)return;hb.notes=hb.notes||{};
+  var dk=dayKey((hb.startTs||Date.now())+__hsIdx*86400000);
+  var habits=getHabits();var h2=habits.find(function(x){return x.id===__hsId;});h2.notes=h2.notes||{};
+  h2.notes[dk]=((document.getElementById('hsheet-note')||{}).value||'').trim();
+  saveHabits(habits);toast('Reflection saved 📝','ok');
 }
 </script></body></html>
