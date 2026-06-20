@@ -1222,7 +1222,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v190</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v191</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5920,7 +5920,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v190 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v191 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12400,7 +12400,7 @@ function habitSnap(hb){
   var p=habitProgress(hb);var start=hb.startTs||Date.now();var grid=[];
   for(var i=0;i<(hb.days||40);i++){grid.push((hb.done||[]).indexOf(dayKey(start+i*86400000))>=0?1:0);}
   return {v:1,nm:(CU&&CU.name)||'A friend',t:hb.n,goal:hb.goal||'',aff:hb.manifest||'',days:hb.days||40,
-    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),cap:(hb.vidText||''),capCol:(hb.vidTextCol||'#ffffff'),img:(hb.vidImg||''),imgs:((hb.vidImgs&&hb.vidImgs.length)?hb.vidImgs:(hb.vidImg?[hb.vidImg]:[])),c:hb.c||'#16a34a'};
+    done:p.done,pct:habGoalOverallPct(hb),daysPct:p.pct,todayPct:habDayPct(hb,dayKey()),todayDone:habDayGoalsDone(hb,dayKey()),goalCount:(hb.goals||[]).length,streak:p.streak,grid:grid,gpct:(function(){var a=[];for(var i=0;i<(hb.days||40);i++){a.push(habDayPct(hb,dayKey((hb.startTs||Date.now())+i*86400000)));}return a;})(),music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),cap:(hb.vidText||''),capCol:(hb.vidTextCol||'#ffffff'),img:(hb.vidImg||''),imgs:((hb.vidImgs&&hb.vidImgs.length)?hb.vidImgs:(hb.vidImg?[hb.vidImg]:[])),c:hb.c||'#16a34a'};
 }
 function shareHabitLink(habitId){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===habitId;});if(!hb)return;
@@ -12425,7 +12425,7 @@ function openSharedHabit(snap,views){
     ovl.innerHTML='<div class="modal" style="max-width:400px"><div id="shhabit-body"></div></div>';
     document.body.appendChild(ovl);}
   var watch=(typeof views==='number')?('<div style="font-size:13px;opacity:.95;margin-top:10px;font-weight:700;position:relative">👁️ '+views+' '+(views===1?'person watching':'people watching')+'</div>'):'';
-  var grid='<div class="shh-grid">'+(snap.grid||[]).map(function(x){return '<div class="shh-dot'+(x?' on':'')+'"></div>';}).join('')+'</div>';
+  var grid='<div class="shh-grid">'+(snap.grid||[]).map(function(x,i){var gp=(snap.gpct&&snap.gpct[i]!=null)?snap.gpct[i]:(x?100:0);var st=(gp>=100)?'':(gp>0?('background:linear-gradient(to top,rgba(255,255,255,.95) '+gp+'%,rgba(255,255,255,.18) '+gp+'%)'):'');return '<div class="shh-dot'+(gp>=100?' on':'')+'" style="'+st+'"></div>';}).join('')+'</div>';
   var pct=snap.pct||0;var R=46,CIRC=2*Math.PI*R,off=CIRC*(1-pct/100);
   var ring='<div style="position:relative;width:120px;height:120px;margin:6px auto 4px"><svg width="120" height="120" style="transform:rotate(-90deg)"><circle cx="60" cy="60" r="'+R+'" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="10"/><circle cx="60" cy="60" r="'+R+'" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+CIRC+'" stroke-dashoffset="'+off+'"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:30px;font-weight:900;line-height:1">'+pct+'%</div><div style="font-size:10px;opacity:.9">achieved</div></div></div>';
   document.getElementById('shhabit-body').innerHTML=
@@ -12433,7 +12433,7 @@ function openSharedHabit(snap,views){
     +'<div style="font-size:13px;opacity:.9;position:relative">'+esc(snap.nm||'A friend')+'\'s '+(snap.days||40)+'-day journey</div>'
     +'<div style="font-size:23px;font-weight:900;position:relative;margin-top:2px">'+esc(snap.t||'My habit')+'</div>'
     +ring
-    +'<div style="display:flex;gap:8px;margin-top:6px;position:relative"><div class="sh-stat"><b>'+(snap.done||0)+'/'+(snap.days||40)+'</b><small>days done</small></div><div class="sh-stat"><b>🔥 '+(snap.streak||0)+'</b><small>streak</small></div><div class="sh-stat"><b>'+((snap.days||40)-(snap.done||0))+'</b><small>days to go</small></div></div>'
+    +'<div style="display:flex;gap:8px;margin-top:6px;position:relative"><div class="sh-stat"><b>'+(snap.done||0)+'/'+(snap.days||40)+'</b><small>days done</small></div><div class="sh-stat"><b>🔥 '+(snap.streak||0)+'</b><small>streak</small></div>'+((snap.goalCount)?'<div class="sh-stat"><b>'+(snap.todayDone||0)+'/'+snap.goalCount+'</b><small>today '+(snap.todayPct||0)+'%</small></div>':'<div class="sh-stat"><b>'+((snap.days||40)-(snap.done||0))+'</b><small>days to go</small></div>')+'</div>'
     +'<div style="position:relative;margin-top:14px"><div style="font-size:10px;opacity:.85;text-align:left;margin-bottom:4px">Days completed</div>'+grid+'</div>'+watch+'</div>'
     +(snap.aff?'<div style="text-align:center;font-style:italic;color:#0d9488;margin-top:12px;font-size:14px">✨ '+esc(snap.aff)+'</div>':'')
     +(snap.music?'<button class="btn" style="width:100%;margin-top:11px;border:1px solid #0d9488;color:#0d9488;font-weight:700" onclick="shPlayMusic(\''+encodeURIComponent(snap.music)+'\')"><i class="ti ti-music"></i> Play their motivation track</button>':'')
@@ -13988,5 +13988,17 @@ function gcalLink(hb,g){
   var det=encodeURIComponent('It\'s your time, '+nm+' — begin "'+g.name+'" now. One small step. 🌟 (Reedbi)');
   var rec=encodeURIComponent('RRULE:FREQ=DAILY;COUNT='+daysLeft);
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+text+'&dates='+z(d)+'/'+z(d2)+'&recur='+rec+'&details='+det;
+}
+
+/* v191: goal-aware overall % — averages each elapsed day's goal completion so
+   PARTIAL days (e.g. 5/6 = 83%) show up when sharing, instead of only full days. */
+function habGoalOverallPct(hb){
+  var goals=(hb.goals||[]).length;
+  if(!goals)return habitProgress(hb).pct;
+  var start=hb.startTs||Date.now();var total=hb.days||40;
+  var todayIdx=Math.max(0,Math.floor((Date.now()-start)/86400000));
+  var n=Math.min(todayIdx+1,total);if(n<1)n=1;var sum=0;
+  for(var i=0;i<n;i++){sum+=habDayPct(hb,dayKey(start+i*86400000));}
+  return Math.round(sum/n);
 }
 </script></body></html>
