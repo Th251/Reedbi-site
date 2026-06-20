@@ -333,7 +333,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .buy-gimg{width:100%;flex:0 0 100%;height:200px;object-fit:cover;border-radius:10px;scroll-snap-align:center}
 .overlay.open{display:flex}
 .modal{background:var(--sf);border:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
-.modal>*{flex-shrink:0}
 .mhd{padding:13px 16px 10px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .mhd h3{font-size:14px;font-weight:700}
 .mbd{padding:13px 16px;overflow-y:auto;flex:1}
@@ -493,8 +492,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .bub-media{width:100%;max-width:240px;max-height:240px;object-fit:cover;border-radius:10px;display:block}
 .user-ad{position:relative;background:linear-gradient(135deg,rgba(10,102,194,.06),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:10px;padding:10px 11px;margin:8px 10px 0;font-size:12px}
 .ad-tag{position:absolute;top:7px;right:9px;font-size:8px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.5px}\n.bub{box-shadow:0 1px 3px rgba(0,0,0,.06)}\n.abtn{border-radius:10px;font-weight:600}\n.ps-card{box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:12px}\n.appl-card{box-shadow:0 1px 3px rgba(0,0,0,.05)}
-#prodsearch-ovl .modal{max-width:1320px;width:97vw;height:96vh;max-height:96vh;display:flex;flex-direction:column}
-#prodsearch-ovl .modal>div:last-child,#ps-results{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+#prodsearch-ovl .modal{max-width:1320px;width:97vw;height:96vh;max-height:96vh;display:flex;flex-direction:column;overflow:hidden}
+#prodsearch-ovl .mbd{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;display:block}
+#prodsearch-ovl #ps-results{overflow:visible;min-height:0}
 @media(max-width:700px){#prodsearch-ovl .modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}}
 @media(min-width:701px){.sf-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}.sf-img{height:150px;object-fit:contain;background:#fff;padding:6px}.sf-hero{padding:26px 24px}.sf-hero .sf-av{width:68px;height:68px;font-size:30px}.sf-ttl{font-size:13px}}
 .p3d-ovl{position:fixed;inset:0;background:rgba(8,8,8,.92);z-index:100000;display:none;align-items:center;justify-content:center;flex-direction:column}
@@ -1219,7 +1219,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v180</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v182</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5917,7 +5917,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v180 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v182 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -9615,16 +9615,17 @@ var __rbView=null;         // function to re-render the current shop page (for r
 var __pdSel={color:'',size:'',qty:1};
 
 function rbSetView(fn){__rbView=fn;}
+function rbScrollBox(){return document.querySelector('#prodsearch-ovl .mbd')||document.getElementById('ps-results');}
 function rbSnapPush(){
-  var box=document.getElementById('ps-results');
-  if(box&&box.innerHTML.trim())__rbNav.push({html:box.innerHTML,top:box.scrollTop||0,view:__rbView});
+  var box=document.getElementById('ps-results');var sc=rbScrollBox();
+  if(box&&box.innerHTML.trim())__rbNav.push({html:box.innerHTML,top:(sc&&sc.scrollTop)||0,view:__rbView});
   if(__rbNav.length>80)__rbNav.shift();
   try{history.pushState({rb:1},'');}catch(e){}
 }
 function rbNavBack(){
-  var box=document.getElementById('ps-results');if(!box)return;
+  var box=document.getElementById('ps-results');if(!box)return;var sc=rbScrollBox();
   var s=__rbNav.pop();
-  if(s){box.innerHTML=s.html;box.scrollTop=s.top||0;__rbView=s.view||null;try{fkInitMotion(box);}catch(e){}}
+  if(s){box.innerHTML=s.html;if(sc)sc.scrollTop=s.top||0;__rbView=s.view||null;try{fkInitMotion(box);}catch(e){}}
   else { closeOvl('prodsearch-ovl'); }  // nothing to go back to → close the store
 }
 function rbNavHome(){ __rbNav=[]; openMainStore(); }
@@ -13509,7 +13510,10 @@ function renderHabitMonitor(){
     +'</div>'
     +'<div style="font-size:11px;font-weight:700;color:var(--mt2);margin-bottom:6px">Daily goal % — last '+st.count+' day(s)</div>'
     +'<div style="display:flex;gap:2px;align-items:flex-end;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:8px">'+(bars||'<div style="color:var(--mt2);font-size:12px;padding:14px;text-align:center;width:100%">No tracked days yet</div>')+'</div>'
-    +'<div style="font-size:11px;color:var(--mt2);margin-top:10px;text-align:center">Overall: '+p.done+'/'+(hb.days||40)+' full days · '+p.pct+'% complete</div>';
+    +'<div style="font-size:11px;color:var(--mt2);margin-top:10px;text-align:center">Overall: '+p.done+'/'+(hb.days||40)+' full days · '+p.pct+'% complete</div>'
+    +((hb.goals&&hb.goals.length)?('<div style="font-size:12px;font-weight:800;margin:14px 0 7px">📈 Each goal — last '+st.count+' day(s)</div>'+hb.goals.map(function(g){var gs=habGoalStats(hb,g.id,__hmonRange);return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">🎯 '+esc(g.name)+'</span><span style="font-weight:800;color:'+col+'">'+gs.done+'/'+gs.span+' · '+gs.pct+'%</span></div><div style="height:7px;background:var(--card2);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+gs.pct+'%;background:'+col+'"></div></div></div>';}).join('')):'')
+    +'<button class="btn" style="width:100%;margin-top:14px;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;font-weight:800;padding:11px" onclick="habReportPDF(\''+hb.id+'\')"><i class="ti ti-file-text"></i> Download progress report (PDF)</button>'
+    +'<div style="font-size:10px;color:var(--mt2);text-align:center;margin-top:6px">Opens a printable report — choose “Save as PDF” to store it for your reference</div>';
 }
 
 /* ===== v180: each habit challenge gets its OWN full daily-goals sheet =====
@@ -13518,7 +13522,7 @@ function renderHabitMonitor(){
 var __hsId='',__hsIdx=0;
 function openHabitSheet(id,idx){
   var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
-  __hsId=id;
+  __hsId=id;__hsNoteGoal='';
   var todayIdx=Math.max(0,Math.floor((Date.now()-(hb.startTs||Date.now()))/86400000));
   __hsIdx=(typeof idx==='number')?idx:Math.min(todayIdx,(hb.days||40)-1);
   var ovl=document.getElementById('hsheet-ovl');
@@ -13555,8 +13559,12 @@ function renderHabitSheet(){
   } else if(future){
     body+='<div style="text-align:center;padding:16px;color:var(--mt2);font-size:13px">🗓️ This day hasn\'t arrived yet.</div>';
   } else {
-    body+=goals.map(function(g){var ck=doneArr.indexOf(g.id)>=0;
-      return '<div class="hs-goal" style="border-color:'+(ck?col:'var(--b)')+';background:'+(ck?'rgba(22,163,74,.07)':'var(--card2)')+'"><div class="hs-tick" onclick="hsToggle(\''+g.id+'\')" style="border-color:'+(ck?col:'var(--mt2)')+';background:'+(ck?col:'transparent')+'">'+(ck?'✓':'')+'</div><div style="flex:1;font-size:13px;font-weight:600'+(ck?';text-decoration:line-through;color:var(--mt2)':'')+'">🎯 '+esc(g.name)+'</div></div>';
+    body+=goals.map(function(g){var ck=doneArr.indexOf(g.id)>=0;var gn=hsGetGoalNote(hb,dk,g.id);var open=(__hsNoteGoal===g.id);
+      return '<div class="hs-goal" style="flex-direction:column;align-items:stretch;border-color:'+(ck?col:'var(--b)')+';background:'+(ck?'rgba(22,163,74,.07)':'var(--card2)')+'">'
+        +'<div style="display:flex;align-items:center;gap:10px"><div class="hs-tick" onclick="hsToggle(\''+g.id+'\')" style="border-color:'+(ck?col:'var(--mt2)')+';background:'+(ck?col:'transparent')+'">'+(ck?'✓':'')+'</div><div style="flex:1;font-size:13px;font-weight:600'+(ck?';text-decoration:line-through;color:var(--mt2)':'')+'">🎯 '+esc(g.name)+'</div><button onclick="hsNoteToggle(\''+g.id+'\')" title="Reflection" style="flex:none;border:1px solid var(--b);background:var(--sf);color:'+(gn?col:'var(--mt2)')+';border-radius:8px;padding:6px 9px;cursor:pointer;font-size:12px">📝</button></div>'
+        +(gn?'<div style="margin-top:8px;font-size:12px;color:var(--tx);background:var(--sf);border:1px solid var(--b);border-radius:9px;padding:8px 10px">'+esc(gn.t)+'<div style="font-size:10px;color:var(--mt2);margin-top:4px">🕒 '+fmtDT(gn.ts)+'</div></div>':'')
+        +(open?'<div style="margin-top:8px"><textarea id="hs-gn-'+g.id+'" rows="2" placeholder="Reflection for this goal..." style="width:100%;font-size:12px;padding:8px;border:1px solid var(--b);border-radius:9px;background:var(--sf);color:var(--tx);font-family:var(--fn);box-sizing:border-box">'+esc(gn?gn.t:'')+'</textarea><button class="btn btnok" style="width:100%;margin-top:6px;font-size:12px;padding:7px" onclick="hsSaveGoalNote(\''+g.id+'\')"><i class="ti ti-device-floppy"></i> Save with date &amp; time</button></div>':'')
+        +'</div>';
     }).join('');
     body+='<button class="btn" style="width:100%;margin-top:4px;border:1px dashed var(--b);color:var(--mt);font-size:12px;font-weight:600" onclick="closeOvl(\'hsheet-ovl\');editHabitGoal(\''+hb.id+'\')"><i class="ti ti-edit"></i> Edit this challenge\'s goals</button>';
   }
@@ -13588,5 +13596,60 @@ function hsSaveNote(){
   var habits=getHabits();var h2=habits.find(function(x){return x.id===__hsId;});h2.notes=h2.notes||{};
   h2.notes[dk]=((document.getElementById('hsheet-note')||{}).value||'').trim();
   saveHabits(habits);toast('Reflection saved 📝','ok');
+}
+
+/* ===== v181: per-goal timestamped reflections ===== */
+function fmtDT(ts){try{var d=new Date(ts);return d.toLocaleDateString()+' · '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
+function hsGetGoalNote(hb,dk,gid){return (((hb.goalNotes||{})[dk])||{})[gid]||null;}
+var __hsNoteGoal='';
+function hsNoteToggle(gid){__hsNoteGoal=(__hsNoteGoal===gid)?'':gid;renderHabitSheet();}
+function hsSaveGoalNote(gid){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===__hsId;});if(!hb)return;
+  var dk=dayKey((hb.startTs||Date.now())+__hsIdx*86400000);
+  var t=((document.getElementById('hs-gn-'+gid)||{}).value||'').trim();
+  hb.goalNotes=hb.goalNotes||{};hb.goalNotes[dk]=hb.goalNotes[dk]||{};
+  if(t){hb.goalNotes[dk][gid]={t:t,ts:Date.now()};}else{delete hb.goalNotes[dk][gid];}
+  saveHabits(habits);__hsNoteGoal='';renderHabitSheet();toast(t?'Goal reflection saved 📝':'Note cleared','ok');
+}
+/* per-goal completion stats over a range (weekly / period) */
+function habGoalStats(hb,gid,nDays){
+  var start=hb.startTs||Date.now();var total=hb.days||40;
+  var todayIdx=Math.max(0,Math.floor((Date.now()-start)/86400000));
+  var from=Math.max(0,Math.min(todayIdx,total-1)-nDays+1);var done=0,span=0;
+  for(var i=from;i<=Math.min(todayIdx,total-1);i++){span++;var dk=dayKey(start+i*86400000);if((((hb.dayGoals||{})[dk])||[]).indexOf(gid)>=0)done++;}
+  return {done:done,span:span,pct:span?Math.round(done/span*100):0};
+}
+
+/* ===== v181: printable progress report (Save as PDF) ===== */
+function habReportPDF(id){
+  var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
+  var col=hb.c||'#16a34a';var total=hb.days||40;var start=hb.startTs||Date.now();
+  var p=habitProgress(hb);var st=habRangeStats(hb,total);
+  var goals=hb.goals||[];var nm=(CU&&CU.name)||'Reedbi user';
+  var todayIdx=Math.max(0,Math.floor((Date.now()-start)/86400000));
+  // per-goal full-range stats
+  var goalRows=goals.map(function(g){var gs=habGoalStats(hb,g.id,total);return '<tr><td>'+esc(g.name)+'</td><td style="text-align:center">'+gs.done+'/'+gs.span+'</td><td style="text-align:center;font-weight:700;color:'+col+'">'+gs.pct+'%</td></tr>';}).join('');
+  // day-by-day with reflections
+  var dayRows='';for(var i=0;i<=Math.min(todayIdx,total-1);i++){var dk=dayKey(start+i*86400000);var pct=habDayPct(hb,dk);var note=(hb.notes||{})[dk]||'';
+    var gnotes=(hb.goalNotes||{})[dk]||{};var gnTxt=Object.keys(gnotes).map(function(gid){var gg=goals.find(function(x){return x.id===gid;});return (gg?gg.name:'goal')+': '+gnotes[gid].t+' ('+fmtDT(gnotes[gid].ts)+')';}).join(' · ');
+    if(pct>0||note||gnTxt)dayRows+='<tr><td>Day '+(i+1)+'</td><td style="text-align:center;color:'+(pct>=100?col:'#555')+'">'+pct+'%</td><td>'+esc(note)+(gnTxt?'<br><span style="color:#777;font-size:11px">'+esc(gnTxt)+'</span>':'')+'</td></tr>';}
+  var html='<!doctype html><html><head><meta charset="utf-8"><title>'+esc(hb.n)+' — Reedbi report</title><style>'
+    +'body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a1a1a;max-width:760px;margin:0 auto;padding:28px}'
+    +'h1{color:'+col+';margin:0 0 4px}.sub{color:#666;font-size:13px;margin-bottom:18px}'
+    +'.tiles{display:flex;gap:12px;margin:18px 0}.tile{flex:1;border:1px solid #e3e3e3;border-radius:12px;padding:14px;text-align:center}'
+    +'.tile b{font-size:26px;color:'+col+';display:block}.tile span{font-size:11px;color:#777}'
+    +'table{width:100%;border-collapse:collapse;margin:10px 0 22px;font-size:13px}th,td{border:1px solid #e3e3e3;padding:7px 9px;text-align:left}th{background:'+col+';color:#fff}'
+    +'h2{font-size:15px;margin:22px 0 6px;border-bottom:2px solid '+col+';padding-bottom:4px}'
+    +'.foot{margin-top:26px;font-size:11px;color:#999;text-align:center}@media print{.noprint{display:none}}'
+    +'.btnbar{text-align:center;margin:18px 0}.btnbar button{background:'+col+';color:#fff;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;margin:0 5px}</style></head><body>'
+    +'<div class="btnbar noprint"><button onclick="window.print()">🖨️ Save as PDF / Print</button></div>'
+    +'<h1>'+esc(hb.n)+'</h1><div class="sub">Progress report for '+esc(nm)+' · '+esc(hb.topic||'Custom')+' · '+total+'-day challenge<br>Generated '+fmtDT(Date.now())+'</div>'
+    +'<div class="tiles"><div class="tile"><b>'+p.pct+'%</b><span>overall complete</span></div><div class="tile"><b>'+p.done+'/'+total+'</b><span>full days</span></div><div class="tile"><b>'+st.avg+'%</b><span>avg goals/day</span></div><div class="tile"><b>'+p.streak+'</b><span>best streak</span></div></div>'
+    +(goals.length?('<h2>Goal completion (whole challenge)</h2><table><tr><th>Goal</th><th style="text-align:center">Days done</th><th style="text-align:center">%</th></tr>'+goalRows+'</table>'):'')
+    +'<h2>Day-by-day log &amp; reflections</h2><table><tr><th>Day</th><th style="text-align:center">%</th><th>Reflection</th></tr>'+(dayRows||'<tr><td colspan="3" style="text-align:center;color:#999">No entries yet</td></tr>')+'</table>'
+    +'<div class="foot">Made with Reedbi · keep going — you\'ve got this 🔥</div>'
+    +'<div class="btnbar noprint"><button onclick="window.print()">🖨️ Save as PDF / Print</button></div></body></html>';
+  try{var w=window.open('','_blank');if(!w){toast('Allow pop-ups to view the report','info');return;}w.document.open();w.document.write(html);w.document.close();toast('Report ready — choose “Save as PDF” 📄','ok');}
+  catch(e){toast('Could not open report window','err');}
 }
 </script></body></html>
