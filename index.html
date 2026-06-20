@@ -333,6 +333,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .buy-gimg{width:100%;flex:0 0 100%;height:200px;object-fit:cover;border-radius:10px;scroll-snap-align:center}
 .overlay.open{display:flex}
 .modal{background:var(--sf);border:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.overlay:not(#prodsearch-ovl) .modal>*{flex-shrink:0}
+.overlay{overscroll-behavior:contain}
 .mhd{padding:13px 16px 10px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .mhd h3{font-size:14px;font-weight:700}
 .mbd{padding:13px 16px;overflow-y:auto;flex:1}
@@ -1219,7 +1221,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v187</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v189</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5917,7 +5919,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v187 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v189 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12397,7 +12399,7 @@ function habitSnap(hb){
   var p=habitProgress(hb);var start=hb.startTs||Date.now();var grid=[];
   for(var i=0;i<(hb.days||40);i++){grid.push((hb.done||[]).indexOf(dayKey(start+i*86400000))>=0?1:0);}
   return {v:1,nm:(CU&&CU.name)||'A friend',t:hb.n,goal:hb.goal||'',aff:hb.manifest||'',days:hb.days||40,
-    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),cap:(hb.vidText||''),capCol:(hb.vidTextCol||'#ffffff'),img:(hb.vidImg||''),c:hb.c||'#16a34a'};
+    done:p.done,pct:p.pct,streak:p.streak,grid:grid,music:(hb.music||gsGetMusicUrl()||''),by:(hb.musicBy||''),cap:(hb.vidText||''),capCol:(hb.vidTextCol||'#ffffff'),img:(hb.vidImg||''),imgs:((hb.vidImgs&&hb.vidImgs.length)?hb.vidImgs:(hb.vidImg?[hb.vidImg]:[])),c:hb.c||'#16a34a'};
 }
 function shareHabitLink(habitId){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===habitId;});if(!hb)return;
@@ -12532,11 +12534,14 @@ function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,
 function drawDash(ctx,W,H,snap,frac){
   if(frac==null)frac=1;
   rrect(ctx,0,0,W,H,40);ctx.save();ctx.clip();
-  var hasImg=(typeof __vidImgEl!=='undefined'&&__vidImgEl&&__vidImgEl.complete&&__vidImgEl.naturalWidth>0);
+  var __imgs=(typeof __vidImgEls!=='undefined'&&__vidImgEls&&__vidImgEls.length)?__vidImgEls:((typeof __vidImgEl!=='undefined'&&__vidImgEl)?[__vidImgEl]:[]);
+  var __cur=null;
+  if(__imgs.length){var __n=__imgs.length;var __i=Math.min(__n-1,Math.floor((frac||0)*__n));__cur=__imgs[__i];}
+  var hasImg=(__cur&&__cur.complete&&__cur.naturalWidth>0);
   if(hasImg){
     // cover-fit the user photo, then a gradient veil on top so text stays readable
-    var iw=__vidImgEl.naturalWidth,ih=__vidImgEl.naturalHeight,s=Math.max(W/iw,H/ih);
-    var dw=iw*s,dh=ih*s;ctx.drawImage(__vidImgEl,(W-dw)/2,(H-dh)/2,dw,dh);
+    var iw=__cur.naturalWidth,ih=__cur.naturalHeight,s=Math.max(W/iw,H/ih);
+    var dw=iw*s,dh=ih*s;ctx.drawImage(__cur,(W-dw)/2,(H-dh)/2,dw,dh);
     var g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,snap.c||'#16a34a');g.addColorStop(.6,'#0a66c2');g.addColorStop(1,'#7c3aed');
     ctx.globalAlpha=0.72;ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
   }else{
@@ -12568,19 +12573,26 @@ function drawDash(ctx,W,H,snap,frac){
   if(snap.by){ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.9)';ctx.fillText('🎤 voice by '+snap.by,W/2,H-66);}
   ctx.font='22px system-ui,Arial';ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillText('Track yours free on Reedbi',W/2,H-34);
 }
-var __vidImgEl=null;
-/* v171: preload the user's photo so drawDash can paint it into the video/image */
+var __vidImgEl=null,__vidImgEls=[];
+/* v188: preload ALL the user's photos (slideshow) so drawDash can paint them */
 function preloadVidImg(snap,cb){
-  __vidImgEl=null;
-  var src=snap&&snap.img;
-  if(!src){cb&&cb();return;}
-  try{
-    var im=new Image();
-    im.onload=function(){__vidImgEl=im;cb&&cb();};
-    im.onerror=function(){__vidImgEl=null;cb&&cb();};
-    im.src=src;
-    if(im.complete&&im.naturalWidth>0){__vidImgEl=im;cb&&cb();}
-  }catch(e){cb&&cb();}
+  __vidImgEl=null;__vidImgEls=[];
+  var list=(snap&&snap.imgs&&snap.imgs.length)?snap.imgs.slice():((snap&&snap.img)?[snap.img]:[]);
+  if(!list.length){cb&&cb();return;}
+  var loaded=0,done=false;
+  function finish(){if(done)return;done=true;__vidImgEl=__vidImgEls[0]||null;cb&&cb();}
+  __vidImgEls=new Array(list.length).fill(null);
+  list.forEach(function(src,idx){
+    try{
+      var im=new Image();
+      im.onload=function(){__vidImgEls[idx]=im;loaded++;if(loaded>=list.length)finish();};
+      im.onerror=function(){loaded++;if(loaded>=list.length)finish();};
+      im.src=src;
+      if(im.complete&&im.naturalWidth>0){__vidImgEls[idx]=im;loaded++;if(loaded>=list.length)finish();}
+    }catch(e){loaded++;if(loaded>=list.length)finish();}
+  });
+  // safety: don't hang forever if an image stalls
+  setTimeout(finish,4000);
 }
 function habitDashCanvas(snap){
   var W=720,H=1100,cv=document.createElement('canvas');cv.width=W;cv.height=H;var ctx=cv.getContext('2d');
@@ -12983,9 +12995,9 @@ function renderVStudio(id){
       +tabUI+sel+'</div>'
     +'<div class="vstep"><div class="ttl"><span class="num">2</span> Add a message <span style="font-weight:500;color:var(--mt2);margin-left:5px">(optional)</span></div>'
       +'<input id="vs-cap" maxlength="60" placeholder="e.g. Day 12 — never giving up 💪" value="'+esc(hb.vidText||'')+'" oninput="vsSetCap(\''+id+'\',this.value)" style="width:100%;padding:10px;border:1px solid var(--b);border-radius:10px;background:var(--sf);color:var(--tx)"><div style="font-size:10px;color:var(--mt2);margin-top:5px">This appears on your video.</div>'+'<div style="display:flex;align-items:center;gap:7px;margin-top:9px"><span style="font-size:11px;color:var(--mt2)">Text colour:</span>'+['#ffffff','#ffe600','#00e5ff','#ff3b3b','#000000'].map(function(C){var onsel=((hb.vidTextCol||'#ffffff')===C);return '<button onclick="vsSetTextCol(\''+id+'\',\''+C+'\')" style="width:24px;height:24px;border-radius:50%;cursor:pointer;background:'+C+';border:'+(onsel?'3px solid #0a66c2':'1px solid var(--b)')+'"></button>';}).join('')+'</div>'
-      +'<div style="display:flex;gap:8px;align-items:center;margin-top:10px"><label class="btn" style="flex:1;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;cursor:pointer;text-align:center;padding:9px"><i class="ti ti-photo"></i> '+(hb.vidImg?'Change photo':'Add a photo')+'<input type="file" accept="image/*" style="display:none" onchange="vsAddImage(this,\''+id+'\')"></label>'+(hb.vidImg?'<button onclick="vsClearImage(\''+id+'\')" style="border:none;background:rgba(220,38,38,.12);color:#dc2626;font-weight:700;border-radius:10px;padding:9px 12px;cursor:pointer">✕</button>':'')+'</div>'
+      +'<div style="display:flex;gap:8px;align-items:center;margin-top:10px"><label class="btn" style="flex:1;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;cursor:pointer;text-align:center;padding:9px"><i class="ti ti-photo"></i> '+((hb.vidImgs&&hb.vidImgs.length)?'Add another photo':'Add a photo')+'<input type="file" accept="image/*" style="display:none" onchange="vsAddImage(this,\''+id+'\')"></label>'+((hb.vidImgs&&hb.vidImgs.length)?'<button onclick="vsClearImage(\''+id+'\')" style="border:none;background:rgba(220,38,38,.12);color:#dc2626;font-weight:700;border-radius:10px;padding:9px 12px;cursor:pointer">Clear all</button>':'')+'</div>'
       +'<button class="btn" style="width:100%;margin-top:8px;border:1px solid var(--b);color:var(--mt);font-weight:600;padding:8px;font-size:12px" onclick="closeOvl(\'vstudio-ovl\');openFrameExtractor(\''+id+'\')"><i class="ti ti-photo-video"></i> …or grab a frame from a video</button>'
-      +(hb.vidImg?'<div style="margin-top:8px;text-align:center"><img src="'+hb.vidImg+'" style="max-height:120px;border-radius:10px;border:1px solid var(--b)"><div style="font-size:10px;color:var(--mt2);margin-top:4px">Your photo becomes the video background</div></div>':'')+'</div>'
+      +(((hb.vidImgs&&hb.vidImgs.length)||hb.vidImg)?(function(){var arr=(hb.vidImgs&&hb.vidImgs.length)?hb.vidImgs:[hb.vidImg];return '<div style="margin-top:9px"><div style="font-size:10px;color:var(--mt2);margin-bottom:5px">'+(arr.length>1?('🎞️ '+arr.length+' photos play as a slideshow across your video'):'Your photo becomes the video background')+'</div><div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px">'+arr.map(function(im,ix){return '<div style="position:relative;flex:none"><img src="'+im+'" style="height:84px;border-radius:9px;border:1px solid var(--b);display:block"><button onclick="vsRemoveImage(\''+id+'\','+ix+')" style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(220,38,38,.92);color:#fff;font-size:12px;cursor:pointer;line-height:1">✕</button></div>';}).join('')+'</div></div>';})():'')+'</div>'
     +'<div class="vstep"><div class="ttl"><span class="num">3</span> Choose length</div>'
       +'<div class="vlen" style="display:flex;gap:8px"><button class="'+(__vsLen===30?'sel':'')+'" onclick="vsSetLen(30,\''+id+'\')">30 seconds</button><button class="'+(__vsLen===60?'sel':'')+'" onclick="vsSetLen(60,\''+id+'\')">60 seconds</button></div></div>'
     +'<button class="btn btnok" style="width:100%;font-size:15px;padding:14px" onclick="vsCreate(\''+id+'\')"><i class="ti ti-sparkles"></i> Create &amp; share my video</button>'
@@ -13051,9 +13063,11 @@ function vsAddImage(input,id){
         cv.getContext('2d').drawImage(im,0,0,cw,ch);
         var data=cv.toDataURL('image/jpeg',0.72);
         var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
-        hb.vidImg=data;saveHabits(habits);
+        hb.vidImgs=hb.vidImgs||(hb.vidImg?[hb.vidImg]:[]);
+        hb.vidImgs.push(data);if(hb.vidImgs.length>8)hb.vidImgs=hb.vidImgs.slice(-8);
+        hb.vidImg=hb.vidImgs[0];saveHabits(habits);
         if(typeof vsStudioOpen==='function'&&vsStudioOpen())renderVStudio(id);
-        toast('Photo added 📷 it becomes your video background','ok');
+        toast(hb.vidImgs.length>1?('📷 '+hb.vidImgs.length+' photos — they play as a slideshow'):'Photo added 📷 it becomes your video background','ok');
       }catch(err){toast('Could not use that image','err');}
     };
     im.onerror=function(){toast('Could not read that image','err');};
@@ -13064,7 +13078,14 @@ function vsAddImage(input,id){
 }
 function vsClearImage(id){
   var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
-  hb.vidImg='';saveHabits(habits);
+  hb.vidImg='';hb.vidImgs=[];saveHabits(habits);
+  if(typeof vsStudioOpen==='function'&&vsStudioOpen())renderVStudio(id);
+  toast('Photos removed','info');
+}
+function vsRemoveImage(id,idx){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  hb.vidImgs=hb.vidImgs||(hb.vidImg?[hb.vidImg]:[]);
+  hb.vidImgs.splice(idx,1);hb.vidImg=hb.vidImgs[0]||'';saveHabits(habits);
   if(typeof vsStudioOpen==='function'&&vsStudioOpen())renderVStudio(id);
   toast('Photo removed','info');
 }
