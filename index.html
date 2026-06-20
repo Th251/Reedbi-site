@@ -1219,7 +1219,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v182</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v185</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5917,7 +5917,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v182 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v185 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11936,6 +11936,7 @@ function renderHabits(){
       +'<div style="display:flex;align-items:center;gap:10px;margin-top:9px"><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:8px" onclick="shareHabitLink(\''+hb.id+'\')"><i class="ti ti-share"></i> Share with friends</button>'
       +'<button class="btn" style="flex:1;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800;padding:8px" onclick="openVideoStudio(\''+hb.id+'\')"><i class="ti ti-video"></i> Make video</button>'
       +'<button class="btn" style="flex:none;border:1px solid var(--b);color:var(--tx);font-weight:700;padding:8px 11px" onclick="openHabitMonitor(\''+hb.id+'\')" title="Monitor progress"><i class="ti ti-chart-bar"></i></button>'
+      +'<button class="btn" style="flex:none;border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:8px 11px" onclick="openHabitReminders(\''+hb.id+'\')" title="Goal reminders (works when app is closed)"><i class="ti ti-alarm"></i></button>'
       +'<button class="btn" style="flex:1;border:1px solid #db2777;color:#db2777;font-weight:700;padding:8px" onclick="openTextCard()"><i class="ti ti-quote"></i> Quote card</button>'
       +'<span style="font-size:12px;color:var(--mt2)">👁️ '+(hb.views||0)+'</span>'
       +'<button style="background:none;border:none;color:var(--mt2);font-size:11px;cursor:pointer" onclick="delHabit(\''+hb.id+'\')"><i class="ti ti-trash"></i></button></div>'
@@ -12592,7 +12593,7 @@ function shareVideoBlob(blob,mime){
   ovl.innerHTML='<div class="modal" style="max-width:380px;text-align:center">'
     +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">🎬 Your video is ready!</div>'
     +'<div style="font-size:12px;color:var(--mt2);margin-bottom:10px">Preview it, then post it to your WhatsApp status</div>'
-    +(vurl?'<video src="'+vurl+'" controls autoplay playsinline style="width:100%;max-height:420px;border-radius:14px;background:#000"></video>':'')
+    +(vurl?'<video id="vidresult-video" src="'+vurl+'" controls autoplay playsinline onloadedmetadata="fixVidDuration(this)" style="width:100%;max-height:420px;border-radius:14px;background:#000"></video>':'')
     +'<button onclick="doShareVideo()" style="display:block;width:100%;margin-top:12px;padding:13px;border:none;border-radius:12px;background:#25D366;color:#fff;font-weight:800;font-size:15px;cursor:pointer"><i class="ti ti-brand-whatsapp"></i> Share to WhatsApp status</button>'
     +'<button onclick="downloadVideo(__pendingVideo.blob,\''+ext+'\')" style="display:block;width:100%;margin-top:8px;padding:11px;border:1px solid var(--b);border-radius:12px;background:var(--sf);color:var(--tx);font-weight:700;font-size:14px;cursor:pointer"><i class="ti ti-download"></i> Save video to phone</button>'
     +'<button onclick="editThisVideo()" style="display:block;width:100%;margin-top:8px;padding:11px;border:1px solid #7c3aed;border-radius:12px;background:var(--sf);color:#7c3aed;font-weight:700;font-size:14px;cursor:pointer"><i class="ti ti-edit"></i> Edit this video (voice · text · photo)</button>'
@@ -12650,7 +12651,7 @@ function _makeHabitVideo(snap,seconds){
     catch(e){try{rec=new MediaRecorder(stream);mime=(rec&&rec.mimeType)||'video/webm';}catch(e2){vidProgHide();toast('This browser can\'t record video — use Save image 📸','info');return;}}
     var chunks=[];rec.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data);};
     rec.onstop=function(){shareVideoBlob(new Blob(chunks,{type:mime}),mime);};
-    rec.start();
+    rec.start(1000); // timeslice → correct webm duration (fixes 1-second bug)
     vidProg(0,snap);
     var t0=Date.now();(function loop(){var el=Date.now()-t0;var fp=Math.min(1,el/Math.min(2500,seconds*1000));frame(0.15+0.85*fp);vidProg(Math.min(99,Math.round(el/(seconds*1000)*100)));if(el<seconds*1000){requestAnimationFrame(loop);}})();
     setTimeout(function(){try{rec.stop();}catch(e){}if(window.__vidAudio){try{window.__vidAudio.pause();}catch(e){}}vidProg(100);setTimeout(vidProgHide,1200);},seconds*1000+150);
@@ -12750,11 +12751,13 @@ function dopaBanner(){
   var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
   var msg=RB_DOPA[(new Date().getDate()+new Date().getHours())%RB_DOPA.length];
   var hs=getHabits();var best=0,doneToday=0;
-  hs.forEach(function(h){var p=habitProgress(h);if(p.streak>best)best=p.streak;if((h.done||[]).indexOf(dayKey())>=0)doneToday++;});
-  var s=getSheet();var gsc=s&&s.goals&&s.goals.length?sheetDayScore(s,dayKey()):null;
+  var gTotal=0,gDone=0,dk=dayKey();
+  hs.forEach(function(h){var p=habitProgress(h);if(p.streak>best)best=p.streak;if((h.done||[]).indexOf(dk)>=0)doneToday++;
+    var gl=(h.goals||[]).length;gTotal+=gl;if(gl)gDone+=Math.min(gl,habDayGoalsDone(h,dk));});
+  var s=getSheet();if(s&&s.goals&&s.goals.length){var sc=sheetDayScore(s,dk);gTotal+=sc.total;gDone+=sc.done;}
   return '<div class="dopa"><div class="msg">'+esc(nm)+', '+msg+'</div>'
     +'<div class="sub"><span class="pulse">🔥 '+best+'-day best streak</span>'
-    +(gsc?'<span>✅ today '+gsc.done+'/'+gsc.total+' goals</span>':'')
+    +(gTotal?'<span>✅ today '+gDone+'/'+gTotal+' goals</span>':'')
     +(hs.length?'<span>🏅 '+doneToday+'/'+hs.length+' habits done</span>':'')+'</div></div>';
 }
 
@@ -13223,6 +13226,7 @@ function renderVoiceReview(id,url){
       +'<button class="btn" style="flex:1;background:#16a34a;color:#fff;font-weight:700;padding:9px" onclick="saveVoiceToLibrary(\''+id+'\')"><i class="ti ti-cloud-upload"></i> Save to library</button>'
       +'<button class="btn" style="flex:1;border:1px solid #dc2626;color:#dc2626;font-weight:700;padding:9px" onclick="vsRecord(\''+id+'\')"><i class="ti ti-microphone"></i> Record again</button>'
     +'</div>'
+    +'<button class="btn" style="width:100%;margin-top:7px;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:9px" onclick="openVoiceEditor(\''+encodeURIComponent(url)+'\',\'My recording\',\''+id+'\')"><i class="ti ti-scissors"></i> Trim / edit this voice</button>'
     +'<div style="font-size:10px;color:var(--mt2);margin-top:6px">✓ This take is set as your video voiceover. Save it to the library to reuse it or share with others. You can record more.</div>'
     +'</div>';
 }
@@ -13329,7 +13333,7 @@ function renderVoiceLibrary(){
     return '<div style="display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--b);border-radius:11px;margin-bottom:7px;background:var(--card2)">'
       +'<button onclick="vlibPlay(\''+encodeURIComponent(t.url)+'\')" style="flex:none;width:38px;height:38px;border-radius:50%;border:none;background:'+(playing?'#dc2626':'#16a34a')+';color:#fff;cursor:pointer;font-size:16px"><i class="ti ti-player-'+(playing?'pause':'play')+'-filled"></i></button>'
       +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.title||'Voice')+(t.lang?' <span style="font-size:9px;background:rgba(10,102,194,.12);color:#0a66c2;border-radius:10px;padding:1px 6px">'+esc(t.lang)+'</span>':'')+'</div><div style="font-size:10px;color:var(--mt2)">🎤 by '+esc(t.by||'Anonymous')+(t.local?' · only on your device':'')+'</div></div>'
-      +'<button onclick="delTrack(\''+t.id+'\')" title="Delete" style="flex:none;border:none;background:rgba(220,38,38,.10);color:#dc2626;border-radius:8px;padding:7px 9px;cursor:pointer"><i class="ti ti-trash"></i></button>'
+      +'<button onclick="openVoiceEditor(\''+encodeURIComponent(t.url)+'\',\''+esc((t.title||'Voice').replace(/\x27/g,'')) +'\')" title="Trim / edit" style="flex:none;border:none;background:rgba(124,58,237,.12);color:#7c3aed;border-radius:8px;padding:7px 9px;cursor:pointer;margin-right:5px"><i class="ti ti-scissors"></i></button>'+'<button onclick="delTrack(\''+t.id+'\')" title="Delete" style="flex:none;border:none;background:rgba(220,38,38,.10);color:#dc2626;border-radius:8px;padding:7px 9px;cursor:pointer"><i class="ti ti-trash"></i></button>'
     +'</div>';
   }).join(''):'<div style="text-align:center;color:var(--mt2);font-size:13px;padding:18px">No voiceovers yet. Record the first one below! 🎙️</div>';
   box.innerHTML=(langs.length>1?'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px">'+langs.map(function(L){return '<button class="hab-chip'+((__vlibLang||'All')===L?' on':'')+'" onclick="__vlibLang=\''+L+'\';renderVoiceLibrary()">'+esc(L)+'</button>';}).join('')+'</div>':'')
@@ -13389,8 +13393,8 @@ function feLoad(input){
   __feUrl=URL.createObjectURL(f);__feFrames=[];
   var stage=document.getElementById('fe-stage');
   stage.innerHTML='<video id="fe-vid" src="'+__feUrl+'" controls playsinline style="width:100%;max-height:300px;border-radius:12px;background:#000"></video>'
-    +'<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap"><button class="hab-chip on" onclick="feGrab(6)">📸 Grab 6 frames</button><button class="hab-chip on" onclick="feGrab(9)">Grab 9</button><button class="hab-chip" onclick="feGrabNow()">⭐ Grab current frame</button></div>'
-    +'<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap"><button class="btn" style="flex:1;border:1px solid #16a34a;color:#16a34a;font-weight:700;font-size:12px;padding:9px" onclick="feUseAudio()"><i class="ti ti-volume"></i> Use audio as voiceover</button><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;font-size:12px;padding:9px" onclick="feAudioToLibrary()"><i class="ti ti-cloud-upload"></i> Add audio to library</button></div><button class="btn" style="width:100%;margin-top:7px;border:1px solid var(--b);color:var(--mt);font-size:12px;padding:8px" onclick="feDownloadAudio()"><i class="ti ti-download"></i> Download the clip (audio playable)</button>'
+    +'<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap"><button class="hab-chip on" onclick="feGrab(6)">📸 Grab 6</button><button class="hab-chip on" onclick="feGrab(12)">Grab 12</button><button class="hab-chip on" onclick="feGrab(20)">Grab 20</button><button class="hab-chip" onclick="feGrabNow()">⭐ Current frame</button></div>'
+    +'<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap"><button class="btn" style="flex:1;border:1px solid #16a34a;color:#16a34a;font-weight:700;font-size:12px;padding:9px" onclick="feUseAudio()"><i class="ti ti-volume"></i> Use audio as voiceover</button><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;font-size:12px;padding:9px" onclick="feAudioToLibrary()"><i class="ti ti-cloud-upload"></i> Add audio to library</button></div><button class="btn" style="width:100%;margin-top:7px;border:1px solid var(--b);color:var(--mt);font-size:12px;padding:8px" onclick="feDownloadAudio()"><i class="ti ti-download"></i> Download the clip (audio playable)</button><button class="btn" style="width:100%;margin-top:7px;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;font-size:12px;padding:9px" onclick="openVoiceEditor(\''+encodeURIComponent(__feUrl)+'\',\'Audio from video\',\''+(__feHabit||'')+'\')"><i class="ti ti-scissors"></i> Trim / edit this audio</button>'
     +'<div id="fe-msg" style="font-size:11px;color:var(--mt2);margin-top:6px"></div>';
   document.getElementById('fe-grid').innerHTML='';
 }
@@ -13400,13 +13404,12 @@ function feGrab(n){
   var v=document.getElementById('fe-vid');if(!v||!v.duration||!isFinite(v.duration)){feMsg('Let the video load first, then try again.');return;}
   feMsg('Grabbing '+n+' frames…');
   var dur=v.duration,i=0;var times=[];for(var k=0;k<n;k++)times.push(Math.max(0.05,dur*(k+0.5)/n));
-  var cv=document.createElement('canvas');var W=cv.width=Math.min(720,v.videoWidth||720);var H=cv.height=Math.round(W*((v.videoHeight||1280)/(v.videoWidth||720)));var ctx=cv.getContext('2d');
+  var cv=document.createElement('canvas');var W=cv.width=Math.min(1080,v.videoWidth||720);var H=cv.height=Math.round(W*((v.videoHeight||1280)/(v.videoWidth||720)));var ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   function next(){
-    if(i>=times.length){feMsg('Done! Tap a frame to use or save it.');return;}
+    if(i>=times.length){feMsg('Done! '+__feFrames.length+' frames — tap a frame to Use, or Save to download.');return;}
     var seekHandler=function(){
       v.removeEventListener('seeked',seekHandler);
-      try{ctx.drawImage(v,0,0,W,H);var data=cv.toDataURL('image/jpeg',0.85);feAddFrame(data);}catch(e){feMsg('This video can\'t be read for frames (protected source).');return;}
-      i++;setTimeout(next,60);
+      setTimeout(function(){try{ctx.drawImage(v,0,0,W,H);var data=cv.toDataURL('image/jpeg',0.92);feAddFrame(data);}catch(e){feMsg('This video can\'t be read for frames (protected source).');return;}i++;setTimeout(next,50);},90);
     };
     v.addEventListener('seeked',seekHandler);
     try{v.currentTime=times[i];}catch(e){feMsg('Could not seek this video.');}
@@ -13415,8 +13418,9 @@ function feGrab(n){
 }
 function feGrabNow(){
   var v=document.getElementById('fe-vid');if(!v){return;}
-  var cv=document.createElement('canvas');var W=cv.width=Math.min(720,v.videoWidth||720);var H=cv.height=Math.round(W*((v.videoHeight||1280)/(v.videoWidth||720)));
-  try{cv.getContext('2d').drawImage(v,0,0,W,H);feAddFrame(cv.toDataURL('image/jpeg',0.85));feMsg('Captured the current frame.');}catch(e){feMsg('This video can\'t be read for frames (protected source).');}
+  var cv=document.createElement('canvas');var W=cv.width=Math.min(1080,v.videoWidth||720);var H=cv.height=Math.round(W*((v.videoHeight||1280)/(v.videoWidth||720)));
+  var c2=cv.getContext('2d');c2.imageSmoothingEnabled=true;c2.imageSmoothingQuality='high';
+  try{c2.drawImage(v,0,0,W,H);feAddFrame(cv.toDataURL('image/jpeg',0.92));feMsg('Captured the current frame.');}catch(e){feMsg('This video can\'t be read for frames (protected source).');}
 }
 function feAddFrame(data){
   __feFrames.push(data);
@@ -13424,7 +13428,7 @@ function feAddFrame(data){
   var idx=__feFrames.length-1;
   var cell=document.createElement('div');cell.style.cssText='position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--b)';
   cell.innerHTML='<img src="'+data+'" style="width:100%;display:block;aspect-ratio:9/16;object-fit:cover" onclick="feUseFrame('+idx+')">'
-    +'<div style="display:flex"><button onclick="feUseFrame('+idx+')" style="flex:1;border:none;background:#16a34a;color:#fff;font-size:10px;font-weight:700;padding:5px;cursor:pointer">Use</button><button onclick="feSaveFrame('+idx+')" style="flex:none;border:none;background:#0a66c2;color:#fff;font-size:10px;padding:5px 8px;cursor:pointer">⬇</button></div>';
+    +'<div style="display:flex"><button onclick="feUseFrame('+idx+')" style="flex:1;border:none;background:#16a34a;color:#fff;font-size:10px;font-weight:700;padding:5px;cursor:pointer">Use</button><button onclick="feSaveFrame('+idx+')" style="flex:none;border:none;background:#0a66c2;color:#fff;font-size:10px;font-weight:700;padding:5px 9px;cursor:pointer">⬇ Save</button></div>';
   grid.appendChild(cell);
 }
 function feUseFrame(idx){
@@ -13651,5 +13655,222 @@ function habReportPDF(id){
     +'<div class="btnbar noprint"><button onclick="window.print()">🖨️ Save as PDF / Print</button></div></body></html>';
   try{var w=window.open('','_blank');if(!w){toast('Allow pop-ups to view the report','info');return;}w.document.open();w.document.write(html);w.document.close();toast('Report ready — choose “Save as PDF” 📄','ok');}
   catch(e){toast('Could not open report window','err');}
+}
+
+/* v183: webm from MediaRecorder reports Infinity/1s duration until forced.
+   Seeking past the end makes the browser compute the true length so the
+   30/60s video shows and scrubs correctly. */
+function fixVidDuration(v){
+  try{
+    if(v.dataset.fixed)return;
+    if(v.duration===Infinity||isNaN(v.duration)||v.duration<0.5){
+      v.dataset.fixed='1';
+      var onhuge=function(){v.removeEventListener('timeupdate',onhuge);v.currentTime=0;};
+      v.addEventListener('timeupdate',onhuge);
+      v.currentTime=1e101;
+    }
+  }catch(e){}
+}
+
+/* ===== v184: Voiceover editor — trim (real cut), listen, download, post to library =====
+   Decodes the audio, slices [start,end] samples, re-encodes to WAV so the
+   trimmed clip is a real new file (not just a player range). */
+var __veUrl='',__veTitle='',__veBuf=null,__veDur=0,__veStart=0,__veEnd=0,__veHabit='',__veReg=null,__veTrimUrl='',__veTrimBlob=null;
+function audioBufferToWav(buf){
+  var nch=buf.numberOfChannels,sr=buf.sampleRate,len=buf.length,bps=2,ba=nch*bps,dataLen=len*ba;
+  var ab=new ArrayBuffer(44+dataLen),dv=new DataView(ab);
+  function ws(o,s){for(var i=0;i<s.length;i++)dv.setUint8(o+i,s.charCodeAt(i));}
+  ws(0,'RIFF');dv.setUint32(4,36+dataLen,true);ws(8,'WAVE');ws(12,'fmt ');
+  dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,nch,true);
+  dv.setUint32(24,sr,true);dv.setUint32(28,sr*ba,true);dv.setUint16(32,ba,true);dv.setUint16(34,16,true);
+  ws(36,'data');dv.setUint32(40,dataLen,true);var off=44;
+  for(var i=0;i<len;i++){for(var ch=0;ch<nch;ch++){var s=Math.max(-1,Math.min(1,buf.getChannelData(ch)[i]));dv.setInt16(off,s<0?s*0x8000:s*0x7FFF,true);off+=2;}}
+  return new Blob([ab],{type:'audio/wav'});
+}
+function veSliceBuffer(){
+  if(!__veBuf)return null;
+  var sr=__veBuf.sampleRate;var s=Math.max(0,Math.floor(__veStart*sr));var e=Math.min(__veBuf.length,Math.floor(__veEnd*sr));var len=Math.max(1,e-s);
+  var actx=new (window.AudioContext||window.webkitAudioContext)();
+  var out=actx.createBuffer(__veBuf.numberOfChannels,len,sr);
+  for(var ch=0;ch<__veBuf.numberOfChannels;ch++){var src=__veBuf.getChannelData(ch);var dst=out.getChannelData(ch);for(var i=0;i<len;i++)dst[i]=src[s+i]||0;}
+  return out;
+}
+function openVoiceEditor(url,title,habitId){
+  __veUrl=decodeURIComponent(url||'');__veTitle=title||'My voiceover';__veHabit=habitId||'';
+  __veBuf=null;__veDur=0;__veStart=0;__veEnd=0;__veTrimUrl='';__veTrimBlob=null;
+  var ovl=document.getElementById('ve-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='ve-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:430px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:15px">✂️ Voiceover editor</b><button class="modal-x" onclick="veClose()"><i class="ti ti-x"></i></button></div><div id="ve-body"></div></div>';
+    document.body.appendChild(ovl);}
+  ovl.classList.add('open');
+  document.getElementById('ve-body').innerHTML='<div style="text-align:center;padding:24px;color:var(--mt2)"><i class="ti ti-loader" style="font-size:24px"></i><div style="margin-top:8px;font-size:13px">Loading audio…</div></div>';
+  // decode for real trimming
+  stopAllAudio();
+  var done=function(buf){__veBuf=buf;__veDur=buf.duration;__veStart=0;__veEnd=buf.duration;renderVoiceEditor();};
+  var fail=function(){__veBuf=null;renderVoiceEditor();};
+  try{
+    fetch(__veUrl).then(function(r){return r.arrayBuffer();}).then(function(ab){
+      var actx=new (window.AudioContext||window.webkitAudioContext)();
+      actx.decodeAudioData(ab.slice(0),done,fail);
+    }).catch(fail);
+  }catch(e){fail();}
+}
+function veClose(){try{if(__veReg){__veReg.pause();}}catch(e){}stopAllAudio();closeOvl('ve-ovl');}
+function veFmt(t){t=Math.max(0,t||0);var m=Math.floor(t/60),s=Math.floor(t%60),d=Math.floor((t*10)%10);return m+':'+(s<10?'0':'')+s+'.'+d;}
+function renderVoiceEditor(){
+  var box=document.getElementById('ve-body');if(!box)return;
+  if(!__veBuf){
+    // couldn't decode (often a cross-origin URL) — preview + download original only
+    box.innerHTML='<audio src="'+esc(__veUrl)+'" controls preload="metadata" style="width:100%"></audio>'
+      +'<div style="font-size:12px;color:var(--mt2);margin:10px 0;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:10px">This audio can\'t be cut here (it\'s hosted on another site, so the browser blocks editing it). You can still play it, download it, or add it to your library as-is. To trim, first <b>download</b> it, then <b>upload the file</b> and edit that.</div>'
+      +'<button class="btn" style="width:100%;border:1px solid var(--b);color:var(--tx);font-weight:700;padding:10px;margin-bottom:7px" onclick="veDownloadOriginal()"><i class="ti ti-download"></i> Download original</button>'
+      +'<button class="btn btnok" style="width:100%;padding:10px" onclick="veSaveOriginalToLibrary()"><i class="ti ti-cloud-upload"></i> Add to library (as-is)</button>';
+    return;
+  }
+  var rl=Math.max(0,__veEnd-__veStart);
+  box.innerHTML='<div class="fg" style="margin-bottom:8px"><label>Name</label><input id="ve-title" value="'+esc(__veTitle)+'" placeholder="Voiceover name"></div>'
+    +'<div style="background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:12px;margin-bottom:10px">'
+      +'<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:9px"><span>✂️ Trim</span><span style="color:#0a66c2">selection: '+veFmt(rl)+'s</span></div>'
+      +'<label style="font-size:11px;color:var(--mt2)">Start: <b id="ve-sl">'+veFmt(__veStart)+'</b></label>'
+      +'<input type="range" id="ve-startr" min="0" max="'+__veDur.toFixed(2)+'" step="0.1" value="'+__veStart.toFixed(2)+'" oninput="veSetStart(this.value)" style="width:100%">'
+      +'<label style="font-size:11px;color:var(--mt2)">End: <b id="ve-el">'+veFmt(__veEnd)+'</b></label>'
+      +'<input type="range" id="ve-endr" min="0" max="'+__veDur.toFixed(2)+'" step="0.1" value="'+__veEnd.toFixed(2)+'" oninput="veSetEnd(this.value)" style="width:100%">'
+      +'<div style="display:flex;gap:7px;margin-top:9px"><button class="btn" style="flex:1;background:#16a34a;color:#fff;font-weight:700;padding:9px" onclick="vePlayRegion()"><i class="ti ti-player-play"></i> Play selection</button>'
+      +'<button class="btn" style="flex:none;border:1px solid var(--b);color:var(--tx);padding:9px 12px" onclick="veStopRegion()"><i class="ti ti-player-stop"></i></button></div>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--mt2);margin-bottom:6px">Full length '+veFmt(__veDur)+'s. Drag the handles to keep only the part you want.</div>'
+    +'<button class="btn" style="width:100%;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;font-weight:800;padding:12px;margin-bottom:7px" onclick="veTrimDownload()"><i class="ti ti-scissors"></i> Cut &amp; download (.wav)</button>'
+    +'<button class="btn btnok" style="width:100%;padding:11px;margin-bottom:7px" onclick="veTrimLibrary()"><i class="ti ti-cloud-upload"></i> Cut &amp; save to library (anyone can use)</button>'
+    +(__veHabit?'<button class="btn" style="width:100%;border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:10px" onclick="veTrimUseVoiceover()"><i class="ti ti-volume"></i> Cut &amp; use as my voiceover</button>':'');
+}
+function veSetStart(v){v=parseFloat(v)||0;if(v>__veEnd-0.2)v=Math.max(0,__veEnd-0.2);__veStart=v;var el=document.getElementById('ve-sl');if(el)el.textContent=veFmt(v);var rl=document.querySelector('#ve-body span[style*="color:#0a66c2"]');if(rl)rl.textContent='selection: '+veFmt(__veEnd-__veStart)+'s';}
+function veSetEnd(v){v=parseFloat(v)||0;if(v<__veStart+0.2)v=Math.min(__veDur,__veStart+0.2);__veEnd=v;var el=document.getElementById('ve-el');if(el)el.textContent=veFmt(v);var rl=document.querySelector('#ve-body span[style*="color:#0a66c2"]');if(rl)rl.textContent='selection: '+veFmt(__veEnd-__veStart)+'s';}
+function vePlayRegion(){
+  stopAllAudio();
+  try{
+    var a=new Audio(__veUrl);__veReg=a;window.__voicePrev=a;
+    a.currentTime=__veStart;
+    a.ontimeupdate=function(){if(a.currentTime>=__veEnd){a.pause();a.ontimeupdate=null;}};
+    a.play().then(function(){try{a.currentTime=__veStart;}catch(e){}}).catch(function(){toast('Tap again to play','info');});
+  }catch(e){toast('Cannot play','err');}
+}
+function veStopRegion(){try{if(__veReg)__veReg.pause();}catch(e){}stopAllAudio();}
+function veMakeTrim(){
+  var b=veSliceBuffer();if(!b)return null;var blob=audioBufferToWav(b);__veTrimBlob=blob;__veTrimUrl=URL.createObjectURL(blob);return __veTrimUrl;
+}
+function veTitleVal(){return ((document.getElementById('ve-title')||{}).value||__veTitle||'Voiceover').trim();}
+function veTrimDownload(){
+  var u=veMakeTrim();if(!u){toast('Could not cut','err');return;}
+  try{var a=document.createElement('a');a.href=u;a.download=veTitleVal().replace(/[^\w\- ]/g,'')+'-trim.wav';document.body.appendChild(a);a.click();a.remove();toast('Trimmed clip downloaded ✂️','ok');}catch(e){toast('Could not save','err');}
+}
+function veTrimLibrary(){
+  var u=veMakeTrim();if(!u){toast('Could not cut','err');return;}
+  var by=(CU&&CU.name)||'Anonymous';var lang=(document.getElementById('hg-lang')||{}).value||'';
+  try{registerTrack(u,by,veTitleVal(),lang);}catch(e){}
+  try{if(typeof hgUploadBlob==='function'&&__veHabit)hgUploadBlob(__veTrimBlob,__veHabit,'voiceover-trim.wav');}catch(e){}
+  toast('Saved to library 🎙️ anyone can use it','ok');
+  try{if(document.getElementById('vlib-ovl')&&document.getElementById('vlib-ovl').classList.contains('open'))renderVoiceLibrary();}catch(e){}
+}
+function veTrimUseVoiceover(){
+  var u=veMakeTrim();if(!u){toast('Could not cut','err');return;}
+  if(__veHabit){var habits=getHabits();var hb=habits.find(function(x){return x.id===__veHabit;});if(hb){hb.music=u;hb.musicBy=(CU&&CU.name)||'';saveHabits(habits);toast('Trimmed voiceover set ✓','ok');veClose();if(typeof vsStudioOpen==='function'&&vsStudioOpen())renderVStudio(__veHabit);return;}}
+  toast('Open the editor from a habit to set its voiceover','info');
+}
+function veDownloadOriginal(){try{var a=document.createElement('a');a.href=__veUrl;a.download=(veTitleVal?veTitleVal():'voice')+'.audio';document.body.appendChild(a);a.click();a.remove();toast('Downloaded','ok');}catch(e){toast('Could not save','err');}}
+function veSaveOriginalToLibrary(){var by=(CU&&CU.name)||'Anonymous';try{registerTrack(__veUrl,by,__veTitle||'Voiceover',(document.getElementById('hg-lang')||{}).value||'');toast('Added to library 🎙️','ok');}catch(e){}try{if(document.getElementById('vlib-ovl'))renderVoiceLibrary();}catch(e){}}
+
+/* ===== v185: per-goal reminder times + phone-calendar export =====
+   The honest "works even when the app is closed" method: we spread each goal
+   across the day (default 5:30 AM → 8:30 PM) and export real calendar events
+   with alarms. The phone's calendar fires them even when Reedbi is shut. */
+function habWindow(hb){var w=hb.remWin||{s:330,e:1230};return {s:w.s,e:w.e};} // minutes from midnight
+function habGoalTimes(hb){
+  var goals=hb.goals||[];var w=habWindow(hb);var n=goals.length;var out=[];
+  for(var i=0;i<n;i++){
+    var mins;
+    if(n===1){mins=Math.round((w.s+w.e)/2);}
+    else{mins=Math.round(w.s+(w.e-w.s)*i/(n-1));}
+    out.push({id:goals[i].id,name:goals[i].name,hh:Math.floor(mins/60),mm:mins%60,mins:mins});
+  }
+  return out;
+}
+function fmtTime12(hh,mm){var ap=hh<12?'AM':'PM';var h=hh%12;if(h===0)h=12;return h+':'+(mm<10?'0':'')+mm+' '+ap;}
+function pad2(n){return (n<10?'0':'')+n;}
+function icsDate(d){return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+'T'+pad2(d.getHours())+pad2(d.getMinutes())+'00';}
+function icsEsc(s){return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');}
+function habExportICS(id){
+  var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
+  var goals=hb.goals||[];
+  if(!goals.length){toast('Add goals first, then export reminders','info');return;}
+  var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
+  var times=habGoalTimes(hb);
+  var start=hb.startTs||Date.now();var total=hb.days||40;
+  var todayIdx=Math.max(0,Math.floor((Date.now()-start)/86400000));
+  var daysLeft=Math.max(1,total-todayIdx);
+  var firstDay=new Date();firstDay.setHours(0,0,0,0);
+  var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Reedbi//Habit Reminders//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+  var stamp=icsDate(new Date());
+  times.forEach(function(g,gi){
+    var dt=new Date(firstDay);dt.setHours(g.hh,g.mm,0,0);
+    // gentle, mind-stimulating wording
+    var summary='🔥 '+hb.n+' — '+g.name;
+    var desc='It\'s your time, '+nm+'. Begin "'+g.name+'" now — one small step is all it takes. Your future self is watching with pride. 🌟';
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:reedbi-'+hb.id+'-'+g.id+'-'+gi+'@reedbi');
+    lines.push('DTSTAMP:'+stamp+'Z');
+    lines.push('DTSTART:'+icsDate(dt));
+    lines.push('DURATION:PT15M');
+    lines.push('RRULE:FREQ=DAILY;COUNT='+daysLeft);
+    lines.push('SUMMARY:'+icsEsc(summary));
+    lines.push('DESCRIPTION:'+icsEsc(desc));
+    lines.push('BEGIN:VALARM');
+    lines.push('TRIGGER:PT0M');
+    lines.push('ACTION:DISPLAY');
+    lines.push('DESCRIPTION:'+icsEsc(summary));
+    lines.push('END:VALARM');
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  var ics=lines.join('\r\n');
+  try{
+    var blob=new Blob([ics],{type:'text/calendar'});var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download=(hb.n||'habit').replace(/[^\w\- ]/g,'')+'-reminders.ics';document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){try{URL.revokeObjectURL(url);}catch(e){}},4000);
+    toast('Calendar file ready 📅 open it to add the alarms to your phone','ok');
+  }catch(e){toast('Could not create the calendar file','err');}
+}
+function openHabitReminders(id){
+  var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
+  __hremId=id;
+  var ovl=document.getElementById('hrem-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='hrem-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:15px">⏰ Goal reminders</b><button class="modal-x" onclick="closeOvl(\'hrem-ovl\')"><i class="ti ti-x"></i></button></div><div id="hrem-body"></div></div>';
+    document.body.appendChild(ovl);}
+  renderHabitReminders();ovl.classList.add('open');
+}
+var __hremId='';
+function hremSetWin(which,val){
+  var hb=getHabits().find(function(x){return x.id===__hremId;});if(!hb)return;
+  var parts=String(val).split(':');var mins=(+parts[0])*60+(+(parts[1]||0));
+  var habits=getHabits();var h2=habits.find(function(x){return x.id===__hremId;});h2.remWin=h2.remWin||{s:330,e:1230};
+  if(which==='s')h2.remWin.s=mins;else h2.remWin.e=mins;
+  if(h2.remWin.e<=h2.remWin.s+30)h2.remWin.e=h2.remWin.s+30;
+  saveHabits(habits);renderHabitReminders();
+}
+function renderHabitReminders(){
+  var hb=getHabits().find(function(x){return x.id===__hremId;});if(!hb)return;
+  var box=document.getElementById('hrem-body');if(!box)return;
+  var goals=hb.goals||[];var w=habWindow(hb);
+  if(!goals.length){box.innerHTML='<div style="text-align:center;padding:18px;color:var(--mt2);font-size:13px">Add goals to this challenge first — then each one gets its own daily reminder time.<div style="margin-top:10px"><button class="btn btnok" onclick="closeOvl(\'hrem-ovl\');editHabitGoal(\''+hb.id+'\')"><i class="ti ti-target"></i> Add goals</button></div></div>';return;}
+  var times=habGoalTimes(hb);
+  function toHM(m){return pad2(Math.floor(m/60))+':'+pad2(m%60);}
+  box.innerHTML='<div style="font-size:13px;font-weight:700;margin-bottom:3px">'+esc(hb.n)+'</div>'
+    +'<div style="font-size:12px;color:var(--mt2);margin-bottom:12px">Your '+goals.length+' goals are spread evenly across the day so you finish them all by night. 🌙</div>'
+    +'<div style="display:flex;gap:9px;margin-bottom:12px"><div class="fg" style="flex:1;margin:0"><label>First reminder</label><input type="time" value="'+toHM(w.s)+'" onchange="hremSetWin(\'s\',this.value)"></div><div class="fg" style="flex:1;margin:0"><label>Last reminder</label><input type="time" value="'+toHM(w.e)+'" onchange="hremSetWin(\'e\',this.value)"></div></div>'
+    +'<div style="border:1px solid var(--b);border-radius:12px;overflow:hidden;margin-bottom:13px">'
+      +times.map(function(g,i){return '<div style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:'+(i<times.length-1?'1px solid var(--b)':'none')+';background:var(--card2)"><div style="flex:none;font-weight:800;color:#0a66c2;font-size:13px;width:78px">'+fmtTime12(g.hh,g.mm)+'</div><div style="flex:1;font-size:13px;font-weight:600">🎯 '+esc(g.name)+'</div></div>';}).join('')
+    +'</div>'
+    +'<button class="btn" style="width:100%;background:linear-gradient(135deg,#16a34a,#0a66c2);color:#fff;font-weight:800;padding:13px;margin-bottom:8px" onclick="habExportICS(\''+hb.id+'\')"><i class="ti ti-calendar-plus"></i> Add these to my phone calendar</button>'
+    +'<div style="font-size:11px;color:var(--mt2);background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:10px;line-height:1.5">📲 <b>This is how you get reminders even when Reedbi is closed:</b><br>1. Tap the button above — a calendar file downloads.<br>2. Open it — your phone asks to add the events.<br>3. Tap <b>Add all</b>. Done!<br>Your phone\'s calendar will now alarm you for each goal every day, with gentle words — even if the app and browser are shut. Delete a goal and just re-export to update.</div>';
 }
 </script></body></html>
