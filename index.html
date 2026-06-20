@@ -333,7 +333,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .buy-gimg{width:100%;flex:0 0 100%;height:200px;object-fit:cover;border-radius:10px;scroll-snap-align:center}
 .overlay.open{display:flex}
 .modal{background:var(--sf);border:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
-.overlay:not(#prodsearch-ovl) .modal>*{flex-shrink:0}
+.modal>*{flex-shrink:0}
 .overlay{overscroll-behavior:contain}
 .mhd{padding:13px 16px 10px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .mhd h3{font-size:14px;font-weight:700}
@@ -494,9 +494,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .bub-media{width:100%;max-width:240px;max-height:240px;object-fit:cover;border-radius:10px;display:block}
 .user-ad{position:relative;background:linear-gradient(135deg,rgba(10,102,194,.06),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:10px;padding:10px 11px;margin:8px 10px 0;font-size:12px}
 .ad-tag{position:absolute;top:7px;right:9px;font-size:8px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.5px}\n.bub{box-shadow:0 1px 3px rgba(0,0,0,.06)}\n.abtn{border-radius:10px;font-weight:600}\n.ps-card{box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:12px}\n.appl-card{box-shadow:0 1px 3px rgba(0,0,0,.05)}
-#prodsearch-ovl .modal{max-width:1320px;width:97vw;height:96vh;max-height:96vh;display:flex;flex-direction:column;overflow:hidden}
-#prodsearch-ovl .mbd{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;display:block}
+#prodsearch-ovl .modal{max-width:1320px;width:97vw;height:96vh;max-height:96vh;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+#prodsearch-ovl .mbd{flex:0 0 auto;min-height:0;overflow:visible;display:block}
 #prodsearch-ovl #ps-results{overflow:visible;min-height:0}
+#prodsearch-ovl .mhd{position:sticky;top:0;z-index:12;background:var(--sf)}
 @media(max-width:700px){#prodsearch-ovl .modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}}
 @media(min-width:701px){.sf-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}.sf-img{height:150px;object-fit:contain;background:#fff;padding:6px}.sf-hero{padding:26px 24px}.sf-hero .sf-av{width:68px;height:68px;font-size:30px}.sf-ttl{font-size:13px}}
 .p3d-ovl{position:fixed;inset:0;background:rgba(8,8,8,.92);z-index:100000;display:none;align-items:center;justify-content:center;flex-direction:column}
@@ -1221,7 +1222,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v189</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v190</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5919,7 +5920,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v189 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v190 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -9617,7 +9618,7 @@ var __rbView=null;         // function to re-render the current shop page (for r
 var __pdSel={color:'',size:'',qty:1};
 
 function rbSetView(fn){__rbView=fn;}
-function rbScrollBox(){return document.querySelector('#prodsearch-ovl .mbd')||document.getElementById('ps-results');}
+function rbScrollBox(){return document.querySelector('#prodsearch-ovl .modal')||document.querySelector('#prodsearch-ovl .mbd')||document.getElementById('ps-results');}
 function rbSnapPush(){
   var box=document.getElementById('ps-results');var sc=rbScrollBox();
   if(box&&box.innerHTML.trim())__rbNav.push({html:box.innerHTML,top:(sc&&sc.scrollTop)||0,view:__rbView});
