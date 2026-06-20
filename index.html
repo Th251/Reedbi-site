@@ -1219,7 +1219,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v185</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v187</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5917,7 +5917,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v185 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v187 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12164,9 +12164,33 @@ function fireHabitReminder(am){
     // AM window 5:00–5:10, PM window 21:30–21:40
     if(hm>=300&&hm<=310&&st.am!==today){st.am=today;LS.set('rb_habit_remind_state',st);fireHabitReminder(true);}
     if(hm>=1290&&hm<=1300&&st.pm!==today){st.pm=today;LS.set('rb_habit_remind_state',st);fireHabitReminder(false);}
+    try{fireGoalTimeReminders(hm,today);}catch(e){}  // per-goal reminders at their own times
   }
   setInterval(check,60000);setTimeout(check,3000);
 })();
+/* v186: auto per-goal time reminders — fire each goal at its spread time
+   (5:30 AM→8:30 PM by default). No setup: works the moment goals are set,
+   while the app is open or backgrounded. Skips goals already done today. */
+function fireGoalTimeReminders(hm,today){
+  var habits=getHabits();if(!habits.length)return;
+  var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
+  var fired=LS.get('rb_goaltime_state',{})||{};if(fired.day!==today){fired={day:today,ids:{}};}
+  habits.forEach(function(hb){
+    if((habitProgress(hb).done)>=(hb.days||40))return;
+    var times=habGoalTimes(hb);
+    times.forEach(function(g){
+      if(hm<g.mins||hm>g.mins+1)return;                       // only at its minute (1-min grace)
+      var key=hb.id+'_'+g.id;if(fired.ids[key])return;         // once per day
+      if((((hb.dayGoals||{})[today])||[]).indexOf(g.id)>=0)return; // already done today
+      fired.ids[key]=1;
+      try{if(!getNotifCfg().muted)playTune(LS.get('rb_habit_tune','melody'));}catch(e){}
+      var body='It\'s your time, '+nm+' — begin "'+g.name+'" now. One small step is all it takes. 🌟';
+      try{if(typeof Notification!=='undefined'&&Notification.permission==='granted'){new Notification('🎯 '+hb.n+' — '+g.name,{body:body,tag:'rb-gt-'+key,renotify:true});}}catch(e){}
+      try{toast('⏰ '+g.name+' — '+body,'ok');}catch(e){}
+    });
+  });
+  LS.set('rb_goaltime_state',fired);
+}
 
 function habTuneOptions(){var cur=LS.get('rb_habit_tune','melody');return ['melody','reedbi','bell','ding','pop'].map(function(t){return '<option value="'+t+'"'+(cur===t?' selected':'')+'>'+t+'</option>';}).join('');}
 function habSetTune(t){LS.set('rb_habit_tune',t);try{playTune(t);}catch(e){}}
@@ -12464,6 +12488,14 @@ function saveHabitGoal(id){
   saveHabits(habits);closeOvl('habgoal-ovl');renderHabits();
   try{rbConfetti(50);}catch(e){}
   toast('Goal saved 🎯','ok');
+  // make reminders feel automatic: the first time a habit gets goals, open the
+  // reminder setup so the user can switch on auto-nudges + add to their calendar
+  try{
+    if((hb.goals&&hb.goals.length)&&!hb._remPrompted){
+      hb._remPrompted=true;var h2=getHabits();var x=h2.find(function(y){return y.id===id;});if(x)x._remPrompted=true;saveHabits(h2);
+      setTimeout(function(){openHabitReminders(id);},500);
+    }
+  }catch(e){}
 }
 
 /* v156: per-habit music upload (session objectURL into the URL field) */
@@ -13739,9 +13771,53 @@ function renderVoiceEditor(){
       +'<button class="btn" style="flex:none;border:1px solid var(--b);color:var(--tx);padding:9px 12px" onclick="veStopRegion()"><i class="ti ti-player-stop"></i></button></div>'
     +'</div>'
     +'<div style="font-size:11px;color:var(--mt2);margin-bottom:6px">Full length '+veFmt(__veDur)+'s. Drag the handles to keep only the part you want.</div>'
-    +'<button class="btn" style="width:100%;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;font-weight:800;padding:12px;margin-bottom:7px" onclick="veTrimDownload()"><i class="ti ti-scissors"></i> Cut &amp; download (.wav)</button>'
-    +'<button class="btn btnok" style="width:100%;padding:11px;margin-bottom:7px" onclick="veTrimLibrary()"><i class="ti ti-cloud-upload"></i> Cut &amp; save to library (anyone can use)</button>'
-    +(__veHabit?'<button class="btn" style="width:100%;border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:10px" onclick="veTrimUseVoiceover()"><i class="ti ti-volume"></i> Cut &amp; use as my voiceover</button>':'');
+    +'<button class="btn" style="width:100%;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;font-weight:800;padding:13px" onclick="veCut()"><i class="ti ti-scissors"></i> Cut this part</button>'
+    +'<div id="ve-result"></div>';
+  // if a cut was already made this session, re-show its result
+  if(__veTrimUrl){veRenderResult();}
+}
+function veCut(){
+  var box=document.getElementById('ve-result');if(box)box.innerHTML='<div style="text-align:center;padding:14px;color:var(--mt2);font-size:13px"><i class="ti ti-loader"></i> Cutting your clip…</div>';
+  // let the status paint, then do the (sync) cut
+  setTimeout(function(){
+    var u=veMakeTrim();
+    if(!u){if(box)box.innerHTML='<div style="color:#dc2626;font-size:13px;padding:10px">Could not cut this audio. Try a different selection.</div>';return;}
+    veRenderResult();
+    try{box.scrollIntoView&&box.scrollIntoView({behavior:'smooth',block:'nearest'});}catch(e){}
+    toast('Cut ready — listen below, then download or save ✂️','ok');
+  },60);
+}
+function veRenderResult(){
+  var box=document.getElementById('ve-result');if(!box||!__veTrimUrl)return;
+  var rl=Math.max(0,__veEnd-__veStart);
+  box.innerHTML='<div style="border:2px solid #16a34a;border-radius:13px;padding:13px;margin-top:12px;background:rgba(22,163,74,.06)">'
+    +'<div style="font-size:13px;font-weight:800;color:#16a34a;margin-bottom:8px">✅ Your trimmed clip ('+veFmt(rl)+'s) — listen here</div>'
+    +'<audio src="'+__veTrimUrl+'" controls preload="metadata" style="width:100%"></audio>'
+    +'<div style="display:flex;gap:7px;margin-top:11px">'
+      +'<button class="btn" style="flex:1;background:#0a66c2;color:#fff;font-weight:800;padding:11px" onclick="veDownloadTrim()"><i class="ti ti-download"></i> Download</button>'
+      +'<button class="btn" style="flex:1;background:#16a34a;color:#fff;font-weight:800;padding:11px" onclick="veSaveTrimLibrary()"><i class="ti ti-cloud-upload"></i> Save to library</button>'
+    +'</div>'
+    +(__veHabit?'<button class="btn" style="width:100%;margin-top:8px;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:10px" onclick="veUseTrimVoiceover()"><i class="ti ti-volume"></i> Use as my video voiceover</button>':'')
+    +'<button class="btn" style="width:100%;margin-top:8px;border:1px solid var(--b);color:var(--mt);font-weight:600;padding:9px;font-size:12px" onclick="veRecut()"><i class="ti ti-rotate"></i> Adjust &amp; cut again</button>'
+  +'</div>';
+}
+function veRecut(){__veTrimUrl='';__veTrimBlob=null;var box=document.getElementById('ve-result');if(box)box.innerHTML='';toast('Adjust the handles, then Cut again','info');}
+function veDownloadTrim(){
+  if(!__veTrimUrl){toast('Cut the clip first','info');return;}
+  try{var a=document.createElement('a');a.href=__veTrimUrl;a.download=veTitleVal().replace(/[^\w\- ]/g,'')+'-trim.wav';document.body.appendChild(a);a.click();a.remove();toast('Downloaded ✂️ check your files/Downloads','ok');}catch(e){toast('Could not save','err');}
+}
+function veSaveTrimLibrary(){
+  if(!__veTrimUrl){toast('Cut the clip first','info');return;}
+  var by=(CU&&CU.name)||'Anonymous';var lang=(document.getElementById('hg-lang')||{}).value||'';
+  try{registerTrack(__veTrimUrl,by,veTitleVal(),lang);}catch(e){}
+  try{if(typeof hgUploadBlob==='function'&&__veHabit)hgUploadBlob(__veTrimBlob,__veHabit,'voiceover-trim.wav');}catch(e){}
+  toast('Saved to library 🎙️ anyone can use it','ok');
+  try{if(document.getElementById('vlib-ovl')&&document.getElementById('vlib-ovl').classList.contains('open'))renderVoiceLibrary();}catch(e){}
+}
+function veUseTrimVoiceover(){
+  if(!__veTrimUrl){toast('Cut the clip first','info');return;}
+  if(__veHabit){var habits=getHabits();var hb=habits.find(function(x){return x.id===__veHabit;});if(hb){hb.music=__veTrimUrl;hb.musicBy=(CU&&CU.name)||'';saveHabits(habits);toast('Trimmed voiceover set ✓','ok');veClose();if(typeof vsStudioOpen==='function'&&vsStudioOpen())renderVStudio(__veHabit);return;}}
+  toast('Open the editor from a habit to set its voiceover','info');
 }
 function veSetStart(v){v=parseFloat(v)||0;if(v>__veEnd-0.2)v=Math.max(0,__veEnd-0.2);__veStart=v;var el=document.getElementById('ve-sl');if(el)el.textContent=veFmt(v);var rl=document.querySelector('#ve-body span[style*="color:#0a66c2"]');if(rl)rl.textContent='selection: '+veFmt(__veEnd-__veStart)+'s';}
 function veSetEnd(v){v=parseFloat(v)||0;if(v<__veStart+0.2)v=Math.min(__veDur,__veStart+0.2);__veEnd=v;var el=document.getElementById('ve-el');if(el)el.textContent=veFmt(v);var rl=document.querySelector('#ve-body span[style*="color:#0a66c2"]');if(rl)rl.textContent='selection: '+veFmt(__veEnd-__veStart)+'s';}
@@ -13864,13 +13940,31 @@ function renderHabitReminders(){
   if(!goals.length){box.innerHTML='<div style="text-align:center;padding:18px;color:var(--mt2);font-size:13px">Add goals to this challenge first — then each one gets its own daily reminder time.<div style="margin-top:10px"><button class="btn btnok" onclick="closeOvl(\'hrem-ovl\');editHabitGoal(\''+hb.id+'\')"><i class="ti ti-target"></i> Add goals</button></div></div>';return;}
   var times=habGoalTimes(hb);
   function toHM(m){return pad2(Math.floor(m/60))+':'+pad2(m%60);}
+  var on=habRemindOn();
   box.innerHTML='<div style="font-size:13px;font-weight:700;margin-bottom:3px">'+esc(hb.n)+'</div>'
     +'<div style="font-size:12px;color:var(--mt2);margin-bottom:12px">Your '+goals.length+' goals are spread evenly across the day so you finish them all by night. 🌙</div>'
+    +'<div style="background:'+(on?'rgba(22,163,74,.10)':'var(--card2)')+';border:1px solid '+(on?'#16a34a':'var(--b)')+';border-radius:12px;padding:12px;margin-bottom:12px">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between"><div><b style="font-size:13px">'+(on?'✅ Automatic reminders are ON':'🔔 Turn on automatic reminders')+'</b><div style="font-size:11px;color:var(--mt2);margin-top:2px">'+(on?'You\'ll be nudged at each goal\'s time while Reedbi is open or in the background — no setup needed.':'Get reminded at each goal\'s time automatically — the moment you set goals.')+'</div></div>'
+      +(on?'':'<button class="btn btnok" style="flex:none;padding:9px 13px;font-weight:800" onclick="enableHabitReminders();setTimeout(function(){renderHabitReminders();},300)">Turn on</button>')+'</div>'
+    +'</div>'
     +'<div style="display:flex;gap:9px;margin-bottom:12px"><div class="fg" style="flex:1;margin:0"><label>First reminder</label><input type="time" value="'+toHM(w.s)+'" onchange="hremSetWin(\'s\',this.value)"></div><div class="fg" style="flex:1;margin:0"><label>Last reminder</label><input type="time" value="'+toHM(w.e)+'" onchange="hremSetWin(\'e\',this.value)"></div></div>'
     +'<div style="border:1px solid var(--b);border-radius:12px;overflow:hidden;margin-bottom:13px">'
-      +times.map(function(g,i){return '<div style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:'+(i<times.length-1?'1px solid var(--b)':'none')+';background:var(--card2)"><div style="flex:none;font-weight:800;color:#0a66c2;font-size:13px;width:78px">'+fmtTime12(g.hh,g.mm)+'</div><div style="flex:1;font-size:13px;font-weight:600">🎯 '+esc(g.name)+'</div></div>';}).join('')
+      +times.map(function(g,i){return '<div style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:'+(i<times.length-1?'1px solid var(--b)':'none')+';background:var(--card2)"><div style="flex:none;font-weight:800;color:#0a66c2;font-size:13px;width:78px">'+fmtTime12(g.hh,g.mm)+'</div><div style="flex:1;font-size:13px;font-weight:600">🎯 '+esc(g.name)+'</div><a href="'+gcalLink(hb,g)+'" target="_blank" rel="noopener" style="flex:none;font-size:10px;color:#16a34a;font-weight:700;text-decoration:none;border:1px solid #16a34a;border-radius:7px;padding:4px 7px">+ Google</a></div>';}).join('')
     +'</div>'
-    +'<button class="btn" style="width:100%;background:linear-gradient(135deg,#16a34a,#0a66c2);color:#fff;font-weight:800;padding:13px;margin-bottom:8px" onclick="habExportICS(\''+hb.id+'\')"><i class="ti ti-calendar-plus"></i> Add these to my phone calendar</button>'
-    +'<div style="font-size:11px;color:var(--mt2);background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:10px;line-height:1.5">📲 <b>This is how you get reminders even when Reedbi is closed:</b><br>1. Tap the button above — a calendar file downloads.<br>2. Open it — your phone asks to add the events.<br>3. Tap <b>Add all</b>. Done!<br>Your phone\'s calendar will now alarm you for each goal every day, with gentle words — even if the app and browser are shut. Delete a goal and just re-export to update.</div>';
+    +'<div style="font-size:12px;font-weight:800;color:var(--mt2);margin-bottom:6px">📲 Also want alarms when the app is fully closed?</div>'
+    +'<button class="btn" style="width:100%;background:linear-gradient(135deg,#16a34a,#0a66c2);color:#fff;font-weight:800;padding:13px;margin-bottom:8px" onclick="habExportICS(\''+hb.id+'\')"><i class="ti ti-calendar-plus"></i> Add all '+goals.length+' to my phone calendar (1 tap)</button>'
+    +'<div style="font-size:11px;color:var(--mt2);background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:10px;line-height:1.5">Tap above → your phone asks <b>“Add all events?”</b> → tap <b>Add</b>. Now your calendar alarms you for every goal each day, even when Reedbi and the browser are shut. Or use the small <b>+ Google</b> on any goal to add just that one.<br><br><i>Note: phones don\'t let any website set alarms silently — this one tap is the closest automatic way without our server.</i></div>';
+}
+/* Google Calendar one-tap add link (recurring daily, with the goal's time) */
+function gcalLink(hb,g){
+  var total=hb.days||40;var start=hb.startTs||Date.now();
+  var todayIdx=Math.max(0,Math.floor((Date.now()-start)/86400000));var daysLeft=Math.max(1,total-todayIdx);
+  var d=new Date();d.setHours(g.hh,g.mm,0,0);var d2=new Date(d.getTime()+15*60000);
+  function z(x){return x.getUTCFullYear()+pad2(x.getUTCMonth()+1)+pad2(x.getUTCDate())+'T'+pad2(x.getUTCHours())+pad2(x.getUTCMinutes())+'00Z';}
+  var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'friend';
+  var text=encodeURIComponent('🔥 '+hb.n+' — '+g.name);
+  var det=encodeURIComponent('It\'s your time, '+nm+' — begin "'+g.name+'" now. One small step. 🌟 (Reedbi)');
+  var rec=encodeURIComponent('RRULE:FREQ=DAILY;COUNT='+daysLeft);
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+text+'&dates='+z(d)+'/'+z(d2)+'&recur='+rec+'&details='+det;
 }
 </script></body></html>
