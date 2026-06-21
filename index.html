@@ -334,6 +334,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .overlay.open{display:flex}
 .modal{background:var(--sf);border:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
 .modal>*{flex-shrink:0}
+summary{list-style:none}summary::-webkit-details-marker{display:none}
 .overlay{overscroll-behavior:contain}
 .mhd{padding:13px 16px 10px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .mhd h3{font-size:14px;font-weight:700}
@@ -498,6 +499,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 #prodsearch-ovl .mbd{flex:0 0 auto;min-height:0;overflow:visible;display:block}
 #prodsearch-ovl #ps-results{overflow:visible;min-height:0}
 #prodsearch-ovl .mhd{position:sticky;top:0;z-index:12;background:var(--sf)}
+#prodsearch-ovl .fk-bar{top:46px;z-index:7}
 @media(max-width:700px){#prodsearch-ovl .modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}}
 @media(min-width:701px){.sf-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}.sf-img{height:150px;object-fit:contain;background:#fff;padding:6px}.sf-hero{padding:26px 24px}.sf-hero .sf-av{width:68px;height:68px;font-size:30px}.sf-ttl{font-size:13px}}
 .p3d-ovl{position:fixed;inset:0;background:rgba(8,8,8,.92);z-index:100000;display:none;align-items:center;justify-content:center;flex-direction:column}
@@ -1222,7 +1224,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v191</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v195</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1745,6 +1747,7 @@ body.dark .spin-wheel{border-color:#2a333f}
   <button class="bn-orders" onclick="rbTab('orders')"><i class="ti ti-package"></i><span>Orders</span></button>
   <button class="bn-account" onclick="rbTab('account')"><i class="ti ti-user"></i><span>Account</span><span class="bn-badge" id="bn-acct-badge" style="display:none">0</span></button>
 </nav>
+<button id="ragent-fab" onclick="openReedbiAgent()" aria-label="Reedbi Agent" style="position:fixed;right:16px;bottom:74px;z-index:8500;width:54px;height:54px;border-radius:50%;border:none;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;box-shadow:0 6px 18px rgba(124,58,237,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px">✨</button>
 <button class="care-fab" id="care-fab" onclick="openCareAi()" title="Reedbi Care — help with orders, delivery, returns"><i class="ti ti-headset"></i></button>
 <div class="scroll-btns" id="scroll-btns"><button onclick="rbScrollTo('up')" title="Scroll to top"><i class="ti ti-chevron-up"></i></button><button onclick="rbScrollTo('down')" title="Scroll to bottom"><i class="ti ti-chevron-down"></i></button></div>
 <div class="tstack" id="tstack"></div>
@@ -5920,7 +5923,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v191 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v195 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6887,8 +6890,13 @@ function renderCartCheckout(){
     return '<div style="display:flex;gap:9px;align-items:center;padding:7px 0;border-bottom:1px solid var(--b)"><img src="'+esc((p.photos&&p.photos[0])||'')+'" style="width:40px;height:40px;border-radius:8px;object-fit:cover;background:var(--card2)"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">'+esc(p.title)+'</div><div style="font-size:11px;color:var(--mt2)">'+esc(p.currency||'')+' '+esc(p.price)+' × '+(it.qty||1)+'</div></div></div>';
   }).join('');
   var t=cartTotals();var totalStr=Object.keys(t.byCur).map(function(cur){return esc(cur)+' '+Math.round(t.byCur[cur]*100)/100;}).join(' + ');
+  var td=cartTotalsDiscounted();var off=td.off;
+  var discStr=Object.keys(td.disc).map(function(cur){return esc(cur)+' '+td.disc[cur];}).join(' + ');
   box.innerHTML=items
-    +'<div style="display:flex;justify-content:space-between;font-weight:800;margin:10px 0 12px"><span>Total</span><span style="color:var(--g)">'+totalStr+'</span></div>'
+    +pointsOfferBanner()
+    +(off.pct?('<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mt2);margin:8px 0 0"><span>Subtotal</span><span style="text-decoration:line-through">'+totalStr+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between;font-weight:800;margin:4px 0 12px"><span>Total ('+off.pct+'% off)</span><span style="color:var(--g)">'+discStr+'</span></div>')
+     :('<div style="display:flex;justify-content:space-between;font-weight:800;margin:10px 0 12px"><span>Total</span><span style="color:var(--g)">'+totalStr+'</span></div>'))
     +'<div id="cartco-saved" style="margin-bottom:8px"></div>'
     +'<div class="fg"><label>Delivery address</label><textarea id="cartco-addr" rows="2" placeholder="Full delivery address"></textarea></div>'
     +'<div class="fg" style="margin-top:7px"><label>Your WhatsApp number</label><input id="cartco-phone" placeholder="+1 234 567 8900"></div>'
@@ -7926,7 +7934,7 @@ function open3DThree(p){
       window.addEventListener('mousemove',function(e){mv(e.clientX,e.clientY);});
       window.addEventListener('mouseup',function(){drag=null;});
       st.addEventListener('touchstart',function(e){var t=e.touches[0];dn(t.clientX,t.clientY);},{passive:true});
-      st.addEventListener('touchmove',function(e){var t=e.touches[0];mv(t.clientX,t.clientY);},{passive:true});
+      st.addEventListener('touchmove',function(e){var t=e.touches[0];if(drag){var dx=Math.abs(t.clientX-drag.x),dy=Math.abs(t.clientY-drag.y);if(dy>dx&&dy>5){drag=null;return;}}mv(t.clientX,t.clientY);},{passive:true});
       st.addEventListener('touchend',function(){drag=null;});
       st.addEventListener('wheel',function(e){__t3.zoom=Math.max(1.6,Math.min(6,__t3.zoom+(e.deltaY>0?0.25:-0.25)));},{passive:true});
       ovl.addEventListener('dblclick',function(){__t3.rx=-0.12;__t3.ry=0.35;__t3.zoom=3.2;});
@@ -8104,7 +8112,7 @@ function openMainStore(cat){
   // category view = focused page; All view = full storytelling homepage
   var homeBlocks=cat?'':(story+stage+strip+'<div class="reveal">'+banner+'</div>'+feat+'<div class="reveal">'+storesRail+'</div>'+'<div class="reveal">'+dealRail+'</div>');
   box.innerHTML='<div class="fk-wrap">'+bar+cats+homeBlocks+'<div class="reveal">'+grid+'</div>'+'<div style="height:20px"></div></div>';
-  box.scrollTop=0;
+  box.scrollTop=0;rbStoreTop();
   fkInitMotion(box);
   if(!cat&&featured)fkStart3DHero(featured);
 }
@@ -9533,7 +9541,7 @@ function openCategoryPage(cat,opts){
     +'<div class="fk-grid">'+(list.length?list.slice(0,80).map(fkTile).join(''):'<div style="grid-column:1/-1;padding:30px;text-align:center;color:#878787">No products'+(__catBrand?' for '+esc(__catBrand):'')+'.</div>')+'</div></div>';
 
   box.innerHTML='<div class="fk-wrap">'+bar+crumb+hero+subRail+brandRow+sortBar+dealRail+grid+'<div style="height:20px"></div></div>';
-  box.scrollTop=0;
+  box.scrollTop=0;rbStoreTop();
 }
 function catSetSort(cat,s){__catSort=s;openCategoryPage(cat,{reset:false});}
 function catSetBrand(cat,b){__catBrand=b;openCategoryPage(cat,{reset:false});}
@@ -9547,7 +9555,7 @@ function catSearchIn(cat,q){
   box.innerHTML='<div class="fk-wrap"><div class="fk-bar"><button class="brand" style="background:none;border:none;cursor:pointer" onclick="openCategoryPage('+ce+')"><i class="ti ti-arrow-left"></i> '+esc(cat)+'</button></div>'
     +'<div class="fk-sec"><div class="fk-sec-h"><b>Results for "'+esc(q)+'" in '+esc(cat)+'</b><span style="font-size:11px;color:#878787">'+list.length+' items</span></div>'
     +'<div class="fk-grid">'+(list.length?list.map(fkTile).join(''):'<div style="grid-column:1/-1;padding:30px;text-align:center;color:#878787">No matches.</div>')+'</div></div></div>';
-  box.scrollTop=0;
+  box.scrollTop=0;rbStoreTop();
 }
 
 /* ===== v118: motion + real-time 3D engines ===== */
@@ -9677,7 +9685,7 @@ function openWishlist(){
   var render=function(){openWishlist();};render.__isWishlist=true;rbSetView(render);
   box.innerHTML='<div class="fk-wrap">'+rbTopBar('My Wishlist ('+prods.length+')')
     +'<div class="fk-sec"><div class="fk-sec-h"><b>Saved items</b><span style="font-size:11px;color:#878787">'+prods.length+'</span></div>'+grid+'</div></div>';
-  box.scrollTop=0;
+  box.scrollTop=0;rbStoreTop();
 }
 
 /* ---- Page (store) likes — cloud-synced aggregate + per-user ---- */
@@ -9832,7 +9840,7 @@ function renderProductDetail(pid){
     +'<div style="font-size:11px;color:#878787">Inclusive of all taxes shown below</div>'
     +colorSec+sizeSec+qtySec+vatSec+store+cmpSec+desc+barcodeSec+reviews
     +'</div>'+buybar+'</div>';
-  box.scrollTop=0;
+  box.scrollTop=0;rbStoreTop();
 }
 function colorToHex(name){
   var m={black:'#222',white:'#f3f3f3',red:'#e23b3b',blue:'#2b6fd6',green:'#2ea44f',yellow:'#f4c41a',orange:'#f08a24',purple:'#7c3aed',pink:'#e85aa0',grey:'#9aa3ad',gray:'#9aa3ad',silver:'#c8ccd1',gold:'#d4af37',brown:'#8a5a33',navy:'#1c2c54',beige:'#e3d6bf','frosted white':'#eef1f4'};
@@ -11206,7 +11214,7 @@ function renderHome(){
 
   var learnSec='<div class="home-sec"><div class="home-sec-h"><b>Learn something new today</b></div>'+learnCardHtml()+'</div>';
   box.innerHTML=hero+'<div class="home-body">'+funSec+learnSec+attn+achSec+rvSec+picksSec+quick+'</div>';
-  box.scrollTop=0;
+  box.scrollTop=0;rbStoreTop();
 }
 
 var __buyDeliver='asap';
@@ -11905,11 +11913,10 @@ function openHabits(){
 function renderHabits(){
   var habits=getHabits();var box=document.getElementById('habits-body');if(!box)return;
   var remOn=habRemindOn();
-  var h=stratCard()+'<button class="btn" style="width:100%;margin-bottom:11px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;padding:11px;border:none" onclick="openManifest()">✨ Manifestation &amp; affirmation — train your brain for success</button>'+'<div style="display:flex;gap:8px;margin-bottom:11px"><button class="btn" style="flex:1;border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:9px" onclick="openVoiceLibrary()"><i class="ti ti-microphone"></i> Voice library</button><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:9px" onclick="openGoalSheet()"><i class="ti ti-checklist"></i> Daily goals</button></div>'+'<button class="btn" style="width:100%;margin-bottom:11px;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;padding:9px" onclick="openFrameExtractor(\'\')"><i class="ti ti-photo-video"></i> Frame &amp; screenshot extractor (from your video)</button>'+dopaBanner()+'<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
+  var h=stratCard()+'<details style="margin-bottom:11px;border:1px solid var(--b);border-radius:12px;background:var(--card2);overflow:hidden"><summary style="cursor:pointer;padding:12px 14px;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:space-between"><span>🧰 More tools — manifestation · voice · video</span><span style="color:var(--mt2);font-weight:500;font-size:11px">tap ▾</span></summary><div style="padding:2px 12px 8px">'+'<button class="btn" style="width:100%;margin-bottom:11px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;padding:11px;border:none" onclick="openManifest()">✨ Manifestation &amp; affirmation — train your brain for success</button>'+'<div style="display:flex;gap:8px;margin-bottom:11px"><button class="btn" style="flex:1;border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:9px" onclick="openVoiceLibrary()"><i class="ti ti-microphone"></i> Voice library</button><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:9px" onclick="openGoalSheet()"><i class="ti ti-checklist"></i> Daily goals</button></div>'+'<button class="btn" style="width:100%;margin-bottom:11px;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;padding:9px" onclick="openFrameExtractor(\'\')"><i class="ti ti-photo-video"></i> Frame &amp; screenshot extractor (from your video)</button>'+'</div></details>'+dopaBanner()+'<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:12px;padding:10px 12px;margin-bottom:11px;background:var(--card2)">'
     +'<div style="font-size:20px">'+(remOn?'🔔':'🔕')+'</div><div style="flex:1"><div style="font-size:13px;font-weight:800">Daily reminders</div><div style="font-size:10px;color:var(--mt2)">A gentle nudge at 5:00 AM &amp; 9:30 PM</div></div>'
     +(remOn?'<button class="hab-chip on" onclick="disableHabitReminders()">On</button>':'<button class="hab-chip" onclick="enableHabitReminders()">Turn on</button>')+'<button class="hab-chip" style="margin-left:5px" onclick="testHabitSound()" title="Hear the reminder sound"><i class="ti ti-volume"></i></button></div>'
     +(remOn?'<div style="display:flex;align-items:center;gap:8px;margin:-4px 0 11px;font-size:12px"><span style="color:var(--mt2)">Motivational tune</span><select id="hab-tune" onchange="habSetTune(this.value)" style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--b);background:var(--sf);color:var(--tx)">'+habTuneOptions()+'</select><button class="hab-chip" onclick="habPreviewTune()"><i class="ti ti-player-play"></i></button></div>':'');
-  h+='<button class="btn" style="width:100%;margin-bottom:9px;border:1.5px solid #16a34a;color:#16a34a;font-weight:800" onclick="closeOvl(\'habits-ovl\');openGoalSheet()"><i class="ti ti-checklist"></i> Open my Daily Goals Sheet (tick each goal daily)</button>';
   h+='<button class="btn btnok" style="width:100%;margin-bottom:12px" onclick="openAddHabit()"><i class="ti ti-plus"></i> Start a single-habit challenge</button>';
   if(!habits.length){
     h+='<div class="home-empty" style="margin-bottom:12px">No habits yet. Start one above — set a goal, pick a length (7 days to 1 year), and build a streak. 🌱</div>';
@@ -14001,4 +14008,115 @@ function habGoalOverallPct(hb){
   for(var i=0;i<n;i++){sum+=habDayPct(hb,dayKey(start+i*86400000));}
   return Math.round(sum/n);
 }
+
+/* v193: after v190 the store scrolls on the modal, not #ps-results — so reset
+   the modal to top on every forward navigation (fixes "lands mid-page"). */
+function rbStoreTop(){try{var m=document.querySelector('#prodsearch-ovl .modal');if(m)m.scrollTop=0;}catch(e){}}
+
+/* v194: loyalty points (earned from daily spin + 30-day streaks) unlock a
+   purchase discount — rewards your most engaged customers. */
+function pointsOffer(){
+  var pts=(loyalty()||{}).points||0;
+  if(pts>=500)return {pct:15,tier:'VIP',emoji:'💎',need:0};
+  if(pts>=250)return {pct:10,tier:'Gold',emoji:'🏆',need:500-pts};
+  if(pts>=100)return {pct:5,tier:'Silver',emoji:'🥈',need:250-pts};
+  return {pct:0,tier:'',emoji:'⭐',need:100-pts};
+}
+function cartTotalsDiscounted(){
+  var t=cartTotals();var off=pointsOffer();var disc={};var saved={};
+  Object.keys(t.byCur).forEach(function(cur){
+    var base=t.byCur[cur];var d=off.pct?Math.round(base*off.pct)/100:0;
+    disc[cur]=Math.round((base-d)*100)/100;saved[cur]=Math.round(d*100)/100;
+  });
+  return {byCur:t.byCur,disc:disc,saved:saved,n:t.n,off:off};
+}
+function pointsOfferBanner(){
+  var t=cartTotalsDiscounted();var off=t.off;
+  if(off.pct){
+    var savedStr=Object.keys(t.saved).filter(function(c){return t.saved[c]>0;}).map(function(c){return esc(c)+' '+t.saved[c];}).join(' + ');
+    return '<div style="background:linear-gradient(135deg,#16a34a,#0a66c2);color:#fff;border-radius:12px;padding:11px 13px;margin-bottom:11px"><div style="font-weight:800;font-size:13px">'+off.emoji+' '+off.tier+' reward — '+off.pct+'% off!</div><div style="font-size:11px;opacity:.92;margin-top:2px">Your '+((loyalty()||{}).points||0)+' points saved you '+savedStr+' on this order. Keep spinning & tracking to earn more. 🔥</div></div>';
+  }
+  return '<div style="background:var(--card2);border:1px dashed var(--b);border-radius:12px;padding:11px 13px;margin-bottom:11px;font-size:12px;color:var(--mt2)">⭐ You have '+((loyalty()||{}).points||0)+' points. Earn '+off.need+' more to unlock <b>5% off</b> your orders. Spin daily & keep your streak! 🎯</div>';
+}
+
+/* ===== v195: Reedbi Agent — one helper for shopping + finding jobs =====
+   Honest scope: a fast intent router (not an LLM — that needs the backend).
+   It understands what you want and takes you straight there. */
+var __agentChat=[];
+function openReedbiAgent(prefill){
+  var ovl=document.getElementById('ragent-ovl');
+  if(!ovl){ovl=document.createElement('div');ovl.id='ragent-ovl';ovl.className='overlay';
+    ovl.innerHTML='<div class="modal" style="max-width:440px;height:88vh;max-height:88vh"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:15px"><i class="ti ti-sparkles" style="color:#7c3aed"></i> Reedbi Agent</b><button class="modal-x" onclick="closeOvl(\'ragent-ovl\')"><i class="ti ti-x"></i></button></div><div id="ragent-chat" style="flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:4px 2px"></div><div id="ragent-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div><div style="display:flex;gap:7px"><input id="ragent-in" placeholder="Find a job, shop, track an order…" style="flex:1" onkeydown="if(event.key===\'Enter\')agentSend()"><button class="btn btnok" style="padding:10px 14px" onclick="agentSend()"><i class="ti ti-send"></i></button></div></div>';
+    document.body.appendChild(ovl);}
+  ovl.classList.add('open');
+  if(!__agentChat.length){
+    var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'there';
+    __agentChat.push({a:1,t:'Hi '+nm+'! 👋 I\'m your Reedbi helper. I can find <b>products</b> to buy, search <b>jobs</b> for you, track <b>orders</b>, or help you <b>sell</b>. What do you need?'});
+  }
+  renderAgent();
+  if(prefill){var el=document.getElementById('ragent-in');if(el){el.value=prefill;agentSend();}}
+  setTimeout(function(){var el=document.getElementById('ragent-in');if(el)el.focus();},120);
+}
+function renderAgent(){
+  var box=document.getElementById('ragent-chat');if(!box)return;
+  box.innerHTML=__agentChat.map(function(m){
+    if(m.a)return '<div style="align-self:flex-start;max-width:90%;background:var(--card2);border:1px solid var(--b);border-radius:13px 13px 13px 4px;padding:10px 12px;font-size:13px;line-height:1.45">'+m.t+(m.actions||'')+'</div>';
+    return '<div style="align-self:flex-end;max-width:85%;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:13px 13px 4px 13px;padding:9px 12px;font-size:13px">'+esc(m.t)+'</div>';
+  }).join('');
+  box.scrollTop=box.scrollHeight;
+  var chips=document.getElementById('ragent-chips');
+  if(chips)chips.innerHTML=['🔍 Find a job','🛍️ Shop products','📦 Track my order','💼 Sell something'].map(function(c){return '<button class="hab-chip" onclick="agentChip(\''+c.replace(/'/g,'')+'\')">'+c+'</button>';}).join('');
+}
+function agentChip(c){var el=document.getElementById('ragent-in');if(el){el.value=c.replace(/^[^\w]+/,'');}agentSend();}
+function agentSend(){
+  var el=document.getElementById('ragent-in');if(!el)return;var text=(el.value||'').trim();if(!text)return;
+  el.value='';__agentChat.push({a:0,t:text});
+  var reply=agentRespond(text);__agentChat.push(reply);renderAgent();
+}
+function agentRespond(text){
+  var q=text.toLowerCase();
+  var has=function(arr){return arr.some(function(w){return q.indexOf(w)>=0;});};
+  // strip intent words to get the search term
+  function term(words){var t=q;words.forEach(function(w){t=t.replace(new RegExp('\\b'+w+'\\b','g'),' ');});return t.replace(/\b(a|an|the|me|my|for|find|near|please|want|need|to|in|as|of|some|any|looking)\b/g,' ').replace(/\s+/g,' ').trim();}
+  // JOB intent
+  if(has(['job','jobs','work','career','vacancy','vacancies','hire','hiring','employ','position','recruit','apply','salary','interview'])){
+    var role=term(['job','jobs','work','career','vacancy','vacancies','hire','hiring','employ','position','recruit','apply','salary','find','search','get','want','as','a','an']);
+    var pool=[];try{pool=jobsPool();}catch(e){}
+    var matches=pool;
+    var jwords=role.split(/\s+/).filter(function(w){return w.length>2;});
+    if(jwords.length){matches=pool.filter(function(j){var hay=((j.title||'')+' '+(j.body||'')+' '+(j.co||'')).toLowerCase();return jwords.some(function(w){return hay.indexOf(w)>=0;});});}
+    if(matches.length){
+      var top=matches.slice(0,5).map(function(j){return '<div style="border:1px solid var(--b);border-radius:10px;padding:9px;margin-top:7px;background:var(--card2)"><b style="font-size:12px">'+esc(j.title||'Job')+'</b>'+(j.co?' <span style="color:var(--mt2);font-size:11px">· '+esc(j.co)+'</span>':'')+'<div style="font-size:11px;color:var(--mt2);margin:3px 0 6px">'+esc((j.body||'').slice(0,90))+'</div><button class="btn btnok" style="padding:6px 11px;font-size:12px" onclick="agentOpenJobs()">View &amp; apply</button></div>';}).join('');
+      return {a:1,t:'I found <b>'+matches.length+' job'+(matches.length!==1?'s':'')+'</b>'+(role?' for "<b>'+esc(role)+'</b>"':'')+'. Top matches:',actions:top+'<div style="margin-top:9px"><button class="btn" style="border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:8px 12px;font-size:12px" onclick="agentOpenAgent()">🤖 Let the AI Job Agent auto-apply with my CV</button></div>'};
+    }
+    return {a:1,t:'I couldn\'t find a job matching'+(role?' "<b>'+esc(role)+'</b>"':' that')+' right now. New jobs are posted often — set up the <b>AI Job Agent</b> and it\'ll apply for you automatically the moment a match appears.',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentOpenAgent()">🤖 Set up AI Job Agent</button> <button class="btn" style="border:1px solid var(--b);color:var(--tx);padding:8px 12px;font-size:12px" onclick="agentOpenJobs()">Browse all jobs</button></div>'};
+  }
+  // ORDER / TRACK intent
+  if(has(['order','track','delivery','deliver','where is','shipment','parcel','my orders'])){
+    return {a:1,t:'Let\'s check your orders and delivery status. 📦',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');showMyOrders()">Open my orders</button></div>'};
+  }
+  // SELL intent
+  if(has(['sell','selling','list my','become a seller','my product','i want to sell','add product'])){
+    return {a:1,t:'You can list your products and reach buyers nearby and worldwide. 💼',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentOpenSell()">Start selling</button></div>'};
+  }
+  // HABIT intent
+  if(has(['habit','goal','routine','motivat','discipline','streak'])){
+    return {a:1,t:'Your Habit Tracker keeps you on track with goals, reminders and progress videos. 🎯',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');openHabits()">Open Habit Tracker</button></div>'};
+  }
+  // default = SHOP intent (search products)
+  var pterm=term(['buy','shop','purchase','price','cheap','looking','show','find','get','want','need','search','product','products']);
+  pterm=pterm||q;
+  var pwords=pterm.split(/\s+/).filter(function(w){return w.length>2;});
+  var prods=[];try{prods=getProducts().filter(function(p){return productInMarketplace(p);});}catch(e){}
+  var pm=pwords.length?prods.filter(function(p){var hay=(((p.title||'')+' '+(p.desc||'')+' '+(p.category||'')+' '+(p.brand||'')).toLowerCase());return pwords.some(function(w){return hay.indexOf(w)>=0;});}):prods;
+  if(pm.length){
+    var tp=pm.slice(0,4).map(function(p){return '<div style="display:flex;gap:8px;align-items:center;border:1px solid var(--b);border-radius:10px;padding:7px;margin-top:7px;background:var(--card2)"><img src="'+esc((p.photos&&p.photos[0])||'')+'" style="width:38px;height:38px;border-radius:7px;object-fit:cover;background:var(--b)"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(p.title)+'</div><div style="font-size:11px;color:var(--g);font-weight:700">'+esc(p.currency||'')+' '+esc(p.price)+'</div></div></div>';}).join('');
+    return {a:1,t:'Found <b>'+pm.length+'</b> product'+(pm.length!==1?'s':'')+(pterm?' for "<b>'+esc(pterm)+'</b>"':'')+':',actions:tp+'<div style="margin-top:9px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentShop(\''+esc(pterm).replace(/\\/g,'').replace(/'/g,'')+'\')">See all in the shop</button></div>'};
+  }
+  return {a:1,t:'I can search the shop for that. Want me to open it?',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentShop(\''+esc(pterm).replace(/\\/g,'').replace(/\x27/g,'')+'\')">Search the shop</button></div>'};
+}
+function agentOpenJobs(){closeOvl('ragent-ovl');try{openTag('jobs');}catch(e){try{rbTab('feed');}catch(_){}}}
+function agentOpenAgent(){closeOvl('ragent-ovl');try{openJobAgent();}catch(e){}}
+function agentOpenSell(){closeOvl('ragent-ovl');try{if(typeof openSellFlow==='function')openSellFlow();else if(typeof openAddProduct==='function')openAddProduct();else rbTab('account');}catch(e){}}
+function agentShop(term){closeOvl('ragent-ovl');try{openProductSearch();setTimeout(function(){var s=document.getElementById('ps-q');if(s&&term){s.value=term;}runProductSearch(term||'');},120);}catch(e){}}
 </script></body></html>
