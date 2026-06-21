@@ -103,7 +103,7 @@ body.fs-lg{--rb-fs:112%}body.fs-xl{--rb-fs:125%}
 .home-rv .t{font-size:11px;color:var(--tx);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .home-rv .p{font-size:12px;font-weight:800;color:#0a8f5c}
 .home-empty{text-align:center;color:var(--mt2);font-size:13px;padding:26px 16px;background:var(--card2);border-radius:14px}
-.home-fab{position:fixed;left:16px;bottom:84px;z-index:8800;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(10,102,194,.45);display:flex;align-items:center;justify-content:center;font-size:24px}
+.home-fab{display:none!important;position:fixed;left:16px;bottom:84px;z-index:8800;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(10,102,194,.45);display:flex;align-items:center;justify-content:center;font-size:24px}
 
 
 html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg);color:var(--tx)}
@@ -131,7 +131,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .auth-note{background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);border-radius:8px;padding:9px 11px;font-size:11px;color:var(--g);margin-bottom:12px;line-height:1.6}
 .db-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px;margin-top:6px}
 .db-live{background:rgba(37,211,102,.15);color:var(--g)}.db-local{background:rgba(245,166,35,.15);color:var(--gold)}
-.left{width:310px;flex-shrink:0;display:flex;flex-direction:column;background:var(--sf);border-right:1px solid var(--b)}
+.left{display:none}
 .lhd{padding:10px 14px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;background:var(--sf);box-shadow:0 1px 0 rgba(0,0,0,.04)}
 .logo{font-size:19px;font-weight:800;color:var(--g);letter-spacing:-.5px}
 .uchip{display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 8px;border-radius:20px;background:var(--card2);border:1px solid var(--b);transition:background .15s}
@@ -1224,7 +1224,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v196</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v197</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1248,18 +1248,24 @@ body.dark .spin-wheel{border-color:#2a333f}
     <div class="tlist" id="tlist"></div>
   </div>
   <div class="right">
-    <div class="es" id="es">
-      <i class="ti ti-messages" style="font-size:46px;color:var(--g)"></i>
-      <h2>Welcome to Reedbi</h2>
-      <p>Pick a tag on the left to join the conversation, or create your own. Share posts, apply to jobs, and connect worldwide.</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px">
-        <button class="btn btnok" onclick="openCreateModal()" style="border-radius:20px;display:flex;align-items:center;gap:5px"><i class="ti ti-plus"></i> Create a Post</button>
-        <button class="btn" onclick="openTag('jobs')" style="border-radius:20px;border:1px solid var(--b);background:var(--card2);color:var(--tx);display:flex;align-items:center;gap:5px"><i class="ti ti-briefcase"></i> Browse Jobs</button>
-      </div>
-      <div style="margin-top:16px;font-size:11px;color:var(--mt2);display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
-        <span><i class="ti ti-bolt" style="color:var(--gold)"></i> Real-time</span>
-        <span><i class="ti ti-briefcase" style="color:var(--g)"></i> Jobs &amp; ATS</span>
-        <span><i class="ti ti-photo" style="color:var(--cyan)"></i> Photos &amp; videos</span>
+    <div class="es" id="es" style="padding:20px 16px;overflow-y:auto">
+      <div style="width:100%;max-width:520px;margin:0 auto">
+        <div style="text-align:center;margin-bottom:18px">
+          <h2 style="margin:0 0 4px">Welcome to Reedbi 👋</h2>
+          <p style="color:var(--mt2);margin:0;font-size:13px">Shop real products, build habits, and find jobs — all in one place.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+          <button onclick="openMainStore()" style="text-align:left;border:1px solid var(--b);background:var(--sf);border-radius:14px;padding:15px;cursor:pointer"><div style="font-size:26px">🛍️</div><b style="display:block;margin-top:6px;font-size:14px">Shop</b><small style="color:var(--mt2)">Browse & buy products</small></button>
+          <button onclick="openHabits()" style="text-align:left;border:1px solid var(--b);background:var(--sf);border-radius:14px;padding:15px;cursor:pointer"><div style="font-size:26px">🔥</div><b style="display:block;margin-top:6px;font-size:14px">Habits</b><small style="color:var(--mt2)">Goals, streaks & reminders</small></button>
+          <button onclick="openReedbiAgent('')" style="text-align:left;border:1px solid var(--b);background:var(--sf);border-radius:14px;padding:15px;cursor:pointer"><div style="font-size:26px">🔍</div><b style="display:block;margin-top:6px;font-size:14px">Find a Job</b><small style="color:var(--mt2)">AI search & auto-apply</small></button>
+          <button onclick="showMyOrders()" style="text-align:left;border:1px solid var(--b);background:var(--sf);border-radius:14px;padding:15px;cursor:pointer"><div style="font-size:26px">📦</div><b style="display:block;margin-top:6px;font-size:14px">Orders</b><small style="color:var(--mt2)">Track your deliveries</small></button>
+        </div>
+        <button class="btn btnok" onclick="openReedbiAgent('')" style="width:100%;margin-top:13px;padding:13px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#0a66c2);border:none"><i class="ti ti-sparkles"></i> Ask the Reedbi Agent</button>
+        <div style="margin-top:16px;font-size:11px;color:var(--mt2);display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+          <span><i class="ti ti-bolt" style="color:var(--gold)"></i> Real-time 3D shop</span>
+          <span><i class="ti ti-briefcase" style="color:var(--g)"></i> Jobs &amp; ATS</span>
+          <span><i class="ti ti-target" style="color:var(--cyan)"></i> Habit coaching</span>
+        </div>
       </div>
     </div>
     <div id="cv-view" style="display:none;flex-direction:column;flex:1;min-height:0;height:100%">
@@ -5923,7 +5929,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v196 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v197 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11498,8 +11504,8 @@ function rbUpdateNavBadge(){
 }
 setInterval(rbUpdateNavBadge,1500);
 setTimeout(rbUpdateNavBadge,1000);
-// default: open the Home page on load (not the tag feed)
-setTimeout(function(){try{rbTab('home');}catch(e){rbSetActiveTab('home');}},400);
+// default: show the clean Home landing immediately on load
+setTimeout(function(){try{rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}},400);
 
 /* ===== v135: confetti, daily spin wheel, shopper tiers, achievements =====
    Healthy delight: a once-a-day spin, celebratory confetti, and a level that
