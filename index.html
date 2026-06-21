@@ -175,6 +175,41 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .nores button{margin-top:10px;background:var(--g);color:#fff;border:none;border-radius:17px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fn)}
 .right{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
 .es{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:var(--mt);padding:20px;text-align:center}
+.home-wrap{width:100%;max-width:560px;margin:0 auto;text-align:left}
+.home-hero{background:linear-gradient(135deg,#0a66c2 0%,#5b21b6 100%);border-radius:20px;padding:26px 22px;color:#fff;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(10,102,194,.30)}
+.home-hero::after{content:"";position:absolute;right:-44px;top:-44px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.10)}
+.home-hero::before{content:"";position:absolute;right:34px;bottom:-54px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.07)}
+.home-brand{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;opacity:.92;position:relative}
+.home-title{font-size:26px;font-weight:800;line-height:1.16;margin:9px 0 7px;position:relative}
+.home-sub{font-size:13px;opacity:.93;margin:0;position:relative;line-height:1.5}
+.home-cta{display:inline-flex;align-items:center;gap:7px;background:#fff;color:#0a66c2;font-weight:800;border:none;border-radius:30px;padding:11px 20px;margin-top:17px;cursor:pointer;font-size:13px;position:relative;box-shadow:0 6px 16px rgba(0,0,0,.20)}
+.home-cta:active{transform:scale(.97)}
+.home-sec{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--mt2);margin:24px 2px 12px}
+.home-tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.home-tile{text-align:left;border:1px solid var(--b);background:var(--sf);border-radius:16px;padding:16px;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .12s;display:flex;flex-direction:column;gap:9px;font-family:inherit}
+.home-tile:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.10);border-color:rgba(10,102,194,.35)}
+.home-tile:active{transform:translateY(0)}
+.home-tile .ic{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.home-tile b{font-size:14px;color:var(--tx)}
+.home-tile small{color:var(--mt2);font-size:11.5px;line-height:1.4}
+.home-feat{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:22px}
+.home-feat span{font-size:11px;color:var(--mt2);background:var(--card2);border:1px solid var(--b);border-radius:20px;padding:6px 11px;display:inline-flex;align-items:center;gap:5px}
+@media(min-width:760px){
+  .es#es{padding:40px 32px}
+  .home-wrap{max-width:1000px}
+  .home-hero{padding:46px 44px;border-radius:26px}
+  .home-title{font-size:42px}
+  .home-sub{font-size:16px;max-width:560px}
+  .home-cta{font-size:15px;padding:14px 26px;margin-top:22px}
+  .home-sec{font-size:13px;margin:34px 2px 16px}
+  .home-tiles{grid-template-columns:repeat(4,1fr);gap:16px}
+  .home-tile{padding:22px}
+  .home-tile .ic{width:54px;height:54px;font-size:27px}
+  .home-tile b{font-size:16px}
+  .home-tile small{font-size:13px}
+  .home-feat{margin-top:30px;gap:10px}
+  .home-feat span{font-size:13px;padding:8px 14px}
+}
 .es i{font-size:44px;color:var(--mt2)}
 .es h2{font-size:16px;font-weight:600;color:var(--tx)}
 .es p{font-size:12px;max-width:270px;line-height:1.6}
@@ -832,6 +867,7 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 .col-track b{color:var(--tx)}
 /* yellow AI care */
 .care-fab{position:fixed;right:14px;bottom:120px;z-index:7200;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#ffd23f,#ffb800);color:#3a2a00;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(255,184,0,.5);display:flex;align-items:center;justify-content:center;font-size:24px}
+#fab{display:none!important}
 .care-modal{max-width:430px}
 .care-hero{background:linear-gradient(135deg,#ffe169,#ffb800);border-radius:14px;padding:15px;margin-bottom:12px;color:#3a2a00}
 .care-hero h3{font-size:16px;font-weight:800;display:flex;align-items:center;gap:7px}
@@ -1224,7 +1260,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v197</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v201</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1248,23 +1284,26 @@ body.dark .spin-wheel{border-color:#2a333f}
     <div class="tlist" id="tlist"></div>
   </div>
   <div class="right">
-    <div class="es" id="es" style="padding:20px 16px;overflow-y:auto">
-      <div style="width:100%;max-width:520px;margin:0 auto">
-        <div style="text-align:center;margin-bottom:18px">
-          <h2 style="margin:0 0 4px">Welcome to Reedbi 👋</h2>
-          <p style="color:var(--mt2);margin:0;font-size:13px">Shop real products, build habits, and find jobs — all in one place.</p>
+    <div class="es" id="es" style="padding:22px 16px;overflow-y:auto;align-items:stretch;justify-content:flex-start">
+      <div class="home-wrap">
+        <div class="home-hero">
+          <div class="home-brand">✦ Reedbi</div>
+          <div class="home-title">Shop. Grow.<br>Get hired.</div>
+          <p class="home-sub">Your marketplace, habit coach, and AI job agent — all in one professional platform.</p>
+          <button class="home-cta" onclick="openReedbiAgent('')"><i class="ti ti-sparkles"></i> Ask the Reedbi Agent</button>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
-          <button onclick="openMainStore()" style="text-align:left;border:1px solid var(--b);background:var(--sf);border-radius:14px;padding:15px;cursor:pointer"><div style="font-size:26px">🛍️</div><b style="display:block;margin-top:6px;font-size:14px">Shop</b><small style="color:var(--mt2)">Browse & buy products</small></button>
-          <button onclick="openHabits()" style="text-align:left;border:1px solid var(--b);background:var(--sf);border-radius:14px;padding:15px;cursor:pointer"><div style="font-size:26px">🔥</div><b style="display:block;margin-top:6px;font-size:14px">Habits</b><small style="color:var(--mt2)">Goals, streaks & reminders</small></button>
-          <button onclick="openReedbiAgent('')" style="text-align:left;border:1px solid var(--b);background:var(--sf);border-radius:14px;padding:15px;cursor:pointer"><div style="font-size:26px">🔍</div><b style="display:block;margin-top:6px;font-size:14px">Find a Job</b><small style="color:var(--mt2)">AI search & auto-apply</small></button>
-          <button onclick="showMyOrders()" style="text-align:left;border:1px solid var(--b);background:var(--sf);border-radius:14px;padding:15px;cursor:pointer"><div style="font-size:26px">📦</div><b style="display:block;margin-top:6px;font-size:14px">Orders</b><small style="color:var(--mt2)">Track your deliveries</small></button>
+        <div class="home-sec">What would you like to do?</div>
+        <div class="home-tiles">
+          <button class="home-tile" onclick="openMainStore()"><div class="ic" style="background:rgba(10,102,194,.12)">🛍️</div><b>Shop</b><small>Browse &amp; buy real products</small></button>
+          <button class="home-tile" onclick="openHabits()"><div class="ic" style="background:rgba(234,88,12,.12)">🔥</div><b>Habits</b><small>Goals, streaks &amp; reminders</small></button>
+          <button class="home-tile" onclick="openReedbiAgent('')"><div class="ic" style="background:rgba(124,58,237,.12)">🔍</div><b>Find a Job</b><small>AI search &amp; auto-apply</small></button>
+          <button class="home-tile" onclick="showMyOrders()"><div class="ic" style="background:rgba(22,163,74,.12)">📦</div><b>Orders</b><small>Track your deliveries</small></button>
         </div>
-        <button class="btn btnok" onclick="openReedbiAgent('')" style="width:100%;margin-top:13px;padding:13px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#0a66c2);border:none"><i class="ti ti-sparkles"></i> Ask the Reedbi Agent</button>
-        <div style="margin-top:16px;font-size:11px;color:var(--mt2);display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+        <div class="home-feat">
           <span><i class="ti ti-bolt" style="color:var(--gold)"></i> Real-time 3D shop</span>
           <span><i class="ti ti-briefcase" style="color:var(--g)"></i> Jobs &amp; ATS</span>
           <span><i class="ti ti-target" style="color:var(--cyan)"></i> Habit coaching</span>
+          <span><i class="ti ti-shield-check" style="color:var(--g)"></i> Secure checkout</span>
         </div>
       </div>
     </div>
@@ -5929,7 +5968,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v197 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v201 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -14073,7 +14112,7 @@ function agentPick(opt){
   var labels={job:'Find a Job',shop:'Shop Product',order:'Track My Order',sell:'Sell Something'};
   __agentChat.push({a:0,t:labels[opt]||opt});
   if(opt==='job'){__agentChat.push(agentJobFlow(''));}
-  else if(opt==='shop'){__agentChat.push({a:1,t:'What product are you looking for? Type it below (e.g. "shirt", "phone", "rice") and I\'ll find it. 🛍️',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentShop(\'\')">Browse the whole shop</button></div>'});}
+  else if(opt==='shop'){__agentChat.push(agentShopFlow(''));}
   else if(opt==='order'){__agentChat.push({a:1,t:'Here are your orders & delivery status. 📦',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');showMyOrders()">Open my orders</button></div>'});}
   else if(opt==='sell'){__agentChat.push({a:1,t:'List your products and reach buyers nearby and worldwide. 💼',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentOpenSell()">Start selling</button></div>'});}
   renderAgent();
@@ -14136,20 +14175,53 @@ function agentRespond(text){
   if(has(['habit','goal','routine','motivat','discipline','streak'])){
     return {a:1,t:'Your Habit Tracker keeps you on track with goals, reminders and progress videos. 🎯',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');openHabits()">Open Habit Tracker</button></div>'};
   }
-  // default = SHOP intent (search products)
+  // default = SHOP intent (search products) — use the rich Shop flow
   var pterm=term(['buy','shop','purchase','price','cheap','looking','show','find','get','want','need','search','product','products']);
   pterm=pterm||q;
-  var pwords=pterm.split(/\s+/).filter(function(w){return w.length>2;});
-  var prods=[];try{prods=getProducts().filter(function(p){return productInMarketplace(p);});}catch(e){}
-  var pm=pwords.length?prods.filter(function(p){var hay=(((p.title||'')+' '+(p.desc||'')+' '+(p.category||'')+' '+(p.brand||'')).toLowerCase());return pwords.some(function(w){return hay.indexOf(w)>=0;});}):prods;
-  if(pm.length){
-    var tp=pm.slice(0,4).map(function(p){return '<div style="display:flex;gap:8px;align-items:center;border:1px solid var(--b);border-radius:10px;padding:7px;margin-top:7px;background:var(--card2)"><img src="'+esc((p.photos&&p.photos[0])||'')+'" style="width:38px;height:38px;border-radius:7px;object-fit:cover;background:var(--b)"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(p.title)+'</div><div style="font-size:11px;color:var(--g);font-weight:700">'+esc(p.currency||'')+' '+esc(p.price)+'</div></div></div>';}).join('');
-    return {a:1,t:'Found <b>'+pm.length+'</b> product'+(pm.length!==1?'s':'')+(pterm?' for "<b>'+esc(pterm)+'</b>"':'')+':',actions:tp+'<div style="margin-top:9px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentShop(\''+esc(pterm).replace(/\\/g,'').replace(/'/g,'')+'\')">See all in the shop</button></div>'};
-  }
-  return {a:1,t:'I can search the shop for that. Want me to open it?',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentShop(\''+esc(pterm).replace(/\\/g,'').replace(/\x27/g,'')+'\')">Search the shop</button></div>'};
+  return agentShopFlow(pterm);
 }
 function agentOpenJobs(){closeOvl('ragent-ovl');try{openTag('jobs');}catch(e){try{rbTab('feed');}catch(_){}}}
 function agentOpenAgent(){closeOvl('ragent-ovl');try{openJobAgent();}catch(e){}}
 function agentOpenSell(){closeOvl('ragent-ovl');try{if(typeof openSellFlow==='function')openSellFlow();else if(typeof openAddProduct==='function')openAddProduct();else rbTab('account');}catch(e){}}
 function agentShop(term){closeOvl('ragent-ovl');try{openProductSearch();setTimeout(function(){var s=document.getElementById('ps-q');if(s&&term){s.value=term;}runProductSearch(term||'');},120);}catch(e){}}
+
+/* ===== v200: e-commerce agent — Shop flow as strong as the job search =====
+   Shows real product listings inline (image, price), with View, Add to cart,
+   category chips and search — mirroring the praised v195 job-search flow. */
+function agentShopProducts(term,cat){
+  var prods=[];try{prods=getProducts().filter(function(p){return productInMarketplace(p);});}catch(e){}
+  if(cat)prods=prods.filter(function(p){return (p.category||'Other')===cat;});
+  if(term){var w=term.toLowerCase().split(/\s+/).filter(function(x){return x.length>2;});if(w.length)prods=prods.filter(function(p){var hay=(((p.title||'')+' '+(p.desc||'')+' '+(p.category||'')+' '+(p.brand||'')).toLowerCase());return w.some(function(x){return hay.indexOf(x)>=0;});});}
+  // nearby first (share a word with user's location), then newest
+  try{var loc=((CU&&CU.location)||'').toLowerCase().split(/[ ,]+/).filter(function(x){return x.length>2;});
+    prods.sort(function(a,b){var an=loc.some(function(x){return String(a.location||'').toLowerCase().indexOf(x)>=0;})?1:0;var bn=loc.some(function(x){return String(b.location||'').toLowerCase().indexOf(x)>=0;})?1:0;if(an!==bn)return bn-an;return (b.ts||0)-(a.ts||0);});}catch(e){}
+  return prods;
+}
+function agentShopFlow(term,cat){
+  var prods=agentShopProducts(term,cat);
+  var cats=['Grocery','Electronics','Clothing','Fruits','Vegetables','Household'];
+  var chips='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">'+cats.map(function(c){return '<button class="hab-chip" style="'+(cat===c?'background:var(--g);color:#fff;border-color:var(--g)':'')+'" onclick="agentShopCat(\''+c+'\')">'+esc(c)+'</button>';}).join('')+'</div>';
+  var listing;
+  if(prods.length){
+    listing=prods.slice(0,6).map(function(p){
+      var img=(p.photos&&p.photos[0])||'';
+      return '<div style="display:flex;gap:9px;align-items:center;border:1px solid var(--b);border-radius:11px;padding:8px;margin-top:7px;background:var(--card2)">'
+        +'<img src="'+esc(img)+'" style="width:46px;height:46px;border-radius:8px;object-fit:cover;background:var(--b);flex-shrink:0">'
+        +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(p.title||'Product')+'</div><div style="font-size:12px;color:var(--g);font-weight:800">'+esc(p.currency||'')+' '+esc(p.price)+'</div></div>'
+        +'<div style="display:flex;flex-direction:column;gap:4px"><button class="btn btnok" style="padding:5px 9px;font-size:11px" onclick="agentViewProduct(\''+esc(p.id)+'\')">View</button><button class="btn" style="padding:5px 9px;font-size:11px;border:1px solid var(--g);color:var(--g)" onclick="agentAddCart(\''+esc(p.id)+'\')">+ Cart</button></div>'
+        +'</div>';
+    }).join('');
+  } else {
+    listing='<div style="font-size:12px;color:var(--mt2);margin-top:9px">No products'+(term?' matching "'+esc(term)+'"':'')+(cat?' in '+esc(cat):'')+' yet. Try another category or browse the full shop.</div>';
+  }
+  var footer='<div style="margin-top:11px;display:flex;flex-direction:column;gap:7px">'
+    +'<button class="btn btnok" style="padding:9px 12px;font-size:12px" onclick="agentShop(\''+esc(term||'').replace(/\\/g,'').replace(/\x27/g,'')+'\')">🛍️ Open the full shop</button>'
+    +'<button class="btn" style="padding:9px 12px;font-size:12px;border:1px solid #7c3aed;color:#7c3aed" onclick="agentOpenSell()">💼 I want to sell a product</button>'
+    +'</div>';
+  var head=(term?'Products for "<b>'+esc(term)+'</b>":':(cat?'<b>'+esc(cat)+'</b> products:':'Here are products you can buy now ('+prods.length+'):'));
+  return {a:1,t:head+'<div style="font-size:11px;color:var(--mt2);margin-top:3px">Tip: type a product name below (e.g. "rice", "phone") to search.</div>'+chips,actions:listing+footer};
+}
+function agentShopCat(cat){__agentChat.push({a:0,t:cat});__agentChat.push(agentShopFlow('',cat));renderAgent();}
+function agentViewProduct(pid){closeOvl('ragent-ovl');try{openProductDetail(pid);}catch(e){try{openMainStore();}catch(_){}}}
+function agentAddCart(pid){try{if(typeof addToCart==='function'){addToCart(pid);}else if(typeof addToCartSilent==='function'){addToCartSilent(pid);toast('Added to cart 🛒','success');}}catch(e){}}
 </script></body></html>
