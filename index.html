@@ -1224,7 +1224,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v195</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v196</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1741,7 +1741,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 
 <button class="fab" id="fab" onclick="openPostChooser()"><i class="ti ti-plus"></i> <span class="fab-txt">Post</span></button>
 <nav class="btmnav" id="btmnav">
-  <button class="bn-feed" onclick="rbTab('feed')"><i class="ti ti-layout-grid"></i><span>Tag Talk</span></button>
+  <button class="bn-feed" onclick="openHabits()"><i class="ti ti-flame"></i><span>Habit</span></button>
   <button class="bn-shop" onclick="rbTab('shop')"><i class="ti ti-building-store"></i><span>Shop</span></button>
   <button class="bn-home on" onclick="rbTab('home')"><i class="ti ti-home"></i><span>Home</span></button>
   <button class="bn-orders" onclick="rbTab('orders')"><i class="ti ti-package"></i><span>Orders</span></button>
@@ -5923,7 +5923,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v195 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v196 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11498,8 +11498,8 @@ function rbUpdateNavBadge(){
 }
 setInterval(rbUpdateNavBadge,1500);
 setTimeout(rbUpdateNavBadge,1000);
-// default: highlight Tag Talk feed on load (the landing)
-setTimeout(function(){rbSetActiveTab('feed');},400);
+// default: open the Home page on load (not the tag feed)
+setTimeout(function(){try{rbTab('home');}catch(e){rbSetActiveTab('home');}},400);
 
 /* ===== v135: confetti, daily spin wheel, shopper tiers, achievements =====
    Healthy delight: a once-a-day spin, celebratory confetti, and a level that
@@ -14051,12 +14051,39 @@ function openReedbiAgent(prefill){
   ovl.classList.add('open');
   if(!__agentChat.length){
     var nm=(CU&&CU.name)?CU.name.split(' ')[0]:'there';
-    __agentChat.push({a:1,t:'Hi '+nm+'! 👋 I\'m your Reedbi helper. I can find <b>products</b> to buy, search <b>jobs</b> for you, track <b>orders</b>, or help you <b>sell</b>. What do you need?'});
+    __agentChat.push({a:1,t:'Hi '+nm+'! 👋 What would you like to do?',actions:agentMenuCard()});
   }
   renderAgent();
   if(prefill){var el=document.getElementById('ragent-in');if(el){el.value=prefill;agentSend();}}
   setTimeout(function(){var el=document.getElementById('ragent-in');if(el)el.focus();},120);
 }
+function agentMenuCard(){
+  var opts=[['job','🔍','Find a Job','Search jobs · AI auto-apply · post a job'],['shop','🛍️','Shop Product','Find products to buy'],['order','📦','Track My Order','See your orders & delivery'],['sell','💼','Sell Something','List your product to buyers']];
+  return '<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">'+opts.map(function(o){
+    return '<button onclick="agentPick(\''+o[0]+'\')" style="display:flex;align-items:center;gap:11px;text-align:left;background:var(--sf);border:1px solid var(--b);border-radius:12px;padding:12px;cursor:pointer;width:100%"><span style="font-size:22px">'+o[1]+'</span><span style="flex:1"><b style="font-size:13px;display:block">'+o[2]+'</b><small style="color:var(--mt2);font-size:11px">'+o[3]+'</small></span><i class="ti ti-chevron-right" style="color:var(--mt2)"></i></button>';
+  }).join('')+'</div>';
+}
+function agentPick(opt){
+  var labels={job:'Find a Job',shop:'Shop Product',order:'Track My Order',sell:'Sell Something'};
+  __agentChat.push({a:0,t:labels[opt]||opt});
+  if(opt==='job'){__agentChat.push(agentJobFlow(''));}
+  else if(opt==='shop'){__agentChat.push({a:1,t:'What product are you looking for? Type it below (e.g. "shirt", "phone", "rice") and I\'ll find it. 🛍️',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentShop(\'\')">Browse the whole shop</button></div>'});}
+  else if(opt==='order'){__agentChat.push({a:1,t:'Here are your orders & delivery status. 📦',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');showMyOrders()">Open my orders</button></div>'});}
+  else if(opt==='sell'){__agentChat.push({a:1,t:'List your products and reach buyers nearby and worldwide. 💼',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentOpenSell()">Start selling</button></div>'});}
+  renderAgent();
+}
+function agentJobFlow(role){
+  var pool=[];try{pool=jobsPool();}catch(e){}
+  var matches=pool;
+  if(role){var jw=role.toLowerCase().split(/\s+/).filter(function(w){return w.length>2;});if(jw.length)matches=pool.filter(function(j){var hay=((j.title||'')+' '+(j.body||'')+' '+(j.co||'')).toLowerCase();return jw.some(function(w){return hay.indexOf(w)>=0;});});}
+  var listing=matches.length?matches.slice(0,6).map(function(j){return '<div style="border:1px solid var(--b);border-radius:10px;padding:9px;margin-top:7px;background:var(--card2)"><b style="font-size:12px">'+esc(j.title||'Job')+'</b>'+(j.co?' <span style="color:var(--mt2);font-size:11px">· '+esc(j.co)+'</span>':'')+'<div style="font-size:11px;color:var(--mt2);margin:3px 0 6px">'+esc((j.body||'').slice(0,90))+'</div><button class="btn btnok" style="padding:6px 11px;font-size:12px" onclick="agentOpenJobs()">View &amp; apply</button></div>';}).join(''):'<div style="font-size:12px;color:var(--mt2);margin-top:8px">No jobs match'+(role?' "'+esc(role)+'"':'')+' yet — new ones are posted often.</div>';
+  var footer='<div style="margin-top:12px;border-top:1px solid var(--b);padding-top:11px;display:flex;flex-direction:column;gap:8px">'
+    +'<button class="btn" style="background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800;padding:11px;border:none" onclick="agentOpenAgent()">🤖 AI Job Agent — auto-apply with my CV</button>'
+    +'<button class="btn" style="border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:10px" onclick="agentPostJob()">➕ Post a job (I\'m hiring)</button>'
+    +'</div>';
+  return {a:1,t:(role?'Jobs for "<b>'+esc(role)+'</b>":':'Latest jobs ('+matches.length+'):'),actions:listing+footer};
+}
+function agentPostJob(){closeOvl('ragent-ovl');try{openTag('jobs');toast('Tap the + to post your job 📝','info');}catch(e){try{rbTab('feed');}catch(_){}}}
 function renderAgent(){
   var box=document.getElementById('ragent-chat');if(!box)return;
   box.innerHTML=__agentChat.map(function(m){
@@ -14065,7 +14092,7 @@ function renderAgent(){
   }).join('');
   box.scrollTop=box.scrollHeight;
   var chips=document.getElementById('ragent-chips');
-  if(chips)chips.innerHTML=['🔍 Find a job','🛍️ Shop products','📦 Track my order','💼 Sell something'].map(function(c){return '<button class="hab-chip" onclick="agentChip(\''+c.replace(/'/g,'')+'\')">'+c+'</button>';}).join('');
+  if(chips)chips.innerHTML=[['job','🔍 Job'],['shop','🛍️ Shop'],['order','📦 Orders'],['sell','💼 Sell']].map(function(c){return '<button class="hab-chip" onclick="agentPick(\''+c[0]+'\')">'+c[1]+'</button>';}).join('');
 }
 function agentChip(c){var el=document.getElementById('ragent-in');if(el){el.value=c.replace(/^[^\w]+/,'');}agentSend();}
 function agentSend(){
