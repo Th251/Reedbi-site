@@ -1290,7 +1290,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v216</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v217</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5999,7 +5999,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v216 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v217 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -14347,7 +14347,7 @@ function renderHomeProducts(){
     +'<div class="home-sec" style="margin:0">Suggested for you</div>'
     +'<button onclick="openMainStore()" style="background:none;border:none;color:var(--g);font-weight:700;font-size:12.5px;cursor:pointer">See all &rarr;</button>'
     +'</div>'
-    +'<div class="fk-grid" style="border-radius:12px;overflow:hidden;border:1px solid var(--b)">'+show.map(fkTile).join('')+'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:11px">'+show.map(homeCard).join('')+'</div>'
     +'<div style="text-align:center;margin:16px 0 4px"><button onclick="openMainStore()" class="btn btnln" style="font-weight:700">Explore the full store</button></div>';
 }
 
@@ -14376,5 +14376,28 @@ function rbOpenFromHash(){
     if(parts.seller){var pg=parts.seller;setTimeout(function(){try{openSellerPage?openSellerPage(pg):openTag(pg);}catch(e){}},650);return true;}
   }catch(e){}
   return false;
+}
+
+/* ===== v217: compact, professional Home product card (Flipkart "Suggested" style) ===== */
+function homeCard(p){
+  var pidJ="'"+p.id+"'";
+  var base=parseFloat(String(p.offer||p.price).replace(/[^0-9.]/g,''))||0;
+  var mrp=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0;
+  var off=(mrp&&base&&base<mrp)?Math.round((mrp-base)/mrp*100):0;
+  var cur=esc(p.currency||'');
+  var img=esc(p.photos&&p.photos[0]||'');
+  var rate='';
+  if(p.reviews&&p.reviews.length){var avg=Math.round(p.reviews.reduce(function(s,r){return s+(r.stars||0);},0)/p.reviews.length*10)/10;rate='<span style="display:inline-flex;align-items:center;gap:3px;background:#388e3c;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px">'+avg+' ★</span>';}
+  return '<div onclick="openProductDetail('+pidJ+')" style="background:var(--sf);border:1px solid var(--b);border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s" onmouseover="this.style.boxShadow=\'0 6px 18px rgba(0,0,0,.12)\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.boxShadow=\'\';this.style.transform=\'\'">'
+    +'<div style="aspect-ratio:1;background:#f4f6f8;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative">'
+    +(img?'<img src="'+img+'" loading="lazy" decoding="async" onerror="this.style.display=\'none\';this.parentNode.setAttribute(\'data-ph\',\'1\')" style="width:100%;height:100%;object-fit:cover">':'')
+    +'<span style="position:absolute;font-size:32px;opacity:.5">🛍️</span>'
+    +'</div>'
+    +'<div style="padding:9px 10px 11px;display:flex;flex-direction:column;gap:3px">'
+    +(p.brand?'<div style="font-size:11px;color:var(--mt2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(p.brand)+'</div>':'')
+    +'<div style="font-size:12.5px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:32px">'+esc(p.title)+'</div>'
+    +(rate?'<div>'+rate+'</div>':'')
+    +'<div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-top:2px"><span style="font-size:15px;font-weight:800">'+cur+' '+base.toLocaleString()+'</span>'+(off?'<span style="font-size:11px;color:var(--mt2);text-decoration:line-through">'+cur+' '+mrp.toLocaleString()+'</span><span style="font-size:11px;color:#388e3c;font-weight:700">'+off+'% off</span>':'')+'</div>'
+    +'</div></div>';
 }
 </script></body></html>
