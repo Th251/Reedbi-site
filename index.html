@@ -182,7 +182,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .home-brand{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;opacity:.92;position:relative}
 .home-title{font-size:26px;font-weight:800;line-height:1.16;margin:9px 0 7px;position:relative}
 .home-sub{font-size:13px;opacity:.93;margin:0;position:relative;line-height:1.5}
-.home-cta{display:inline-flex;align-items:center;gap:7px;background:#fff;color:#0a66c2;font-weight:800;border:none;border-radius:30px;padding:11px 20px;margin-top:17px;cursor:pointer;font-size:13px;position:relative;box-shadow:0 6px 16px rgba(0,0,0,.20)}
+.home-cta{display:inline-flex;align-items:center;gap:7px;background:#fff;color:#0a66c2;font-weight:800;border:none;border-radius:30px;padding:11px 20px;margin-top:17px;cursor:pointer;font-size:13px;position:relative;overflow:hidden;box-shadow:0 6px 16px rgba(0,0,0,.20)}
+.home-cta::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(120deg,transparent,rgba(10,102,194,.16),transparent);transform:skewX(-20deg);animation:ctaShine 3.6s ease-in-out infinite;pointer-events:none}
+@keyframes ctaShine{0%{left:-70%}55%{left:150%}100%{left:150%}}
+.home-tile:active{transform:scale(.985)}
 .home-cta:active{transform:scale(.97)}
 .home-sec{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--mt2);margin:24px 2px 12px}
 .home-tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -192,7 +195,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .home-tile .ic{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px}
 .home-tile b{font-size:14px;color:var(--tx)}
 .home-tile small{color:var(--mt2);font-size:11.5px;line-height:1.4}
-.home-feat{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:22px}
+.home-feat{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:22px;padding-bottom:30px}
 .home-feat span{font-size:11px;color:var(--mt2);background:var(--card2);border:1px solid var(--b);border-radius:20px;padding:6px 11px;display:inline-flex;align-items:center;gap:5px}
 @media(min-width:760px){
   .es#es{padding:40px 32px}
@@ -870,6 +873,8 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 /* yellow AI care */
 .care-fab{position:fixed;right:14px;bottom:120px;z-index:7200;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#ffd23f,#ffb800);color:#3a2a00;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(255,184,0,.5);display:flex;align-items:center;justify-content:center;font-size:24px}
 #fab{display:none!important}
+body.rb-home #cv-view{display:none!important}
+body.rb-home #leftpanel{display:none!important}
 .care-modal{max-width:430px}
 .care-hero{background:linear-gradient(135deg,#ffe169,#ffb800);border-radius:14px;padding:15px;margin-bottom:12px;color:#3a2a00}
 .care-hero h3{font-size:16px;font-weight:800;display:flex;align-items:center;gap:7px}
@@ -1219,7 +1224,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 .av0{background:#1a3a2a;color:#4ade80}.av1{background:#1a2a4a;color:#60a5fa}.av2{background:#3a1a3a;color:#e879f9}.av3{background:#3a2a1a;color:#fb923c}.av4{background:#2a1a3a;color:#a78bfa}.av5{background:#1a3a3a;color:#34d399}.av6{background:#3a1a1a;color:#fb7185}
 </style>
 </head>
-<body>
+<body class="rb-home">
 <!-- AUTH -->
 <div class="auth-scr" id="auth-scr">
   <div class="auth-box">
@@ -1262,7 +1267,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v202</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v206</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5042,7 +5047,7 @@ function loadPhonePosts(tagId){
   t.posts.forEach(function(p){var b=boosts.find(function(x){return x.tagId===tagId&&x.postId===p.id&&Date.now()<x.expiry;});if(b){p.boosted=b.plan;p.boostExpiry=b.expiry;}});
 }
 function openTag(id){
-  stopLive();stopPoll();
+  stopLive();stopPoll();try{document.body.classList.remove('rb-home');}catch(e){}
   activeTagId=id;actRegion=null;actUser=null;actAutoTag=null;sortMode='latest';
   pendingPosts=[];isAtBot=true;addedSuggestTags=[];innerQ='';showIS=false;
   var t=tags.find(function(x){return x.id===id;});if(!t)return;
@@ -5962,7 +5967,7 @@ function createTag_DISABLED(){
 function autoResize(ta){if(!ta)return;ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,80)+'px';}
 function onKey(e){if(e.key==='Enter'&&!e.shiftKey&&window.innerWidth>700){e.preventDefault();sendPost();}}
 function goBack(){stopLive();stopPoll();var _f=document.getElementById('fab');if(_f)_f.style.display='';document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';activeTagId=null;pendingPosts=[];renderTagList(document.getElementById('tsr').value);}
-function goHome(){stopLive();stopPoll();var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;}
+function goHome(){stopLive();stopPoll();try{document.body.classList.add('rb-home');}catch(e){}activeTagId=null;var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;}
 ['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('open');});});
 document.getElementById('pmb').addEventListener('click',function(e){if(e.target===document.getElementById('pmb'))closePM();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('open');});closePM();}});
@@ -5970,7 +5975,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v202 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v206 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -7323,6 +7328,7 @@ function priceHtml(p){
 }
 function runProductSearch(q){
   q=(q||'').trim().toLowerCase();
+  if(q&&q.length>1)logSearchInterest(q,'shop');
   var prods=getProducts().filter(function(p){return productInMarketplace(p);});
   if(psCategory)prods=prods.filter(function(p){return (p.category||'Other')===psCategory;});
   var matches=q?prods.filter(function(p){return ((p.title||'')+' '+(p.desc||'')+' '+(p.category||'')+' '+(p.brand||'')).toLowerCase().indexOf(q)>=0;}):prods;
@@ -8090,9 +8096,7 @@ function openMainStore(cat){
   var prods=cat?allProds.filter(function(p){return (p.category||'Other')===cat;}):allProds;
 
   // top bar + search
-  var bar='<div class="fk-bar"><button onclick="rbNavBack()" title="Back" style="background:none;border:none;color:#fff;cursor:pointer;font-size:20px;padding:2px 6px 2px 0"><i class="ti ti-arrow-left"></i></button><div class="brand">⬡ Reedbi <small>Explore Plus</small></div>'
-    +'<div class="fk-search"><i class="ti ti-search"></i><input placeholder="Search for products, brands &amp; more" '
-    +'onkeydown="if(event.key===\'Enter\'){document.getElementById(\'ps-q\').value=this.value;runProductSearch(this.value);}"></div>'
+  var bar='<div class="fk-bar"><button onclick="rbNavBack()" title="Back" style="background:none;border:none;color:#fff;cursor:pointer;font-size:20px;padding:2px 6px 2px 0"><i class="ti ti-arrow-left"></i></button><div class="brand" style="flex:1">⬡ Reedbi <small>Explore Plus</small></div>'
     +'<button onclick="rbSnapPush();openWishlist()" title="Wishlist" style="background:none;border:none;color:#fff;cursor:pointer;position:relative;padding:4px 6px"><i class="ti ti-heart" style="font-size:20px"></i>'+(getWishlist().length?'<span style="position:absolute;top:-2px;right:-2px;background:#ff4d67;color:#fff;font-size:9px;font-weight:800;border-radius:9px;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px">'+getWishlist().length+'</span>':'')+'</button></div>';
 
   // category circles
@@ -8158,7 +8162,7 @@ function openMainStore(cat){
 
   // category view = focused page; All view = full storytelling homepage
   var homeBlocks=cat?'':(story+stage+strip+'<div class="reveal">'+banner+'</div>'+feat+'<div class="reveal">'+storesRail+'</div>'+'<div class="reveal">'+dealRail+'</div>');
-  box.innerHTML='<div class="fk-wrap">'+bar+cats+homeBlocks+'<div class="reveal">'+grid+'</div>'+'<div style="height:20px"></div></div>';
+  box.innerHTML='<div class="fk-wrap">'+bar+homeBlocks+'<div class="reveal">'+grid+'</div>'+'<div style="height:20px"></div></div>';
   box.scrollTop=0;rbStoreTop();
   fkInitMotion(box);
   if(!cat&&featured)fkStart3DHero(featured);
@@ -8598,6 +8602,7 @@ function renderAdminPanel(){
     +'<button class="seller-tab" onclick="adminTab(\'ads\')">Ads</button>'
     +'<button class="seller-tab" onclick="adminTab(\'content\')">Content</button>'
     +'<button class="seller-tab" onclick="adminTab(\'cancels\')">Cancellations</button>'
+    +'<button class="seller-tab" onclick="adminTab(\'demand\')">User Demand</button>'
     +'</div><div id="admin-tabbody"></div>';
   body.innerHTML=h;
   adminTab('overview');
@@ -8770,6 +8775,17 @@ function adminTab(t){
         +'<div style="font-size:12px;color:var(--tx);margin:3px 0">'+esc((r.post.title||r.post.body||'').substring(0,140))+'</div>'
         +'<button class="lbl-mini" style="color:var(--red);border-color:var(--red)" onclick="adminDeletePost(\''+escJS(r.tag.id)+'\','+r.post.id+')"><i class="ti ti-trash"></i> Delete</button></div>';
     }).join(''):'<p style="font-size:12px;color:var(--mt);text-align:center;padding:14px">No posts.</p>');
+  }else if(t==='demand'){
+    var rep=searchInterestReport();
+    var top=rep.top.length?rep.top.map(function(r){
+      return '<div class="act-row"><div><b>'+esc(r.q)+'</b><small>'+esc(r.kind)+'</small></div><span style="font-weight:800;color:var(--g)">'+r.n+'×</span></div>';
+    }).join(''):'<div class="act-empty" style="font-size:11px;color:var(--mt2)">No searches recorded yet. As people use the Reedbi Agent and search, their interests appear here.</div>';
+    var recent=rep.recent.length?rep.recent.map(function(r){
+      return '<div style="font-size:11px;padding:5px 0;border-bottom:1px solid var(--b)"><b>'+esc(r.name||'Guest')+'</b> <span style="color:var(--mt2)">('+esc(r.kind)+')</span>: '+esc(r.q)+' <span style="color:var(--mt2);float:right">'+new Date(r.ts).toLocaleString()+'</span></div>';
+    }).join(''):'';
+    tb.innerHTML='<div style="font-size:12px;color:var(--mt2);margin-bottom:10px">What people are searching for and asking the agent — your real demand signal ('+rep.total+' total).</div>'
+      +'<div style="font-size:11px;font-weight:800;margin:4px 0 6px"><i class="ti ti-flame"></i> Top demand</div>'+top
+      +(recent?'<div style="font-size:11px;font-weight:800;margin:14px 0 6px"><i class="ti ti-clock"></i> Recent searches</div>'+recent:'');
   }
   // highlight active tab
   var btns=document.querySelectorAll('.admin-tabs .seller-tab');
@@ -11546,7 +11562,8 @@ function rbUpdateNavBadge(){
 setInterval(rbUpdateNavBadge,1500);
 setTimeout(rbUpdateNavBadge,1000);
 // default: show the clean Home landing immediately on load
-setTimeout(function(){try{rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}},400);
+try{document.body.classList.add('rb-home');}catch(e){}
+setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}},400);
 
 /* ===== v135: confetti, daily spin wheel, shopper tiers, achievements =====
    Healthy delight: a once-a-day spin, celebratory confetti, and a level that
@@ -14105,18 +14122,20 @@ function openReedbiAgent(prefill){
   setTimeout(function(){var el=document.getElementById('ragent-in');if(el)el.focus();},120);
 }
 function agentMenuCard(){
-  var opts=[['job','🔍','Find a Job','Search jobs · AI auto-apply · post a job'],['shop','🛍️','Shop Product','Find products to buy'],['order','📦','Track My Order','See your orders & delivery'],['sell','💼','Sell Something','List your product to buyers']];
+  var opts=[['job','🔍','Find a Job','Search jobs · AI auto-apply · post a job'],['shop','🛍️','Shop Product','Find products to buy'],['habit','🔥','Build a Habit','Goals, streaks & reminders'],['order','📦','Track My Order','See your orders & delivery'],['sell','💼','Sell Something','List your product to buyers'],['care','🎧','Get Help','Orders, delivery, returns & refunds']];
   return '<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">'+opts.map(function(o){
     return '<button onclick="agentPick(\''+o[0]+'\')" style="display:flex;align-items:center;gap:11px;text-align:left;background:var(--sf);border:1px solid var(--b);border-radius:12px;padding:12px;cursor:pointer;width:100%"><span style="font-size:22px">'+o[1]+'</span><span style="flex:1"><b style="font-size:13px;display:block">'+o[2]+'</b><small style="color:var(--mt2);font-size:11px">'+o[3]+'</small></span><i class="ti ti-chevron-right" style="color:var(--mt2)"></i></button>';
   }).join('')+'</div>';
 }
 function agentPick(opt){
-  var labels={job:'Find a Job',shop:'Shop Product',order:'Track My Order',sell:'Sell Something'};
+  var labels={job:'Find a Job',shop:'Shop Product',habit:'Build a Habit',order:'Track My Order',sell:'Sell Something',care:'Get Help'};
   __agentChat.push({a:0,t:labels[opt]||opt});
   if(opt==='job'){__agentChat.push(agentJobFlow(''));}
   else if(opt==='shop'){__agentChat.push(agentShopFlow(''));}
+  else if(opt==='habit'){__agentChat.push({a:1,t:'Build a habit that sticks — set goals, get gentle reminders, track your streak, and share your progress. 🔥',actions:'<div style="margin-top:8px;display:flex;flex-direction:column;gap:7px"><button class="btn btnok" style="padding:9px 12px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');openHabits()">Open Habit Tracker</button><button class="btn" style="padding:9px 12px;font-size:12px;border:1px solid #7c3aed;color:#7c3aed" onclick="closeOvl(\'ragent-ovl\');if(typeof openAddHabit===\'function\')openAddHabit()">+ Start a new challenge</button></div>'});}
   else if(opt==='order'){__agentChat.push({a:1,t:'Here are your orders & delivery status. 📦',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');showMyOrders()">Open my orders</button></div>'});}
   else if(opt==='sell'){__agentChat.push({a:1,t:'List your products and reach buyers nearby and worldwide. 💼',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentOpenSell()">Start selling</button></div>'});}
+  else if(opt==='care'){__agentChat.push({a:1,t:'I can help with orders, delivery, returns and refunds. 🎧',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');if(typeof openCareAi===\'function\')openCareAi();else if(typeof openCare===\'function\')openCare()">Open Reedbi Care</button></div>'});}
   renderAgent();
 }
 function agentJobFlow(role){
@@ -14148,6 +14167,7 @@ function agentSend(){
   var reply=agentRespond(text);__agentChat.push(reply);renderAgent();
 }
 function agentRespond(text){
+  try{logSearchInterest(text,'agent');}catch(e){}
   var q=text.toLowerCase();
   var has=function(arr){return arr.some(function(w){return q.indexOf(w)>=0;});};
   // strip intent words to get the search term
@@ -14176,6 +14196,10 @@ function agentRespond(text){
   // HABIT intent
   if(has(['habit','goal','routine','motivat','discipline','streak'])){
     return {a:1,t:'Your Habit Tracker keeps you on track with goals, reminders and progress videos. 🎯',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');openHabits()">Open Habit Tracker</button></div>'};
+  }
+  // HELP / CARE intent
+  if(has(['help','support','refund','return','complaint','problem','issue','cancel','delivery problem','where is my refund','broken','damaged'])){
+    return {a:1,t:'I can help with orders, delivery, returns and refunds. 🎧',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');if(typeof openCareAi===\'function\')openCareAi();else if(typeof openCare===\'function\')openCare()">Open Reedbi Care</button></div>'};
   }
   // default = SHOP intent (search products) — use the rich Shop flow
   var pterm=term(['buy','shop','purchase','price','cheap','looking','show','find','get','want','need','search','product','products']);
@@ -14226,4 +14250,29 @@ function agentShopFlow(term,cat){
 function agentShopCat(cat){__agentChat.push({a:0,t:cat});__agentChat.push(agentShopFlow('',cat));renderAgent();}
 function agentViewProduct(pid){closeOvl('ragent-ovl');try{openProductDetail(pid);}catch(e){try{openMainStore();}catch(_){}}}
 function agentAddCart(pid){try{if(typeof addToCart==='function'){addToCart(pid);}else if(typeof addToCartSilent==='function'){addToCartSilent(pid);toast('Added to cart 🛒','success');}}catch(e){}}
+
+/* ===== v203: capture what people search & want, for admin insight =====
+   Honest scope: this records interests locally and (when signed in) to the
+   cloud so admins can see demand. It is NOT AGI/ASI — true self-learning AI
+   needs a backend LLM. This gives admins the real signal: what users want. */
+function logSearchInterest(term,kind){
+  try{
+    term=(term||'').toString().trim();if(!term||term.length<2)return;
+    var log=LS.get('rb_searchlog',[])||[];
+    log.unshift({q:term.slice(0,80),kind:kind||'search',uid:(CU&&CU.uid)||'guest',name:(CU&&CU.name)||'Guest',ts:Date.now()});
+    if(log.length>500)log=log.slice(0,500);
+    LS.set('rb_searchlog',log);
+    // aggregate demand counts
+    var agg=LS.get('rb_searchagg',{})||{};var key=(kind||'search')+'::'+term.toLowerCase().slice(0,40);
+    agg[key]=(agg[key]||0)+1;LS.set('rb_searchagg',agg);
+    // cloud (signed-in only) — fire and forget
+    try{if(window.FB&&FB.ready&&FB.db&&CU&&!CU.guest&&!window.FB_CLOUD_DISABLED){FB.db.collection('search_interest').add({q:term.slice(0,80),kind:kind||'search',uid:CU.uid,name:CU.name||'',ts:Date.now()});}}catch(e){}
+  }catch(e){}
+}
+function searchInterestReport(){
+  var agg=LS.get('rb_searchagg',{})||{};
+  var rows=Object.keys(agg).map(function(k){var p=k.split('::');return {kind:p[0],q:p[1],n:agg[k]};}).sort(function(a,b){return b.n-a.n;});
+  var recent=(LS.get('rb_searchlog',[])||[]).slice(0,40);
+  return {top:rows.slice(0,30),recent:recent,total:(LS.get('rb_searchlog',[])||[]).length};
+}
 </script></body></html>
