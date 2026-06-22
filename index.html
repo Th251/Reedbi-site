@@ -369,11 +369,28 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .buy-gallery{display:flex;gap:7px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;border-radius:10px;touch-action:pan-x}
 .buy-gallery::-webkit-scrollbar{display:none}
 .buy-gimg{width:100%;flex:0 0 100%;height:200px;object-fit:cover;border-radius:10px;scroll-snap-align:center}
-.overlay.open{display:flex}
+.overlay.open{display:flex;animation:rbFade .18s ease}
+@keyframes rbFade{from{opacity:0}to{opacity:1}}
+@keyframes rbModalIn{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+.overlay.open>.modal{animation:rbModalIn .24s cubic-bezier(.16,1,.3,1)}
+@media(prefers-reduced-motion:reduce){.overlay.open,.overlay.open>.modal{animation:none}}
+#ragent-fab{animation:rbFabPulse 2.8s ease-in-out infinite}
+@keyframes rbFabPulse{0%,100%{box-shadow:0 6px 18px rgba(124,58,237,.45)}50%{box-shadow:0 8px 28px rgba(124,58,237,.80)}}
+@media(prefers-reduced-motion:reduce){#ragent-fab{animation:none}}
+.rb-typing{display:inline-flex;gap:4px;align-items:center;padding:2px 0}
+.rb-typing span{width:7px;height:7px;border-radius:50%;background:var(--mt2);display:inline-block;animation:rbTyping 1.2s ease-in-out infinite}
+.rb-typing span:nth-child(2){animation-delay:.2s}
+.rb-typing span:nth-child(3){animation-delay:.4s}
+@keyframes rbTyping{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){.rb-typing span{animation:none}}
 .modal{background:var(--sf);border:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
 .modal>*{flex-shrink:0}
 summary{list-style:none}summary::-webkit-details-marker{display:none}
 .overlay{overscroll-behavior:contain}
+@media(min-width:760px){
+  .overlay{align-items:center}
+  .modal{max-width:600px;border-radius:18px;max-height:88vh;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+}
 .mhd{padding:13px 16px 10px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .mhd h3{font-size:14px;font-weight:700}
 .mbd{padding:13px 16px;overflow-y:auto;flex:1}
@@ -645,8 +662,8 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 .fk-rail::-webkit-scrollbar{display:none}
 .fk-rail .fk-tile{flex:0 0 140px}
 .fk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#e6e9ee}
-@media(min-width:560px){.fk-grid{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:760px){.fk-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:560px){.fk-grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr))}}
+@media(min-width:760px){.fk-grid{grid-template-columns:repeat(auto-fill,minmax(205px,1fr))}}
 .fk-tile{background:#fff;padding:11px 10px 13px;cursor:pointer;position:relative;display:flex;flex-direction:column;transition:box-shadow .15s}
 .fk-tile:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:1}
 .fk-tile .imgwrap{position:relative;height:140px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
@@ -1267,7 +1284,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v206</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v213</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5975,7 +5992,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v206 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v213 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -7339,10 +7356,13 @@ function runProductSearch(q){
     return near(a)-near(b);
   });}
   var box=document.getElementById('ps-results');if(!box)return;
+  psLastQ=q||'';
+  if(psMaxPrice>0)matches=matches.filter(function(p){return (p.price||0)<=psMaxPrice;});
+  matches=psApplySort(matches);
   if(!prods.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products listed yet.</p>';return;}
   if(!matches.length){box.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px">No products match “'+esc(q)+'”.</p>';return;}
   var intro=(!q?rbInterestChips():'');
-  box.innerHTML=intro+'<div style="font-size:10px;color:var(--mt2);margin-bottom:6px">'+matches.length+' product'+(matches.length!==1?'s':'')+'</div>'+matches.map(psCard).join('');
+  box.innerHTML=intro+psSortBar()+'<div style="font-size:10px;color:var(--mt2);margin-bottom:6px">'+matches.length+' product'+(matches.length!==1?'s':'')+'</div>'+matches.map(psCard).join('');
 }
 
 /* ===== Bulk label printing with printed/balance tracking ===== */
@@ -14110,7 +14130,7 @@ var __agentChat=[];
 function openReedbiAgent(prefill){
   var ovl=document.getElementById('ragent-ovl');
   if(!ovl){ovl=document.createElement('div');ovl.id='ragent-ovl';ovl.className='overlay';
-    ovl.innerHTML='<div class="modal" style="max-width:440px;height:88vh;max-height:88vh"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:15px"><i class="ti ti-sparkles" style="color:#7c3aed"></i> Reedbi Agent</b><button class="modal-x" onclick="closeOvl(\'ragent-ovl\')"><i class="ti ti-x"></i></button></div><div id="ragent-chat" style="flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:4px 2px"></div><div id="ragent-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div><div style="display:flex;gap:7px"><input id="ragent-in" placeholder="Find a job, shop, track an order…" style="flex:1" onkeydown="if(event.key===\'Enter\')agentSend()"><button class="btn btnok" style="padding:10px 14px" onclick="agentSend()"><i class="ti ti-send"></i></button></div></div>';
+    ovl.innerHTML='<div class="modal" style="max-width:460px;height:88vh;max-height:88vh"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="display:flex;align-items:center;gap:9px"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#0a66c2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 3px 10px rgba(124,58,237,.4)">✨</div><div><b style="font-size:15px;display:block;line-height:1.1">Reedbi Agent</b><small style="color:var(--g);font-size:10.5px;font-weight:600">● Online · here to help</small></div></div><button class="modal-x" onclick="closeOvl(\'ragent-ovl\')"><i class="ti ti-x"></i></button></div><div id="ragent-chat" style="flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:11px;padding:4px 2px"></div><div id="ragent-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div><div style="display:flex;gap:7px"><input id="ragent-in" placeholder="Find a job, shop, track an order…" style="flex:1" onkeydown="if(event.key===\'Enter\')agentSend()"><button class="btn btnok" style="padding:10px 14px" onclick="agentSend()"><i class="ti ti-send"></i></button></div></div>';
     document.body.appendChild(ovl);}
   ovl.classList.add('open');
   if(!__agentChat.length){
@@ -14153,18 +14173,22 @@ function agentPostJob(){closeOvl('ragent-ovl');try{openTag('jobs');toast('Tap th
 function renderAgent(){
   var box=document.getElementById('ragent-chat');if(!box)return;
   box.innerHTML=__agentChat.map(function(m){
-    if(m.a)return '<div style="align-self:flex-start;max-width:90%;background:var(--card2);border:1px solid var(--b);border-radius:13px 13px 13px 4px;padding:10px 12px;font-size:13px;line-height:1.45">'+m.t+(m.actions||'')+'</div>';
-    return '<div style="align-self:flex-end;max-width:85%;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:13px 13px 4px 13px;padding:9px 12px;font-size:13px">'+esc(m.t)+'</div>';
+    if(m.a){var inner=(m.t==='__typing__')?'<span class="rb-typing"><span></span><span></span><span></span></span>':(m.t+(m.actions||''));return '<div style="display:flex;gap:8px;align-items:flex-start;max-width:95%"><div style="flex-shrink:0;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#0a66c2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;box-shadow:0 3px 9px rgba(124,58,237,.38)">✨</div><div style="flex:1;min-width:0;background:var(--card2);border:1px solid var(--b);border-radius:4px 14px 14px 14px;padding:11px 13px;font-size:13px;line-height:1.5;box-shadow:0 2px 10px rgba(0,0,0,.06)">'+inner+'</div></div>';}
+    return '<div style="align-self:flex-end;max-width:85%;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:14px 14px 4px 14px;padding:10px 13px;font-size:13px;box-shadow:0 4px 12px rgba(10,102,194,.30)">'+esc(m.t)+'</div>';
   }).join('');
   box.scrollTop=box.scrollHeight;
   var chips=document.getElementById('ragent-chips');
-  if(chips)chips.innerHTML=[['job','🔍 Job'],['shop','🛍️ Shop'],['order','📦 Orders'],['sell','💼 Sell']].map(function(c){return '<button class="hab-chip" onclick="agentPick(\''+c[0]+'\')">'+c[1]+'</button>';}).join('');
+  if(chips)chips.innerHTML=[['job','🔍 Job'],['shop','🛍️ Shop'],['habit','🔥 Habit'],['order','📦 Orders'],['sell','💼 Sell'],['care','🎧 Help']].map(function(c){return '<button class="hab-chip" onclick="agentPick(\''+c[0]+'\')">'+c[1]+'</button>';}).join('');
 }
 function agentChip(c){var el=document.getElementById('ragent-in');if(el){el.value=c.replace(/^[^\w]+/,'');}agentSend();}
 function agentSend(){
   var el=document.getElementById('ragent-in');if(!el)return;var text=(el.value||'').trim();if(!text)return;
   el.value='';__agentChat.push({a:0,t:text});
-  var reply=agentRespond(text);__agentChat.push(reply);renderAgent();
+  __agentChat.push({a:1,t:'__typing__'});renderAgent();
+  setTimeout(function(){
+    __agentChat=__agentChat.filter(function(m){return m.t!=='__typing__';});
+    var reply=agentRespond(text);__agentChat.push(reply);renderAgent();
+  },650);
 }
 function agentRespond(text){
   try{logSearchInterest(text,'agent');}catch(e){}
@@ -14274,5 +14298,31 @@ function searchInterestReport(){
   var rows=Object.keys(agg).map(function(k){var p=k.split('::');return {kind:p[0],q:p[1],n:agg[k]};}).sort(function(a,b){return b.n-a.n;});
   var recent=(LS.get('rb_searchlog',[])||[]).slice(0,40);
   return {top:rows.slice(0,30),recent:recent,total:(LS.get('rb_searchlog',[])||[]).length};
+}
+
+/* ===== v211: Flipkart/Meesho-style Sort & price filter for the shop ===== */
+var psSort='relevant';var psLastQ='';var psMaxPrice=0;
+function psApplySort(arr){
+  var a=arr.slice();
+  if(psSort==='price_low')a.sort(function(x,y){return (x.price||0)-(y.price||0);});
+  else if(psSort==='price_high')a.sort(function(x,y){return (y.price||0)-(x.price||0);});
+  else if(psSort==='newest')a.sort(function(x,y){return (y.ts||0)-(x.ts||0);});
+  // 'relevant' keeps the nearby-first order already applied
+  return a;
+}
+function psSetSort(mode){psSort=mode;runProductSearch(psLastQ);}
+function psSetMaxPrice(v){psMaxPrice=parseFloat(v)||0;runProductSearch(psLastQ);}
+function psSortBar(){
+  var opts=[['relevant','Relevance'],['price_low','Price ↑'],['price_high','Price ↓'],['newest','Newest']];
+  var prices=[[0,'All prices'],[50,'Under 50'],[200,'Under 200'],[500,'Under 500'],[1000,'Under 1000']];
+  var sortRow='<div style="display:flex;gap:7px;align-items:center;overflow-x:auto;padding:2px 0 7px;scrollbar-width:none">'
+    +'<span style="font-size:11px;font-weight:700;color:var(--mt2);flex-shrink:0"><i class="ti ti-arrows-sort"></i> Sort</span>'
+    +opts.map(function(o){return '<button onclick="psSetSort(\''+o[0]+'\')" style="flex-shrink:0;font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:16px;cursor:pointer;border:1px solid '+(psSort===o[0]?'var(--g)':'var(--b)')+';background:'+(psSort===o[0]?'var(--g)':'var(--card2)')+';color:'+(psSort===o[0]?'#fff':'var(--tx)')+'">'+o[1]+'</button>';}).join('')
+    +'</div>';
+  var priceRow='<div style="display:flex;gap:7px;align-items:center;overflow-x:auto;padding:0 0 9px;scrollbar-width:none">'
+    +'<span style="font-size:11px;font-weight:700;color:var(--mt2);flex-shrink:0"><i class="ti ti-tag"></i> Price</span>'
+    +prices.map(function(p){return '<button onclick="psSetMaxPrice('+p[0]+')" style="flex-shrink:0;font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:16px;cursor:pointer;border:1px solid '+(psMaxPrice===p[0]?'var(--g)':'var(--b)')+';background:'+(psMaxPrice===p[0]?'var(--g)':'var(--card2)')+';color:'+(psMaxPrice===p[0]?'#fff':'var(--tx)')+'">'+p[1]+'</button>';}).join('')
+    +'</div>';
+  return sortRow+priceRow;
 }
 </script></body></html>
