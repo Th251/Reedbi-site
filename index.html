@@ -395,7 +395,13 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
   .home-wrap{max-width:1320px}
 }
 @media(min-width:960px){
-  .modal{max-width:680px}
+  .modal{max-width:760px}
+}
+@media(min-width:1280px){
+  .modal{max-width:1000px}
+}
+@media(min-width:1600px){
+  .modal{max-width:1100px}
 }
 .mhd{padding:13px 16px 10px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .mhd h3{font-size:14px;font-weight:700}
@@ -1290,7 +1296,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v217</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v219</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5999,7 +6005,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v217 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v219 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -8188,8 +8194,10 @@ function openMainStore(cat){
     +'<div class="fk-grid">'+(prods.length?prods.slice(0,60).map(fkTile).join(''):'<div style="grid-column:1/-1;padding:30px;text-align:center;color:#878787;font-size:13px">No products'+(cat?' in '+esc(cat):'')+' yet.</div>')+'</div></div>';
 
   // category view = focused page; All view = full storytelling homepage
-  var homeBlocks=cat?'':(story+stage+strip+'<div class="reveal">'+banner+'</div>'+feat+'<div class="reveal">'+storesRail+'</div>'+'<div class="reveal">'+dealRail+'</div>');
-  box.innerHTML='<div class="fk-wrap">'+bar+homeBlocks+'<div class="reveal">'+grid+'</div>'+'<div style="height:20px"></div></div>';
+  // Flipkart-style: products appear right after the hero; promo blocks move below
+  var topBlocks=cat?'':(story+stage);
+  var btmBlocks=cat?'':(strip+'<div class="reveal">'+banner+'</div>'+feat+'<div class="reveal">'+storesRail+'</div>'+'<div class="reveal">'+dealRail+'</div>');
+  box.innerHTML='<div class="fk-wrap">'+bar+topBlocks+'<div class="reveal">'+grid+'</div>'+btmBlocks+'<div style="height:20px"></div></div>';
   box.scrollTop=0;rbStoreTop();
   fkInitMotion(box);
   if(!cat&&featured)fkStart3DHero(featured);
