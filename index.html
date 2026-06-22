@@ -530,11 +530,11 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 .bub-media{width:100%;max-width:240px;max-height:240px;object-fit:cover;border-radius:10px;display:block}
 .user-ad{position:relative;background:linear-gradient(135deg,rgba(10,102,194,.06),rgba(195,125,22,.06));border:1px solid var(--b);border-radius:10px;padding:10px 11px;margin:8px 10px 0;font-size:12px}
 .ad-tag{position:absolute;top:7px;right:9px;font-size:8px;font-weight:700;color:var(--mt2);text-transform:uppercase;letter-spacing:.5px}\n.bub{box-shadow:0 1px 3px rgba(0,0,0,.06)}\n.abtn{border-radius:10px;font-weight:600}\n.ps-card{box-shadow:0 1px 4px rgba(0,0,0,.05);border-radius:12px}\n.appl-card{box-shadow:0 1px 3px rgba(0,0,0,.05)}
-#prodsearch-ovl .modal{max-width:1320px;width:97vw;height:96vh;max-height:96vh;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
-#prodsearch-ovl .mbd{flex:0 0 auto;min-height:0;overflow:visible;display:block}
+#prodsearch-ovl .modal{max-width:1320px;width:97vw;height:96vh;max-height:96vh;display:flex;flex-direction:column;overflow:hidden}
+#prodsearch-ovl .mbd{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;display:block;padding-top:0}
 #prodsearch-ovl #ps-results{overflow:visible;min-height:0}
-#prodsearch-ovl .mhd{position:sticky;top:0;z-index:12;background:var(--sf)}
-#prodsearch-ovl .fk-bar{top:46px;z-index:7}
+#prodsearch-ovl .mhd{background:var(--sf);flex:0 0 auto}
+#prodsearch-ovl .fk-bar{position:sticky;top:0;z-index:7}
 @media(max-width:700px){#prodsearch-ovl .modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}}
 @media(min-width:701px){.sf-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}.sf-img{height:150px;object-fit:contain;background:#fff;padding:6px}.sf-hero{padding:26px 24px}.sf-hero .sf-av{width:68px;height:68px;font-size:30px}.sf-ttl{font-size:13px}}
 .p3d-ovl{position:fixed;inset:0;background:rgba(8,8,8,.92);z-index:100000;display:none;align-items:center;justify-content:center;flex-direction:column}
@@ -615,12 +615,14 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 .fk-search{flex:1;display:flex;align-items:center;gap:7px;background:#fff;border-radius:4px;padding:9px 12px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
 .fk-search i{color:#0a66c2;font-size:15px}
 .fk-search input{flex:1;border:none;outline:none;font-size:13px;font-family:var(--fn);color:#111}
-.fk-cats{display:flex;gap:4px;overflow-x:auto;background:#fff;padding:12px 8px;-webkit-overflow-scrolling:touch;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.fk-cat{flex-shrink:0;width:74px;text-align:center;cursor:pointer}
-.fk-cat-ic{width:52px;height:52px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:26px;background:linear-gradient(135deg,#eaf2fb,#f3eafb)}
-.fk-cat.on .fk-cat-ic{background:linear-gradient(135deg,#0a66c2,#7c3aed);box-shadow:0 4px 12px rgba(10,102,194,.35)}
-.fk-cat span{font-size:10px;font-weight:600;color:#212121;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fk-cat.on span{color:#0a66c2}
+.fk-cats{display:flex;gap:8px;overflow-x:auto;background:transparent;padding:10px 2px 4px;-webkit-overflow-scrolling:touch;box-shadow:none;scrollbar-width:none}
+.fk-cats::-webkit-scrollbar{display:none}
+.fk-cat{flex-shrink:0;width:auto;text-align:center;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--b);border-radius:22px;background:var(--card2);transition:background .15s,border-color .15s}
+.fk-cat-ic{width:auto;height:auto;border-radius:0;margin:0;display:inline;align-items:center;justify-content:center;font-size:15px;background:none;box-shadow:none}
+.fk-cat.on{background:var(--g);border-color:var(--g)}
+.fk-cat.on .fk-cat-ic{background:none;box-shadow:none}
+.fk-cat span{font-size:12.5px;font-weight:600;color:var(--tx);display:inline;white-space:nowrap;overflow:visible;text-overflow:clip}
+.fk-cat.on span{color:#fff}
 .fk-banner{margin:10px;border-radius:10px;overflow:hidden;background:linear-gradient(110deg,#0a66c2,#7c3aed 60%,#0a8f5c);color:#fff;padding:18px 18px 16px;position:relative;box-shadow:0 6px 18px rgba(10,102,194,.25)}
 .fk-banner::after{content:"";position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1)}
 .fk-banner .lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;opacity:.9;font-weight:700}
@@ -1260,7 +1262,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v201</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v202</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5968,7 +5970,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v201 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v202 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -8103,7 +8105,7 @@ function openMainStore(cat){
   allProds.forEach(function(p){var pr=parseFloat(String(p.price).replace(/[^0-9.]/g,''))||0,of=parseFloat(String(p.offer||'').replace(/[^0-9.]/g,''))||0;var dd=(of&&pr&&of<pr)?Math.round((pr-of)/pr*100):0;if(dd>bestD){bestD=dd;best=p;}});
   var banner='<div class="fk-banner"><div class="lbl">Reedbi Ecommerce</div><h2>'+(bestD?('Up to '+bestD+'% OFF'):'Shop nearby & worldwide')+'</h2>'
     +'<p>'+pages.length+' approved stores · '+allProds.length+' products · nearby sellers first</p>'
-    +'<span class="cta" onclick="document.getElementById(\'ps-results\').scrollTo({top:9999,behavior:\'smooth\'})">Shop deals <i class="ti ti-arrow-right"></i></span></div>';
+    +'<span class="cta" onclick="(rbScrollBox()||document.getElementById(\'ps-results\')).scrollTo({top:9999,behavior:\'smooth\'})">Shop deals <i class="ti ti-arrow-right"></i></span></div>';
 
   // immersive shopping shortcuts
   var feat='<div class="fk-feat">'
@@ -8127,7 +8129,7 @@ function openMainStore(cat){
     +'<h1>Walk the market. <span class="hl">Touch it.</span> Spin it in 3D. Make it yours.</h1>'
     +'<p>From a farmer\'s fruit nearby to a dress across the world — discover real products from approved sellers, see them in real-time 3D, and collect them with a tap.</p>'
     +'<div class="acts"><button class="p1" onclick="openTouchCollect()"><i class="ti ti-hand-finger"></i> Start Touch &amp; Collect</button>'
-    +'<button class="p2" onclick="document.getElementById(\'ps-results\').scrollTo({top:9999,behavior:\'smooth\'})">Explore deals <i class="ti ti-arrow-down"></i></button></div></div>';
+    +'<button class="p2" onclick="(rbScrollBox()||document.getElementById(\'ps-results\')).scrollTo({top:9999,behavior:\'smooth\'})">Explore deals <i class="ti ti-arrow-down"></i></button></div></div>';
 
   // ===== v118 real-time 3D hero (auto-rotating featured product) =====
   var featured=best||allProds[0];
@@ -9671,7 +9673,7 @@ var __rbView=null;         // function to re-render the current shop page (for r
 var __pdSel={color:'',size:'',qty:1};
 
 function rbSetView(fn){__rbView=fn;}
-function rbScrollBox(){return document.querySelector('#prodsearch-ovl .modal')||document.querySelector('#prodsearch-ovl .mbd')||document.getElementById('ps-results');}
+function rbScrollBox(){return document.querySelector('#prodsearch-ovl .mbd')||document.querySelector('#prodsearch-ovl .modal')||document.getElementById('ps-results');}
 function rbSnapPush(){
   var box=document.getElementById('ps-results');var sc=rbScrollBox();
   if(box&&box.innerHTML.trim())__rbNav.push({html:box.innerHTML,top:(sc&&sc.scrollTop)||0,view:__rbView});
@@ -14056,7 +14058,7 @@ function habGoalOverallPct(hb){
 
 /* v193: after v190 the store scrolls on the modal, not #ps-results — so reset
    the modal to top on every forward navigation (fixes "lands mid-page"). */
-function rbStoreTop(){try{var m=document.querySelector('#prodsearch-ovl .modal');if(m)m.scrollTop=0;}catch(e){}}
+function rbStoreTop(){try{var m=document.querySelector('#prodsearch-ovl .mbd')||document.querySelector('#prodsearch-ovl .modal');if(m)m.scrollTop=0;}catch(e){}}
 
 /* v194: loyalty points (earned from daily spin + 30-day streaks) unlock a
    purchase discount — rewards your most engaged customers. */
