@@ -198,8 +198,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .home-feat{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:22px;padding-bottom:30px}
 .home-feat span{font-size:11px;color:var(--mt2);background:var(--card2);border:1px solid var(--b);border-radius:20px;padding:6px 11px;display:inline-flex;align-items:center;gap:5px}
 @media(min-width:760px){
-  .es#es{padding:40px 32px}
-  .home-wrap{max-width:1000px}
+  .es#es{padding:36px 40px}
+  .home-wrap{max-width:1180px}
   .home-hero{padding:46px 44px;border-radius:26px}
   .home-title{font-size:42px}
   .home-sub{font-size:16px;max-width:560px}
@@ -390,6 +390,12 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 @media(min-width:760px){
   .overlay{align-items:center}
   .modal{max-width:600px;border-radius:18px;max-height:88vh;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+}
+@media(min-width:1280px){
+  .home-wrap{max-width:1320px}
+}
+@media(min-width:960px){
+  .modal{max-width:680px}
 }
 .mhd{padding:13px 16px 10px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .mhd h3{font-size:14px;font-weight:700}
@@ -1284,7 +1290,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v213</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v215</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1329,6 +1335,7 @@ body.dark .spin-wheel{border-color:#2a333f}
           <span><i class="ti ti-target" style="color:var(--cyan)"></i> Habit coaching</span>
           <span><i class="ti ti-shield-check" style="color:var(--g)"></i> Secure checkout</span>
         </div>
+        <div id="home-shop"></div>
       </div>
     </div>
     <div id="cv-view" style="display:none;flex-direction:column;flex:1;min-height:0;height:100%">
@@ -5984,7 +5991,7 @@ function createTag_DISABLED(){
 function autoResize(ta){if(!ta)return;ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,80)+'px';}
 function onKey(e){if(e.key==='Enter'&&!e.shiftKey&&window.innerWidth>700){e.preventDefault();sendPost();}}
 function goBack(){stopLive();stopPoll();var _f=document.getElementById('fab');if(_f)_f.style.display='';document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';activeTagId=null;pendingPosts=[];renderTagList(document.getElementById('tsr').value);}
-function goHome(){stopLive();stopPoll();try{document.body.classList.add('rb-home');}catch(e){}activeTagId=null;var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;}
+function goHome(){stopLive();stopPoll();try{document.body.classList.add('rb-home');}catch(e){}activeTagId=null;var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;try{renderHomeProducts();}catch(e){}}
 ['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('open');});});
 document.getElementById('pmb').addEventListener('click',function(e){if(e.target===document.getElementById('pmb'))closePM();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('open');});closePM();}});
@@ -5992,7 +5999,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v213 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v215 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -14324,5 +14331,21 @@ function psSortBar(){
     +prices.map(function(p){return '<button onclick="psSetMaxPrice('+p[0]+')" style="flex-shrink:0;font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:16px;cursor:pointer;border:1px solid '+(psMaxPrice===p[0]?'var(--g)':'var(--b)')+';background:'+(psMaxPrice===p[0]?'var(--g)':'var(--card2)')+';color:'+(psMaxPrice===p[0]?'#fff':'var(--tx)')+'">'+p[1]+'</button>';}).join('')
     +'</div>';
   return sortRow+priceRow;
+}
+
+/* ===== v215: Flipkart/Meesho-style product grid on the Home page ===== */
+function renderHomeProducts(){
+  var box=document.getElementById('home-shop');if(!box)return;
+  var prods=getProducts().filter(function(p){return productInMarketplace(p)&&!p.withdrawn&&productAvailable(p)&&p.photos&&p.photos[0];});
+  if(!prods.length){box.innerHTML='';return;}
+  var myLocW=(CU&&CU.location?CU.location:'').toLowerCase().split(/[\s,]+/).filter(function(w){return w.length>2;});
+  if(myLocW.length){prods=prods.slice().sort(function(a,b){function near(p){var pl=(p.location||'').toLowerCase();return myLocW.some(function(w){return pl.indexOf(w)>=0;})?0:1;}return near(a)-near(b);});}
+  var show=prods.slice(0,12);
+  box.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin:32px 2px 14px">'
+    +'<div class="home-sec" style="margin:0">Suggested for you</div>'
+    +'<button onclick="openMainStore()" style="background:none;border:none;color:var(--g);font-weight:700;font-size:12.5px;cursor:pointer">See all &rarr;</button>'
+    +'</div>'
+    +'<div class="fk-grid" style="border-radius:12px;overflow:hidden;border:1px solid var(--b)">'+show.map(fkTile).join('')+'</div>'
+    +'<div style="text-align:center;margin:16px 0 4px"><button onclick="openMainStore()" class="btn btnln" style="font-weight:700">Explore the full store</button></div>';
 }
 </script></body></html>
