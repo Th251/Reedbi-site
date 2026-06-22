@@ -1290,7 +1290,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v215</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v216</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5999,7 +5999,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v215 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v216 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -9805,6 +9805,7 @@ function openProductDetail(pid,opts){
   var p=getProducts().find(function(x){return x.id===pid;});
   if(!p){toast('Product not found','err');return;}
   try{pushRecentViewed(pid);}catch(e){}
+  try{history.replaceState(null,'','#product='+encodeURIComponent(pid)+'&n='+rbSlug(p.title));}catch(e){}
   if(!document.getElementById('prodsearch-ovl')||!document.getElementById('prodsearch-ovl').classList.contains('open'))openProductSearch();
   if(opts.nav!==false)rbSnapPush();
   __pdSel={color:'',size:'',qty:1};__pdPi=0;
@@ -9925,6 +9926,7 @@ function renderProductDetail(pid){
     +'<div class="pd-body">'
     +(p.brand?'<div class="pd-brand">'+esc(p.brand)+'</div>':'')
     +'<div class="pd-title">'+esc(p.title)+'</div>'
+    +'<button onclick="shareProduct('+pidJ+')" style="display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--b);border-radius:18px;padding:6px 13px;font-size:12px;font-weight:600;color:var(--g);cursor:pointer;margin:8px 0 2px"><i class="ti ti-share"></i> Share this product link</button>'
     +rate
     +'<div class="pd-price"><span class="pd-now">'+cur+' '+base.toLocaleString()+'</span>'+(off?'<span class="pd-mrp">'+cur+' '+mrp.toLocaleString()+'</span><span class="pd-off">'+off+'% off</span>':'')+'</div>'
     +'<div style="font-size:11px;color:#878787">Inclusive of all taxes shown below</div>'
@@ -11590,7 +11592,7 @@ setInterval(rbUpdateNavBadge,1500);
 setTimeout(rbUpdateNavBadge,1000);
 // default: show the clean Home landing immediately on load
 try{document.body.classList.add('rb-home');}catch(e){}
-setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}},400);
+setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}try{rbOpenFromHash();}catch(e){}},400);
 
 /* ===== v135: confetti, daily spin wheel, shopper tiers, achievements =====
    Healthy delight: a once-a-day spin, celebratory confetti, and a level that
@@ -14347,5 +14349,32 @@ function renderHomeProducts(){
     +'</div>'
     +'<div class="fk-grid" style="border-radius:12px;overflow:hidden;border:1px solid var(--b)">'+show.map(fkTile).join('')+'</div>'
     +'<div style="text-align:center;margin:16px 0 4px"><button onclick="openMainStore()" class="btn btnln" style="font-weight:700">Explore the full store</button></div>';
+}
+
+/* ===== v216: Shareable product deep-links (Flipkart-style URLs) ===== */
+function rbSlug(s){return (s||'product').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,50);}
+function rbProductLink(id){
+  var p=getProducts().find(function(x){return x.id===id;});
+  var slug=p?rbSlug(p.title):'product';
+  return location.origin+location.pathname+'#product='+encodeURIComponent(id)+'&n='+slug;
+}
+function shareProduct(id){
+  var url=rbProductLink(id);
+  var p=getProducts().find(function(x){return x.id===id;});
+  var title=p?p.title:'Reedbi product';
+  if(navigator.share){navigator.share({title:title,text:'Check out '+title+' on Reedbi',url:url}).catch(function(){});return;}
+  try{navigator.clipboard.writeText(url);toast('Product link copied — share it anywhere','ok');}catch(e){
+    try{var t=document.createElement('input');t.value=url;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);toast('Product link copied','ok');}catch(_){toast(url,'info');}
+  }
+}
+function rbOpenFromHash(){
+  try{
+    var h=(location.hash||'').replace(/^#/,'');
+    if(!h)return false;
+    var parts={};h.split('&').forEach(function(kv){var a=kv.split('=');parts[a[0]]=decodeURIComponent(a[1]||'');});
+    if(parts.product){var id=parts.product;var p=getProducts().find(function(x){return x.id===id;});if(p){setTimeout(function(){try{openProductDetail(id);}catch(e){}},650);return true;}}
+    if(parts.seller){var pg=parts.seller;setTimeout(function(){try{openSellerPage?openSellerPage(pg):openTag(pg);}catch(e){}},650);return true;}
+  }catch(e){}
+  return false;
 }
 </script></body></html>
