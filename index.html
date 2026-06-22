@@ -640,7 +640,8 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 .tcm-bag .ct{background:#fff;color:#0a8f5c;border-radius:12px;min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;padding:0 5px}
 .tcm-hint{text-align:center;color:#9fb3c8;font-size:11px;padding:4px 16px 14px}
 /* ===== Flipkart-style professional main store (v116) ===== */
-.fk-wrap{background:#f1f3f6;margin:-13px -16px 0;min-height:auto}
+.fk-wrap{background:#f1f3f6;margin:-13px -16px 0;min-height:auto;overflow-x:hidden;max-width:100vw}
+#prodsearch-ovl .mbd,#ps-results{overflow-x:hidden}
 .fk-bar{background:#0a66c2;padding:11px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:8;box-shadow:0 2px 6px rgba(0,0,0,.12)}
 .fk-bar .brand{color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .fk-bar .brand small{font-style:italic;color:#ffe500;font-weight:600;font-size:9px}
@@ -673,10 +674,11 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 .fk-rail{display:flex;gap:10px;overflow-x:auto;padding:0 14px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .fk-rail::-webkit-scrollbar{display:none}
 .fk-rail .fk-tile{flex:0 0 140px}
-.fk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#e6e9ee}
+.fk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#e6e9ee;width:100%;max-width:100%;box-sizing:border-box;overflow-x:hidden}
+.fk-ttl,.fk-brand,.fk-now{min-width:0;word-break:break-word;overflow-wrap:anywhere}
 @media(min-width:560px){.fk-grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr))}}
 @media(min-width:760px){.fk-grid{grid-template-columns:repeat(auto-fill,minmax(205px,1fr))}}
-.fk-tile{background:#fff;padding:11px 10px 13px;cursor:pointer;position:relative;display:flex;flex-direction:column;transition:box-shadow .15s}
+.fk-tile{background:#fff;padding:11px 10px 13px;cursor:pointer;position:relative;display:flex;flex-direction:column;transition:box-shadow .15s;min-width:0;overflow:hidden;box-sizing:border-box}
 .fk-tile:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:1}
 .fk-tile .imgwrap{position:relative;height:140px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
 .fk-tile img{max-width:100%;max-height:140px;object-fit:contain;mix-blend-mode:multiply}
@@ -1296,7 +1298,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v219</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v221</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6005,7 +6007,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v219 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v221 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -9752,7 +9754,7 @@ function rbRefresh(btn){
 // reusable top navigation bar (back + title + home + refresh)
 function rbTopBar(title){
   return '<div class="rb-navbar">'
-    +'<button onclick="rbNavBack()" title="Back" aria-label="Go back"><i class="ti ti-arrow-left"></i></button>'
+    +'<button onclick="rbNavBack()" title="Back" aria-label="Go back" style="display:inline-flex;align-items:center;gap:4px;width:auto;padding:0 10px;font-weight:700;font-size:13px"><i class="ti ti-arrow-left"></i> Back</button>'
     +'<div class="ttl">'+esc(title||'Reedbi')+'</div>'
     +'<button onclick="rbNavHome()" title="Home"><i class="ti ti-home"></i></button>'
     +'<span class="sp"></span>'
@@ -14183,6 +14185,7 @@ function agentJobFlow(role){
   var footer='<div style="margin-top:12px;border-top:1px solid var(--b);padding-top:11px;display:flex;flex-direction:column;gap:8px">'
     +'<button class="btn" style="background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800;padding:11px;border:none" onclick="agentOpenAgent()">🤖 AI Job Agent — auto-apply with my CV</button>'
     +'<button class="btn" style="border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:10px" onclick="agentPostJob()">➕ Post a job (I\'m hiring)</button>'
+    +'<button class="btn" style="border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:10px" onclick="agentInterviewPrep()">🎤 Practice interview — AI questions from my CV</button>'
     +'</div>';
   return {a:1,t:(role?'Jobs for "<b>'+esc(role)+'</b>":':'Latest jobs ('+matches.length+'):'),actions:listing+footer};
 }
@@ -14407,5 +14410,87 @@ function homeCard(p){
     +(rate?'<div>'+rate+'</div>':'')
     +'<div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-top:2px"><span style="font-size:15px;font-weight:800">'+cur+' '+base.toLocaleString()+'</span>'+(off?'<span style="font-size:11px;color:var(--mt2);text-decoration:line-through">'+cur+' '+mrp.toLocaleString()+'</span><span style="font-size:11px;color:#388e3c;font-weight:700">'+off+'% off</span>':'')+'</div>'
     +'</div></div>';
+}
+
+/* ===== v221: AI Interview Question generator + printable Q&A sheet ===== */
+function genInterviewQuestions(cvText, skills, jobTitle){
+  cvText=(cvText||'').toLowerCase();
+  var sk=(skills||'').split(/[,;\n|]/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+  var known=['javascript','typescript','python','java','react','node','angular','vue','sql','mongodb','excel','powerpoint','marketing','sales','design','figma','management','communication','leadership','accounting','finance','customer service','project management','data analysis','html','css','aws','azure','docker','kubernetes','photoshop','illustrator','seo','content writing','copywriting','testing','qa','android','ios','flutter','swift','kotlin','c++','c#','machine learning','tensorflow','sap','tally','logistics','supply chain','nursing','teaching'];
+  known.forEach(function(k){if(cvText.indexOf(k)>=0&&sk.map(function(x){return x.toLowerCase();}).indexOf(k)<0)sk.push(k);});
+  sk=sk.slice(0,6);
+  var qs=[];
+  if(jobTitle)qs.push({c:'Role fit',q:'What attracts you to the '+jobTitle+' role, and how does your background prepare you for it?'});
+  sk.forEach(function(s){qs.push({c:'Skill: '+s,q:'Can you describe a project where you used '+s+'? What was your specific contribution and the outcome?'});});
+  qs.push({c:'Experience',q:'Walk me through your most significant professional achievement so far and the impact it had.'});
+  qs.push({c:'Problem solving',q:'Tell me about a time you faced a difficult problem at work. How did you approach and resolve it?'});
+  qs.push({c:'Pressure',q:'Describe a situation where you had to work under pressure or meet a tight deadline. What did you do?'});
+  qs.push({c:'Teamwork',q:'Give an example of how you handled a disagreement with a colleague or team member.'});
+  qs.push({c:'Growth',q:'What is a skill you are currently working to improve, and how are you doing it?'});
+  qs.push({c:'Motivation',q:'Where do you see yourself professionally in the next 2-3 years?'});
+  qs.push({c:'Candidate Q',q:'Do you have any questions for us about the role, the team, or the company?'});
+  return qs;
+}
+function openInterviewSheet(o){
+  o=o||{};
+  var qs=genInterviewQuestions(o.cvText,o.skills,o.jobTitle);
+  var cand=esc(o.candidate||'Candidate');
+  var role=esc(o.jobTitle||'Interview');
+  var ov=document.getElementById('intv-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='intv-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  var rows=qs.map(function(q,i){
+    return '<div class="intv-q" style="border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--sf)">'
+      +'<div style="font-size:10px;font-weight:800;color:var(--g);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">'+(i+1)+'. '+esc(q.c)+'</div>'
+      +'<div style="font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.4">'+esc(q.q)+'</div>'
+      +'<textarea data-iq="'+i+'" placeholder="Type the candidate\u2019s answer here during the interview\u2026" style="width:100%;min-height:54px;border:1px solid var(--b);border-radius:8px;padding:8px;font-size:12.5px;font-family:var(--fn);resize:vertical;background:var(--bg);color:var(--tx)"></textarea>'
+      +'</div>';
+  }).join('');
+  ov.innerHTML='<div class="modal" style="max-width:760px"><div class="mhd"><h3>🎤 Interview · '+role+'</h3><button class="modal-x" onclick="closeOvl(\'intv-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:11px 13px;margin-bottom:14px;font-size:12px;color:var(--mt)">Candidate: <b style="color:var(--tx)">'+cand+'</b> · '+qs.length+' AI-generated questions based on the CV. Type answers live, then print or save so the employer can review.</div>'
+    +'<div id="intv-list">'+rows+'</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">'
+    +'<button class="btn btnok" onclick="printInterviewSheet()" style="flex:1;min-width:130px"><i class="ti ti-printer"></i> Print Q &amp; A</button>'
+    +'<button class="btn btnln" onclick="saveInterviewSheet(\''+esc(o.appId||'')+'\')" style="flex:1;min-width:130px"><i class="ti ti-device-floppy"></i> Save answers</button>'
+    +'</div></div></div>';
+  __intvCtx={cand:o.candidate||'Candidate',role:o.jobTitle||'Interview',qs:qs,appId:o.appId||''};
+  ov.classList.add('open');
+}
+var __intvCtx=null;
+function _collectInterviewAnswers(){
+  var ans=[];document.querySelectorAll('#intv-list textarea[data-iq]').forEach(function(t){ans[parseInt(t.getAttribute('data-iq'),10)]=t.value||'';});
+  return ans;
+}
+function printInterviewSheet(){
+  if(!__intvCtx)return;var ans=_collectInterviewAnswers();
+  var html='<html><head><title>Interview — '+esc(__intvCtx.cand)+'</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;max-width:760px;margin:24px auto;padding:0 20px;color:#111}h1{font-size:20px}h2{font-size:13px;color:#0a66c2;text-transform:uppercase;margin:18px 0 3px}p{font-size:14px;line-height:1.5;margin:3px 0 0}.a{background:#f5f7fa;border-left:3px solid #0a66c2;padding:8px 12px;margin-top:6px;white-space:pre-wrap;min-height:20px}.hd{border-bottom:2px solid #0a66c2;padding-bottom:8px;margin-bottom:6px}</style></head><body>'
+    +'<div class="hd"><h1>Interview Q &amp; A</h1><div style="font-size:13px;color:#555">Candidate: <b>'+esc(__intvCtx.cand)+'</b> · Role: <b>'+esc(__intvCtx.role)+'</b> · '+new Date().toLocaleDateString()+'</div></div>'
+    +__intvCtx.qs.map(function(q,i){return '<h2>'+(i+1)+'. '+esc(q.c)+'</h2><p><b>Q:</b> '+esc(q.q)+'</p><div class="a"><b>A:</b> '+esc(ans[i]||'—')+'</div>';}).join('')
+    +'<p style="margin-top:30px;font-size:11px;color:#999">Generated by Reedbi AI Interview Assistant</p></body></html>';
+  var w=window.open('','_blank');if(w){w.document.write(html);w.document.close();setTimeout(function(){try{w.print();}catch(e){}},350);}else{toast('Allow pop-ups to print','info');}
+}
+function saveInterviewSheet(appId){
+  if(!__intvCtx)return;var ans=_collectInterviewAnswers();
+  var rec={cand:__intvCtx.cand,role:__intvCtx.role,ts:Date.now(),qa:__intvCtx.qs.map(function(q,i){return{c:q.c,q:q.q,a:ans[i]||''};})};
+  try{var key='rb_interviews';var all=LS.get(key,[])||[];if(appId)rec.appId=appId;all.unshift(rec);LS.set(key,all.slice(0,200));
+    try{if(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest){FB.db.collection('interviews').add(rec).catch(function(){});}}catch(e){}
+    toast('Interview answers saved — employer can review','ok');
+  }catch(e){toast('Could not save','err');}
+}
+
+/* v221: agent → interview prep from the user's latest CV */
+function agentInterviewPrep(jobTitle){
+  if(!requireAuth('generate interview questions'))return;
+  var cvs=getCVs(CU.uid);var cv=cvs&&cvs.length?cvs[cvs.length-1]:null;
+  var cvText=cv&&cv.text?cv.text:'';
+  var prof=(typeof getJobProfile==='function')?(getJobProfile()||{}):{};
+  var skills=prof.skills||'';
+  if(!cvText&&!skills){
+    __agentChat.push({a:1,t:'I can generate tailored interview questions once you add a CV or skills. Open the <b>AI Job Agent</b> to upload your CV, then come back.',actions:'<button class="btn btnok" style="margin-top:8px;padding:8px 12px;font-size:12px" onclick="openJobAgent()">Open AI Job Agent</button>'});
+    renderAgent();return;
+  }
+  openInterviewSheet({cvText:cvText,skills:skills,jobTitle:jobTitle||prof.role||'',candidate:CU.name||'Candidate'});
+  __agentChat.push({a:1,t:'I\u2019ve prepared interview questions from your CV. Type your answers in the sheet to practice, then print or save them. Employers can review saved answers.'});
+  renderAgent();
 }
 </script></body></html>
