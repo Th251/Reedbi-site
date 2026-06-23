@@ -567,7 +567,7 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 #prodsearch-ovl #ps-results{overflow:visible;min-height:0}
 #prodsearch-ovl .mhd{background:var(--sf);flex:0 0 auto}
 #prodsearch-ovl .fk-bar{position:sticky;top:0;z-index:7}
-@media(max-width:700px){#prodsearch-ovl .modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}}
+@media(max-width:700px){#prodsearch-ovl .modal{width:100vw;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;border-radius:0}}
 @media(min-width:701px){.sf-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}.sf-img{height:150px;object-fit:contain;background:#fff;padding:6px}.sf-hero{padding:26px 24px}.sf-hero .sf-av{width:68px;height:68px;font-size:30px}.sf-ttl{font-size:13px}}
 .p3d-ovl{position:fixed;inset:0;background:rgba(8,8,8,.92);z-index:100000;display:none;align-items:center;justify-content:center;flex-direction:column}
 .p3d-ovl.open{display:flex}
@@ -1298,7 +1298,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v221</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v229</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1334,7 +1334,7 @@ body.dark .spin-wheel{border-color:#2a333f}
         <div class="home-tiles">
           <button class="home-tile" onclick="openMainStore()"><div class="ic" style="background:rgba(10,102,194,.12)">🛍️</div><b>Shop</b><small>Browse &amp; buy real products</small></button>
           <button class="home-tile" onclick="openHabits()"><div class="ic" style="background:rgba(234,88,12,.12)">🔥</div><b>Habits</b><small>Goals, streaks &amp; reminders</small></button>
-          <button class="home-tile" onclick="openReedbiAgent('')"><div class="ic" style="background:rgba(124,58,237,.12)">🔍</div><b>Find a Job</b><small>AI search &amp; auto-apply</small></button>
+          <button class="home-tile" onclick="openJobHub()"><div class="ic" style="background:rgba(124,58,237,.12)">🔍</div><b>Find a Job</b><small>Search · apply · track · report</small></button>
           <button class="home-tile" onclick="showMyOrders()"><div class="ic" style="background:rgba(22,163,74,.12)">📦</div><b>Orders</b><small>Track your deliveries</small></button>
         </div>
         <div class="home-feat">
@@ -6007,7 +6007,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v221 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v229 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11706,17 +11706,16 @@ function rbAchievements(){
   document.addEventListener('wheel',function(e){
     var ovl=document.getElementById('prodsearch-ovl');
     if(!ovl||!ovl.classList.contains('open'))return;
-    var sc=document.getElementById('ps-results');if(!sc)return;
-    // if the event target is already inside the scroller and it can scroll natively, let it be
+    var sc=(typeof rbScrollBox==='function'?rbScrollBox():null)||document.getElementById('ps-results');if(!sc)return;
     var t=e.target;
     if(sc.contains(t)){
       var atTop=sc.scrollTop<=0&&e.deltaY<0;
       var atBot=(sc.scrollTop+sc.clientHeight>=sc.scrollHeight-1)&&e.deltaY>0;
       if(!atTop&&!atBot){return;} // native scroll is working — don't interfere
     }
-    // otherwise drive the scroller manually
+    var before=sc.scrollTop;
     sc.scrollTop+=e.deltaY;
-    e.preventDefault();
+    if(sc.scrollTop!==before)e.preventDefault();
   },{passive:false});
 })();
 
@@ -12165,8 +12164,16 @@ function openHabitDay(id,idx){
       +'<button class="hab-chip'+(!done?' on':'')+'" style="flex:1" onclick="habDaySet(\''+id+'\','+idx+',false)"><i class="ti ti-x"></i> Missed</button></div>'
       +'<button class="btn btnok" style="width:100%" onclick="closeOvl(\'habday-ovl\');editHabitGoal(\''+id+'\')"><i class="ti ti-target"></i> Add goals to this challenge</button>';
   }
-  body+='<div class="fg" style="margin-top:11px"><label>📝 Reflection for this day</label><textarea id="habday-note" rows="2" placeholder="A line for your future self...">'+esc(hb.notes[dk]||'')+'</textarea></div>'
-    +'<button class="btn" style="width:100%;margin-top:8px;border:1px solid var(--b);color:var(--tx);font-weight:600" onclick="habDaySaveNote(\''+id+'\','+idx+')"><i class="ti ti-device-floppy"></i> Save reflection</button>';
+  body+='<div class="fg" style="margin-top:11px"><label>📝 Reflection / note for this day</label><textarea id="habday-note" rows="3" placeholder="Type or speak a note for your future self…">'+esc(hb.notes[dk]||'')+'</textarea></div>'
+    +'<div style="display:flex;gap:8px;margin-top:8px">'
+    +'<button class="btn mic-btn" style="flex:0 0 auto;border:1px solid #7c3aed;color:#7c3aed;font-weight:700" onclick="habDictateNote(\''+id+'\','+idx+',this)"><i class="ti ti-microphone"></i> Speak</button>'
+    +'<button class="btn" style="flex:1;border:1px solid var(--b);color:var(--tx);font-weight:600" onclick="habDaySaveNote(\''+id+'\','+idx+')"><i class="ti ti-device-floppy"></i> Save</button>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:8px">'
+    +'<button class="btn" style="flex:1;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;font-size:12px" onclick="habSummarizeNote(\''+id+'\','+idx+')"><i class="ti ti-scissors"></i> Short note</button>'
+    +'<button class="btn" style="flex:1;border:1px solid #16a34a;color:#16a34a;font-weight:700;font-size:12px" onclick="habCreateSubGoals(\''+id+'\','+idx+')"><i class="ti ti-target"></i> Sub-goals from note</button>'
+    +'</div>'
+    +'<div id="habday-savestate" style="font-size:10px;color:var(--mt2);text-align:center;margin-top:6px">'+((hb.noteTs&&hb.noteTs[dk])?'<i class="ti ti-clock"></i> Last saved: '+fmtDT(hb.noteTs[dk]):'')+'</div>';
   document.getElementById('habday-body').innerHTML=body;
   ovl.classList.add('open');
 }
@@ -12180,9 +12187,10 @@ function habDaySet(id,idx,achieved){
   saveHabits(habits);openHabitDay(id,idx);renderHabits();
 }
 function habDaySaveNote(id,idx){
-  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;hb.notes=hb.notes||{};
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;hb.notes=hb.notes||{};hb.noteTs=hb.noteTs||{};
   var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
   hb.notes[dk]=((document.getElementById('habday-note')||{}).value||'').trim();
+  hb.noteTs[dk]=Date.now();
   saveHabits(habits);closeOvl('habday-ovl');renderHabits();
   toast('Reflection saved 📝','ok');
 }
@@ -13680,7 +13688,12 @@ function renderHabitMonitor(){
     +'<div style="display:flex;gap:2px;align-items:flex-end;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:8px">'+(bars||'<div style="color:var(--mt2);font-size:12px;padding:14px;text-align:center;width:100%">No tracked days yet</div>')+'</div>'
     +'<div style="font-size:11px;color:var(--mt2);margin-top:10px;text-align:center">Overall: '+p.done+'/'+(hb.days||40)+' full days · '+p.pct+'% complete</div>'
     +((hb.goals&&hb.goals.length)?('<div style="font-size:12px;font-weight:800;margin:14px 0 7px">📈 Each goal — last '+st.count+' day(s)</div>'+hb.goals.map(function(g){var gs=habGoalStats(hb,g.id,__hmonRange);return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">🎯 '+esc(g.name)+'</span><span style="font-weight:800;color:'+col+'">'+gs.done+'/'+gs.span+' · '+gs.pct+'%</span></div><div style="height:7px;background:var(--card2);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+gs.pct+'%;background:'+col+'"></div></div></div>';}).join('')):'')
+    +'<div style="margin-top:14px;border:1px solid var(--b);border-radius:12px;padding:11px;background:var(--card2)">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:12.5px">📷 Progress photos</b><button class="btn btnln" style="padding:5px 10px;font-size:11.5px;font-weight:700" onclick="habAddPhoto(\''+hb.id+'\')"><i class="ti ti-camera-plus"></i> Add photo</button></div>'
+    +((hb.photos&&hb.photos.length)?'<div style="display:flex;gap:7px;flex-wrap:wrap">'+hb.photos.map(function(p,pi){return '<div style="position:relative"><img src="'+p.img+'" style="width:62px;height:62px;object-fit:cover;border-radius:8px;border:1px solid var(--b)"><button onclick="habRemovePhoto(\''+hb.id+'\','+pi+')" style="position:absolute;top:-6px;right:-6px;background:#dc2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1">×</button></div>';}).join('')+'</div>':'<div style="font-size:11px;color:var(--mt2)">No photos yet — add before/after or proof photos. They appear neatly arranged in your printable PDF report.</div>')
+    +'</div>'
     +'<button class="btn" style="width:100%;margin-top:14px;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;font-weight:800;padding:11px" onclick="habReportPDF(\''+hb.id+'\')"><i class="ti ti-file-text"></i> Download progress report (PDF)</button>'
+    +'<button class="btn" style="width:100%;margin-top:9px;border:1px solid #16a34a;color:#16a34a;font-weight:800;padding:11px" onclick="openHabitReportPicker()"><i class="ti ti-file-spreadsheet"></i> Export Excel report — daily · weekly · 30 · 90 days &amp; more</button>'
     +'<div style="font-size:10px;color:var(--mt2);text-align:center;margin-top:6px">Opens a printable report — choose “Save as PDF” to store it for your reference</div>';
 }
 
@@ -13731,7 +13744,14 @@ function renderHabitSheet(){
       return '<div class="hs-goal" style="flex-direction:column;align-items:stretch;border-color:'+(ck?col:'var(--b)')+';background:'+(ck?'rgba(22,163,74,.07)':'var(--card2)')+'">'
         +'<div style="display:flex;align-items:center;gap:10px"><div class="hs-tick" onclick="hsToggle(\''+g.id+'\')" style="border-color:'+(ck?col:'var(--mt2)')+';background:'+(ck?col:'transparent')+'">'+(ck?'✓':'')+'</div><div style="flex:1;font-size:13px;font-weight:600'+(ck?';text-decoration:line-through;color:var(--mt2)':'')+'">🎯 '+esc(g.name)+'</div><button onclick="hsNoteToggle(\''+g.id+'\')" title="Reflection" style="flex:none;border:1px solid var(--b);background:var(--sf);color:'+(gn?col:'var(--mt2)')+';border-radius:8px;padding:6px 9px;cursor:pointer;font-size:12px">📝</button></div>'
         +(gn?'<div style="margin-top:8px;font-size:12px;color:var(--tx);background:var(--sf);border:1px solid var(--b);border-radius:9px;padding:8px 10px">'+esc(gn.t)+'<div style="font-size:10px;color:var(--mt2);margin-top:4px">🕒 '+fmtDT(gn.ts)+'</div></div>':'')
-        +(open?'<div style="margin-top:8px"><textarea id="hs-gn-'+g.id+'" rows="2" placeholder="Reflection for this goal..." style="width:100%;font-size:12px;padding:8px;border:1px solid var(--b);border-radius:9px;background:var(--sf);color:var(--tx);font-family:var(--fn);box-sizing:border-box">'+esc(gn?gn.t:'')+'</textarea><button class="btn btnok" style="width:100%;margin-top:6px;font-size:12px;padding:7px" onclick="hsSaveGoalNote(\''+g.id+'\')"><i class="ti ti-device-floppy"></i> Save with date &amp; time</button></div>':'')
+        +(open?'<div style="margin-top:8px"><textarea id="hs-gn-'+g.id+'" rows="3" placeholder="Type or speak an update for this goal…" style="width:100%;font-size:12px;padding:8px;border:1px solid var(--b);border-radius:9px;background:var(--sf);color:var(--tx);font-family:var(--fn);box-sizing:border-box">'+esc(gn?gn.t:'')+'</textarea>'
+          +'<div style="display:flex;gap:6px;margin-top:6px">'
+          +'<button class="btn mic-btn" style="flex:0 0 auto;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;font-size:12px;padding:7px 10px" onclick="hsDictateGoalNote(\''+g.id+'\',this)"><i class="ti ti-microphone"></i> Speak</button>'
+          +'<button class="btn" style="flex:0 0 auto;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;font-size:12px;padding:7px 10px" onclick="hsSummarizeGoalNote(\''+g.id+'\')"><i class="ti ti-scissors"></i> Short</button>'
+          +'<button class="btn btnok" style="flex:1;font-size:12px;padding:7px" onclick="hsSaveGoalNote(\''+g.id+'\')"><i class="ti ti-device-floppy"></i> Save with date &amp; time</button>'
+          +'</div>'
+          +'<div id="hs-gn-state-'+g.id+'" style="font-size:10px;color:var(--mt2);text-align:center;margin-top:5px"></div>'
+          +'</div>':'')
         +'</div>';
     }).join('');
     body+='<button class="btn" style="width:100%;margin-top:4px;border:1px dashed var(--b);color:var(--mt);font-size:12px;font-weight:600" onclick="closeOvl(\'hsheet-ovl\');editHabitGoal(\''+hb.id+'\')"><i class="ti ti-edit"></i> Edit this challenge\'s goals</button>';
@@ -13816,6 +13836,7 @@ function habReportPDF(id){
     +(goals.length?('<h2>Goal completion (whole challenge)</h2><table><tr><th>Goal</th><th style="text-align:center">Days done</th><th style="text-align:center">%</th></tr>'+goalRows+'</table>'):'')
     +'<h2>Day-by-day log &amp; reflections</h2><table><tr><th>Day</th><th style="text-align:center">%</th><th>Reflection</th></tr>'+(dayRows||'<tr><td colspan="3" style="text-align:center;color:#999">No entries yet</td></tr>')+'</table>'
     +'<div class="foot">Made with Reedbi · keep going — you\'ve got this 🔥</div>'
+    +((hb.photos&&hb.photos.length)?'<h2 style="font-size:15px;color:'+col+';margin-top:22px;border-bottom:1px solid #eee;padding-bottom:4px">Progress photos</h2><div style="margin-top:8px">'+hb.photos.map(function(p){return '<div style="display:inline-block;margin:7px;text-align:center;vertical-align:top"><img src="'+p.img+'" style="width:180px;height:180px;object-fit:cover;border:1px solid #ddd;border-radius:8px"><div style="font-size:10px;color:#777;margin-top:3px">'+new Date(p.ts).toLocaleDateString()+'</div></div>';}).join('')+'</div>':'')
     +'<div class="btnbar noprint"><button onclick="window.print()">🖨️ Save as PDF / Print</button></div></body></html>';
   try{var w=window.open('','_blank');if(!w){toast('Allow pop-ups to view the report','info');return;}w.document.open();w.document.write(html);w.document.close();toast('Report ready — choose “Save as PDF” 📄','ok');}
   catch(e){toast('Could not open report window','err');}
@@ -14186,6 +14207,7 @@ function agentJobFlow(role){
     +'<button class="btn" style="background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800;padding:11px;border:none" onclick="agentOpenAgent()">🤖 AI Job Agent — auto-apply with my CV</button>'
     +'<button class="btn" style="border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:10px" onclick="agentPostJob()">➕ Post a job (I\'m hiring)</button>'
     +'<button class="btn" style="border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:10px" onclick="agentInterviewPrep()">🎤 Practice interview — AI questions from my CV</button>'
+    +'<button class="btn btnok" style="font-weight:800;padding:10px" onclick="closeOvl(\'ragent-ovl\');openJobHub()">💼 Open Job Hub — all my jobs in one place</button>'
     +'</div>';
   return {a:1,t:(role?'Jobs for "<b>'+esc(role)+'</b>":':'Latest jobs ('+matches.length+'):'),actions:listing+footer};
 }
@@ -14414,21 +14436,44 @@ function homeCard(p){
 
 /* ===== v221: AI Interview Question generator + printable Q&A sheet ===== */
 function genInterviewQuestions(cvText, skills, jobTitle){
-  cvText=(cvText||'').toLowerCase();
+  var cv=(cvText||'').toLowerCase();
   var sk=(skills||'').split(/[,;\n|]/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
-  var known=['javascript','typescript','python','java','react','node','angular','vue','sql','mongodb','excel','powerpoint','marketing','sales','design','figma','management','communication','leadership','accounting','finance','customer service','project management','data analysis','html','css','aws','azure','docker','kubernetes','photoshop','illustrator','seo','content writing','copywriting','testing','qa','android','ios','flutter','swift','kotlin','c++','c#','machine learning','tensorflow','sap','tally','logistics','supply chain','nursing','teaching'];
-  known.forEach(function(k){if(cvText.indexOf(k)>=0&&sk.map(function(x){return x.toLowerCase();}).indexOf(k)<0)sk.push(k);});
+  var known=['javascript','typescript','python','java','react','node','angular','vue','sql','mongodb','excel','powerpoint','marketing','sales','design','figma','management','communication','leadership','accounting','finance','customer service','project management','data analysis','html','css','aws','azure','docker','kubernetes','photoshop','illustrator','seo','content writing','copywriting','testing','qa','android','ios','flutter','swift','kotlin','c++','c#','machine learning','tensorflow','sap','tally','logistics','supply chain','nursing','teaching','git','rest api','agile','scrum','tableau','power bi','negotiation','branding'];
+  known.forEach(function(k){if(cv.indexOf(k)>=0&&sk.map(function(x){return x.toLowerCase();}).indexOf(k)<0)sk.push(k);});
   sk=sk.slice(0,6);
+  // varied per-skill templates — each skill gets a DIFFERENT style by rotating
+  var skillTpls=[
+    function(s){return 'Walk me through a specific project where you used '+s+'. What was your exact role and the measurable result?';},
+    function(s){return 'What is the most challenging problem you have solved using '+s+', and how did you approach it?';},
+    function(s){return 'How do you keep your '+s+' skills current? Tell me about something new in '+s+' you applied recently.';},
+    function(s){return 'If a teammate was stuck on a '+s+' task, how would you help them work through it?';},
+    function(s){return 'Compare two different approaches you have used in '+s+' and explain when you would choose each.';},
+    function(s){return 'Tell me about a mistake you made while working with '+s+' and what you learned from it.';},
+    function(s){return 'How would you rate your depth in '+s+', and what would it take for you to reach the next level?';}
+  ];
   var qs=[];
-  if(jobTitle)qs.push({c:'Role fit',q:'What attracts you to the '+jobTitle+' role, and how does your background prepare you for it?'});
-  sk.forEach(function(s){qs.push({c:'Skill: '+s,q:'Can you describe a project where you used '+s+'? What was your specific contribution and the outcome?'});});
-  qs.push({c:'Experience',q:'Walk me through your most significant professional achievement so far and the impact it had.'});
-  qs.push({c:'Problem solving',q:'Tell me about a time you faced a difficult problem at work. How did you approach and resolve it?'});
-  qs.push({c:'Pressure',q:'Describe a situation where you had to work under pressure or meet a tight deadline. What did you do?'});
-  qs.push({c:'Teamwork',q:'Give an example of how you handled a disagreement with a colleague or team member.'});
-  qs.push({c:'Growth',q:'What is a skill you are currently working to improve, and how are you doing it?'});
-  qs.push({c:'Motivation',q:'Where do you see yourself professionally in the next 2-3 years?'});
-  qs.push({c:'Candidate Q',q:'Do you have any questions for us about the role, the team, or the company?'});
+  if(jobTitle)qs.push({c:'Role fit',q:'What specifically attracts you to the '+jobTitle+' role, and which parts of your experience map most directly to it?'});
+  sk.forEach(function(s,i){qs.push({c:'Skill: '+s,q:skillTpls[i%skillTpls.length](s)});});
+  // CV-signal-based questions (different for each candidate)
+  var seniorWords=['senior','lead','manager','head of','principal','architect','supervisor','director'];
+  if(seniorWords.some(function(w){return cv.indexOf(w)>=0;})){
+    qs.push({c:'Leadership',q:'Your CV shows leadership experience. Tell me about a time you led a team through a difficult project — how did you keep everyone aligned?'});
+    qs.push({c:'Mentoring',q:'How do you develop and mentor more junior team members? Give a concrete example.'});
+  }
+  var yrs=cv.match(/(\d+)\+?\s*(years|yrs)/);
+  if(yrs)qs.push({c:'Experience depth',q:'You mention around '+yrs[1]+' years of experience. How has your approach to your work changed from when you started until now?'});
+  if(/(bsc|b\.sc|btech|b\.tech|bachelor|master|msc|mba|phd|degree|diploma|university|college)/.test(cv))qs.push({c:'Education',q:'How has your education prepared you for this role, and what did you have to learn on the job that studies did not teach?'});
+  if(/(certified|certificate|certification|pmp|cfa|cpa)/.test(cv))qs.push({c:'Certifications',q:'You list a certification on your CV. How have you applied what you learned from it in real work?'});
+  if(/(sales|revenue|target|quota|client|deal)/.test(cv))qs.push({c:'Results',q:'Tell me about a time you exceeded a target or won an important client. What did you do differently?'});
+  if(/(customer|support|service|helpdesk)/.test(cv))qs.push({c:'Customer focus',q:'Describe a difficult customer situation you turned around. What was the outcome?'});
+  if(/(design|ui|ux|figma|photoshop|illustrator|brand)/.test(cv))qs.push({c:'Craft',q:'Walk me through your design process from brief to final delivery on a piece of work you are proud of.'});
+  // universal behavioral (varied, no overlap with the above)
+  qs.push({c:'Achievement',q:'Walk me through the professional achievement you are most proud of and the impact it had.'});
+  qs.push({c:'Pressure',q:'Describe a situation where you had to deliver under a tight deadline. How did you prioritise?'});
+  qs.push({c:'Conflict',q:'Give an example of a disagreement with a colleague and how you resolved it.'});
+  qs.push({c:'Growth',q:'What is one skill you are actively working to improve right now, and how?'});
+  qs.push({c:'Motivation',q:'Where do you want to be professionally in two to three years?'});
+  qs.push({c:'Candidate Q',q:'What questions do you have for us about the role, the team, or the company?'});
   return qs;
 }
 function openInterviewSheet(o){
@@ -14492,5 +14537,316 @@ function agentInterviewPrep(jobTitle){
   openInterviewSheet({cvText:cvText,skills:skills,jobTitle:jobTitle||prof.role||'',candidate:CU.name||'Candidate'});
   __agentChat.push({a:1,t:'I\u2019ve prepared interview questions from your CV. Type your answers in the sheet to practice, then print or save them. Employers can review saved answers.'});
   renderAgent();
+}
+
+/* ===== v224: Habit Excel reports (any period) + period picker ===== */
+function exportHabitExcel(days, label){
+  if(typeof XLSX==='undefined'){toast('Excel engine still loading — try again','err');return;}
+  var habits=getHabits();
+  if(!habits.length){toast('No habits yet — start one first','info');return;}
+  var today=new Date();today.setHours(0,0,0,0);
+  var dates=[];for(var i=days-1;i>=0;i--){dates.push(new Date(today.getTime()-i*86400000));}
+  var dkOf=function(d){return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();};
+  // ---- Summary sheet: date rows x habit columns (% each day) ----
+  var header=['Date'].concat(habits.map(function(h){return (h.name||'Habit');})).concat(['Overall %']);
+  var rows=[header];
+  dates.forEach(function(d){
+    var dk=dkOf(d),row=[d.toLocaleDateString()],sum=0;
+    habits.forEach(function(h){var p=habDayPct(h,dk);row.push(p);sum+=p;});
+    row.push(Math.round(sum/habits.length));rows.push(row);
+  });
+  var avg=['Average %'];
+  for(var c=1;c<header.length;c++){var s=0;for(var r=1;r<rows.length;r++){s+=rows[r][c];}avg.push(Math.round(s/(rows.length-1)));}
+  rows.push(avg);
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'Summary');
+  // ---- Per-habit detail sheet (with notes + goals done) ----
+  habits.forEach(function(h,hi){
+    var nrows=[['Date','Completion %','Goals done','Note']];
+    dates.forEach(function(d){
+      var dk=dkOf(d);
+      var note=(h.notes&&h.notes[dk])||'';
+      var gd=((h.dayGoals&&h.dayGoals[dk])||[]).length;
+      nrows.push([d.toLocaleDateString(),habDayPct(h,dk),gd,note]);
+    });
+    var nm=('H'+(hi+1)+' '+(h.name||'Habit')).slice(0,28).replace(/[\\\/\?\*\[\]:]/g,' ');
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(nrows),nm);
+  });
+  try{XLSX.writeFile(wb,'Reedbi-Habit-Report-'+(label||(days+'days')).replace(/\s+/g,'-')+'.xlsx');toast('Excel report downloaded','ok');}
+  catch(e){toast('Could not create file','err');}
+}
+function openHabitReportPicker(){
+  if(!getHabits().length){toast('No habits yet — start one first','info');return;}
+  var periods=[['Daily (today)',1],['Weekly',7],['15 days',15],['30 days',30],['40 days',40],['50 days',50],['90 days',90],['6 months',180],['1 year',365]];
+  var ov=document.getElementById('habrep-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='habrep-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  ov.innerHTML='<div class="modal" style="max-width:440px"><div class="mhd"><h3>📊 Habit report</h3><button class="modal-x" onclick="closeOvl(\'habrep-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="font-size:12px;color:var(--mt);margin-bottom:12px">Pick a period — you\u2019ll get an Excel file with a summary plus a sheet of daily progress and notes for each habit.</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">'
+    +periods.map(function(p){return '<button class="btn btnln" style="font-weight:700;padding:11px 8px" onclick="exportHabitExcel('+p[1]+',\''+p[0].replace(/[^a-zA-Z0-9]/g,'')+'\')"><i class="ti ti-file-spreadsheet"></i> '+p[0]+'</button>';}).join('')
+    +'</div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:12px;font-weight:700" onclick="printHabitReport()"><i class="ti ti-printer"></i> Print progress report</button>'
+    +'</div></div>';
+  ov.classList.add('open');
+}
+function printHabitReport(){
+  var habits=getHabits();if(!habits.length){toast('No habits yet','info');return;}
+  var today=new Date();today.setHours(0,0,0,0);
+  var rows=habits.map(function(h){
+    var pct=(typeof habGoalOverallPct==='function')?habGoalOverallPct(h):0;
+    var done=(h.done||[]).length;
+    var pc=(h.photos&&h.photos.length)||0;
+    return '<tr><td>'+esc(h.name||'Habit')+'</td><td style="text-align:center">'+done+'</td><td style="text-align:center">'+pct+'%</td><td style="text-align:center">'+pc+'</td></tr>';
+  }).join('');
+  var galleries=habits.filter(function(h){return h.photos&&h.photos.length;}).map(function(h){
+    var imgs=h.photos.map(function(p){
+      return '<div style="display:inline-block;margin:7px;text-align:center;vertical-align:top"><img src="'+p.img+'" style="width:180px;height:180px;object-fit:cover;border:1px solid #ddd;border-radius:8px"><div style="font-size:10px;color:#777;margin-top:3px">'+new Date(p.ts).toLocaleDateString()+'</div></div>';
+    }).join('');
+    return '<h2 style="font-size:15px;color:#0a66c2;margin-top:24px;border-bottom:1px solid #eee;padding-bottom:4px">'+esc(h.name||'Habit')+' — progress photos</h2><div style="margin-top:8px">'+imgs+'</div>';
+  }).join('');
+  var html='<html><head><title>Habit Report</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;max-width:760px;margin:24px auto;padding:0 20px;color:#111}h1{font-size:20px;color:#0a66c2}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #ddd;padding:8px 10px;font-size:13px}th{background:#0a66c2;color:#fff;text-align:left}img{page-break-inside:avoid}</style></head><body>'
+    +'<h1>Reedbi Habit Progress Report</h1><div style="font-size:12px;color:#555">'+(CU?esc(CU.name):'')+' · '+today.toLocaleDateString()+'</div>'
+    +'<table><tr><th>Habit</th><th>Days completed</th><th>Overall progress</th><th>Photos</th></tr>'+rows+'</table>'
+    +galleries
+    +'<p style="margin-top:26px;font-size:11px;color:#999">Generated by Reedbi Habit Tracker</p></body></html>';
+  var w=window.open('','_blank');if(w){w.document.write(html);w.document.close();setTimeout(function(){try{w.print();}catch(e){}},400);}else{toast('Allow pop-ups to print','info');}
+}
+
+/* ===== v225: attach photos to a habit → shown in the PDF report ===== */
+function habAddPhoto(id){
+  var inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  inp.onchange=function(){
+    var f=inp.files&&inp.files[0];if(!f)return;
+    if(f.size>3*1024*1024){toast('Image too large — please use one under 3MB','err');return;}
+    var rd=new FileReader();
+    rd.onload=function(){
+      var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+      hb.photos=hb.photos||[];hb.photos.push({img:rd.result,ts:Date.now()});
+      if(hb.photos.length>12)hb.photos=hb.photos.slice(-12);
+      saveHabits(habits);toast('Photo added — it will appear in your PDF report','ok');
+      try{openHabitMonitor(id);}catch(e){}
+    };
+    rd.readAsDataURL(f);
+  };
+  inp.click();
+}
+function habRemovePhoto(id,idx){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb||!hb.photos)return;
+  hb.photos.splice(idx,1);saveHabits(habits);try{openHabitMonitor(id);}catch(e){}
+}
+
+/* ===== v226: unified Job Hub + job reports (Excel/PDF) ===== */
+function myJobApps(){var u=CU&&CU.uid;return getAllApps().filter(function(a){return a.uid===u;});}
+function openJobHub(){
+  if(!requireAuth('open the job hub'))return;
+  var apps=myJobApps();
+  var posts=[];try{var jt=tags.find(function(x){return x.id==='jobs';});if(jt)posts=(jt.posts||[]).filter(function(p){return p.mine||p.uid===CU.uid;});}catch(e){}
+  var myCV=getCVs(CU.uid);
+  var ov=document.getElementById('jobhub-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='jobhub-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  function tile(ic,t,sub,onclick,badge){
+    return '<button onclick="'+onclick+'" style="text-align:left;background:var(--sf);border:1px solid var(--b);border-radius:13px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%">'
+      +'<div style="width:42px;height:42px;border-radius:11px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+ic+'</div>'
+      +'<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:13.5px">'+t+(badge?' <span style="background:var(--g);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:4px">'+badge+'</span>':'')+'</div><div style="font-size:11.5px;color:var(--mt2);margin-top:1px">'+sub+'</div></div>'
+      +'<i class="ti ti-chevron-right" style="color:var(--mt2)"></i></button>';
+  }
+  ov.innerHTML='<div class="modal" style="max-width:560px"><div class="mhd"><h3>💼 Job Hub</h3><button class="modal-x" onclick="closeOvl(\'jobhub-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:13px;padding:14px 16px;margin-bottom:14px"><div style="font-weight:800;font-size:15px">Everything jobs, in one place</div><div style="font-size:12px;opacity:.9;margin-top:3px">Search, apply, post, track, and report — with the AI agent.</div></div>'
+    +'<div style="display:grid;gap:9px">'
+    +tile('🔍','Find a job (AI agent)','Scan &amp; match jobs to your CV, auto-apply','closeOvl(\'jobhub-ovl\');openJobAgent()')
+    +tile('📄','My CV','Upload or update your CV','closeOvl(\'jobhub-ovl\');openJobAgent()',myCV.length?myCV.length+'':'')
+    +tile('📊','My applications','Jobs you applied to &amp; their status','closeOvl(\'jobhub-ovl\');showMyApps()',apps.length?apps.length+'':'')
+    +tile('🎤','Practice interview','AI questions from your CV','closeOvl(\'jobhub-ovl\');agentInterviewPrep()')
+    +tile('📢','Post a job','Hire — publish a job post','closeOvl(\'jobhub-ovl\');openTag(\'jobs\')')
+    +tile('👥','Manage applicants','Review people who applied to your posts','closeOvl(\'jobhub-ovl\');openCompanyPage((CU&&CU.co)||\'\')',posts.length?posts.length+'':'')
+    +tile('📈','Job report (Excel / PDF)','Daily report of applications &amp; posts','openJobReportPicker()')
+    +'</div></div></div>';
+  ov.classList.add('open');
+}
+function openJobReportPicker(){
+  var ov=document.getElementById('jobrep-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='jobrep-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  ov.innerHTML='<div class="modal" style="max-width:420px"><div class="mhd"><h3>📈 Job report</h3><button class="modal-x" onclick="closeOvl(\'jobrep-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="font-size:12px;color:var(--mt);margin-bottom:12px">A report of every job you applied to — company, role, status, ATS match %, and date applied.</div>'
+    +'<button class="btn btnln" style="width:100%;font-weight:700;margin-bottom:9px;padding:12px" onclick="jobReportExcel()"><i class="ti ti-file-spreadsheet"></i> Download Excel report</button>'
+    +'<button class="btn btnok" style="width:100%;font-weight:700;padding:12px" onclick="jobReportPDF()"><i class="ti ti-printer"></i> Print / PDF report</button>'
+    +'</div></div>';
+  ov.classList.add('open');
+}
+function jobReportExcel(){
+  if(typeof XLSX==='undefined'){toast('Excel engine still loading','err');return;}
+  var apps=myJobApps();
+  if(!apps.length){toast('No job applications yet','info');return;}
+  var stMap={received:'Submitted',shortlisted:'Shortlisted',interview:'Interview',offer:'Offer',rejected:'Not selected',hired:'Hired'};
+  var rows=[['Date applied','Company','Role','Status','ATS match %','Your note']];
+  apps.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).forEach(function(a){
+    rows.push([new Date(a.ts||Date.now()).toLocaleDateString(),a.company||'—',a.postTitle||'(untitled)',stMap[a.status]||a.status||'Submitted',(a.atsPct||0),a.note||'']);
+  });
+  try{var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'My Applications');
+    XLSX.writeFile(wb,'Reedbi-Job-Report-'+new Date().toISOString().slice(0,10)+'.xlsx');toast('Job Excel report downloaded','ok');}
+  catch(e){toast('Could not create file','err');}
+}
+function jobReportPDF(){
+  var apps=myJobApps();
+  if(!apps.length){toast('No job applications yet','info');return;}
+  var stMap={received:'Submitted',shortlisted:'Shortlisted',interview:'Interview',offer:'Offer',rejected:'Not selected',hired:'Hired'};
+  var rows=apps.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).map(function(a){
+    return '<tr><td>'+new Date(a.ts||Date.now()).toLocaleDateString()+'</td><td>'+esc(a.company||'—')+'</td><td>'+esc(a.postTitle||'(untitled)')+'</td><td>'+esc(stMap[a.status]||a.status||'Submitted')+'</td><td style="text-align:center">'+(a.atsPct||0)+'%</td></tr>';
+  }).join('');
+  var html='<html><head><title>Job Report</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;max-width:760px;margin:24px auto;padding:0 20px;color:#111}h1{font-size:20px;color:#0a66c2}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border:1px solid #ddd;padding:8px 10px;font-size:13px}th{background:#0a66c2;color:#fff;text-align:left}</style></head><body>'
+    +'<h1>Reedbi Job Application Report</h1><div style="font-size:12px;color:#555">'+(CU?esc(CU.name):'')+' · '+new Date().toLocaleDateString()+' · '+apps.length+' application'+(apps.length!==1?'s':'')+'</div>'
+    +'<table><tr><th>Date</th><th>Company</th><th>Role</th><th>Status</th><th>ATS match</th></tr>'+rows+'</table>'
+    +'<p style="margin-top:24px;font-size:11px;color:#999">Generated by Reedbi Job Hub</p></body></html>';
+  var w=window.open('','_blank');if(w){w.document.write(html);w.document.close();setTimeout(function(){try{w.print();}catch(e){}},350);}else{toast('Allow pop-ups to print','info');}
+}
+
+/* ===== v227: voice-to-text dictation for notes (in the user's language) ===== */
+var __rbDict=null;
+function rbDictate(targetId, btn, onUpdate){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Voice typing needs Chrome, Edge or an Android browser','err');return;}
+  var ta=document.getElementById(targetId);if(!ta)return;
+  try{
+    if(__rbDict){__rbDict.stop();__rbDict=null;if(btn){btn.classList.remove('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Speak';}return;}
+    var rec=new SR();rec.lang=(navigator.language||'en-US');rec.interimResults=true;rec.continuous=true;rec.maxAlternatives=1;
+    __rbDict=rec;if(btn){btn.classList.add('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Listening… tap to stop';}
+    var base=ta.value?ta.value.replace(/\s+$/,'')+' ':'';var finalT='';
+    rec.onresult=function(e){
+      var interim='';
+      for(var i=e.resultIndex;i<e.results.length;i++){
+        var tr=e.results[i][0].transcript;
+        if(e.results[i].isFinal)finalT+=tr+' ';else interim+=tr;
+      }
+      ta.value=base+finalT+interim;
+      if(typeof onUpdate==='function'){try{onUpdate(ta.value);}catch(_){}}  // auto-save as you speak
+    };
+    rec.onerror=function(){toast('Didn’t catch that — try again','err');};
+    rec.onend=function(){
+      // keep listening across long sessions until the user taps stop
+      if(__rbDict===rec){try{rec.start();return;}catch(_){}}
+      __rbDict=null;if(btn){btn.classList.remove('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Speak';}
+    };
+    rec.start();
+    toast('Listening — speak in any language. Auto-saving until you tap stop.','info');
+  }catch(e){toast('Voice typing unavailable','err');if(btn)btn.classList.remove('rec');}
+}
+
+/* ===== v228: long dictation auto-save + short-note summary + sub-goals from text ===== */
+function habDictateNote(id, idx, btn){
+  rbDictate('habday-note', btn, function(text){
+    var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+    hb.notes=hb.notes||{};hb.noteTs=hb.noteTs||{};
+    var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+    hb.notes[dk]=text;hb.noteTs[dk]=Date.now();
+    saveHabits(habits);
+    var st=document.getElementById('habday-savestate');if(st)st.innerHTML='<i class="ti ti-clock"></i> Auto-saved while you speak · '+fmtDT(Date.now());
+  });
+}
+/* Extractive summary — TF sentence scoring. No regex lookbehind (Android-safe). */
+function rbExtractiveSummary(text, maxSentences){
+  text=(text||'').replace(/\s+/g,' ').trim();
+  if(!text)return '';
+  maxSentences=maxSentences||4;
+  var sents=text.replace(/([.!?])\s+/g,'$1\n').split('\n').map(function(s){return s.trim();}).filter(function(s){return s.length>4;});
+  if(sents.length<=maxSentences)return sents.join(' ');
+  var stop={the:1,a:1,an:1,and:1,or:1,but:1,to:1,of:1,in:1,on:1,for:1,is:1,are:1,was:1,were:1,i:1,you:1,it:1,this:1,that:1,with:1,as:1,at:1,be:1,by:1,my:1,we:1,so:1,if:1,me:1,do:1,did:1,have:1,has:1,had:1,will:1,would:1,can:1,not:1,no:1,he:1,she:1,they:1,them:1,our:1,your:1};
+  var freq={},words=text.toLowerCase().match(/[a-z']+/g)||[];
+  words.forEach(function(w){if(!stop[w]&&w.length>2)freq[w]=(freq[w]||0)+1;});
+  var scored=sents.map(function(s,i){
+    var sc=0,sw=(s.toLowerCase().match(/[a-z']+/g)||[]);
+    sw.forEach(function(w){sc+=freq[w]||0;});
+    if(i===0)sc*=1.15; // first sentence often topical
+    return {s:s,sc:sc/Math.max(1,sw.length),i:i};
+  });
+  scored.sort(function(a,b){return b.sc-a.sc;});
+  var top=scored.slice(0,maxSentences).sort(function(a,b){return a.i-b.i;});
+  return top.map(function(x){return x.s;}).join(' ');
+}
+function habSummarizeNote(id, idx){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+  var note=((document.getElementById('habday-note')||{}).value||(hb.notes&&hb.notes[dk])||'').trim();
+  if(note.length<40){toast('Write or speak a longer note first — then I’ll shorten it','info');return;}
+  var sum=rbExtractiveSummary(note, 4);
+  var ov=document.getElementById('habsum-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='habsum-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  ov.innerHTML='<div class="modal" style="max-width:460px"><div class="mhd"><h3>✂️ Short note</h3><button class="modal-x" onclick="closeOvl(\'habsum-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="font-size:11px;color:var(--mt2);margin-bottom:8px">A quick summary pulled from your '+note.split(/\s+/).length+' words. You can edit it, then keep it.</div>'
+    +'<textarea id="habsum-text" rows="5" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--b);background:var(--sf);color:var(--tx);font-size:13px">'+esc(sum)+'</textarea>'
+    +'<button class="btn btnok" style="width:100%;margin-top:10px;font-weight:700" onclick="habSaveSummary(\''+id+'\','+idx+')"><i class="ti ti-check"></i> Save as the note for this day</button>'
+    +'<div style="font-size:10px;color:var(--mt2);text-align:center;margin-top:8px">Tip: a true AI rewrite (Gemini-style) needs the backend. This is a fast on-device summary.</div>'
+    +'</div></div>';
+  ov.classList.add('open');
+}
+function habSaveSummary(id, idx){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  hb.notes=hb.notes||{};hb.noteTs=hb.noteTs||{};
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+  hb.notes[dk]=((document.getElementById('habsum-text')||{}).value||'').trim();
+  hb.noteTs[dk]=Date.now();saveHabits(habits);closeOvl('habsum-ovl');
+  toast('Short note saved 📝','ok');try{openHabitDay(id,idx);renderHabits();}catch(e){}
+}
+/* Turn note lines/sentences into sub-goals under this habit. Android-safe split. */
+function habGoalsFromText(text){
+  text=(text||'').replace(/\r/g,'').replace(/([.!?])\s+/g,'$1\n');
+  var parts=text.split(/[\n•·]|(?:^|\s)[-*]\s/).map(function(s){return s.replace(/^[\s\-*•·\d.\)]+/,'').trim();}).filter(function(s){return s.length>3&&s.length<90;});
+  var seen={},out=[];
+  parts.forEach(function(p){var k=p.toLowerCase();if(!seen[k]){seen[k]=1;out.push(p);}});
+  return out.slice(0,12);
+}
+function habCreateSubGoals(id, idx){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+  var note=((document.getElementById('habday-note')||{}).value||(hb.notes&&hb.notes[dk])||'').trim();
+  var items=habGoalsFromText(note);
+  if(!items.length){toast('Add note text first — each line becomes a sub-goal','info');return;}
+  var ov=document.getElementById('habsg-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='habsg-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  __habSgCache={id:id,idx:idx,items:items};
+  ov.innerHTML='<div class="modal" style="max-width:460px"><div class="mhd"><h3>➕ Sub-goals from your note</h3><button class="modal-x" onclick="closeOvl(\'habsg-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="font-size:11px;color:var(--mt2);margin-bottom:10px">Pick the lines to add as sub-goals under this habit.</div>'
+    +items.map(function(t,i){return '<label style="display:flex;gap:9px;align-items:flex-start;padding:9px;border:1px solid var(--b);border-radius:10px;margin-bottom:7px;cursor:pointer"><input type="checkbox" class="habsg-cb" data-i="'+i+'" checked style="margin-top:2px"><span style="font-size:13px">🎯 '+esc(t)+'</span></label>';}).join('')
+    +'<button class="btn btnok" style="width:100%;margin-top:6px;font-weight:700" onclick="habSgAdd()"><i class="ti ti-plus"></i> Add selected sub-goals</button>'
+    +'</div></div>';
+  ov.classList.add('open');
+}
+var __habSgCache=null;
+function habSgAdd(){
+  if(!__habSgCache)return;
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===__habSgCache.id;});if(!hb)return;
+  hb.goals=hb.goals||[];var added=0;
+  Array.prototype.slice.call(document.querySelectorAll('.habsg-cb')).forEach(function(cb){
+    if(cb.checked){var t=__habSgCache.items[+cb.getAttribute('data-i')];
+      if(t&&!hb.goals.some(function(g){return (g.name||'').toLowerCase()===t.toLowerCase();})){hb.goals.push({id:'g'+Date.now()+Math.floor(Math.random()*9999),name:t});added++;}}
+  });
+  saveHabits(habits);closeOvl('habsg-ovl');
+  toast(added+' sub-goal'+(added!==1?'s':'')+' added ✅','ok');
+  try{openHabitDay(__habSgCache.id,__habSgCache.idx);renderHabits();}catch(e){}
+}
+
+/* ===== v229: per-sub-goal voice dictation + continuous auto-save ===== */
+function hsDictateGoalNote(gid, btn){
+  rbDictate('hs-gn-'+gid, btn, function(text){
+    var habits=getHabits();var hb=habits.find(function(x){return x.id===__hsId;});if(!hb)return;
+    var dk=dayKey((hb.startTs||Date.now())+__hsIdx*86400000);
+    hb.goalNotes=hb.goalNotes||{};hb.goalNotes[dk]=hb.goalNotes[dk]||{};
+    hb.goalNotes[dk][gid]={t:text,ts:Date.now()};
+    saveHabits(habits);
+    var st=document.getElementById('hs-gn-state-'+gid);
+    if(st)st.innerHTML='<span style="color:#16a34a">● Auto-saving as you speak · '+fmtDT(Date.now())+'</span>';
+  });
+}
+/* Make a short note from a goal's update text */
+function hsSummarizeGoalNote(gid){
+  var ta=document.getElementById('hs-gn-'+gid);if(!ta)return;
+  var note=(ta.value||'').trim();
+  if(note.length<40){toast('Write or speak a longer update first','info');return;}
+  ta.value=rbExtractiveSummary(note,3);
+  toast('Shortened — tap Save to keep it','ok');
 }
 </script></body></html>
