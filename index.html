@@ -1298,7 +1298,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v229</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v230</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6007,7 +6007,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v229 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v230 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12373,11 +12373,15 @@ function renderGoalSheet(){
     +'<div style="background:var(--card2);border-radius:12px;padding:12px;margin:0 0 12px;text-align:center">'
       +'<div class="gs-score" style="color:'+(dsc.state==='done'?'#16a34a':(dsc.state==='partial'?'#c2410c':'#dc2626'))+'">'+dsc.done+'/'+dsc.total+'</div>'
       +'<div style="font-size:12px;color:var(--mt2)">'+(sel===todayK?'Today':sel)+' · '+dsc.pct+'%'+(dsc.state==='done'?' — all done! 🎉':(dsc.state==='miss'&&dsc.total?' — tough day, be kind to yourself':''))+'</div></div>'
-    +s.goals.map(function(g){var mk=(day.marks&&day.marks[g.id])||'';var gn=(day.gnotes&&day.gnotes[g.id])||'';
+    +s.goals.map(function(g){var mk=(day.marks&&day.marks[g.id])||'';var gn=(day.gnotes&&day.gnotes[g.id])||'';var gnTs=(day.gnoteTs&&day.gnoteTs[g.id])||0;
       return '<div class="gs-goal"><div class="nm">'+esc(g.name)+'</div>'
         +'<button class="gs-mk '+(mk==='done'?'don':'')+'" onclick="markSheetGoal(\''+sel+'\',\''+g.id+'\',\'done\')" title="Achieved"><i class="ti ti-check"></i></button>'
         +'<button class="gs-mk '+(mk==='miss'?'mis':'')+'" onclick="markSheetGoal(\''+sel+'\',\''+g.id+'\',\'miss\')" title="Missed"><i class="ti ti-x"></i></button></div>'
-        +'<input class="gs-gnote" placeholder="✎ note for this goal…" value="'+esc(gn)+'" onchange="saveGoalNote(\''+sel+'\',\''+g.id+'\',this.value)" style="width:100%;margin:2px 0 9px;padding:6px 9px;border:1px solid var(--b);border-radius:8px;background:var(--sf);color:var(--tx);font-size:12px">';
+        +'<div style="display:flex;gap:6px;align-items:center;margin:2px 0 4px">'
+        +'<input id="gs-gnote-'+g.id+'" class="gs-gnote" placeholder="✎ type or speak an update…" value="'+esc(gn)+'" onchange="saveGoalNote(\''+sel+'\',\''+g.id+'\',this.value)" style="flex:1;padding:6px 9px;border:1px solid var(--b);border-radius:8px;background:var(--sf);color:var(--tx);font-size:12px">'
+        +'<button class="btn mic-btn" style="flex:0 0 auto;padding:6px 10px;border:1px solid #7c3aed;color:#7c3aed" onclick="gsDictateGoal(\''+sel+'\',\''+g.id+'\',this)" title="Speak this update"><i class="ti ti-microphone"></i></button>'
+        +'</div>'
+        +'<div id="gs-gnts-'+g.id+'" style="font-size:9px;color:var(--mt2);margin:0 0 9px">'+(gnTs?'<i class="ti ti-clock"></i> '+fmtDT(gnTs):'')+'</div>';
     }).join('')
     +'<div class="fg" style="margin-top:11px"><label>📝 Overall day reflection (optional)</label><textarea id="gs-note" rows="2" placeholder="A line for your future self...">'+esc(day.note||'')+'</textarea></div>'
     +'<button class="btn btnok" style="width:100%;margin-top:8px" onclick="saveSheetNote(\''+sel+'\')"><i class="ti ti-device-floppy"></i> Save reflection</button>'
@@ -14848,5 +14852,16 @@ function hsSummarizeGoalNote(gid){
   if(note.length<40){toast('Write or speak a longer update first','info');return;}
   ta.value=rbExtractiveSummary(note,3);
   toast('Shortened — tap Save to keep it','ok');
+}
+
+/* ===== v230: voice dictation + auto-save inside each individual goal update ===== */
+function gsDictateGoal(dk, gid, btn){
+  rbDictate('gs-gnote-'+gid, btn, function(text){
+    var s=getSheet();s.days[dk]=s.days[dk]||{marks:{},note:'',gnotes:{}};
+    s.days[dk].gnotes=s.days[dk].gnotes||{};s.days[dk].gnoteTs=s.days[dk].gnoteTs||{};
+    s.days[dk].gnotes[gid]=text;s.days[dk].gnoteTs[gid]=Date.now();
+    saveSheet(s);
+    var ts=document.getElementById('gs-gnts-'+gid);if(ts)ts.innerHTML='<i class="ti ti-clock"></i> Auto-saving while you speak · '+fmtDT(Date.now());
+  });
 }
 </script></body></html>
