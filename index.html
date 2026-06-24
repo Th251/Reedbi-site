@@ -183,6 +183,27 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .home-title{font-size:26px;font-weight:800;line-height:1.16;margin:9px 0 7px;position:relative}
 .home-sub{font-size:13px;opacity:.93;margin:0;position:relative;line-height:1.5}
 .home-cta{display:inline-flex;align-items:center;gap:7px;background:#fff;color:#0a66c2;font-weight:800;border:none;border-radius:30px;padding:11px 20px;margin-top:17px;cursor:pointer;font-size:13px;position:relative;overflow:hidden;box-shadow:0 6px 16px rgba(0,0,0,.20)}
+.home-agentcard{display:flex;align-items:center;gap:11px;background:var(--sf);border:1px solid var(--b);border-radius:15px;padding:12px 13px;margin:0 0 11px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.home-agentmic{flex:0 0 auto;width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(124,58,237,.4);transition:transform .15s}
+.jarvis-orb{width:118px;height:118px;border-radius:50%;margin:0 auto;background:linear-gradient(135deg,#7c3aed,#0a66c2);display:flex;align-items:center;justify-content:center;font-size:42px;color:#fff;cursor:pointer;box-shadow:0 8px 30px rgba(124,58,237,.45);transition:transform .2s}
+.jarvis-orb.listening{animation:jarvisPulse 1.2s infinite;background:linear-gradient(135deg,#16a34a,#0a66c2)}
+.jarvis-orb.thinking{animation:jarvisSpin 1.4s linear infinite;background:linear-gradient(135deg,#f59e0b,#7c3aed)}
+.jarvis-orb.speaking{animation:jarvisPulse .8s infinite;background:linear-gradient(135deg,#0a66c2,#7c3aed)}
+@keyframes jarvisPulse{0%,100%{transform:scale(1);box-shadow:0 8px 30px rgba(124,58,237,.45)}50%{transform:scale(1.09);box-shadow:0 8px 46px rgba(124,58,237,.7)}}
+@keyframes jarvisSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.jarvis-orb.listening,.jarvis-orb.thinking,.jarvis-orb.speaking{animation:none}}
+.home-agentmic:active{transform:scale(.92)}
+.home-agentmic.rec{animation:rbFabPulse 1.1s infinite;background:linear-gradient(135deg,#dc2626,#7c3aed)}
+.home-agenttxt{flex:1;min-width:0}
+.home-agenttxt b{display:block;font-size:13.5px;font-weight:800}
+.home-agenttxt small{font-size:11px;color:var(--mt2)}
+.home-agentgo{flex:0 0 auto;border:1px solid var(--b);background:var(--card2);color:var(--tx);border-radius:10px;padding:8px 11px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.home-statusgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 14px}
+.home-statc{border:1px solid var(--b);border-radius:12px;padding:11px;background:var(--sf)}
+.home-statc .h{font-size:11px;color:var(--mt2);font-weight:700;display:flex;align-items:center;gap:5px}
+.home-statc .v{font-size:20px;font-weight:800;margin-top:3px}
+.home-statc .s{font-size:10.5px;color:var(--mt2);margin-top:1px}
+@media(min-width:760px){.home-statusgrid{grid-template-columns:repeat(4,1fr)}}
 .home-cta::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(120deg,transparent,rgba(10,102,194,.16),transparent);transform:skewX(-20deg);animation:ctaShine 3.6s ease-in-out infinite;pointer-events:none}
 @keyframes ctaShine{0%{left:-70%}55%{left:150%}100%{left:150%}}
 .home-tile:active{transform:scale(.985)}
@@ -1298,7 +1319,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v242</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v249</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1331,6 +1352,15 @@ body.dark .spin-wheel{border-color:#2a333f}
           <button class="home-cta" onclick="openReedbiAgent('')"><i class="ti ti-sparkles"></i> Ask the Reedbi Agent</button>
         </div>
         <div class="home-sec">What would you like to do?</div>
+        <div class="home-agentcard">
+          <button class="home-agentmic" onclick="homeAgentVoice()" aria-label="Talk to your agent"><i class="ti ti-microphone"></i></button>
+          <div class="home-agenttxt"><b>Talk to your Reedbi agent</b><small>Tap the mic and speak — or say “my status”</small></div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex:0 0 auto">
+            <button class="home-agentgo" onclick="homeShowStatus()"><i class="ti ti-chart-bar"></i> Status</button>
+            <button class="home-agentgo" onclick="openMoneyAgent()" style="border-color:#15803d;color:#15803d"><i class="ti ti-coin"></i> Earn</button>
+          </div>
+        </div>
+        <div id="home-status"></div>
         <div class="home-tiles">
           <button class="home-tile" onclick="openMainStore()"><div class="ic" style="background:rgba(10,102,194,.12)">🛍️</div><b>Shop</b><small>Browse &amp; buy real products</small></button>
           <button class="home-tile" onclick="openHabits()"><div class="ic" style="background:rgba(234,88,12,.12)">🔥</div><b>Habits</b><small>Goals, streaks &amp; reminders</small></button>
@@ -6005,7 +6035,7 @@ function createTag_DISABLED(){
 function autoResize(ta){if(!ta)return;ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,80)+'px';}
 function onKey(e){if(e.key==='Enter'&&!e.shiftKey&&window.innerWidth>700){e.preventDefault();sendPost();}}
 function goBack(){stopLive();stopPoll();var _f=document.getElementById('fab');if(_f)_f.style.display='';document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';activeTagId=null;pendingPosts=[];renderTagList(document.getElementById('tsr').value);}
-function goHome(){stopLive();stopPoll();try{document.body.classList.add('rb-home');}catch(e){}activeTagId=null;var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;try{renderHomeProducts();}catch(e){}}
+function goHome(){stopLive();stopPoll();try{document.body.classList.add('rb-home');}catch(e){}activeTagId=null;var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;try{renderHomeProducts();}catch(e){}try{renderHomeStatus();}catch(e){}}
 ['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('open');});});
 document.getElementById('pmb').addEventListener('click',function(e){if(e.target===document.getElementById('pmb'))closePM();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('open');});closePM();}});
@@ -6013,7 +6043,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v242 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v249 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12189,6 +12219,7 @@ function openHabitDay(id,idx){
     +rbVoiceLangPicker()
     +'<div style="display:flex;gap:8px;margin-top:8px">'
     +'<button class="btn mic-btn" style="flex:0 0 auto;border:1px solid #7c3aed;color:#7c3aed;font-weight:700" onclick="habDictateNote(\''+id+'\','+idx+',this)"><i class="ti ti-microphone"></i> Speak</button>'
+    +'<button class="btn" style="flex:0 0 auto;border:1px solid #0d9488;color:#0d9488;font-weight:700" onclick="habReadNote(\''+id+'\','+idx+',this)"><i class="ti ti-volume"></i> Read</button>'
     +'<button class="btn" style="flex:1;border:1px solid var(--b);color:var(--tx);font-weight:600" onclick="habDaySaveNote(\''+id+'\','+idx+')"><i class="ti ti-device-floppy"></i> Save</button>'
     +'</div>'
     +'<div style="display:flex;gap:8px;margin-top:8px">'
@@ -14218,7 +14249,7 @@ function agentMenuCard(){
   var opts=[['job','🔍','Find a Job','Search jobs · AI auto-apply · post a job'],['shop','🛍️','Shop Product','Find products to buy'],['habit','🔥','Build a Habit','Goals, streaks & reminders'],['order','📦','Track My Order','See your orders & delivery'],['sell','💼','Sell Something','List your product to buyers'],['care','🎧','Get Help','Orders, delivery, returns & refunds']];
   return '<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">'+opts.map(function(o){
     return '<button onclick="agentPick(\''+o[0]+'\')" style="display:flex;align-items:center;gap:11px;text-align:left;background:var(--sf);border:1px solid var(--b);border-radius:12px;padding:12px;cursor:pointer;width:100%"><span style="font-size:22px">'+o[1]+'</span><span style="flex:1"><b style="font-size:13px;display:block">'+o[2]+'</b><small style="color:var(--mt2);font-size:11px">'+o[3]+'</small></span><i class="ti ti-chevron-right" style="color:var(--mt2)"></i></button>';
-  }).join('')+'</div>';
+  }).join('')+'<button onclick="closeOvl(\'ragent-ovl\');openJarvis()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;border:none;border-radius:12px;padding:12px;cursor:pointer;width:100%;font-size:12.5px;font-weight:700;margin-top:2px"><i class="ti ti-microphone"></i> Talk to me — hands-free voice</button><button onclick="openAISettings()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:none;border:1px dashed var(--b);border-radius:12px;padding:10px;cursor:pointer;width:100%;color:var(--mt2);font-size:11.5px;font-weight:600;margin-top:2px"><i class="ti ti-sparkles"></i> '+(rbAIEndpoint()?'AI brain connected ✓ · settings':'Connect AI brain (free) — make me smarter')+'</button></div>';
 }
 function agentPick(opt){
   var labels={job:'Find a Job',shop:'Shop Product',habit:'Build a Habit',order:'Track My Order',sell:'Sell Something',care:'Get Help'};
@@ -14253,17 +14284,22 @@ function renderAgent(){
   }).join('');
   box.scrollTop=box.scrollHeight;
   var chips=document.getElementById('ragent-chips');
-  if(chips)chips.innerHTML=[['job','🔍 Job'],['shop','🛍️ Shop'],['habit','🔥 Habit'],['order','📦 Orders'],['sell','💼 Sell'],['care','🎧 Help']].map(function(c){return '<button class="hab-chip" onclick="agentPick(\''+c[0]+'\')">'+c[1]+'</button>';}).join('');
+  if(chips)chips.innerHTML=[['__status','📊 My status'],['__money','💰 Earn'],['job','🔍 Job'],['shop','🛍️ Shop'],['habit','🔥 Habit'],['order','📦 Orders'],['care','🎧 Help']].map(function(c){var fn=c[0]==='__status'?'agentShowStatus()':(c[0]==='__money'?'agentShowMoney()':'agentPick(\''+c[0]+'\')');return '<button class="hab-chip" onclick="'+fn+'">'+c[1]+'</button>';}).join('');
 }
 function agentChip(c){var el=document.getElementById('ragent-in');if(el){el.value=c.replace(/^[^\w]+/,'');}agentSend();}
 function agentSend(){
   var el=document.getElementById('ragent-in');if(!el)return;var text=(el.value||'').trim();if(!text)return;
   el.value='';__agentChat.push({a:0,t:text});
   __agentChat.push({a:1,t:'__typing__'});renderAgent();
-  setTimeout(function(){
-    __agentChat=__agentChat.filter(function(m){return m.t!=='__typing__';});
-    var reply=agentRespond(text);__agentChat.push(reply);renderAgent();
-  },650);
+  var done=function(reply){__agentChat=__agentChat.filter(function(m){return m.t!=='__typing__';});__agentChat.push(reply);renderAgent();};
+  if(rbAIEndpoint()){
+    askAgentAI(text).then(function(aiReply){
+      if(aiReply){done({a:1,t:esc(aiReply).replace(/\n/g,'<br>')});}
+      else{setTimeout(function(){done(agentRespond(text));},150);}  // graceful fallback to built-in router
+    });
+  }else{
+    setTimeout(function(){__agentChat=__agentChat.filter(function(m){return m.t!=='__typing__';});var reply=agentRespond(text);__agentChat.push(reply);renderAgent();},650);
+  }
 }
 function agentRespond(text){
   try{logSearchInterest(text,'agent');}catch(e){}
@@ -14271,6 +14307,14 @@ function agentRespond(text){
   var has=function(arr){return arr.some(function(w){return q.indexOf(w)>=0;});};
   // strip intent words to get the search term
   function term(words){var t=q;words.forEach(function(w){t=t.replace(new RegExp('\\b'+w+'\\b','g'),' ');});return t.replace(/\b(a|an|the|me|my|for|find|near|please|want|need|to|in|as|of|some|any|looking)\b/g,' ').replace(/\s+/g,' ').trim();}
+  // MAKE MONEY / EARN intent
+  if(has(['make money','earn money','make cash','side income','side hustle','how to earn','how can i earn','ways to earn','how to make money','how do i make money','income from','earn from'])){
+    return {a:1,t:'💰 Let\'s look at real ways to earn on Reedbi — selling and jobs — plus what you\'ve made so far. (No promises — just the tools and honest next steps.)',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:9px 12px;font-size:12px" onclick="agentShowMoney()">Open my Earnings agent</button></div>'};
+  }
+  // STATUS / SUMMARY intent — overall view of commerce, jobs, delivery, habits
+  if(has(['status','summary','overview','dashboard','how am i doing','how is everything','how are things','check everything','overall'])){
+    return agentStatusReport();
+  }
   // JOB intent
   if(has(['job','jobs','work','career','vacancy','vacancies','hire','hiring','employ','position','recruit','apply','salary','interview'])){
     var role=term(['job','jobs','work','career','vacancy','vacancies','hire','hiring','employ','position','recruit','apply','salary','find','search','get','want','as','a','an']);
@@ -14290,7 +14334,7 @@ function agentRespond(text){
   }
   // SELL intent
   if(has(['sell','selling','list my','become a seller','my product','i want to sell','add product'])){
-    return {a:1,t:'You can list your products and reach buyers nearby and worldwide. 💼',actions:'<div style="margin-top:8px"><button class="btn btnok" style="padding:8px 12px;font-size:12px" onclick="agentOpenSell()">Start selling</button></div>'};
+    return {a:1,t:'You can list your products and reach buyers nearby and worldwide. And I can match what you sell to what people are actually searching for. 💼',actions:'<div style="margin-top:8px;display:flex;flex-direction:column;gap:7px"><button class="btn btnok" style="padding:9px 12px;font-size:12px" onclick="agentOpenSell()">Start selling</button><button class="btn" style="padding:9px 12px;font-size:12px;border:1px solid #15803d;color:#15803d;font-weight:700" onclick="agentShowSellAgent()">🎯 Sell to demand — what people want</button></div>'};
   }
   // HABIT intent
   if(has(['habit','goal','routine','motivat','discipline','streak'])){
@@ -15471,5 +15515,390 @@ function openDeliveryHub(){
     +rbHubTile('🎧','Delivery help','Issues with a delivery','closeOvl(\'delivhub-ovl\');openCareAi()')
     +'</div></div></div>';
   ov.classList.add('open');
+}
+
+/* ===== v243: text-to-speech (read notes aloud) + agent status report ===== */
+function rbSpeak(text, btn){
+  if(!('speechSynthesis' in window)){toast('Read-aloud needs a modern browser','err');return;}
+  try{
+    if(window.speechSynthesis.speaking||window.speechSynthesis.pending){window.speechSynthesis.cancel();if(btn)btn.classList.remove('rec');return;}
+    text=(text||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+    if(!text){toast('Nothing to read yet','info');return;}
+    var u=new SpeechSynthesisUtterance(text);u.lang=(navigator.language||'en-US');u.rate=1;u.pitch=1;
+    if(btn)btn.classList.add('rec');
+    u.onend=function(){if(btn)btn.classList.remove('rec');};
+    u.onerror=function(){if(btn)btn.classList.remove('rec');};
+    window.speechSynthesis.speak(u);
+    toast('Reading aloud… tap again to stop','info');
+  }catch(e){toast('Read-aloud unavailable','err');}
+}
+function habReadNote(id,idx,btn){
+  var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+  var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+  var note=((document.getElementById('habday-note')||{}).value||(hb.notes&&hb.notes[dk])||'').trim();
+  if(!note){toast('No note to read yet','info');return;}
+  rbSpeak(note,btn);
+}
+function agentStatusData(){
+  var prods=getProducts().filter(function(p){return p&&!p.withdrawn;});
+  var orders=getOrders();
+  var apps=(CU?getAllApps().filter(function(a){return a.uid===CU.uid;}):[]);
+  var deliv=orders.filter(function(o){return o.status&&/transit|out for|shipp|on the way|way/i.test(o.status);});
+  var delivered=orders.filter(function(o){return o.status&&/delivered|complete/i.test(o.status);});
+  var habits=getHabits();var todayK=dayKey();
+  var doneToday=habits.filter(function(h){return (h.done||[]).indexOf(todayK)>=0;});
+  var notes=[];
+  habits.forEach(function(h){if(h.notes){Object.keys(h.notes).sort().reverse().slice(0,2).forEach(function(k){if(h.notes[k])notes.push({hab:h.n||h.name||'Habit',day:k,txt:h.notes[k]});});}});
+  return {prods:prods,orders:orders,apps:apps,deliv:deliv,delivered:delivered,habits:habits,doneToday:doneToday,notes:notes.slice(0,4),todayK:todayK};
+}
+function agentStatusReport(){
+  var d=agentStatusData();
+  function card(ic,t,sub){return '<div style="border:1px solid var(--b);border-radius:9px;padding:8px 10px;background:var(--card2)"><b style="font-size:12px">'+ic+' '+t+'</b><div style="font-size:11.5px;color:var(--mt)">'+sub+'</div></div>';}
+  var html='<div style="display:grid;gap:7px;margin-top:4px">'
+    +card('🛍️','Shop',d.prods.length+' product'+(d.prods.length!==1?'s':'')+' listed · '+d.orders.length+' order'+(d.orders.length!==1?'s':''))
+    +card('💼','Jobs',d.apps.length+' application'+(d.apps.length!==1?'s':'')+' submitted')
+    +card('🚚','Delivery',d.deliv.length+' in progress · '+d.delivered.length+' delivered')
+    +'<div style="border:1px solid var(--b);border-radius:9px;padding:8px 10px;background:var(--card2)"><b style="font-size:12px">🔥 Habits</b><div style="font-size:11.5px;color:var(--mt)">'+d.habits.length+' tracked · '+d.doneToday.length+' done today</div>';
+  if(d.notes.length){html+='<div style="font-size:10.5px;color:var(--mt2);margin-top:6px;font-weight:700">📝 What you wrote recently:</div>'+d.notes.map(function(n){return '<div style="font-size:11px;color:var(--mt);margin-top:3px;padding-left:4px">• <b>'+esc(n.hab)+'</b> <span style="color:var(--mt2)">('+esc(n.day)+')</span>: '+esc(n.txt.slice(0,90))+(n.txt.length>90?'…':'')+'</div>';}).join('');}
+  html+='</div></div>';
+  var spoken='Here is your status. Shop has '+d.prods.length+' products and '+d.orders.length+' orders. You have '+d.apps.length+' job applications. Delivery: '+d.deliv.length+' in progress and '+d.delivered.length+' delivered. Habits: '+d.doneToday.length+' of '+d.habits.length+' completed today.';
+  html+='<div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap">'
+    +'<button class="btn" style="border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:7px 11px;font-size:12px" onclick="rbSpeak(\''+escJS(spoken)+'\',this)"><i class="ti ti-volume"></i> Read aloud</button>'
+    +'<button class="btn" style="border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:7px 11px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');openHabits()">Open habits</button>'
+    +'<button class="btn" style="border:1px solid #0a66c2;color:#0a66c2;font-weight:700;padding:7px 11px;font-size:12px" onclick="closeOvl(\'ragent-ovl\');showMyOrders()">Open orders</button>'
+    +'</div>';
+  return {a:1,t:'📊 <b>Your Reedbi status</b> — here\'s where everything stands:',actions:html};
+}
+
+function agentShowStatus(){__agentChat.push({a:0,t:'My status'});__agentChat.push(agentStatusReport());renderAgent();}
+
+/* ===== v244: Home agent panel + live status (free, local data) ===== */
+function renderHomeStatus(){
+  var box=document.getElementById('home-status');if(!box)return;
+  if(!CU||CU.guest){box.innerHTML='';return;}
+  try{
+    var d=agentStatusData();
+    function c(ic,h,v,s){return '<div class="home-statc"><div class="h">'+ic+' '+h+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></div>';}
+    box.innerHTML='<div class="home-statusgrid">'
+      +c('🛍️','Shop',d.orders.length,d.prods.length+' listed')
+      +c('🚚','Delivery',d.deliv.length,d.delivered.length+' delivered')
+      +c('💼','Jobs',d.apps.length,'application'+(d.apps.length!==1?'s':''))
+      +c('🔥','Habits',d.doneToday.length+'/'+d.habits.length,'done today')
+      +'</div>';
+  }catch(e){box.innerHTML='';}
+}
+function homeAgentVoice(){
+  try{openJarvis();}catch(e){try{openReedbiAgent('');}catch(_){}}
+}
+function homeShowStatus(){
+  try{openReedbiAgent('');}catch(e){}
+  setTimeout(function(){try{agentShowStatus();}catch(e){}},220);
+}
+
+/* ===== v245: honest "make money" agent — real earnings + concrete steps, no hype ===== */
+function moneyEarnings(){
+  if(!CU)return {earned:{},pending:{},orders:0,delivered:0};
+  var orders=getOrders().filter(function(o){return o.sellerUid===CU.uid;});
+  var earned={},pending={},count=0;
+  orders.forEach(function(o){
+    var cur=o.currency||'';var amt=parseFloat(o.price)||0;
+    if(/delivered|complete/i.test(o.status||'')){earned[cur]=(earned[cur]||0)+amt;count++;}
+    else if(!/cancel/i.test(o.status||'')){pending[cur]=(pending[cur]||0)+amt;}
+  });
+  return {earned:earned,pending:pending,orders:orders.length,delivered:count};
+}
+function moneyFmt(map){
+  var keys=Object.keys(map).filter(function(k){return map[k]>0;});
+  if(!keys.length)return '0';
+  return keys.map(function(k){return (k?k+' ':'')+Math.round(map[k]*100)/100;}).join(' · ');
+}
+function moneyTips(){
+  var tips=[];
+  if(!CU)return tips;
+  var mine=getProducts().filter(function(p){return p&&p.sellerUid===CU.uid&&!p.withdrawn;});
+  var noPhoto=mine.filter(function(p){return !(p.photos&&p.photos[0]);});
+  if(noPhoto.length)tips.push({ic:'📸',t:'Add photos to '+noPhoto.length+' of your listings',s:'Products with clear photos sell far more than those without.'});
+  var unsold=mine.filter(function(p){return (p.sold||0)===0&&(p.qty||0)>0;});
+  if(unsold.length)tips.push({ic:'🏷️',t:unsold.length+' product'+(unsold.length!==1?'s':'')+' haven\'t sold yet',s:'Try a sharper price or better photos to get the first sale.'});
+  var best=mine.slice().sort(function(a,b){return (b.sold||0)-(a.sold||0)
+;})[0];
+  if(best&&(best.sold||0)>0)tips.push({ic:'🔁',t:'"'+(best.title||'Your top item')+'" is your best seller',s:'Keep it in stock and consider a small bundle or related items.'});
+  if(!mine.length)tips.push({ic:'🚀',t:'List your first product',s:'You can\'t earn from selling until something is listed. Start with one good item.'});
+  tips.push({ic:'⭐',t:'Ask happy buyers for a rating',s:'Trust drives sales — a few good reviews lift everything you sell.'});
+  return tips;
+}
+function openMoneyAgent(){
+  if(!requireAuth('open the earnings agent'))return;
+  var e=moneyEarnings();var tips=moneyTips();
+  var ov=document.getElementById('money-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='money-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  function action(ic,t,sub,onclick){
+    return '<button onclick="'+onclick+'" style="text-align:left;background:var(--sf);border:1px solid var(--b);border-radius:13px;padding:13px;cursor:pointer;display:flex;align-items:center;gap:11px;width:100%">'
+      +'<div style="width:40px;height:40px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">'+ic+'</div>'
+      +'<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:13px">'+t+'</div><div style="font-size:11.5px;color:var(--mt2);margin-top:1px">'+sub+'</div></div>'
+      +'<i class="ti ti-chevron-right" style="color:var(--mt2)"></i></button>';
+  }
+  var earnedStr=moneyFmt(e.earned),pendStr=moneyFmt(e.pending);
+  ov.innerHTML='<div class="modal" style="max-width:560px"><div class="mhd"><h3>💰 Earn with Reedbi</h3><button class="modal-x" onclick="closeOvl(\'money-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="background:linear-gradient(135deg,#15803d,#0a66c2);color:#fff;border-radius:14px;padding:15px 16px;margin-bottom:13px">'
+      +'<div style="font-size:11px;opacity:.85;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Your earnings so far</div>'
+      +'<div style="font-size:26px;font-weight:800;margin-top:3px">'+esc(earnedStr)+'</div>'
+      +'<div style="font-size:12px;opacity:.9;margin-top:2px">'+e.delivered+' completed sale'+(e.delivered!==1?'s':'')+(pendStr!=='0'?' · '+esc(pendStr)+' in progress':'')+'</div>'
+    +'</div>'
+    +'<div style="font-size:12.5px;font-weight:800;margin:4px 0 9px">Real ways to earn here</div>'
+    +'<div style="display:grid;gap:9px;margin-bottom:14px">'
+      +action('🛍️','Sell a product','List something — reach buyers nearby & worldwide','closeOvl(\'money-ovl\');agentOpenSell()')
+      +action('🎯','Sell to demand','Match your products to what people are searching for','closeOvl(\'money-ovl\');openSellAgent()')
+      +action('💼','Find work or gigs','Apply to jobs with your CV in the Job Hub','closeOvl(\'money-ovl\');openJobHub()')
+      +action('📊','See what people want','Real demand signal — what buyers are searching','closeOvl(\'money-ovl\');try{rbTab(\'account\')}catch(e){}')
+    +'</div>'
+    +'<div style="font-size:12.5px;font-weight:800;margin:4px 0 9px">Your next best moves</div>'
+    +'<div style="display:grid;gap:8px">'
+      +(tips.length?tips.map(function(tp){return '<div style="display:flex;gap:10px;align-items:flex-start;border:1px solid var(--b);border-radius:11px;padding:10px;background:var(--card2)"><div style="font-size:17px">'+tp.ic+'</div><div style="flex:1"><div style="font-size:12.5px;font-weight:700">'+esc(tp.t)+'</div><div style="font-size:11px;color:var(--mt2);margin-top:1px">'+esc(tp.s)+'</div></div></div>';}).join(''):'<div style="font-size:12px;color:var(--mt2)">List a product to get personalized tips.</div>')
+    +'</div>'
+    +'<div style="font-size:10.5px;color:var(--mt2);margin-top:14px;line-height:1.5;border-top:1px solid var(--b);padding-top:11px">💡 Honest note: Reedbi gives you the tools and the audience — real income depends on what you sell, your prices, and demand. No app can promise earnings, and anyone who does is not being straight with you. Consistent effort on good products is what works.</div>'
+    +'</div></div>';
+  ov.classList.add('open');
+}
+function agentShowMoney(){closeOvl('ragent-ovl');openMoneyAgent();}
+
+/* ===== v246: Sell-to-demand agent — match my products to what people search for ===== */
+function sellAgentMatch(term, mine){
+  var tw=(term||'').toLowerCase().split(/\s+/).filter(function(w){return w.length>2;});
+  if(!tw.length)tw=[(term||'').toLowerCase()];
+  return mine.find(function(p){var hay=((p.title||'')+' '+(p.brand||'')+' '+(p.category||'')+' '+(p.desc||'')).toLowerCase();return tw.some(function(w){return w&&hay.indexOf(w)>=0;});});
+}
+function openSellAgent(){
+  if(!requireAuth('open the sell agent'))return;
+  var rep=searchInterestReport();
+  var demand=(rep.top||[]).filter(function(d){return d.q&&d.q.replace(/\s/g,'').length>1;});
+  var mine=getProducts().filter(function(p){return p&&p.sellerUid===CU.uid&&!p.withdrawn;});
+  var matches=[],gaps=[],seenGap={};
+  demand.forEach(function(d){
+    var p=sellAgentMatch(d.q,mine);
+    if(p){if(!matches.some(function(m){return m.p.id===p.id;}))matches.push({d:d,p:p});}
+    else {var k=d.q.toLowerCase();if(!seenGap[k]){seenGap[k]=1;gaps.push(d);}}
+  });
+  var ov=document.getElementById('sellagent-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='sellagent-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  var body='';
+  if(!demand.length){
+    body='<div style="text-align:center;padding:26px 12px;color:var(--mt2)"><div style="font-size:34px;margin-bottom:8px">🔍</div><div style="font-size:13px;font-weight:700;color:var(--tx)">No demand signal yet</div><div style="font-size:12px;margin-top:5px">As people search and ask the agent, their interests show up here — then I\'ll match them to your products and tell you exactly what to promote.</div></div>';
+  } else {
+    if(matches.length){
+      body+='<div style="font-size:12.5px;font-weight:800;margin:2px 0 9px;color:#15803d">🎯 People want what you sell — reach them</div>';
+      body+=matches.slice(0,8).map(function(m){
+        var pidJ="'"+escJS(m.p.id)+"'";
+        var img=(m.p.photos&&m.p.photos[0])?'<img src="'+m.p.photos[0]+'" style="width:46px;height:46px;border-radius:9px;object-fit:cover;flex-shrink:0">':'<div style="width:46px;height:46px;border-radius:9px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0">🛍️</div>';
+        return '<div style="border:1px solid var(--b);border-left:3px solid #15803d;border-radius:11px;padding:11px;margin-bottom:8px;background:var(--card2)">'
+          +'<div style="display:flex;gap:10px;align-items:center">'+img
+          +'<div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700">'+esc(m.p.title||'Product')+'</div>'
+          +'<div style="font-size:11px;color:var(--mt2)">'+(m.p.currency||'')+' '+(m.p.offer||m.p.price||'')+' · '+(m.p.sold||0)+' sold</div></div></div>'
+          +'<div style="font-size:11.5px;color:var(--mt);margin:8px 0 9px">💬 People searched <b>"'+esc(m.d.q)+'"</b> '+m.d.n+'×, which matches this. Share it to put it in front of them.</div>'
+          +'<div style="display:flex;gap:7px"><button class="btn btnok" style="flex:1;padding:8px;font-size:12px" onclick="shareProduct('+pidJ+')"><i class="ti ti-share"></i> Share this product</button>'
+          +'<button class="btn" style="flex:0 0 auto;padding:8px 11px;font-size:12px;border:1px solid var(--b);color:var(--tx)" onclick="closeOvl(\'sellagent-ovl\');openProductDetail('+pidJ+')">View</button></div>'
+          +'</div>';
+      }).join('');
+    }
+    if(gaps.length){
+      body+='<div style="font-size:12.5px;font-weight:800;margin:14px 0 9px;color:#c2410c">💡 Demand you could fill</div>';
+      body+='<div style="font-size:11px;color:var(--mt2);margin-bottom:9px">People are searching for these, but you don\'t list anything matching. Each is a chance to earn:</div>';
+      body+=gaps.slice(0,10).map(function(d){
+        return '<div style="display:flex;gap:9px;align-items:center;border:1px solid var(--b);border-radius:11px;padding:10px;margin-bottom:7px;background:var(--card2)">'
+          +'<div style="flex:1"><div style="font-size:12.5px;font-weight:700">"'+esc(d.q)+'"</div><div style="font-size:11px;color:var(--mt2)">searched '+d.n+'×'+(d.kind==='agent'?' · asked the agent':'')+'</div></div>'
+          +'<button class="btn" style="flex:0 0 auto;padding:7px 11px;font-size:12px;border:1px solid #c2410c;color:#c2410c;font-weight:700" onclick="closeOvl(\'sellagent-ovl\');agentOpenSell()">+ List it</button></div>';
+      }).join('');
+    }
+    if(!matches.length&&!mine.length){
+      body='<div style="border:1px solid var(--b);border-radius:12px;padding:14px;background:var(--card2);margin-bottom:12px;text-align:center"><div style="font-size:13px;font-weight:700">You haven\'t listed any products yet</div><div style="font-size:11.5px;color:var(--mt2);margin:5px 0 11px">List something to start matching it with what people want.</div><button class="btn btnok" style="padding:9px 16px;font-size:12px" onclick="closeOvl(\'sellagent-ovl\');agentOpenSell()">List my first product</button></div>'+body;
+    }
+  }
+  ov.innerHTML='<div class="modal" style="max-width:560px"><div class="mhd"><h3>🎯 Sell to demand</h3><button class="modal-x" onclick="closeOvl(\'sellagent-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="background:linear-gradient(135deg,#0a66c2,#15803d);color:#fff;border-radius:13px;padding:13px 15px;margin-bottom:13px"><div style="font-weight:800;font-size:14px">Match your products to real demand</div><div style="font-size:12px;opacity:.9;margin-top:3px">Based on what people actually search for on Reedbi.</div></div>'
+    +body
+    +'<div style="font-size:10.5px;color:var(--mt2);margin-top:14px;line-height:1.5;border-top:1px solid var(--b);padding-top:11px">💡 This reads real searches from people using Reedbi. The more the app is used, the sharper these matches get. Sharing a product creates a direct link you can send to anyone.</div>'
+    +'</div></div>';
+  ov.classList.add('open');
+}
+function agentShowSellAgent(){closeOvl('ragent-ovl');openSellAgent();}
+
+/* ===== v247: AI brain integration — tries your free backend, falls back to the router ===== */
+function rbAIEndpoint(){return (LS.get('rb_ai_endpoint','')||'').trim();}
+function setReedbiAI(url){url=(url||'').trim();LS.set('rb_ai_endpoint',url);}
+function agentAIContext(){
+  try{
+    var d=agentStatusData();
+    return {
+      name:(CU&&CU.name)||'there',
+      shop:{products:d.prods.length,orders:d.orders.length,listed:d.prods.slice(0,8).map(function(p){return p.title;}).filter(Boolean)},
+      jobs:{applications:d.apps.length},
+      delivery:{inProgress:d.deliv.length,delivered:d.delivered.length},
+      habits:{tracked:d.habits.length,doneToday:d.doneToday.length}
+    };
+  }catch(e){return {};}
+}
+function askAgentAI(message){
+  var ep=rbAIEndpoint();if(!ep)return Promise.resolve(null);
+  try{
+    return fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:message,context:agentAIContext()})})
+      .then(function(r){if(!r.ok)return null;return r.json();})
+      .then(function(j){return (j&&(j.reply||j.text||j.message))||null;})
+      .catch(function(){return null;});
+  }catch(e){return Promise.resolve(null);}
+}
+function openAISettings(){
+  var ov=document.getElementById('aiset-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='aiset-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  var cur=rbAIEndpoint();
+  ov.innerHTML='<div class="modal" style="max-width:480px"><div class="mhd"><h3>✨ Connect AI brain</h3><button class="modal-x" onclick="closeOvl(\'aiset-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="font-size:12px;color:var(--mt);line-height:1.55;margin-bottom:12px">Paste your deployed Cloud Function URL. It works with any open-source model — Llama, Mistral or Qwen — whether self-hosted with Ollama (100% open source, free) or via a free host. Once connected, the agent answers with real AI and falls back to the built-in helper if the AI is ever unavailable.</div>'
+    +'<input id="aiset-url" placeholder="https://...cloudfunctions.net/reedbiAgent" value="'+esc(cur)+'" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--b);background:var(--sf);color:var(--tx);font-size:13px">'
+    +'<div style="display:flex;gap:8px;margin-top:11px">'
+    +'<button class="btn btnok" style="flex:1;font-weight:700;padding:11px" onclick="aiSettingsSave()"><i class="ti ti-check"></i> Connect</button>'
+    +(cur?'<button class="btn" style="flex:0 0 auto;border:1px solid #dc2626;color:#dc2626;padding:11px 13px" onclick="setReedbiAI(\'\');closeOvl(\'aiset-ovl\');toast(\'AI disconnected\',\'ok\')"><i class="ti ti-unlink"></i></button>':'')
+    +'</div>'
+    +'<button class="btn" style="width:100%;margin-top:9px;border:1px solid var(--b);color:var(--tx);padding:10px;font-size:12px" onclick="aiSettingsTest()"><i class="ti ti-bolt"></i> Test connection</button>'
+    +'<div id="aiset-result" style="font-size:11.5px;margin-top:9px"></div>'
+    +'<div style="font-size:10.5px;color:var(--mt2);margin-top:12px;line-height:1.5;border-top:1px solid var(--b);padding-top:10px">Don\'t have a backend yet? It\'s free — Groq runs open-source Llama at no cost. The setup steps are in your <b>Reedbi AI Backend Setup Guide</b>.</div>'
+    +'</div></div>';
+  ov.classList.add('open');
+}
+function aiSettingsSave(){
+  var url=((document.getElementById('aiset-url')||{}).value||'').trim();
+  if(url&&!/^https:\/\//.test(url)){toast('URL must start with https://','err');return;}
+  setReedbiAI(url);closeOvl('aiset-ovl');toast(url?'AI agent connected ✨':'AI endpoint cleared','ok');
+  try{renderAgent();}catch(e){}
+}
+function aiSettingsTest(){
+  var url=((document.getElementById('aiset-url')||{}).value||'').trim();
+  var box=document.getElementById('aiset-result');if(box)box.innerHTML='<span style="color:var(--mt2)">Testing…</span>';
+  if(!url){if(box)box.innerHTML='<span style="color:#dc2626">Enter a URL first.</span>';return;}
+  var saved=rbAIEndpoint();setReedbiAI(url);
+  askAgentAI('Say hello in one short sentence.').then(function(r){
+    setReedbiAI(saved);
+    if(box)box.innerHTML=r?'<span style="color:#15803d">✓ Connected! AI replied: "'+esc(r.slice(0,80))+'"</span>':'<span style="color:#dc2626">✗ No reply. Check the URL is deployed and public, then try again.</span>';
+  });
+}
+
+/* ===== v249: "Jarvis" hands-free voice assistant — talk → answer → act ===== */
+var __jarvis={on:false,rec:null};
+function jarvisStatusSpoken(){
+  var d=agentStatusData();
+  return 'Here is your status. Your shop has '+d.prods.length+' product'+(d.prods.length!==1?'s':'')+' and '+d.orders.length+' order'+(d.orders.length!==1?'s':'')+'. You have '+d.apps.length+' job application'+(d.apps.length!==1?'s':'')+'. Delivery: '+d.deliv.length+' in progress and '+d.delivered.length+' delivered. Habits: '+d.doneToday.length+' of '+d.habits.length+' done today.';
+}
+function jarvisFallback(text){
+  try{var r=agentRespond(text);return (r.t||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()||'I can help you shop, sell, find a job, or track habits. What would you like?';}
+  catch(e){return 'I can help you shop, find a job, or check your status. What would you like?';}
+}
+function jarvisRoute(text){
+  var q=text.toLowerCase();
+  var has=function(a){return a.some(function(w){return q.indexOf(w)>=0;});};
+  if(has(['stop','exit','goodbye','good bye','close','quit','shut down','that is all','thats all']))return {close:true};
+  if(has(['status','how am i doing','overview','how is everything','my dashboard','how are things']))return {reply:jarvisStatusSpoken(),stay:true};
+  if(has(['find a job','find job','search job','look for job','jobs',' job','job ','job hub','find work','hiring','vacancy','apply for','get a job','need a job','want a job']))return {reply:'Opening the Job Hub so you can search and apply for jobs.',action:function(){closeJarvis();openJobHub();}};
+  if(has(['sell','earn','make money','my earnings','income']))return {reply:'Opening your earnings agent, where you can sell and see what you have made.',action:function(){closeJarvis();openMoneyAgent();}};
+  if(has(['my orders','my order','track order','track my','where is my','order status']))return {reply:'Opening your orders.',action:function(){closeJarvis();showMyOrders();}};
+  if(has(['habit','habits','my goals']))return {reply:'Opening your habits.',action:function(){closeJarvis();openHabits();}};
+  var m=text.match(/(?:find|search for|search|show me|looking for|look for|buy|i want|get me|do you have|need|where can i get)\s+(?:a |an |the |some |me )?(.+)/i);
+  if(m){
+    var term=m[1].replace(/\b(product|products|item|items|please|for me|on reedbi|to buy)\b/gi,'').replace(/[?.!]+$/,'').trim();
+    if(term.length>1)return {reply:'Searching for '+term+'.',search:term};
+  }
+  return {ai:true};
+}
+function jarvisLog(who,t){
+  var box=document.getElementById('jarvis-log');if(!box)return;
+  var mine=who==='you';
+  box.innerHTML+='<div style="margin:5px 0;display:flex;'+(mine?'justify-content:flex-end':'justify-content:flex-start')+'"><div style="max-width:82%;padding:7px 11px;border-radius:12px;font-size:12px;line-height:1.4;'+(mine?'background:var(--g);color:#fff':'background:var(--card2);color:var(--tx)')+'">'+esc(t)+'</div></div>';
+  box.scrollTop=box.scrollHeight;
+}
+function jarvisSetStatus(txt,mode){
+  var s=document.getElementById('jarvis-status');if(s)s.textContent=txt;
+  var orb=document.getElementById('jarvis-orb');if(orb)orb.className='jarvis-orb '+(mode||'');
+}
+function jarvisSpeak(text, cb){
+  jarvisSetStatus('Speaking…','speaking');
+  if(!('speechSynthesis' in window)){if(cb)cb();return;}
+  try{
+    window.speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance((text||'').replace(/<[^>]+>/g,' '));u.lang=(navigator.language||'en-US');u.rate=1;u.pitch=1;
+    u.onend=function(){if(__jarvis.on&&cb)cb();};
+    u.onerror=function(){if(__jarvis.on&&cb)cb();};
+    window.speechSynthesis.speak(u);
+  }catch(e){if(cb)cb();}
+}
+function jarvisListen(){
+  if(!__jarvis.on)return;
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){jarvisSetStatus('Voice not supported','idle');return;}
+  try{
+    if(__jarvis.rec){try{__jarvis.rec.stop();}catch(e){}}
+    var rec=new SR();rec.lang=(navigator.language||'en-US');rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
+    __jarvis.rec=rec;jarvisSetStatus('Listening…','listening');
+    var finalT='';
+    rec.onresult=function(e){
+      var interim='';
+      for(var i=e.resultIndex;i<e.results.length;i++){var tr=e.results[i][0].transcript;if(e.results[i].isFinal)finalT+=tr;else interim+=tr;}
+      var h=document.getElementById('jarvis-heard');if(h)h.textContent=(finalT||interim);
+    };
+    rec.onerror=function(){};
+    rec.onend=function(){
+      __jarvis.rec=null;var said=(finalT||'').trim();
+      if(said&&__jarvis.on)jarvisHandle(said);
+      else if(__jarvis.on)jarvisSetStatus('Tap the orb and speak','idle');
+    };
+    rec.start();
+  }catch(e){jarvisSetStatus('Mic error — tap to retry','idle');}
+}
+function jarvisHandle(text){
+  if(!__jarvis.on)return;
+  jarvisSetStatus('Thinking…','thinking');
+  var h=document.getElementById('jarvis-heard');if(h)h.textContent='';
+  jarvisLog('you',text);
+  var route=jarvisRoute(text);
+  if(route.close){jarvisSpeak('Goodbye!',function(){closeJarvis();});return;}
+  if(route.ai){
+    if(rbAIEndpoint()){askAgentAI(text).then(function(r){var reply=r||jarvisFallback(text);jarvisLog('ai',reply);jarvisSpeak(reply,function(){if(__jarvis.on)jarvisListen();});});}
+    else{var reply=jarvisFallback(text);jarvisLog('ai',reply);jarvisSpeak(reply,function(){if(__jarvis.on)jarvisListen();});}
+    return;
+  }
+  jarvisLog('ai',route.reply);
+  jarvisSpeak(route.reply,function(){
+    if(route.search){closeJarvis();jarvisDoSearch(route.search);return;}
+    if(route.action){route.action();return;}
+    if(route.stay&&__jarvis.on)jarvisListen();
+  });
+}
+function jarvisDoSearch(term){
+  try{openProductSearch();}catch(e){}
+  var q=document.getElementById('ps-q');if(q)q.value=term;
+  try{runProductSearch(term);}catch(e){}
+}
+function openJarvis(){
+  if(!('speechSynthesis' in window)||!(window.SpeechRecognition||window.webkitSpeechRecognition)){toast('Voice assistant needs Chrome, Edge, or an Android browser','err');return;}
+  if(!requireAuth('use the voice assistant'))return;
+  var ov=document.getElementById('jarvis-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='jarvis-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  ov.innerHTML='<div class="modal" style="max-width:440px;position:relative">'
+    +'<button class="modal-x" onclick="closeJarvis()" style="position:absolute;top:12px;right:12px;z-index:3"><i class="ti ti-x"></i></button>'
+    +'<div class="mbd" style="padding:30px 20px;text-align:center">'
+    +'<div style="font-weight:800;font-size:15px;margin-bottom:4px">✨ Reedbi Voice Assistant</div>'
+    +'<div style="font-size:11.5px;color:var(--mt2);margin-bottom:24px">Say “my status”, “find a job”, or “find rice”</div>'
+    +'<div id="jarvis-orb" class="jarvis-orb" onclick="jarvisListen()"><i class="ti ti-microphone"></i></div>'
+    +'<div id="jarvis-status" style="font-size:13px;font-weight:700;margin-top:18px">Starting…</div>'
+    +'<div id="jarvis-heard" style="font-size:12px;color:var(--mt);margin-top:8px;min-height:18px"></div>'
+    +'<div id="jarvis-log" style="margin-top:16px;text-align:left;max-height:170px;overflow-y:auto"></div>'
+    +'</div></div>';
+  ov.classList.add('open');
+  __jarvis.on=true;
+  jarvisSpeak('Hi '+((CU&&CU.name)?CU.name:'there')+', I am your Reedbi assistant. Ask me for your status, to find a job, or to find a product.',function(){jarvisListen();});
+}
+function closeJarvis(){
+  __jarvis.on=false;
+  try{if(__jarvis.rec)__jarvis.rec.stop();}catch(e){}__jarvis.rec=null;
+  try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
+  closeOvl('jarvis-ovl');
 }
 </script></body></html>
