@@ -1298,7 +1298,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v237</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v238</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6007,7 +6007,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v237 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v238 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12059,6 +12059,7 @@ function renderHabits(){
       +grid
       +(complete?'<div class="learn-done" style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;margin-top:11px"><i class="ti ti-trophy"></i> Goal complete — '+(hb.days)+' days! 🎉</div>'
         :'<button class="hab-check'+(doneToday?' done':'')+'" onclick="toggleHabitToday(\''+hb.id+'\')">'+(doneToday?'<i class="ti ti-check"></i> Done today — '+p.left+' days to go':'<i class="ti ti-circle-check"></i> Mark done today')+'</button>')
+      +'<button class="btn" style="width:100%;margin-top:9px;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;font-weight:800;padding:11px" onclick="openHabitReports(\''+hb.id+'\')"><i class="ti ti-chart-bar"></i> 📊 Reports — Excel (all periods) + PDF with photos</button>'
       +'<div style="display:flex;align-items:center;gap:10px;margin-top:9px"><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:8px" onclick="shareHabitLink(\''+hb.id+'\')"><i class="ti ti-share"></i> Share with friends</button>'
       +'<button class="btn" style="flex:1;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800;padding:8px" onclick="openVideoStudio(\''+hb.id+'\')"><i class="ti ti-video"></i> Make video</button>'
       +'<button class="btn" style="flex:none;border:1px solid var(--b);color:var(--tx);font-weight:700;padding:8px 11px" onclick="openHabitMonitor(\''+hb.id+'\')" title="Monitor progress"><i class="ti ti-chart-bar"></i></button>'
@@ -15200,5 +15201,22 @@ function rbCompressImage(dataURL, maxDim, quality, cb){
     img.onerror=function(){cb(dataURL);};
     img.src=dataURL;
   }catch(e){cb(dataURL);}
+}
+
+/* ===== v238: prominent per-habit report launcher (Excel all periods + PDF with photos) ===== */
+function openHabitReports(id){
+  var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
+  var ov=document.getElementById('habrepmenu-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='habrepmenu-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  var pc=(hb.photos&&hb.photos.length)||0;
+  ov.innerHTML='<div class="modal" style="max-width:450px"><div class="mhd"><h3>📊 '+esc(hb.n)+' — reports</h3><button class="modal-x" onclick="closeOvl(\'habrepmenu-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="font-size:12px;color:var(--mt);margin-bottom:12px">Download your progress as a spreadsheet (any period) or a printable PDF with your photos.</div>'
+    +'<button class="btn btnln" style="width:100%;font-weight:700;margin-bottom:9px;padding:12px;text-align:left" onclick="closeOvl(\'habrepmenu-ovl\');openHabitReportPicker()"><i class="ti ti-file-spreadsheet"></i> Excel report — daily · weekly · 15 · 30 · 40 · 50 · 90 · 6mo · 1yr</button>'
+    +'<button class="btn btnok" style="width:100%;font-weight:700;margin-bottom:9px;padding:12px;text-align:left" onclick="habReportPDF(\''+id+'\')"><i class="ti ti-file-text"></i> PDF report — with photos ('+pc+' photo'+(pc!==1?'s':'')+')</button>'
+    +'<button class="btn" style="width:100%;font-weight:700;margin-bottom:9px;padding:12px;text-align:left;border:1px solid var(--b);color:var(--tx)" onclick="habAddPhoto(\''+id+'\')"><i class="ti ti-camera-plus"></i> Add a progress photo</button>'
+    +'<button class="btn" style="width:100%;font-weight:700;padding:12px;text-align:left;border:1px solid var(--b);color:var(--tx)" onclick="closeOvl(\'habrepmenu-ovl\');openHabitMonitor(\''+id+'\')"><i class="ti ti-chart-bar"></i> Open full progress monitor</button>'
+    +'</div></div>';
+  ov.classList.add('open');
 }
 </script></body></html>
