@@ -1298,7 +1298,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v241</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v242</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5894,6 +5894,12 @@ function openAccountMenu(){
   // main store — everyone
   h+='<button class="acct-item" style="border:1px solid var(--g);border-radius:11px;margin-bottom:9px" onclick="closeOvl(\'acctmenu-ovl\');openMainStore()"><i class="ti ti-building-store" style="color:var(--g)"></i> <b>Reedbi Ecommerce — Main store</b> <small>shop all approved sellers</small></button>';
 
+  // === HUBS — everything organized in one place ===
+  h+='<div style="font-size:11px;font-weight:800;color:var(--mt2);letter-spacing:.4px;margin:8px 2px 7px">✨ EVERYTHING IN ONE PLACE</div>';
+  h+='<button class="acct-item" style="border:1px solid #0a66c2;border-radius:11px;margin-bottom:8px" onclick="closeOvl(\'acctmenu-ovl\');openShopHub()"><i class="ti ti-shopping-bag" style="color:#0a66c2"></i> <b>🛍️ Shop Hub</b> <small>browse · cart · orders · sell — all here</small></button>';
+  h+='<button class="acct-item" style="border:1px solid #7c3aed;border-radius:11px;margin-bottom:8px" onclick="closeOvl(\'acctmenu-ovl\');openJobHub()"><i class="ti ti-briefcase" style="color:#7c3aed"></i> <b>💼 Job Hub</b> <small>CV · apply · post · agent · reports</small></button>';
+  h+='<button class="acct-item" style="border:1px solid #0d9488;border-radius:11px;margin-bottom:9px" onclick="closeOvl(\'acctmenu-ovl\');openDeliveryHub()"><i class="ti ti-truck-delivery" style="color:#0d9488"></i> <b>🛵 Delivery Hub</b> <small>deliver &amp; earn · track orders</small></button>';
+
   // === MY ACTIVITY (everyone) ===
   var act=item('showMyActivity()','layout-dashboard','var(--g)','My Activity','your jobs, orders, shop &amp; license in one place')
     +item('showMyOrders()','package','','My Orders','track &amp; manage purchases')
@@ -6007,7 +6013,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v241 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v242 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6908,7 +6914,7 @@ function cartSetQty(productId,q){
   if(i){i.qty=Math.max(1,q);saveCart(cart);showCart();}
 }
 function removeFromCart(productId){saveCart(getCart().filter(function(i){return i.productId!==productId;}));showCart();}
-function cartTotals(){
+function cartTotalsMrp(){
   var cart=getCart();var sub=0,mrp=0,cur='';
   cart.forEach(function(i){var p=getProducts().find(function(x){return x.id===i.productId;});if(!p)return;cur=p.currency;
     var price=parseFloat(String(p.offer||p.price).replace(/[^0-9.]/g,''))||0;
@@ -6919,7 +6925,7 @@ function cartTotals(){
 function showCart(){
   var cart=getCart();var body=document.getElementById('cart-body');
   if(!cart.length){body.innerHTML='<div style="text-align:center;padding:30px 14px;color:var(--mt2)"><i class="ti ti-shopping-bag" style="font-size:36px;display:block;margin-bottom:8px"></i>Your bag is empty.<div style="margin-top:10px"><button class="btn btnok" onclick="closeOvl(\'cart-ovl\');openProductSearch()">Browse products</button></div></div>';document.getElementById('cart-ovl').classList.add('open');return;}
-  var t=cartTotals();
+  var t=cartTotalsMrp();
   var items=cart.map(function(i){
     var p=getProducts().find(function(x){return x.id===i.productId;});if(!p)return '';
     var avail=productAvailable(p);
@@ -15425,6 +15431,45 @@ function openEmployerAgent(){
     +'<div style="background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:13px;padding:14px 16px;margin-bottom:14px"><div style="font-weight:800;font-size:15px">The agent screens candidates for you</div><div style="font-size:12px;opacity:.92;margin-top:3px">It ranks every applicant by fit and shortlists the best — no manual review needed.</div></div>'
     +(jobs.length?'<button class="btn btnln" style="width:100%;font-weight:700;padding:11px;margin-bottom:14px" onclick="empAutoShortlistAll()"><i class="ti ti-robot"></i> Auto-shortlist best across ALL jobs</button>':'')
     +body+'</div></div>';
+  ov.classList.add('open');
+}
+
+/* ===== v242: Shop Hub + Delivery Hub — everything organized in one place ===== */
+function rbHubTile(ic,t,sub,onclick,badge){
+  return '<button onclick="'+onclick+'" style="text-align:left;background:var(--sf);border:1px solid var(--b);border-radius:13px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%">'
+    +'<div style="width:42px;height:42px;border-radius:11px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">'+ic+'</div>'
+    +'<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:13.5px">'+t+(badge?' <span style="background:var(--g);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:4px">'+badge+'</span>':'')+'</div><div style="font-size:11.5px;color:var(--mt2);margin-top:1px">'+sub+'</div></div>'
+    +'<i class="ti ti-chevron-right" style="color:var(--mt2)"></i></button>';
+}
+function openShopHub(){
+  var ov=document.getElementById('shophub-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='shophub-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  var cartN=0;try{cartN=(getCart()||[]).reduce(function(s,i){return s+(i.qty||1);},0);}catch(e){}
+  ov.innerHTML='<div class="modal" style="max-width:560px"><div class="mhd"><h3>🛍️ Shop Hub</h3><button class="modal-x" onclick="closeOvl(\'shophub-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="background:linear-gradient(135deg,#0a66c2,#5b21b6);color:#fff;border-radius:13px;padding:14px 16px;margin-bottom:14px"><div style="font-weight:800;font-size:15px">Everything shopping, in one place</div><div style="font-size:12px;opacity:.92;margin-top:3px">Browse, buy, track, and sell — all here.</div></div>'
+    +'<div style="display:grid;gap:9px">'
+    +rbHubTile('🛒','Browse the store','Shop products nearby &amp; worldwide','closeOvl(\'shophub-ovl\');openMainStore()')
+    +rbHubTile('🛍️','My cart','Items ready to check out','closeOvl(\'shophub-ovl\');showCart()',cartN?cartN+'':'')
+    +rbHubTile('📦','My orders','Track everything you bought','closeOvl(\'shophub-ovl\');showMyOrders()')
+    +rbHubTile('🏪','Sell a product','List something for sale','closeOvl(\'shophub-ovl\');openListProduct()')
+    +rbHubTile('📊','My shop &amp; sales','Your listings, orders &amp; profit','closeOvl(\'shophub-ovl\');showMyProducts()')
+    +rbHubTile('🎧','Care &amp; returns','Help with orders, returns &amp; refunds','closeOvl(\'shophub-ovl\');openCareAi()')
+    +'</div></div></div>';
+  ov.classList.add('open');
+}
+function openDeliveryHub(){
+  var ov=document.getElementById('delivhub-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='delivhub-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  ov.innerHTML='<div class="modal" style="max-width:560px"><div class="mhd"><h3>🛵 Delivery Hub</h3><button class="modal-x" onclick="closeOvl(\'delivhub-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="background:linear-gradient(135deg,#0a66c2,#0d9488);color:#fff;border-radius:13px;padding:14px 16px;margin-bottom:14px"><div style="font-weight:800;font-size:15px">Everything delivery, in one place</div><div style="font-size:12px;opacity:.92;margin-top:3px">Deliver &amp; earn, or track your incoming orders.</div></div>'
+    +'<div style="display:grid;gap:9px">'
+    +rbHubTile('🛵','Delivery dashboard','Accept &amp; deliver orders, earn money','closeOvl(\'delivhub-ovl\');showAgentDashboard()')
+    +rbHubTile('📍','Track my deliveries','See where your orders are right now','closeOvl(\'delivhub-ovl\');showMyOrders()')
+    +rbHubTile('📊','Seller dispatch','Orders to pack &amp; hand to a courier','closeOvl(\'delivhub-ovl\');showMyProducts(\'orders\')')
+    +rbHubTile('🎧','Delivery help','Issues with a delivery','closeOvl(\'delivhub-ovl\');openCareAi()')
+    +'</div></div></div>';
   ov.classList.add('open');
 }
 </script></body></html>
