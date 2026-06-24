@@ -1298,7 +1298,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v238</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v241</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6007,7 +6007,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v238 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v241 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -12052,7 +12052,7 @@ function renderHabits(){
       +'<div style="flex:1;min-width:0"><div class="hab-name">'+esc(hb.n)+' <button style="background:none;border:none;color:var(--mt2);cursor:pointer;font-size:12px" onclick="openRenameHabit(\''+hb.id+'\')"><i class="ti ti-edit"></i></button></div><div class="hab-meta">'+esc(hb.topic||'')+' · '+((hb.days||40)===365?'1-year':(hb.days||40)+'-day')+' · 🔥 '+p.streak+'-day streak</div>'+(hb.music?'<div style="font-size:11px;color:#7c3aed;margin-top:2px">🎵 '+esc(hb.musicBy||'your track')+'</div>':'')+'</div>'
       +'<div class="hab-ring"><svg width="46" height="46"><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="var(--card2)" stroke-width="4"/><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'"/></svg><div class="pc">'+p.pct+'%</div></div></div>'
       +'<div style="font-size:12px;margin-top:8px">'+(hb.goal?'<b>🎯 Goal:</b> '+esc(hb.goal):'<span style="color:var(--mt2)">No goal set yet</span>')+' <button style="background:none;border:none;color:#0a66c2;cursor:pointer;font-size:11px;font-weight:700" onclick="editHabitGoal(\''+hb.id+'\')"><i class="ti ti-edit"></i> '+((hb.goals&&hb.goals.length)?'edit goals':'set goals')+'</button></div>'
-      +((hb.goals&&hb.goals.length)?'<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">'+hb.goals.slice(0,8).map(function(g){return '<span style="font-size:11px;background:rgba(22,163,74,.10);color:#16a34a;border:1px solid rgba(22,163,74,.25);border-radius:20px;padding:3px 9px">🎯 '+esc(g.name)+'</span>';}).join('')+(hb.goals.length>8?'<span style="font-size:11px;color:var(--mt2)">+'+(hb.goals.length-8)+' more</span>':'')+'</div>':'')
+      +((hb.goals&&hb.goals.length)?'<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">'+hb.goals.slice(0,8).map(function(g){return '<span onclick="openHabitHistory(\''+hb.id+'\')" style="cursor:pointer;font-size:11px;background:rgba(22,163,74,.10);color:#16a34a;border:1px solid rgba(22,163,74,.25);border-radius:20px;padding:3px 9px">🎯 '+esc(g.name)+'</span>';}).join('')+(hb.goals.length>8?'<span style="font-size:11px;color:var(--mt2)">+'+(hb.goals.length-8)+' more</span>':'')+'</div><div style="font-size:10px;color:var(--mt2);margin-top:4px">👆 Tap a goal to see your full history &amp; daily reflections</div>':'')
       +(hb.manifest?'<div style="font-size:12px;color:#0d9488;margin-top:3px;font-style:italic">✨ '+esc(hb.manifest)+'</div>':'')
       +'<div style="font-size:10px;color:var(--mt2);margin-top:8px">👆 Tap any day to open this challenge\'s goals &amp; tick what you did 📝</div>'
       +(function(){var g=(hb.goals||[]).length;if(!g)return '';var td=habDayGoalsDone(hb,dayKey());var p=habDayPct(hb,dayKey());var col=hb.c||'#16a34a';return '<div onclick="habCellClick(\''+hb.id+'\','+Math.max(0,Math.round((Date.now()-(hb.startTs||Date.now()))/86400000))+')" style="cursor:pointer;margin-top:9px;padding:9px 11px;border-radius:11px;background:'+(p>=100?'rgba(22,163,74,.12)':'var(--card2)')+';border:1px solid '+(p>=100?col:'var(--b)')+'"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:12px">📅 Today: '+td+'/'+g+' goals</b><span style="font-size:12px;font-weight:800;color:'+col+'">'+p+'%</span></div><div style="height:7px;background:var(--b);border-radius:5px;margin-top:6px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:'+col+';transition:width .25s"></div></div></div>';})()
@@ -14685,11 +14685,13 @@ function openJobHub(){
     +'<div class="mbd" style="padding:14px 16px">'
     +'<div style="background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:13px;padding:14px 16px;margin-bottom:14px"><div style="font-weight:800;font-size:15px">Everything jobs, in one place</div><div style="font-size:12px;opacity:.9;margin-top:3px">Search, apply, post, track, and report — with the AI agent.</div></div>'
     +'<div style="display:grid;gap:9px">'
+    +tile('🤖','Auto Job Agent','Upload your CV/photo — I scan, match &amp; apply for you','closeOvl(\'jobhub-ovl\');openAutoJobAgent()')
     +tile('🔍','Find a job (AI agent)','Scan &amp; match jobs to your CV, auto-apply','closeOvl(\'jobhub-ovl\');openJobAgent()')
     +tile('📄','My CV','Upload or update your CV','closeOvl(\'jobhub-ovl\');openJobAgent()',myCV.length?myCV.length+'':'')
     +tile('📊','My applications','Jobs you applied to &amp; their status','closeOvl(\'jobhub-ovl\');showMyApps()',apps.length?apps.length+'':'')
     +tile('🎤','Practice interview','AI questions from your CV','closeOvl(\'jobhub-ovl\');agentInterviewPrep()')
     +tile('📢','Post a job','Hire — publish a job post','closeOvl(\'jobhub-ovl\');openTag(\'jobs\')')
+    +tile('🧑‍💼','Employer Agent','Agent auto-screens &amp; shortlists your applicants','closeOvl(\'jobhub-ovl\');openEmployerAgent()')
     +tile('👥','Manage applicants','Review people who applied to your posts','closeOvl(\'jobhub-ovl\');openCompanyPage((CU&&CU.co)||\'\')',posts.length?posts.length+'':'')
     +tile('📈','Job report (Excel / PDF)','Daily report of applications &amp; posts','openJobReportPicker()')
     +'</div></div></div>';
@@ -15213,10 +15215,216 @@ function openHabitReports(id){
     +'<div class="mbd" style="padding:14px 16px">'
     +'<div style="font-size:12px;color:var(--mt);margin-bottom:12px">Download your progress as a spreadsheet (any period) or a printable PDF with your photos.</div>'
     +'<button class="btn btnln" style="width:100%;font-weight:700;margin-bottom:9px;padding:12px;text-align:left" onclick="closeOvl(\'habrepmenu-ovl\');openHabitReportPicker()"><i class="ti ti-file-spreadsheet"></i> Excel report — daily · weekly · 15 · 30 · 40 · 50 · 90 · 6mo · 1yr</button>'
+    +'<button class="btn btnok" style="width:100%;font-weight:700;margin-bottom:9px;padding:12px;text-align:left" onclick="closeOvl(\'habrepmenu-ovl\');openHabitHistory(\''+id+'\')"><i class="ti ti-calendar"></i> Daily history — days completed + your reflections</button>'
     +'<button class="btn btnok" style="width:100%;font-weight:700;margin-bottom:9px;padding:12px;text-align:left" onclick="habReportPDF(\''+id+'\')"><i class="ti ti-file-text"></i> PDF report — with photos ('+pc+' photo'+(pc!==1?'s':'')+')</button>'
     +'<button class="btn" style="width:100%;font-weight:700;margin-bottom:9px;padding:12px;text-align:left;border:1px solid var(--b);color:var(--tx)" onclick="habAddPhoto(\''+id+'\')"><i class="ti ti-camera-plus"></i> Add a progress photo</button>'
     +'<button class="btn" style="width:100%;font-weight:700;padding:12px;text-align:left;border:1px solid var(--b);color:var(--tx)" onclick="closeOvl(\'habrepmenu-ovl\');openHabitMonitor(\''+id+'\')"><i class="ti ti-chart-bar"></i> Open full progress monitor</button>'
     +'</div></div>';
+  ov.classList.add('open');
+}
+
+/* ===== v239: per-habit daily history — days completed + saved reflections/notes ===== */
+function openHabitHistory(id){
+  var hb=getHabits().find(function(x){return x.id===id;});if(!hb)return;
+  var ov=document.getElementById('habhist-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='habhist-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  var start=hb.startTs||Date.now();
+  var today=new Date();today.setHours(0,0,0,0);
+  var goalsById={};(hb.goals||[]).forEach(function(g){goalsById[g.id]=g.name;});
+  var entries=[];
+  for(var t=today.getTime(); t>=start-86400000; t-=86400000){
+    var d=new Date(t);var dk=d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();
+    var done=(hb.done||[]).indexOf(dk)>=0;
+    var dg=(hb.dayGoals&&hb.dayGoals[dk])||[];
+    var note=(hb.notes&&hb.notes[dk])||'';
+    var nts=(hb.noteTs&&hb.noteTs[dk])||0;
+    if(done||dg.length||note){ entries.push({d:d,dk:dk,done:done,dg:dg,note:note,nts:nts}); }
+  }
+  var totalDone=(hb.done||[]).length;
+  var withNotes=entries.filter(function(e){return e.note;}).length;
+  var body=entries.length? entries.map(function(e){
+    var goalsLine=e.dg.length? '<div style="font-size:11.5px;color:#16a34a;margin-top:4px">✓ '+e.dg.map(function(gid){return esc(goalsById[gid]||'goal');}).join(' · ')+'</div>':'';
+    var doneBadge=e.done?'<span style="background:rgba(22,163,74,.14);color:#16a34a;border-radius:20px;padding:2px 9px;font-size:10.5px;font-weight:800">✓ Completed</span>':'<span style="background:var(--card2);color:var(--mt2);border-radius:20px;padding:2px 9px;font-size:10.5px;font-weight:700">Logged</span>';
+    var noteBlock=e.note?'<div style="margin-top:6px;font-size:12.5px;background:var(--card2);border-left:3px solid #7c3aed;border-radius:0 8px 8px 0;padding:8px 10px">📝 '+esc(e.note)+(e.nts?'<div style="font-size:9.5px;color:var(--mt2);margin-top:3px"><i class="ti ti-clock"></i> '+fmtDT(e.nts)+'</div>':'')+'</div>':'';
+    var idx=Math.max(0,Math.round((e.d.getTime()-start)/86400000));
+    return '<div style="border:1px solid var(--b);border-radius:12px;padding:11px 12px;margin-bottom:9px;background:var(--sf)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:12.5px">'+e.d.toLocaleDateString(undefined,{weekday:'short',year:'numeric',month:'short',day:'numeric'})+'</b>'+doneBadge+'</div>'
+      +goalsLine+noteBlock
+      +'<button style="margin-top:7px;background:none;border:none;color:#0a66c2;font-size:11px;font-weight:700;cursor:pointer;padding:0" onclick="closeOvl(\'habhist-ovl\');openHabitDay(\''+hb.id+'\','+idx+')"><i class="ti ti-edit"></i> Open / edit this day</button>'
+      +'</div>';
+  }).join('') : '<div style="text-align:center;color:var(--mt2);padding:30px 10px;font-size:13px">No completed days or notes yet.<br>Tap a day square in the habit to tick goals and write a reflection — it will show up here.</div>';
+  ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>📅 '+esc(hb.n)+' — history</h3><button class="modal-x" onclick="closeOvl(\'habhist-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;border-radius:12px;padding:12px 14px;margin-bottom:14px"><div style="font-size:22px;font-weight:800">'+totalDone+' day'+(totalDone!==1?'s':'')+' completed</div><div style="font-size:12px;opacity:.92">'+withNotes+' reflection'+(withNotes!==1?'s':'')+' saved · your full journey below</div></div>'
+    +body+'</div></div>';
+  ov.classList.add('open');
+}
+
+/* ===== v240: Auto Job Agent — upload CV/photo, agent scans + matches + auto-applies ===== */
+var __autoCV={text:'',name:''};
+function rbJobPosts(){try{var jt=tags.find(function(x){return x.id==='jobs';});return (jt&&jt.posts)||[];}catch(e){return [];}}
+function jobMatchInfo(cvText, post){
+  var jobKw=aiKeywordsFrom((post.title||'')+' '+(post.body||''));
+  var hay=(cvText||'').toLowerCase();var matched=[];
+  jobKw.forEach(function(k){if(hay.indexOf(k)>=0)matched.push(k);});
+  return {pct: jobKw.length?Math.round(matched.length/jobKw.length*100):0, matched:matched, total:jobKw.length};
+}
+function autoApplyToJob(post){
+  var apps=getAllApps();
+  if(apps.some(function(a){return a.uid===(CU&&CU.uid) && a.postId===post.id;}))return false; // no duplicate
+  var mi=jobMatchInfo(__autoCV.text, post);
+  apps.push({
+    id:'app'+Date.now()+Math.floor(Math.random()*99999),
+    name:(CU&&CU.name)||'', email:(CU&&CU.email)||'', phone:'', loc:(CU&&CU.location)||'',
+    note:'Applied automatically by the Reedbi Job Agent based on CV match.',
+    skills:aiKeywordsFrom(__autoCV.text).join(', '), cvText:__autoCV.text, cvName:__autoCV.name||'My CV',
+    company:post.company||post.author||post.by||'', companyLower:((post.company||post.author||post.by||'')+'').toLowerCase(),
+    tagId:'jobs', postId:post.id, postTitle:post.title||'(role)', postBody:post.body||'',
+    ts:Date.now(), uid:(CU&&CU.uid), status:'received', statusTs:Date.now(), atsPct:mi.pct, atsMatched:mi.matched
+  });
+  saveAllApps(apps);
+  try{var jt=tags.find(function(x){return x.id==='jobs';});var pp=jt&&jt.posts.find(function(x){return x.id===post.id;});if(pp)pp.applied=true;}catch(e){}
+  return true;
+}
+function openAutoJobAgent(){
+  if(!requireAuth('use the auto job agent'))return;
+  var ov=document.getElementById('autojob-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='autojob-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  ov.innerHTML='<div class="modal" style="max-width:540px"><div class="mhd"><h3>🤖 Auto Job Agent</h3><button class="modal-x" onclick="closeOvl(\'autojob-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:13px;padding:14px 16px;margin-bottom:14px"><div style="font-weight:800;font-size:15px">Just upload your CV — I do the rest</div><div style="font-size:12px;opacity:.92;margin-top:3px">Upload your CV as a photo or text. I’ll read it, find matching jobs on Reedbi, and apply for you.</div></div>'
+    +'<input type="file" id="autocv-file" accept="image/*,.txt,.text" style="display:none" onchange="autoAgentFile(this)">'
+    +'<button class="btn btnok" style="width:100%;font-weight:800;padding:13px;margin-bottom:9px" onclick="document.getElementById(\'autocv-file\').click()"><i class="ti ti-camera"></i> Upload CV photo / file</button>'
+    +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-bottom:10px">— or paste your CV text —</div>'
+    +'<textarea id="autocv-text" rows="4" placeholder="Paste your CV / resume text here…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--b);background:var(--sf);color:var(--tx);font-size:12.5px"></textarea>'
+    +'<button class="btn btnln" style="width:100%;font-weight:700;padding:11px;margin-top:9px" onclick="autoAgentUseTyped()"><i class="ti ti-robot"></i> Scan &amp; auto-apply to matching jobs</button>'
+    +'<div id="autojob-result" style="margin-top:14px"></div>'
+    +'<div style="font-size:10px;color:var(--mt2);margin-top:12px;line-height:1.5">The agent applies to jobs posted on Reedbi. Photo reading uses free open-source OCR (downloads once, works best on Chrome). For deep CV understanding and external job sites, the AI backend is needed.</div>'
+    +'</div></div>';
+  ov.classList.add('open');
+}
+function autoAgentUseTyped(){
+  var txt=((document.getElementById('autocv-text')||{}).value||'').trim();
+  if(txt.length<25){toast('Paste a bit more of your CV text first','info');return;}
+  __autoCV={text:txt,name:'My CV'};
+  autoAgentScan();
+}
+function autoAgentFile(input){
+  var f=input.files&&input.files[0];if(!f)return;
+  var res=document.getElementById('autojob-result');
+  if(/^image\//.test(f.type)){
+    if(res)res.innerHTML='<div style="font-size:12px;color:var(--mt)">📷 Reading your CV photo… (first time downloads the OCR model)</div>';
+    var rd=new FileReader();
+    rd.onload=function(){ rbOcrImage(rd.result, function(msg){ if(res)res.innerHTML='<div style="font-size:12px;color:var(--mt)">'+msg+'</div>'; }).then(function(text){
+      if(!text||text.trim().length<15){ if(res)res.innerHTML='<div style="font-size:12px;color:#dc2626">Couldn’t read enough text from the photo. Try a clearer image, or paste the text.</div>'; return; }
+      __autoCV={text:text,name:f.name||'CV photo'};
+      var ta=document.getElementById('autocv-text');if(ta)ta.value=text;
+      autoAgentScan();
+    }).catch(function(){ if(res)res.innerHTML='<div style="font-size:12px;color:#dc2626">Photo reading needs Chrome + first-time download. Or paste your CV text above.</div>'; }); };
+    rd.readAsDataURL(f);
+  } else {
+    var rd2=new FileReader();
+    rd2.onload=function(){ __autoCV={text:String(rd2.result||''),name:f.name||'CV'}; var ta=document.getElementById('autocv-text');if(ta)ta.value=__autoCV.text; autoAgentScan(); };
+    rd2.readAsText(f);
+  }
+}
+function autoAgentScan(){
+  var res=document.getElementById('autojob-result');if(!res)return;
+  var posts=rbJobPosts();
+  if(!posts.length){res.innerHTML='<div style="font-size:13px;color:var(--mt);text-align:center;padding:16px">No jobs are posted on Reedbi yet to apply to. As soon as employers post jobs, the agent will match and apply.</div>';return;}
+  var ranked=posts.map(function(p){return {post:p, mi:jobMatchInfo(__autoCV.text,p)};}).sort(function(a,b){return b.mi.pct-a.mi.pct;});
+  var top=ranked.filter(function(r){return r.mi.pct>=30;});
+  var list=(top.length?top:ranked.slice(0,5)).map(function(r){
+    return '<div style="border:1px solid var(--b);border-radius:11px;padding:10px 12px;margin-bottom:8px;background:var(--sf)"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:13px">'+esc(r.post.title||'(role)')+'</b><span style="font-weight:800;color:'+(r.mi.pct>=60?'#16a34a':(r.mi.pct>=30?'#d97706':'#888'))+';font-size:13px">'+r.mi.pct+'% match</span></div>'
+      +(r.post.company||r.post.author?'<div style="font-size:11px;color:var(--mt2)">'+esc(r.post.company||r.post.author)+'</div>':'')
+      +(r.mi.matched.length?'<div style="font-size:10.5px;color:#16a34a;margin-top:3px">✓ '+r.mi.matched.slice(0,6).map(esc).join(' · ')+'</div>':'')+'</div>';
+  }).join('');
+  res.innerHTML='<div style="font-weight:800;font-size:13px;margin-bottom:8px">I found '+ranked.length+' job'+(ranked.length!==1?'s':'')+' — best matches first:</div>'+list
+    +'<button class="btn btnok" style="width:100%;font-weight:800;padding:12px;margin-top:6px" onclick="autoAgentApplyAll()"><i class="ti ti-send"></i> Auto-apply to '+(top.length||Math.min(5,ranked.length))+' matching job'+((top.length||Math.min(5,ranked.length))!==1?'s':'')+'</button>';
+}
+function autoAgentApplyAll(){
+  var posts=rbJobPosts();
+  var ranked=posts.map(function(p){return {post:p, mi:jobMatchInfo(__autoCV.text,p)};}).sort(function(a,b){return b.mi.pct-a.mi.pct;});
+  var top=ranked.filter(function(r){return r.mi.pct>=30;}); if(!top.length)top=ranked.slice(0,5);
+  var applied=0;
+  top.forEach(function(r){ if(autoApplyToJob(r.post))applied++; });
+  var res=document.getElementById('autojob-result');
+  if(res)res.innerHTML='<div style="text-align:center;padding:18px"><div style="font-size:40px">✅</div><div style="font-weight:800;font-size:15px;margin-top:6px">Applied to '+applied+' job'+(applied!==1?'s':'')+'!</div><div style="font-size:12px;color:var(--mt);margin-top:4px">Track them all under <b>My applications</b> in the Job Hub.</div>'
+    +'<button class="btn btnln" style="width:100%;font-weight:700;padding:11px;margin-top:12px" onclick="closeOvl(\'autojob-ovl\');showMyApps()"><i class="ti ti-list-check"></i> See my applications</button></div>';
+  toast('Agent applied to '+applied+' job'+(applied!==1?'s':'')+' ✅','ok');
+}
+/* open-source OCR via Tesseract.js (in-browser, free) */
+async function rbOcrImage(dataURL, onProgress){
+  var mod=await import('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.esm.min.js');
+  var T=mod&&(mod.default||mod);
+  var worker=await T.createWorker('eng',1,{logger:function(m){ if(onProgress&&m&&m.status){onProgress('📷 '+m.status+(m.progress?' '+Math.round(m.progress*100)+'%':''));} }});
+  var ret=await worker.recognize(dataURL);
+  try{await worker.terminate();}catch(e){}
+  return (ret&&ret.data&&ret.data.text)||'';
+}
+
+/* ===== v241: Employer Agent — agent auto-screens, ranks & shortlists candidates ===== */
+function empJobsGrouped(){
+  var co=(CU&&CU.co)||'';
+  var apps=getAppsForCompany(co);
+  var byJob={};
+  apps.forEach(function(a){var k=a.postTitle||'(role)';(byJob[k]=byJob[k]||[]).push(a);});
+  return byJob;
+}
+function empRank(apps){ return apps.slice().sort(function(a,b){return (b.atsPct||0)-(a.atsPct||0);}); }
+function empAutoShortlist(jobTitle){
+  var co=(CU&&CU.co)||'';
+  var apps=getAppsForCompany(co).filter(function(a){return (a.postTitle||'(role)')===jobTitle;});
+  var ranked=empRank(apps);
+  var top=ranked.filter(function(a){return (a.atsPct||0)>=50;}); if(!top.length)top=ranked.slice(0,3);
+  var n=0; top.forEach(function(a){ if(a.status==='received'){setAppStatus(a.id,'shortlisted');n++;} });
+  toast('Agent shortlisted '+n+' top candidate'+(n!==1?'s':'')+' ✅','ok');
+  try{openEmployerAgent();}catch(e){}
+}
+function empAutoShortlistAll(){
+  var byJob=empJobsGrouped();var total=0;
+  Object.keys(byJob).forEach(function(jt){
+    var ranked=empRank(byJob[jt]);var top=ranked.filter(function(a){return (a.atsPct||0)>=50;});if(!top.length)top=ranked.slice(0,3);
+    top.forEach(function(a){ if(a.status==='received'){setAppStatus(a.id,'shortlisted');total++;} });
+  });
+  toast('Agent shortlisted '+total+' candidate'+(total!==1?'s':'')+' across all jobs ✅','ok');
+  try{openEmployerAgent();}catch(e){}
+}
+function openEmployerAgent(){
+  if(!requireAuth('use the employer agent'))return;
+  var co=(CU&&CU.co)||'';
+  var ov=document.getElementById('empagent-ovl');
+  if(!ov){ov=document.createElement('div');ov.id='empagent-ovl';ov.className='overlay';document.body.appendChild(ov);}
+  var byJob=empJobsGrouped();
+  var jobs=Object.keys(byJob);
+  var stMap={received:'New',shortlisted:'Shortlisted',interview:'Interview',offer:'Offer',rejected:'Not selected',hired:'Hired',selected:'Selected'};
+  var body;
+  if(!co){
+    body='<div style="text-align:center;color:var(--mt);padding:24px 10px;font-size:13px">Set your <b>company name</b> in your profile so applicants reach you. Then the agent will screen and shortlist them here automatically.</div>';
+  } else if(!jobs.length){
+    body='<div style="text-align:center;color:var(--mt);padding:24px 10px;font-size:13px">No applicants yet for <b>'+esc(co)+'</b>.<br>When people apply to your posts, the agent will rank and shortlist the best fits here automatically.</div>';
+  } else {
+    body=jobs.map(function(jt){
+      var ranked=empRank(byJob[jt]);
+      var best=ranked[0];
+      var rows=ranked.slice(0,8).map(function(a,i){
+        var col=(a.atsPct||0)>=60?'#16a34a':((a.atsPct||0)>=30?'#d97706':'#888');
+        var rec=(i===0&&(a.atsPct||0)>=50)?'<span style="background:#16a34a;color:#fff;font-size:9px;font-weight:800;padding:1px 7px;border-radius:10px;margin-left:6px">★ AGENT PICK</span>':'';
+        return '<div style="border:1px solid var(--b);border-radius:10px;padding:9px 11px;margin-bottom:7px;background:var(--sf)"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:12.5px">'+esc(a.name||'Candidate')+rec+'</b><span style="font-weight:800;color:'+col+';font-size:12.5px">'+(a.atsPct||0)+'%</span></div>'
+          +(a.atsMatched&&a.atsMatched.length?'<div style="font-size:10px;color:#16a34a;margin-top:3px">✓ '+a.atsMatched.slice(0,6).map(esc).join(' · ')+'</div>':'')
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px"><span style="font-size:10.5px;color:var(--mt2)">'+esc(stMap[a.status]||a.status||'New')+'</span>'
+          +'<span><button class="hab-chip" style="font-size:10px;padding:3px 9px" onclick="setAppStatus(\''+a.id+'\',\'shortlisted\');openEmployerAgent()">Shortlist</button> <button class="hab-chip" style="font-size:10px;padding:3px 9px" onclick="setAppStatus(\''+a.id+'\',\'interview\');openEmployerAgent()">Interview</button></span></div></div>';
+      }).join('');
+      return '<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:13.5px">💼 '+esc(jt)+'</b><span style="font-size:11px;color:var(--mt2)">'+ranked.length+' applicant'+(ranked.length!==1?'s':'')+'</span></div>'
+        +rows
+        +'<button class="btn btnok" style="width:100%;font-weight:700;padding:9px;font-size:12px" onclick="empAutoShortlist(\''+escJS(jt)+'\')"><i class="ti ti-robot"></i> Agent: auto-shortlist best for this role</button></div>';
+    }).join('');
+  }
+  ov.innerHTML='<div class="modal" style="max-width:560px"><div class="mhd"><h3>🧑‍💼 Employer Agent</h3><button class="modal-x" onclick="closeOvl(\'empagent-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="padding:14px 16px">'
+    +'<div style="background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:13px;padding:14px 16px;margin-bottom:14px"><div style="font-weight:800;font-size:15px">The agent screens candidates for you</div><div style="font-size:12px;opacity:.92;margin-top:3px">It ranks every applicant by fit and shortlists the best — no manual review needed.</div></div>'
+    +(jobs.length?'<button class="btn btnln" style="width:100%;font-weight:700;padding:11px;margin-bottom:14px" onclick="empAutoShortlistAll()"><i class="ti ti-robot"></i> Auto-shortlist best across ALL jobs</button>':'')
+    +body+'</div></div>';
   ov.classList.add('open');
 }
 </script></body></html>
