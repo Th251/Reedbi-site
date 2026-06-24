@@ -1298,7 +1298,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v230</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v236</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6007,7 +6007,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v230 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v236 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11971,12 +11971,21 @@ function getHabits(){return LS.get('rb_habits',[])||[];}
 function saveHabits(h){LS.set('rb_habits',h);cloudBumpTs();cloudSaveState();}
 var __cloudSaveT=null;
 function cloudBumpTs(){LS.set('rb_state_ts',Date.now());}
+function cloudHabitsLite(){
+  // Firestore docs are capped at ~1MB; photo dataURLs would blow past it and silently fail
+  // the whole backup. Strip image data (keep a count) so notes/goals/voice ALWAYS sync.
+  return getHabits().map(function(h){
+    var c={};for(var k in h){if(h.hasOwnProperty(k))c[k]=h[k];}
+    if(c.photos&&c.photos.length){c.photoCount=c.photos.length;delete c.photos;}
+    return c;
+  });
+}
 function cloudSaveState(){
   if(!(FB.ready&&FB.db&&!FB_CLOUD_DISABLED))return;
   if(!CU||CU.guest||!CU.uid)return;
   clearTimeout(__cloudSaveT);
   __cloudSaveT=setTimeout(function(){
-    try{FB.db.collection('users').doc(CU.uid).set({hbits:getHabits(),loy:loyalty(),gsheet:getSheet(),mtracks:getTracks(),stateTs:(LS.get('rb_state_ts',0)||Date.now())},{merge:true}).catch(function(){});}catch(e){}
+    try{FB.db.collection('users').doc(CU.uid).set({hbits:cloudHabitsLite(),loy:loyalty(),gsheet:getSheet(),mtracks:getTracks(),stateTs:(LS.get('rb_state_ts',0)||Date.now())},{merge:true}).catch(function(){});}catch(e){}
   },1200);
 }
 function cloudLoadState(uid){
@@ -11985,7 +11994,12 @@ function cloudLoadState(uid){
     if(!doc||!doc.exists)return;var d=doc.data();var cloudTs=d.stateTs||0;var localTs=LS.get('rb_state_ts',0)||0;
     var localEmpty=(getHabits().length===0);
     if(cloudTs>localTs||(localEmpty&&d.hbits&&d.hbits.length)){
-      if(d.hbits)LS.set('rb_habits',d.hbits);
+      if(d.hbits){
+        // cloud copy has photos stripped — re-attach any photos still on this device so they aren't lost
+        var local=getHabits();
+        d.hbits.forEach(function(ch){var lh=local.find(function(x){return x.id===ch.id;});if(lh&&lh.photos&&lh.photos.length&&(!ch.photos||!ch.photos.length))ch.photos=lh.photos;});
+        LS.set('rb_habits',d.hbits);
+      }
       if(d.loy)LS.set('rb_loyalty',d.loy);
       if(d.gsheet)LS.set('rb_goalsheet',d.gsheet);
       if(d.mtracks)LS.set('rb_motiv_tracks',d.mtracks);
@@ -12165,6 +12179,7 @@ function openHabitDay(id,idx){
       +'<button class="btn btnok" style="width:100%" onclick="closeOvl(\'habday-ovl\');editHabitGoal(\''+id+'\')"><i class="ti ti-target"></i> Add goals to this challenge</button>';
   }
   body+='<div class="fg" style="margin-top:11px"><label>📝 Reflection / note for this day</label><textarea id="habday-note" rows="3" placeholder="Type or speak a note for your future self…">'+esc(hb.notes[dk]||'')+'</textarea></div>'
+    +rbVoiceLangPicker()
     +'<div style="display:flex;gap:8px;margin-top:8px">'
     +'<button class="btn mic-btn" style="flex:0 0 auto;border:1px solid #7c3aed;color:#7c3aed;font-weight:700" onclick="habDictateNote(\''+id+'\','+idx+',this)"><i class="ti ti-microphone"></i> Speak</button>'
     +'<button class="btn" style="flex:1;border:1px solid var(--b);color:var(--tx);font-weight:600" onclick="habDaySaveNote(\''+id+'\','+idx+')"><i class="ti ti-device-floppy"></i> Save</button>'
@@ -12370,16 +12385,22 @@ function renderGoalSheet(){
     +'<div style="flex:1;border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:800;color:#0d9488">🔥 '+ov.streak+'</div><div style="font-size:10px;color:var(--mt2)">day streak</div></div>'
     +'<div style="flex:1;border:1px solid var(--b);border-radius:12px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:800">'+ov.achieved+'</div><div style="font-size:10px;color:var(--mt2)">days won</div></div></div>'
     +'<button class="btn" style="width:100%;margin-bottom:10px;border:1px solid #0a66c2;color:#0a66c2;font-weight:700" onclick="shareTrackerLink()"><i class="ti ti-share"></i> Share my progress (view-only link)</button>'
+    +habCloudStatusLine()
     +'<div style="background:var(--card2);border-radius:12px;padding:12px;margin:0 0 12px;text-align:center">'
       +'<div class="gs-score" style="color:'+(dsc.state==='done'?'#16a34a':(dsc.state==='partial'?'#c2410c':'#dc2626'))+'">'+dsc.done+'/'+dsc.total+'</div>'
       +'<div style="font-size:12px;color:var(--mt2)">'+(sel===todayK?'Today':sel)+' · '+dsc.pct+'%'+(dsc.state==='done'?' — all done! 🎉':(dsc.state==='miss'&&dsc.total?' — tough day, be kind to yourself':''))+'</div></div>'
+    +rbVoiceLangPicker()
+    +'<div style="font-size:10.5px;color:var(--mt2);margin:-4px 0 10px;line-height:1.5"><b>🎤</b> instant — follows the picker above (incl. Auto-detect) · <b style="color:#16a34a">🌐 Auto</b> detects any language (open-source) · <b style="color:#0a66c2">→EN</b> speak any language, writes English</div>'
     +s.goals.map(function(g){var mk=(day.marks&&day.marks[g.id])||'';var gn=(day.gnotes&&day.gnotes[g.id])||'';var gnTs=(day.gnoteTs&&day.gnoteTs[g.id])||0;
       return '<div class="gs-goal"><div class="nm">'+esc(g.name)+'</div>'
         +'<button class="gs-mk '+(mk==='done'?'don':'')+'" onclick="markSheetGoal(\''+sel+'\',\''+g.id+'\',\'done\')" title="Achieved"><i class="ti ti-check"></i></button>'
         +'<button class="gs-mk '+(mk==='miss'?'mis':'')+'" onclick="markSheetGoal(\''+sel+'\',\''+g.id+'\',\'miss\')" title="Missed"><i class="ti ti-x"></i></button></div>'
-        +'<div style="display:flex;gap:6px;align-items:center;margin:2px 0 4px">'
-        +'<input id="gs-gnote-'+g.id+'" class="gs-gnote" placeholder="✎ type or speak an update…" value="'+esc(gn)+'" onchange="saveGoalNote(\''+sel+'\',\''+g.id+'\',this.value)" style="flex:1;padding:6px 9px;border:1px solid var(--b);border-radius:8px;background:var(--sf);color:var(--tx);font-size:12px">'
-        +'<button class="btn mic-btn" style="flex:0 0 auto;padding:6px 10px;border:1px solid #7c3aed;color:#7c3aed" onclick="gsDictateGoal(\''+sel+'\',\''+g.id+'\',this)" title="Speak this update"><i class="ti ti-microphone"></i></button>'
+        +'<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:2px 0 4px">'
+        +'<input id="gs-gnote-'+g.id+'" class="gs-gnote" placeholder="✎ type or speak an update…" value="'+esc(gn)+'" onchange="saveGoalNote(\''+sel+'\',\''+g.id+'\',this.value)" style="flex:1 1 100%;padding:6px 9px;border:1px solid var(--b);border-radius:8px;background:var(--sf);color:var(--tx);font-size:12px">'
+        +'<button class="btn mic-btn" style="flex:0 0 auto;padding:6px 9px;border:1px solid #7c3aed;color:#7c3aed" onclick="gsDictateGoal(\''+sel+'\',\''+g.id+'\',this)" title="Instant voice (pick language)"><i class="ti ti-microphone"></i></button>'
+        +'<button class="btn" style="flex:0 0 auto;padding:6px 9px;border:1px solid #16a34a;color:#16a34a;font-size:11px;font-weight:700" onclick="gsWhisperGoal(\''+sel+'\',\''+g.id+'\',this,false)" title="Auto-detect ANY language (open-source)">🌐 Auto</button>'
+        +'<button class="btn" style="flex:0 0 auto;padding:6px 9px;border:1px solid #0a66c2;color:#0a66c2;font-size:11px;font-weight:700" onclick="gsWhisperGoal(\''+sel+'\',\''+g.id+'\',this,true)" title="Speak any language → write English (open-source)">→EN</button>'
+        +'<button class="btn" style="flex:0 0 auto;padding:6px 9px;border:1px solid #0a66c2;color:#0a66c2" onclick="gsAgentTidyGoal(\''+sel+'\',\''+g.id+'\')" title="Agent: tidy this update"><i class="ti ti-sparkles"></i></button>'
         +'</div>'
         +'<div id="gs-gnts-'+g.id+'" style="font-size:9px;color:var(--mt2);margin:0 0 9px">'+(gnTs?'<i class="ti ti-clock"></i> '+fmtDT(gnTs):'')+'</div>';
     }).join('')
@@ -14714,9 +14735,9 @@ function rbDictate(targetId, btn, onUpdate){
   if(!SR){toast('Voice typing needs Chrome, Edge or an Android browser','err');return;}
   var ta=document.getElementById(targetId);if(!ta)return;
   try{
-    if(__rbDict){__rbDict.stop();__rbDict=null;if(btn){btn.classList.remove('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Speak';}return;}
-    var rec=new SR();rec.lang=(navigator.language||'en-US');rec.interimResults=true;rec.continuous=true;rec.maxAlternatives=1;
-    __rbDict=rec;if(btn){btn.classList.add('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Listening… tap to stop';}
+    if(__rbDict){__rbDict.stop();__rbDict=null;rbListenBanner(false);if(btn){btn.classList.remove('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Speak';}return;}
+    var rec=new SR();rec.lang=rbVoiceLang();rec.interimResults=true;rec.continuous=true;rec.maxAlternatives=1;
+    __rbDict=rec;rbListenBanner(true);if(btn){btn.classList.add('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Listening… tap to stop';}
     var base=ta.value?ta.value.replace(/\s+$/,'')+' ':'';var finalT='';
     rec.onresult=function(e){
       var interim='';
@@ -14727,19 +14748,41 @@ function rbDictate(targetId, btn, onUpdate){
       ta.value=base+finalT+interim;
       if(typeof onUpdate==='function'){try{onUpdate(ta.value);}catch(_){}}  // auto-save as you speak
     };
-    rec.onerror=function(){toast('Didn’t catch that — try again','err');};
+    rec.onerror=function(ev){
+      var er=(ev&&ev.error)||'';
+      if(er==='not-allowed'||er==='service-not-allowed'){
+        __rbDict=null;rbListenBanner(false);if(btn){btn.classList.remove('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Speak';}
+        toast('Microphone is blocked — allow mic access in your browser settings','err');
+      } else if(er==='language-not-supported'){
+        __rbDict=null;rbListenBanner(false);if(btn){btn.classList.remove('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Speak';}
+        toast('This language isn’t supported for voice on this device/browser — try Chrome, or pick another','err');
+      }
+      // 'no-speech' / 'aborted' / 'network' / 'audio-capture' → ignore so it stays alive through silence; onend restarts it
+    };
     rec.onend=function(){
-      // keep listening across long sessions until the user taps stop
-      if(__rbDict===rec){try{rec.start();return;}catch(_){}}
-      __rbDict=null;if(btn){btn.classList.remove('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Speak';}
+      if(__rbDict===rec){              // user has NOT tapped stop → keep the mic alive through silence/timeouts
+        try{rec.start();return;}
+        catch(_){ setTimeout(function(){ if(__rbDict===rec){ try{rec.start();}catch(e){} } },350); return; }
+      }
+      rbListenBanner(false);if(btn){btn.classList.remove('rec');btn.innerHTML='<i class="ti ti-microphone"></i> Speak';}
     };
     rec.start();
-    toast('Listening — speak in any language. Auto-saving until you tap stop.','info');
+    toast('Listening in '+rbVoiceLangName()+' — it stays on through silence; tap stop when done.','info');
   }catch(e){toast('Voice typing unavailable','err');if(btn)btn.classList.remove('rec');}
 }
 
 /* ===== v228: long dictation auto-save + short-note summary + sub-goals from text ===== */
 function habDictateNote(id, idx, btn){
+  if(rbVoiceLang()==='auto'){
+    rbWhisperLive('habday-note', btn, false, function(text){
+      var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
+      hb.notes=hb.notes||{};hb.noteTs=hb.noteTs||{};
+      var dk=dayKey((hb.startTs||Date.now())+idx*86400000);
+      hb.notes[dk]=text;hb.noteTs[dk]=Date.now();saveHabits(habits);
+      var st=document.getElementById('habday-savestate');if(st)st.innerHTML='<i class="ti ti-clock"></i> Auto-saved live · '+fmtDT(Date.now());
+    });
+    return;
+  }
   rbDictate('habday-note', btn, function(text){
     var habits=getHabits();var hb=habits.find(function(x){return x.id===id;});if(!hb)return;
     hb.notes=hb.notes||{};hb.noteTs=hb.noteTs||{};
@@ -14856,6 +14899,7 @@ function hsSummarizeGoalNote(gid){
 
 /* ===== v230: voice dictation + auto-save inside each individual goal update ===== */
 function gsDictateGoal(dk, gid, btn){
+  if(rbVoiceLang()==='auto'){ gsWhisperGoal(dk, gid, btn, false); return; }   // auto-detect any language via open-source Whisper
   rbDictate('gs-gnote-'+gid, btn, function(text){
     var s=getSheet();s.days[dk]=s.days[dk]||{marks:{},note:'',gnotes:{}};
     s.days[dk].gnotes=s.days[dk].gnotes||{};s.days[dk].gnoteTs=s.days[dk].gnoteTs||{};
@@ -14863,5 +14907,200 @@ function gsDictateGoal(dk, gid, btn){
     saveSheet(s);
     var ts=document.getElementById('gs-gnts-'+gid);if(ts)ts.innerHTML='<i class="ti ti-clock"></i> Auto-saving while you speak · '+fmtDT(Date.now());
   });
+}
+
+/* ===== v231: agent tidies raw voice text (client-side cleanup; true rewrite needs backend) ===== */
+function rbTidyText(text){
+  text=(text||'').replace(/\s+/g,' ').trim();
+  if(!text)return '';
+  text=text.replace(/\b(um+|uh+|erm*|ah+|like|you know|basically|actually|literally|i mean|sort of|kind of)\b/gi,' ');
+  text=text.replace(/\s+/g,' ').replace(/\s+([.,!?;:])/g,'$1').trim();
+  text=text.replace(/\bi\b/g,'I');
+  if(text)text=text.charAt(0).toUpperCase()+text.slice(1);
+  text=text.replace(/([.!?]\s+)([a-z])/g,function(m,a,b){return a+b.toUpperCase();});
+  if(text&&!/[.!?]$/.test(text))text+='.';
+  return text;
+}
+function gsAgentTidyGoal(dk,gid){
+  var inp=document.getElementById('gs-gnote-'+gid);if(!inp)return;
+  var tidy=rbTidyText(inp.value);
+  if(!tidy){toast('Speak or type an update first','info');return;}
+  inp.value=tidy;saveGoalNote(dk,gid,tidy);
+  var s=getSheet();if(s.days[dk]){s.days[dk].gnoteTs=s.days[dk].gnoteTs||{};s.days[dk].gnoteTs[gid]=Date.now();saveSheet(s);}
+  var ts=document.getElementById('gs-gnts-'+gid);if(ts)ts.innerHTML='<i class="ti ti-clock"></i> Tidied &amp; saved · '+fmtDT(Date.now());
+  toast('Agent tidied your note ✨','ok');
+}
+
+/* ===== v232: voice language picker (Malayalam etc.) + clear listening banner ===== */
+var RB_VOICE_LANGS=[['en-US','English'],['ml-IN','മലയാളം Malayalam'],['hi-IN','हिन्दी Hindi'],['ta-IN','தமிழ் Tamil'],['te-IN','తెలుగు Telugu'],['kn-IN','ಕನ್ನಡ Kannada'],['ar-SA','العربية Arabic'],['ur-PK','اردو Urdu'],['bn-IN','বাংলা Bengali'],['mr-IN','मराठी Marathi'],['gu-IN','ગુજરાતી Gujarati'],['pa-IN','ਪੰਜਾਬੀ Punjabi'],['fr-FR','Français French'],['es-ES','Español Spanish'],['de-DE','Deutsch German'],['zh-CN','中文 Chinese'],['ru-RU','Русский Russian'],['pt-BR','Português'],['id-ID','Indonesian'],['tr-TR','Türkçe Turkish'],['fil-PH','Filipino']];
+function rbVoiceLang(){return LS.get('rb_voicelang','')||navigator.language||'en-US';}
+function rbSetVoiceLang(code){LS.set('rb_voicelang',code);var f=RB_VOICE_LANGS.find(function(x){return x[0]===code;});toast('Voice set to '+(f?f[1]:code)+' 🎤','ok');}
+function rbVoiceLangName(code){code=code||rbVoiceLang();if(code==='auto')return 'Auto-detect';var f=RB_VOICE_LANGS.find(function(x){return x[0]===code;});return f?f[1]:code;}
+function rbVoiceLangPicker(){
+  var cur=rbVoiceLang(),has=(cur==='auto')||RB_VOICE_LANGS.some(function(x){return x[0]===cur;});
+  return '<div style="display:flex;align-items:center;gap:8px;border:1px solid var(--b);border-radius:10px;padding:7px 10px;margin-bottom:10px;background:var(--card2)">'
+    +'<span style="font-size:15px">🎤</span><span style="font-size:11.5px;color:var(--mt);flex:0 0 auto">Speak in</span>'
+    +'<select onchange="rbSetVoiceLang(this.value)" style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--b);background:var(--sf);color:var(--tx);font-size:12.5px">'
+    +'<option value="auto"'+(cur==='auto'?' selected':'')+'>🌐 Auto-detect (any language)</option>'
+    +(has?'':'<option value="'+cur+'" selected>'+cur+' (device)</option>')
+    +RB_VOICE_LANGS.map(function(l){return '<option value="'+l[0]+'"'+(l[0]===cur?' selected':'')+'>'+l[1]+'</option>';}).join('')
+    +'</select></div>';
+}
+function rbListenBanner(on){
+  var b=document.getElementById('rb-listen-banner');
+  if(on){
+    if(!b){b=document.createElement('div');b.id='rb-listen-banner';document.body.appendChild(b);}
+    b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:92px;z-index:99999;background:#e23b3b;color:#fff;padding:11px 20px;border-radius:30px;font-size:13px;font-weight:800;box-shadow:0 8px 26px rgba(0,0,0,.35);display:flex;align-items:center;gap:9px;max-width:90vw';
+    b.innerHTML='<span style="width:11px;height:11px;border-radius:50%;background:#fff;animation:micpulse 1s infinite;flex-shrink:0"></span> Listening in '+rbVoiceLangName()+' — speak now · tap mic to stop';
+  } else if(b){b.remove();}
+}
+
+/* ===== v233: explicit cloud backup with honest status ===== */
+function habCloudBackupNow(){
+  if(!CU||CU.guest){toast('Sign in first — then your notes & goals back up to the cloud automatically','info');return;}
+  if(!(window.FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED)){toast('Cloud not connected yet — your data is safe on THIS device. Connect Firebase to sync across devices.','info');return;}
+  cloudBumpTs();cloudSaveState();
+  toast('Backing up your notes & goals to the cloud ☁️','ok');
+}
+function habCloudStatusLine(){
+  var live=(window.FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest);
+  return '<div style="display:flex;align-items:center;gap:9px;border:1px solid var(--b);border-radius:11px;padding:9px 11px;margin-bottom:10px;background:var(--card2)">'
+    +'<span style="font-size:16px">'+(live?'☁️':'📱')+'</span>'
+    +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800">'+(live?'Cloud backup is on':'Saved on this device')+'</div>'
+    +'<div style="font-size:10px;color:var(--mt2)">'+(live?'Your notes, goals &amp; voice text sync to your account':'Sign in + connect Firebase to sync across devices')+'</div></div>'
+    +(live?'<button class="hab-chip on" onclick="habCloudBackupNow()">Back up now</button>':'<button class="hab-chip" onclick="habCloudBackupNow()">Status</button>')
+    +'</div>';
+}
+
+/* ===== v234: FREE open-source voice — Whisper in the browser (auto-detect any language) ===== */
+var RB_WHISPER_MODEL='Xenova/whisper-base';   // multilingual; ~150MB one-time download, cached
+var __rbWhisperPipe=null, __rbWhisperRec=null;
+function rbWhisperStatus(msg){
+  var b=document.getElementById('rb-listen-banner');
+  if(msg){
+    if(!b){b=document.createElement('div');b.id='rb-listen-banner';document.body.appendChild(b);}
+    b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:92px;z-index:99999;background:#0a66c2;color:#fff;padding:11px 20px;border-radius:30px;font-size:12.5px;font-weight:800;box-shadow:0 8px 26px rgba(0,0,0,.35);display:flex;align-items:center;gap:9px;max-width:92vw;text-align:center';
+    b.innerHTML='<span style="width:11px;height:11px;border-radius:50%;background:#fff;animation:micpulse 1s infinite;flex-shrink:0"></span> '+msg;
+  } else if(b){b.remove();}
+}
+async function rbWhisperLoad(){
+  if(__rbWhisperPipe)return __rbWhisperPipe;
+  rbWhisperStatus('Loading voice model (one-time download)…');
+  var TF=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2');
+  __rbWhisperPipe=await TF.pipeline('automatic-speech-recognition',RB_WHISPER_MODEL,{
+    progress_callback:function(p){ if(p&&p.status==='progress'&&typeof p.progress==='number')rbWhisperStatus('Downloading voice model '+Math.round(p.progress)+'% (one-time)'); }
+  });
+  return __rbWhisperPipe;
+}
+/* translate=true → output English; false → output in the spoken language (auto-detected) */
+async function rbWhisperDictate(targetId, btn, translate){
+  var ta=document.getElementById(targetId); if(!ta)return;
+  if(__rbWhisperRec){ try{__rbWhisperRec.stop();}catch(e){} return; }   // tap again = stop
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Microphone not available in this browser','err');return;}
+  if(!window.MediaRecorder){toast('This browser can’t record audio — try Chrome','err');return;}
+  var stream;
+  try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){ toast('Allow microphone access to use voice','err'); return; }
+  var chunks=[], rec=new MediaRecorder(stream); __rbWhisperRec=rec;
+  if(btn)btn.classList.add('rec');
+  rbWhisperStatus('● Recording '+(translate?'→ English':'(any language)')+' — tap to stop');
+  rec.ondataavailable=function(e){ if(e.data&&e.data.size)chunks.push(e.data); };
+  rec.onstop=async function(){
+    try{stream.getTracks().forEach(function(t){t.stop();});}catch(e){}
+    __rbWhisperRec=null; if(btn)btn.classList.remove('rec');
+    if(!chunks.length){rbWhisperStatus('');toast('No audio captured','info');return;}
+    var blob=new Blob(chunks,{type:rec.mimeType||'audio/webm'});
+    try{
+      var pipe=await rbWhisperLoad();
+      rbWhisperStatus('Transcribing… (open-source, on your device)');
+      var arrbuf=await blob.arrayBuffer();
+      var AC=window.AudioContext||window.webkitAudioContext;
+      var ac=new AC({sampleRate:16000});
+      var audioBuf=await ac.decodeAudioData(arrbuf);
+      var data=audioBuf.getChannelData(0);
+      try{ac.close();}catch(e){}
+      var out=await pipe(data,{task:translate?'translate':'transcribe', chunk_length_s:30, stride_length_s:5});
+      var text=((out&&out.text)||'').trim();
+      rbWhisperStatus('');
+      if(!text){toast('Couldn’t hear speech — try again, closer to the mic','info');return;}
+      ta.value=(ta.value?ta.value.replace(/\s+$/,'')+' ':'')+text;
+      try{ta.dispatchEvent(new Event('change'));}catch(e){}
+      toast('Written ✓ (open-source voice)','ok');
+    }catch(e){
+      rbWhisperStatus('');
+      toast('Voice model error — needs Chrome + good connection for first download','err');
+    }
+  };
+  rec.start();
+}
+/* goal-sheet wrapper: auto-detect → write into the goal + auto-save */
+function gsWhisperGoal(dk, gid, btn, translate){
+  rbWhisperLive('gs-gnote-'+gid, btn, translate, function(text){
+    var s=getSheet();s.days[dk]=s.days[dk]||{marks:{},note:'',gnotes:{}};
+    s.days[dk].gnotes=s.days[dk].gnotes||{};s.days[dk].gnoteTs=s.days[dk].gnoteTs||{};
+    s.days[dk].gnotes[gid]=text;s.days[dk].gnoteTs[gid]=Date.now();
+    saveSheet(s);
+    var ts=document.getElementById('gs-gnts-'+gid);if(ts)ts.innerHTML='<i class="ti ti-clock"></i> Auto-saving live · '+fmtDT(Date.now());
+  });
+}
+
+/* ===== v236: LIVE chunked Whisper — auto listen, transcribe every few seconds, auto-save, until stop ===== */
+var __rbWhisperLive=null;
+async function rbWhisperLive(targetId, btn, translate, onUpdate){
+  var ta=document.getElementById(targetId); if(!ta)return;
+  if(__rbWhisperLive){ rbWhisperLiveStop(); return; }   // tap again = stop
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Microphone not available — try Chrome','err');return;}
+  var AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC){toast('Audio not supported in this browser','err');return;}
+  var stream;
+  try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){ toast('Allow microphone access to use voice','err'); return; }
+  if(btn)btn.classList.add('rec');
+  rbWhisperStatus('Loading voice model (one-time)…');
+  var ac, src, proc, buffer=[], base=ta.value?ta.value.replace(/\s+$/,'')+' ':'', timer=null, busy=false, pipe=null;
+  try{
+    ac=new AC({sampleRate:16000});
+    src=ac.createMediaStreamSource(stream);
+    proc=ac.createScriptProcessor?ac.createScriptProcessor(4096,1,1):null;
+    if(!proc){ // very new browsers removed ScriptProcessor without worklet fallback — degrade to record-then-transcribe
+      try{stream.getTracks().forEach(function(t){t.stop();});}catch(e){}
+      if(btn)btn.classList.remove('rec'); rbWhisperStatus('');
+      return rbWhisperDictate(targetId, btn, translate);
+    }
+    proc.onaudioprocess=function(e){ try{buffer.push(new Float32Array(e.inputBuffer.getChannelData(0)));}catch(_){} };
+    src.connect(proc); proc.connect(ac.destination);
+    pipe=await rbWhisperLoad();
+    rbWhisperStatus('● Live '+(translate?'→ English':'(any language)')+' — speak, tap to stop');
+    __rbWhisperLive={stream:stream,ac:ac,src:src,proc:proc,timer:null,btn:btn};
+    timer=setInterval(async function(){
+      if(busy||!__rbWhisperLive)return; busy=true;
+      var len=0,i; for(i=0;i<buffer.length;i++)len+=buffer[i].length;
+      if(len<16000){busy=false;return;}                 // need ≥1s of audio
+      var all=new Float32Array(len), off=0;
+      for(i=0;i<buffer.length;i++){all.set(buffer[i],off);off+=buffer[i].length;}
+      try{
+        var out=await pipe(all,{task:translate?'translate':'transcribe', chunk_length_s:30, stride_length_s:5});
+        var text=((out&&out.text)||'').trim();
+        if(text&&__rbWhisperLive){ ta.value=base+text; if(typeof onUpdate==='function'){try{onUpdate(ta.value);}catch(_){}} }
+      }catch(e){}
+      busy=false;
+    },4000);
+    __rbWhisperLive.timer=timer;
+  }catch(e){
+    try{stream.getTracks().forEach(function(t){t.stop();});}catch(_){}
+    if(timer)clearInterval(timer); if(btn)btn.classList.remove('rec'); rbWhisperStatus('');
+    __rbWhisperLive=null; toast('Live voice needs Chrome + first-time model download','err');
+  }
+}
+function rbWhisperLiveStop(){
+  var L=__rbWhisperLive; if(!L)return; __rbWhisperLive=null;
+  if(L.timer)clearInterval(L.timer);
+  try{L.proc&&L.proc.disconnect();}catch(e){}
+  try{L.src&&L.src.disconnect();}catch(e){}
+  try{L.stream&&L.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}
+  try{L.ac&&L.ac.close();}catch(e){}
+  if(L.btn)L.btn.classList.remove('rec');
+  rbWhisperStatus('');
+  toast('Saved ✓','ok');
 }
 </script></body></html>
