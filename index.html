@@ -1313,7 +1313,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v252</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v256</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6032,7 +6032,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v252 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v256 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -15741,11 +15741,31 @@ function jarvisRoute(text){
   var has=function(a){return a.some(function(w){return q.indexOf(w)>=0;});};
   if(has(['stop','exit','goodbye','good bye','close','quit','shut down','that is all','thats all']))return {close:true};
   if(has(['status','how am i doing','overview','how is everything','my dashboard','how are things']))return {reply:jarvisStatusSpoken(),stay:true};
-  if(has(['find a job','find job','search job','look for job','jobs',' job','job ','job hub','find work','hiring','vacancy','apply for','get a job','need a job','want a job']))return {reply:'Opening the Job Hub so you can search and apply for jobs.',action:function(){closeJarvis();openJobHub();}};
+  if(has(['find a job','find job','search job','look for job','jobs',' job','job ','job hub','find work','hiring','vacancy','apply for','get a job','need a job','want a job','need job','i need work'])){
+    var role='';
+    var jm=text.match(/(?:need|want|find|looking for|get me|apply for)\s+(?:a |an |me a |me an )?([a-z ]+?)\s*(?:job|work|role|position)/i)||text.match(/(?:job|work|role|position)\s+(?:as|for|in)\s+(?:a |an )?([a-z ]+)/i);
+    if(jm)role=(jm[1]||'').replace(/\b(find|me|some|any|new)\b/gi,'').trim();
+    return {job:true, role:role};
+  }
   if(has(['sell','selling','what to sell','sell to demand','list a product','promote my']))return {reply:'Opening the sell helper, where I match your products to what people are searching for.',action:function(){closeJarvis();openSellAgent();}};
   if(has(['my orders','my order','track order','track my','where is my','order status']))return {reply:'Opening your orders.',action:function(){closeJarvis();showMyOrders();}};
+  // HABIT voice commands (specific actions win over just opening habits)
+  if(has(['log my habits','log habits','check my habits','go through my habits','track my habits','review my habits']))return {habitLog:true};
+  if(has(['habit status','my habits','how are my habits','habits today','habit progress','did i do my habits','habits done','how am i doing']))return {habitStatus:true};
+  var hmd=text.match(/(?:mark|complete|completed|finish|finished|log)\s+(?:my |the )?([a-z ]+?)\s*(?:habit\s*)?(?:as )?(?:done|complete|completed|finished)?\s*$/i);
+  if(/\b(mark|complete|completed|finish|finished)\b/.test(q)&&hmd){var hn1=(hmd[1]||'').replace(/\b(habit|today|my|as|the|done|complete|completed|finish|finished)\b/gi,'').replace(/\s+/g,' ').trim();return {habitDone:true,name:hn1};}
+  if(/\bi (?:did|finished|completed)\b/.test(q)){var hm2=text.match(/i (?:did|finished|completed)\s+(?:my |the )?([a-z ]+)/i);return {habitDone:true,name:hm2?(hm2[1]||'').replace(/\b(habit|today|my)\b/gi,'').trim():''};}
   if(has(['habit','habits','my goals']))return {reply:'Opening your habits.',action:function(){closeJarvis();openHabits();}};
-  var m=text.match(/(?:find|search for|search|show me|looking for|look for|buy|i want|get me|do you have|need|where can i get)\s+(?:a |an |the |some |me )?(.+)/i);
+  // DELIVERY agent intent -> hands-free drive-safe delivery flow
+  if(has(['my deliveries','my delivery','start delivery','start delivering','deliver order','delivery mode','accept delivery','any deliveries','orders to deliver','i want to deliver','begin delivery','pickup order','next delivery','delivery job']))return {deliver:true};
+  // SHOPPING (buy) intent -> guided voice cart flow (job intent is checked above, so "i want a job" still wins)
+  if(has(['buy','purchase','add to cart','add to my cart','i want to buy','go shopping','start shopping','do my shopping'])){
+    var bm=text.match(/(?:buy|purchase|order|add)\s+(?:a |an |some |me )?(.+?)(?:\s+to (?:my )?cart)?$/i);
+    var bterm=bm?(bm[1]||'').replace(/[?.!]+$/,'').trim():'';
+    return {shop:true, term:bterm};
+  }
+  if(/\b(go shopping|start shopping|i want to shop)\b/.test(q))return {shop:true,term:''};
+  var m=text.match(/(?:find|search for|search|show me|looking for|look for|i want|get me|do you have|need|where can i get)\s+(?:a |an |the |some |me )?(.+)/i);
   if(m){
     var term=m[1].replace(/\b(product|products|item|items|please|for me|on reedbi|to buy)\b/gi,'').replace(/[?.!]+$/,'').trim();
     if(term.length>1)return {reply:'Searching for '+term+'.',search:term};
@@ -15792,8 +15812,15 @@ function jarvisHandle(text){
   jarvisSetStatus('Thinking…','thinking');
   var h=document.getElementById('jarvis-heard');if(h)h.textContent='';
   jarvisLog('you',text);
+  if(__jarvis.flow){return jarvisFlowStep(text);}  // continue a guided multi-turn flow
   var route=jarvisRoute(text);
   if(route.close){jarvisSpeak('Goodbye!',function(){closeJarvis();});return;}
+  if(route.job){jarvisJobStart(route.role);return;}  // start the guided voice job flow
+  if(route.shop){jarvisShopStart(route.term);return;}  // start the guided voice shopping flow
+  if(route.deliver){jarvisDeliverStart();return;}  // start the hands-free delivery flow
+  if(route.habitStatus){var hs=jarvisHabitStatus();jarvisLog('ai',hs);jarvisSpeak(hs,function(){if(__jarvis.on)jarvisListen();});return;}
+  if(route.habitDone){jarvisHabitDoneStart(route.name);return;}
+  if(route.habitLog){jarvisHabitLogStart();return;}
   if(route.ai){
     if(rbAIEndpoint()){askAgentAI(text).then(function(r){var reply=r||jarvisFallback(text);jarvisLog('ai',reply);jarvisSpeak(reply,function(){if(__jarvis.on)jarvisListen();});});}
     else{var reply=jarvisFallback(text);jarvisLog('ai',reply);jarvisSpeak(reply,function(){if(__jarvis.on)jarvisListen();});}
@@ -15903,5 +15930,228 @@ function aiVoiceSave(){
   if(box)box.innerHTML='<span style="color:var(--mt2)">Saved. Testing voice…</span>';
   toast('Voice connected 🔊','ok');
   rbSpeakSmart('Hi, this is your Reedbi voice. I sound natural now.',function(){if(box)box.innerHTML='<span style="color:#15803d">✓ If you heard a natural voice, it works. If it sounded robotic, the endpoint fell back to the browser — check the URL.</span>';},false);
+}
+
+/* ===== v253: guided voice JOB flow + hands-free call/WhatsApp/maps actions ===== */
+function rbCall(phone){if(!phone){toast('No phone number','info');return;}try{window.location.href='tel:'+String(phone).replace(/[^0-9+]/g,'');}catch(e){}}
+function rbWhatsApp(phone,msg){if(!phone){toast('No WhatsApp number','info');return;}var p=String(phone).replace(/[^0-9]/g,'');var u='https://wa.me/'+p+(msg?'?text='+encodeURIComponent(msg):'');try{window.open(u,'_blank');}catch(e){}}
+function rbNavigate(addr){if(!addr){toast('No address','info');return;}try{window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr),'_blank');}catch(e){}}
+
+function jarvisJobTags(){try{return tags.filter(function(t){return t.cat==='jobs';});}catch(e){return [];}}
+function jarvisFindJobs(role){
+  role=(role||'').toLowerCase().trim();var words=role.split(/\s+/).filter(function(w){return w.length>2;});if(!words.length)words=[role];
+  var out=[];
+  jarvisJobTags().forEach(function(t){(t.posts||[]).forEach(function(p){
+    var hay=((p.title||'')+' '+(p.body||'')+' '+(p.co||'')).toLowerCase();
+    if(words.some(function(w){return w&&hay.indexOf(w)>=0;}))out.push({tag:t,post:p});
+  });});
+  return out.slice(0,10);
+}
+function jarvisApplyToJob(tag, post){
+  var uid=CU.uid;var cvs=getCVs(uid);var cv=cvs.length?cvs[cvs.length-1]:null;
+  var apps=getAllApps();
+  if(apps.some(function(a){return a.uid===uid&&a.postId===post.id;}))return false; // no duplicate
+  var rec={id:'app'+Date.now()+Math.floor(Math.random()*9999),name:CU.name||'',email:CU.email||'',phone:'',loc:CU.location||'',note:'Applied via voice assistant',skills:'',cvText:(cv&&cv.text)||'',cvId:(cv&&cv.id)||null,cvName:(cv&&cv.name)||'',cvOwnerUid:uid,company:post.co||'',companyLower:(post.co||'').toLowerCase(),tagId:tag.id,postId:post.id,postTitle:post.title||'',postBody:post.body||'',ts:Date.now(),uid:uid,status:'received',statusTs:Date.now()};
+  try{var kw=aiKeywordsFrom((rec.postBody||'')+' '+(rec.postTitle||''));var sc=(kw&&kw.length)?atsScore(rec,kw.join(',')):null;rec.atsPct=sc?sc.pct:0;rec.atsMatched=sc?sc.matched:[];}catch(e){rec.atsPct=0;}
+  try{if(cv&&cv.id){var cd=getCVData(uid,cv.id);if(cd&&cd.length<600000)rec.cvData=cd;}}catch(e){}
+  apps.push(rec);saveAllApps(apps);
+  try{if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED)FB.db.collection('applications').doc(rec.id).set(rec).catch(function(){});}catch(e){}
+  return true;
+}
+function jarvisJobStart(role){
+  __jarvis.flow={type:'job',step:'role',role:(role||'').trim()};
+  if(__jarvis.flow.role&&__jarvis.flow.role.length>1)return jarvisJobAfterRole();
+  var msg='Sure, I can help you apply for a job. What kind of role are you looking for? For example: driver, accountant, or sales.';
+  jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
+}
+function jarvisJobAfterRole(){
+  var role=__jarvis.flow.role;
+  var cvs=getCVs(CU.uid);
+  if(!cvs.length){
+    __jarvis.flow=null;
+    var m='Got it — '+role+'. But you haven\'t added a CV yet, and employers need it. I\'ll open the CV upload now. Add your CV, then just say "I need a '+role+' job" and I\'ll apply for you.';
+    jarvisLog('ai',m);jarvisSpeak(m,function(){closeJarvis();try{openJobHub();}catch(e){}});
+    return;
+  }
+  var matches=jarvisFindJobs(role);
+  if(!matches.length){
+    __jarvis.flow=null;
+    var m2='I couldn\'t find jobs matching '+role+' right now. I\'ll open the Job Hub so you can browse and set up alerts.';
+    jarvisLog('ai',m2);jarvisSpeak(m2,function(){closeJarvis();try{openJobHub();}catch(e){}});
+    return;
+  }
+  __jarvis.flow={type:'job',step:'confirm',role:role,matches:matches};
+  var titles=matches.slice(0,3).map(function(m){return m.post.title||'a role';}).join(', ');
+  var msg='I found '+matches.length+' job'+(matches.length!==1?'s':'')+' matching '+role+', including '+titles+'. Shall I apply to '+(matches.length===1?'it':'all of them')+' with your CV? Say yes or no.';
+  jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
+}
+function jarvisFlowStep(text){
+  var q=text.toLowerCase();var f=__jarvis.flow;
+  if(/cancel|never mind|forget it|stop that/.test(q)){__jarvis.flow=null;var m='Okay, cancelled. Anything else?';jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});return;}
+  if(f&&f.type==='job'){
+    if(f.step==='role'){f.role=text.trim();return jarvisJobAfterRole();}
+    if(f.step==='confirm'){
+      if(/\b(yes|yeah|yep|sure|ok|okay|apply|go ahead|do it|please|confirm)\b/.test(q)){
+        var n=0;(f.matches||[]).forEach(function(m){if(jarvisApplyToJob(m.tag,m.post))n++;});
+        __jarvis.flow=null;
+        var msg=n>0?('Done! I applied to '+n+' job'+(n!==1?'s':'')+' for you with your CV. Track them in My Applications. Good luck!'):('It looks like you already applied to those. Nothing new to send.');
+        jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
+        return;
+      }
+      if(/\b(no|nope|don't|do not|cancel|skip)\b/.test(q)){__jarvis.flow=null;var m='No problem, I won\'t apply. Anything else?';jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});return;}
+      var m3='Just say yes to apply, or no to skip.';jarvisLog('ai',m3);jarvisSpeak(m3,function(){if(__jarvis.on)jarvisListen();});return;
+    }
+  }
+  if(f&&f.type==='shop'){
+    if(/\b(checkout|check out|pay|done|finish|that's all|thats all|complete|nothing else|place order|buy now|that is all|i'm done|im done)\b/.test(q)){return jarvisShopCheckout();}
+    if(f.step==='search'){return jarvisShopSearch(text);}
+    if(f.step==='addconfirm'){
+      if(/\b(yes|yeah|yep|sure|ok|okay|add|please|confirm|add it)\b/.test(q)){
+        try{addToCartSilent(f.pid);}catch(e){}
+        __jarvis.flow={type:'shop',step:'search'};
+        var am='Added '+(f.pname||'it')+' to your cart. Anything else? Say a product, or say checkout to finish.';
+        jarvisLog('ai',am);jarvisSpeak(am,function(){if(__jarvis.on)jarvisListen();});return;
+      }
+      if(/\b(no|nope|don't|do not|skip|cancel)\b/.test(q)){
+        __jarvis.flow={type:'shop',step:'search'};
+        var nm='Okay. What else would you like? Or say checkout.';
+        jarvisLog('ai',nm);jarvisSpeak(nm,function(){if(__jarvis.on)jarvisListen();});return;
+      }
+      return jarvisShopSearch(text); // treat anything else as a new product to search
+    }
+  }
+  if(f&&f.type==='deliver'){
+    if(f.step==='acceptoffer'){
+      if(/\b(yes|yeah|yep|sure|ok|okay|accept|take it|confirm|i'll take it)\b/.test(q)){try{acceptPickup(f.offerId);}catch(e){}return jarvisDeliverStart();}
+      if(/\b(no|nope|skip|don't|do not|decline|leave it)\b/.test(q)){__jarvis.flow=null;var dm='Okay, I will leave that offer. Anything else?';jarvisLog('ai',dm);jarvisSpeak(dm,function(){if(__jarvis.on)jarvisListen();});return;}
+      var dmm='Say yes to accept the delivery, or no to skip.';jarvisLog('ai',dmm);jarvisSpeak(dmm,function(){if(__jarvis.on)jarvisListen();});return;
+    }
+    if(f.step==='cmd'){
+      var o=jarvisDeliverCurrent();
+      if(!o){__jarvis.flow=null;var nm='That delivery is no longer active. Anything else?';jarvisLog('ai',nm);jarvisSpeak(nm,function(){if(__jarvis.on)jarvisListen();});return;}
+      if(/\b(navigate|directions|direction|map|maps|take me there|route|where is it|go there)\b/.test(q)){var n2='Opening maps to the delivery address.';jarvisLog('ai',n2);jarvisSpeak(n2,function(){rbNavigate(o.buyerMap||o.buyerAddr||o.buyerName);if(__jarvis.on)setTimeout(function(){if(__jarvis.on)jarvisListen();},900);});return;}
+      if(/\b(call|phone|ring|dial)\b/.test(q)){var c2='Calling the customer now.';jarvisLog('ai',c2);jarvisSpeak(c2,function(){rbCall(o.buyerPhone);});return;}
+      if(/\b(message|whatsapp|text|msg|send message)\b/.test(q)){var w2='Opening WhatsApp to message the customer.';jarvisLog('ai',w2);jarvisSpeak(w2,function(){rbWhatsApp(o.buyerPhone,'Hi, this is your Reedbi delivery agent. I am on my way with your order.');});return;}
+      if(/\b(repeat|again|details|detail|address|info|information|where)\b/.test(q)){var r2=jarvisDeliverInfoText(o,f.idx,f.ids.length);jarvisLog('ai',r2);jarvisSpeak(r2,function(){if(__jarvis.on)jarvisListen();});return;}
+      if(/\b(next|skip|following)\b/.test(q)){if(f.idx+1<f.ids.length){f.idx++;var o3=jarvisDeliverCurrent();var n3=jarvisDeliverInfoText(o3,f.idx,f.ids.length);jarvisLog('ai',n3);jarvisSpeak(n3,function(){if(__jarvis.on)jarvisListen();});}else{var e2='That is your last delivery.';jarvisLog('ai',e2);jarvisSpeak(e2,function(){if(__jarvis.on)jarvisListen();});}return;}
+      if(/\b(done|finish|close|stop|exit|that's all|thats all)\b/.test(q)){__jarvis.flow=null;var f2='Okay, drive safe. Tap the mic whenever you need me.';jarvisLog('ai',f2);jarvisSpeak(f2,function(){if(__jarvis.on)jarvisListen();});return;}
+      var h2='You can say navigate, call customer, message customer, repeat, next, or done.';jarvisLog('ai',h2);jarvisSpeak(h2,function(){if(__jarvis.on)jarvisListen();});return;
+    }
+  }
+  if(f&&f.type==='habitdone'){__jarvis.flow=null;var hres=jarvisHabitMarkDone(text);jarvisLog('ai',hres.msg);jarvisSpeak(hres.msg,function(){if(__jarvis.on)jarvisListen();});return;}
+  if(f&&f.type==='habitlog'){
+    var habits=getHabits();var h=habits.find(function(x){return x.id===f.ids[f.idx];});
+    if(h&&/\b(yes|yeah|yep|did|done|sure|ok|okay|i did)\b/.test(q)){h.done=h.done||[];var k=dayKey();if(h.done.indexOf(k)<0)h.done.push(k);saveHabits(habits);}
+    if(f.idx+1<f.ids.length){f.idx++;jarvisHabitLogAsk();return;}
+    __jarvis.flow=null;var summ='All logged! '+jarvisHabitStatus();jarvisLog('ai',summ);jarvisSpeak(summ,function(){if(__jarvis.on)jarvisListen();});return;
+  }
+  __jarvis.flow=null;jarvisHandle(text);
+}
+
+/* ===== v254: guided voice SHOPPING flow — collect products by voice → checkout ===== */
+function jarvisFindProducts(term){
+  term=(term||'').toLowerCase().trim();var words=term.split(/\s+/).filter(function(w){return w.length>2;});if(!words.length)words=[term];
+  var prods=getProducts().filter(function(p){return p&&productInMarketplace(p)&&!p.withdrawn;});
+  return prods.filter(function(p){var hay=((p.title||'')+' '+(p.brand||'')+' '+(p.category||'')).toLowerCase();return words.some(function(w){return w&&hay.indexOf(w)>=0;});}).slice(0,5);
+}
+function jarvisCartCount(){return getCart().reduce(function(s,c){return s+(c.qty||1);},0);}
+function jarvisShopStart(term){
+  __jarvis.flow={type:'shop',step:'search'};
+  if(term&&term.length>1)return jarvisShopSearch(term);
+  var msg='Sure — what would you like to buy? Say a product name, like rice or shoes.';
+  jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
+}
+function jarvisShopSearch(term){
+  var found=jarvisFindProducts(term);
+  if(!found.length){
+    var m='I couldn\'t find '+term+' in the shop right now. Try another product, or say checkout if you\'re done.';
+    jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});return;
+  }
+  var p=found[0];
+  __jarvis.flow={type:'shop',step:'addconfirm',pid:p.id,pname:p.title};
+  var price=(p.currency?p.currency+' ':'')+(p.offer||p.price||'');
+  var msg='I found '+(p.title||'a product')+' for '+price+'. Add it to your cart? Say yes or no.';
+  jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
+}
+function jarvisShopCheckout(){
+  __jarvis.flow=null;
+  var n=jarvisCartCount();
+  if(!n){__jarvis.flow={type:'shop',step:'search'};var m='Your cart is empty. What would you like to buy?';jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});return;}
+  var msg='Great — you have '+n+' item'+(n!==1?'s':'')+' in your cart. I\'m opening checkout now. Choose your delivery address and payment to finish your order.';
+  jarvisLog('ai',msg);jarvisSpeak(msg,function(){closeJarvis();try{checkoutCart();}catch(e){}});
+}
+
+/* ===== v255: hands-free DELIVERY agent voice flow (drive-safe, all info at once) ===== */
+function jarvisDeliverActive(){return getOrders().filter(function(o){return o.agentUid===CU.uid&&o.status!=='delivered'&&o.status!=='returned'&&o.status!=='cancelled';});}
+function jarvisDeliverOffers(){return getOrders().filter(function(o){return o.pickupOpen===true&&!o.agentUid;});}
+function jarvisDeliverInfoText(o,i,n){
+  var parts=[];
+  parts.push('Delivery '+(i+1)+' of '+n+'.');
+  parts.push((o.productTitle||'order')+(o.qty?', quantity '+o.qty:'')+', for '+(o.buyerName||'the customer')+'.');
+  if(o.buyerAddr)parts.push('Address: '+o.buyerAddr+'.');
+  if(o.buyerPhone)parts.push('Phone: '+o.buyerPhone+'.');
+  parts.push('Say navigate, call customer, message customer, next, or done.');
+  return parts.join(' ');
+}
+function jarvisDeliverCurrent(){var f=__jarvis.flow;if(!f||!f.ids)return null;var id=f.ids[f.idx];return getOrders().find(function(o){return o.id===id;})||null;}
+function jarvisDeliverStart(){
+  var active=jarvisDeliverActive();
+  if(active.length){
+    __jarvis.flow={type:'deliver',step:'cmd',idx:0,ids:active.map(function(o){return o.id;})};
+    var o=active[0];
+    var msg='You have '+active.length+' delivery'+(active.length!==1?' jobs':' job')+'. '+jarvisDeliverInfoText(o,0,active.length);
+    jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});return;
+  }
+  var offers=jarvisDeliverOffers();
+  if(offers.length){
+    var of=offers[0];
+    __jarvis.flow={type:'deliver',step:'acceptoffer',offerId:of.id};
+    var area=of.buyerAddr?(' to '+of.buyerAddr):'';
+    var fee=of.deliveryFee?(' It pays '+(of.currency||'')+' '+of.deliveryFee+'.'):'';
+    var msg2='There is a delivery offer: '+(of.productTitle||'an order')+area+'.'+fee+' Do you want to accept it? Say yes or no.';
+    jarvisLog('ai',msg2);jarvisSpeak(msg2,function(){if(__jarvis.on)jarvisListen();});return;
+  }
+  __jarvis.flow=null;
+  var m='You have no deliveries or offers right now. I will let you know when one comes in.';
+  jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});
+}
+
+/* ===== v256: habit-by-voice — mark done, log all, status, all hands-free ===== */
+function jarvisFindHabitIn(habits,name){
+  name=(name||'').toLowerCase().trim();if(!name)return null;var words=name.split(/\s+/).filter(function(w){return w.length>1;});
+  return habits.find(function(h){var hn=((h.name||h.n||'')).toLowerCase();return hn.indexOf(name)>=0||words.some(function(w){return w&&hn.indexOf(w)>=0;});})||null;
+}
+function jarvisHabitMarkDone(name){
+  var habits=getHabits();
+  if(!habits.length)return {msg:'You don\'t have any habits yet. Open Habits to create one first.'};
+  var h=jarvisFindHabitIn(habits,name);
+  if(!h)return {msg:'I couldn\'t find a habit called '+name+'. Your habits are: '+habits.map(function(x){return x.name||x.n;}).join(', ')+'.'};
+  h.done=h.done||[];var k=dayKey();if(h.done.indexOf(k)<0)h.done.push(k);
+  saveHabits(habits);
+  return {msg:'Done! I marked '+(h.name||h.n)+' complete for today. Keep it up!'};
+}
+function jarvisHabitStatus(){
+  var habits=getHabits();if(!habits.length)return 'You have no habits yet. Open Habits to create one.';
+  var k=dayKey();var done=habits.filter(function(h){return (h.done||[]).indexOf(k)>=0;});var todo=habits.filter(function(h){return (h.done||[]).indexOf(k)<0;});
+  return 'Today you completed '+done.length+' of '+habits.length+' habit'+(habits.length!==1?'s':'')+(done.length?': '+done.map(function(h){return h.name||h.n;}).join(', '):'')+'. '+(todo.length?('Still to do: '+todo.map(function(h){return h.name||h.n;}).join(', ')+'.'):'All done — great job!');
+}
+function jarvisHabitDoneStart(name){
+  var habits=getHabits();
+  if(!habits.length){var m='You don\'t have any habits yet. I\'ll open Habits so you can create one.';jarvisLog('ai',m);jarvisSpeak(m,function(){closeJarvis();try{openHabits();}catch(e){}});return;}
+  if(!name||name.length<2){__jarvis.flow={type:'habitdone'};var qq='Which habit did you complete? Your habits are: '+habits.map(function(x){return x.name||x.n;}).join(', ')+'.';jarvisLog('ai',qq);jarvisSpeak(qq,function(){if(__jarvis.on)jarvisListen();});return;}
+  var res=jarvisHabitMarkDone(name);jarvisLog('ai',res.msg);jarvisSpeak(res.msg,function(){if(__jarvis.on)jarvisListen();});
+}
+function jarvisHabitLogAsk(){
+  var f=__jarvis.flow;var habits=getHabits();var h=habits.find(function(x){return x.id===f.ids[f.idx];});
+  if(!h){__jarvis.flow=null;return;}
+  var already=(h.done||[]).indexOf(dayKey())>=0;
+  var qq='Did you do '+(h.name||h.n)+' today?'+(already?' It\'s already marked done.':'')+' Say yes or no.';
+  jarvisLog('ai',qq);jarvisSpeak(qq,function(){if(__jarvis.on)jarvisListen();});
+}
+function jarvisHabitLogStart(){
+  var habits=getHabits();
+  if(!habits.length){var m='You have no habits yet. I\'ll open Habits to create one.';jarvisLog('ai',m);jarvisSpeak(m,function(){closeJarvis();try{openHabits();}catch(e){}});return;}
+  __jarvis.flow={type:'habitlog',idx:0,ids:habits.map(function(h){return h.id;})};
+  jarvisHabitLogAsk();
 }
 </script></body></html>
