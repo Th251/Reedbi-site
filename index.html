@@ -1313,7 +1313,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v256</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v261</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -5391,6 +5391,7 @@ function renderCVList(){
   var list=document.getElementById('cv-list');
   if(!cvs.length){list.innerHTML='<p style="font-size:11px;color:var(--mt2);margin-bottom:7px">No CVs saved yet. Upload below.</p>';return;}
   list.innerHTML=cvs.map(function(cv){return '<div class="cv-item'+(selCVId===cv.id?' sel':'')+'" onclick="selCV(\''+cv.id+'\')"><div class="cv-info"><div class="cv-name">'+esc(cv.name)+'</div><div class="cv-meta">'+fmtB(cv.size||0)+' '+fmtT(cv.ts)+'</div></div><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end"><div class="cv-chk">'+(selCVId===cv.id?'v':'')+'</div><button style="font-size:10px;color:var(--red);background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:2px" onclick="event.stopPropagation();delCVPhone(\''+cv.id+'\')"><i class="ti ti-trash"></i> Remove</button></div></div>';}).join('');
+  try{renderCVAction();}catch(e){}
 }
 function selCV(id){selCVId=(selCVId===id)?null:id;renderCVList();}
 function delCVPhone(id){var uid=CU?CU.uid:'guest';delCV(uid,id);if(selCVId===id)selCVId=null;
@@ -5931,7 +5932,8 @@ function openAccountMenu(){
   h+=group('My Activity','layout-dashboard','#0a8f5c',act,true);
 
   // === JOBS (everyone) ===
-  var jobs=item('showMyApps()','briefcase','','My Job Applications','where you applied + status')
+  var jobs=item('openMyCV()','file-cv','#7c3aed','My CV / Resume','upload once — the agent applies for you')
+    +item('showMyApps()','briefcase','','My Job Applications','where you applied + status')
     +item('openJobAgent()','robot','#7c3aed','AI Job Agent','finds &amp; auto-applies to matches', jobAgentBadge()?' <span style="background:#7c3aed;color:#fff;border-radius:9px;font-size:9px;padding:1px 6px;font-weight:800">'+jobAgentBadge()+' new</span>':'');
   h+=group('Jobs','briefcase','#7c3aed',jobs,false);
 
@@ -6032,7 +6034,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v256 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v261 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -14238,7 +14240,7 @@ function agentMenuCard(){
   var opts=[['job','🔍','Find a Job','Search jobs · AI auto-apply · post a job'],['shop','🛍️','Shop Product','Find products to buy'],['habit','🔥','Build a Habit','Goals, streaks & reminders'],['order','📦','Track My Order','See your orders & delivery'],['sell','💼','Sell Something','List your product to buyers'],['care','🎧','Get Help','Orders, delivery, returns & refunds']];
   return '<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">'+opts.map(function(o){
     return '<button onclick="agentPick(\''+o[0]+'\')" style="display:flex;align-items:center;gap:11px;text-align:left;background:var(--sf);border:1px solid var(--b);border-radius:12px;padding:12px;cursor:pointer;width:100%"><span style="font-size:22px">'+o[1]+'</span><span style="flex:1"><b style="font-size:13px;display:block">'+o[2]+'</b><small style="color:var(--mt2);font-size:11px">'+o[3]+'</small></span><i class="ti ti-chevron-right" style="color:var(--mt2)"></i></button>';
-  }).join('')+'<button onclick="closeOvl(\'ragent-ovl\');openJarvis()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;border:none;border-radius:12px;padding:12px;cursor:pointer;width:100%;font-size:12.5px;font-weight:700;margin-top:2px"><i class="ti ti-microphone"></i> Talk to me — hands-free voice</button><button onclick="openAISettings()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:none;border:1px dashed var(--b);border-radius:12px;padding:10px;cursor:pointer;width:100%;color:var(--mt2);font-size:11.5px;font-weight:600;margin-top:2px"><i class="ti ti-sparkles"></i> '+(rbAIEndpoint()?'AI brain connected ✓ · settings':'Connect AI brain (free) — make me smarter')+'</button></div>';
+  }).join('')+'<button onclick="closeOvl(\'ragent-ovl\');openJarvis()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;border:none;border-radius:12px;padding:12px;cursor:pointer;width:100%;font-size:12.5px;font-weight:700;margin-top:2px"><i class="ti ti-microphone"></i> Talk to me — hands-free voice</button><button onclick="closeOvl(\'ragent-ovl\');openVoicePicker()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:none;border:1px solid var(--b);border-radius:12px;padding:10px;cursor:pointer;width:100%;color:#0a66c2;font-size:11.5px;font-weight:700;margin-top:2px"><i class="ti ti-microphone-2"></i> Choose a human voice (free)</button><button onclick="openAISettings()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:none;border:1px dashed var(--b);border-radius:12px;padding:10px;cursor:pointer;width:100%;color:var(--mt2);font-size:11.5px;font-weight:600;margin-top:2px"><i class="ti ti-sparkles"></i> '+(rbAIEndpoint()?'AI brain connected ✓ · settings':'Connect AI brain (free) — make me smarter')+'</button></div>';
 }
 function agentPick(opt){
   var labels={job:'Find a Job',shop:'Shop Product',habit:'Build a Habit',order:'Track My Order',sell:'Sell Something',care:'Get Help'};
@@ -14722,7 +14724,7 @@ function openJobHub(){
     +'<div style="display:grid;gap:9px">'
     +tile('🤖','Auto Job Agent','Upload your CV/photo — I scan, match &amp; apply for you','closeOvl(\'jobhub-ovl\');openAutoJobAgent()')
     +tile('🔍','Find a job (AI agent)','Scan &amp; match jobs to your CV, auto-apply','closeOvl(\'jobhub-ovl\');openJobAgent()')
-    +tile('📄','My CV','Upload or update your CV','closeOvl(\'jobhub-ovl\');openJobAgent()',myCV.length?myCV.length+'':'')
+    +tile('📄','My CV','Upload or update your CV','closeOvl(\'jobhub-ovl\');openMyCV()',myCV.length?myCV.length+'':'')
     +tile('📊','My applications','Jobs you applied to &amp; their status','closeOvl(\'jobhub-ovl\');showMyApps()',apps.length?apps.length+'':'')
     +tile('🎤','Practice interview','AI questions from your CV','closeOvl(\'jobhub-ovl\');agentInterviewPrep()')
     +tile('📢','Post a job','Hire — publish a job post','closeOvl(\'jobhub-ovl\');openTag(\'jobs\')')
@@ -15704,6 +15706,8 @@ function openAISettings(){
     +'<input id="aiset-tts" placeholder="https://...cloudfunctions.net/reedbiVoice" value="'+esc(rbTTSEndpoint())+'" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--b);background:var(--sf);color:var(--tx);font-size:13px">'
     +'<button class="btn" style="width:100%;margin-top:9px;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;padding:10px;font-size:12px" onclick="aiVoiceSave()"><i class="ti ti-volume"></i> Save &amp; test voice</button>'
     +'<div id="aiset-ttsresult" style="font-size:11.5px;margin-top:8px"></div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:10px;padding:11px;font-size:13px;font-weight:700" onclick="closeOvl(\'aiset-ovl\');openVoicePicker()"><i class="ti ti-microphone-2"></i> Choose a human voice (free, on your phone)</button>'
+    +'<div style="font-size:11px;color:var(--mt2);margin-top:6px">No setup needed — hear the natural voices on your device and pick one. The box above is only for an optional self-hosted voice.</div>'
     +'</div>'
     +'<div style="font-size:10.5px;color:var(--mt2);margin-top:12px;line-height:1.5;border-top:1px solid var(--b);padding-top:10px">Don\'t have a backend yet? It\'s free with your Google account. The setup steps are in your <b>Reedbi backend guide</b>.</div>'
     +'</div></div>';
@@ -15740,6 +15744,7 @@ function jarvisRoute(text){
   var q=text.toLowerCase();
   var has=function(a){return a.some(function(w){return q.indexOf(w)>=0;});};
   if(has(['stop','exit','goodbye','good bye','close','quit','shut down','that is all','thats all']))return {close:true};
+  if(has(['job status','application status','my applications','status of my application','status of my job','did i get the job','any interview','am i selected','where did i apply','how are my applications','my job applications']))return {jobStatus:true};
   if(has(['status','how am i doing','overview','how is everything','my dashboard','how are things']))return {reply:jarvisStatusSpoken(),stay:true};
   if(has(['find a job','find job','search job','look for job','jobs',' job','job ','job hub','find work','hiring','vacancy','apply for','get a job','need a job','want a job','need job','i need work'])){
     var role='';
@@ -15821,6 +15826,7 @@ function jarvisHandle(text){
   if(route.habitStatus){var hs=jarvisHabitStatus();jarvisLog('ai',hs);jarvisSpeak(hs,function(){if(__jarvis.on)jarvisListen();});return;}
   if(route.habitDone){jarvisHabitDoneStart(route.name);return;}
   if(route.habitLog){jarvisHabitLogStart();return;}
+  if(route.jobStatus){var js=jarvisJobStatusSpoken();jarvisLog('ai',js);jarvisSpeak(js,function(){if(__jarvis.on)jarvisListen();});return;}
   if(route.ai){
     if(rbAIEndpoint()){askAgentAI(text).then(function(r){var reply=r||jarvisFallback(text);jarvisLog('ai',reply);jarvisSpeak(reply,function(){if(__jarvis.on)jarvisListen();});});}
     else{var reply=jarvisFallback(text);jarvisLog('ai',reply);jarvisSpeak(reply,function(){if(__jarvis.on)jarvisListen();});}
@@ -15838,7 +15844,7 @@ function jarvisDoSearch(term){
   var q=document.getElementById('ps-q');if(q)q.value=term;
   try{runProductSearch(term);}catch(e){}
 }
-function openJarvis(){
+function openJarvis(starter){
   if(!('speechSynthesis' in window)||!(window.SpeechRecognition||window.webkitSpeechRecognition)){toast('Voice assistant needs Chrome, Edge, or an Android browser','err');return;}
   if(!requireAuth('use the voice assistant'))return;
   var ov=document.getElementById('jarvis-ovl');
@@ -15855,6 +15861,8 @@ function openJarvis(){
     +'</div></div>';
   ov.classList.add('open');
   __jarvis.on=true;
+  __jarvis.flow=null;
+  if(starter==='job'){jarvisSpeak('Hi '+((CU&&CU.name)?CU.name:'there')+', let\'s find you a job.',function(){if(typeof jarvisJobStart==='function')jarvisJobStart('');});return;}
   jarvisSpeak('Hi '+((CU&&CU.name)?CU.name:'there')+', I am your Reedbi assistant. Ask me for your status, to find a job, or to find a product.',function(){jarvisListen();});
 }
 function closeJarvis(){
@@ -15873,6 +15881,8 @@ function rbLoadVoices(){try{__rbVoices=(window.speechSynthesis&&window.speechSyn
 function rbPickVoice(lang){
   if(!__rbVoices||!__rbVoices.length)rbLoadVoices();
   var vs=__rbVoices||[];if(!vs.length)return null;
+  // the user's explicit choice (from the voice picker) wins
+  try{var pref=LS.get('rb_voice','');if(pref){var pv=vs.find(function(v){return v.name===pref;});if(pv)return pv;}}catch(e){}
   lang=(lang||'en-US').toLowerCase();var base=lang.split('-')[0];
   var match=vs.filter(function(v){return (v.lang||'').toLowerCase().replace('_','-').indexOf(base)===0;});
   var pool=match.length?match:vs;
@@ -15939,13 +15949,20 @@ function rbNavigate(addr){if(!addr){toast('No address','info');return;}try{windo
 
 function jarvisJobTags(){try{return tags.filter(function(t){return t.cat==='jobs';});}catch(e){return [];}}
 function jarvisFindJobs(role){
-  role=(role||'').toLowerCase().trim();var words=role.split(/\s+/).filter(function(w){return w.length>2;});if(!words.length)words=[role];
-  var out=[];
+  var tt=rbTok(role);if(!tt.length){var raw=(role||'').toLowerCase().trim();if(raw)tt=[raw];}
+  var scored=[];
   jarvisJobTags().forEach(function(t){(t.posts||[]).forEach(function(p){
-    var hay=((p.title||'')+' '+(p.body||'')+' '+(p.co||'')).toLowerCase();
-    if(words.some(function(w){return w&&hay.indexOf(w)>=0;}))out.push({tag:t,post:p});
+    var fields=((p.title||'')+' '+(p.body||'')+' '+(p.co||'')).toLowerCase();var ftoks=rbTok(fields);var score=0;
+    tt.forEach(function(w){
+      if(!w)return;
+      if(fields.indexOf(w)>=0){score+=10;return;}
+      var best=9;ftoks.forEach(function(ft){if(ft.indexOf(w)>=0||w.indexOf(ft)>=0){best=Math.min(best,0.3);return;}var d=rbLev(w,ft),norm=d/Math.max(w.length,ft.length);if(norm<best)best=norm;});
+      if(best<=0.34)score+=6;else if(best<=0.5)score+=2;
+    });
+    if(score>0)scored.push({tag:t,post:p,s:score});
   });});
-  return out.slice(0,10);
+  scored.sort(function(a,b){return b.s-a.s;});
+  return scored.map(function(x){return {tag:x.tag,post:x.post};}).slice(0,10);
 }
 function jarvisApplyToJob(tag, post){
   var uid=CU.uid;var cvs=getCVs(uid);var cv=cvs.length?cvs[cvs.length-1]:null;
@@ -15993,8 +16010,9 @@ function jarvisFlowStep(text){
     if(f.step==='confirm'){
       if(/\b(yes|yeah|yep|sure|ok|okay|apply|go ahead|do it|please|confirm)\b/.test(q)){
         var n=0;(f.matches||[]).forEach(function(m){if(jarvisApplyToJob(m.tag,m.post))n++;});
+        try{jarvisEnableJobAgent(f.role);}catch(e){}
         __jarvis.flow=null;
-        var msg=n>0?('Done! I applied to '+n+' job'+(n!==1?'s':'')+' for you with your CV. Track them in My Applications. Good luck!'):('It looks like you already applied to those. Nothing new to send.');
+        var msg=n>0?('Done! I applied to '+n+' job'+(n!==1?'s':'')+' for you with your CV. From now on I\'ll keep watching for new '+(f.role||'')+' jobs and apply automatically. Ask me "what\'s my job status" anytime to hear how each one is going.'):('It looks like you already applied to those. I\'ll keep watching for new '+(f.role||'')+' jobs and apply when they come up. Ask me for your job status anytime.');
         jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
         return;
       }
@@ -16049,28 +16067,56 @@ function jarvisFlowStep(text){
 }
 
 /* ===== v254: guided voice SHOPPING flow — collect products by voice → checkout ===== */
+function rbLev(a,b){a=a||'';b=b||'';var m=a.length,n=b.length;if(!m)return n;if(!n)return m;var d=[];for(var i=0;i<=m;i++)d[i]=[i];for(var j=0;j<=n;j++)d[0][j]=j;for(i=1;i<=m;i++){for(j=1;j<=n;j++){var c=a.charAt(i-1)===b.charAt(j-1)?0:1;d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c);}}return d[m][n];}
+function rbTok(s){return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(function(w){return w.length>=2;});}
+function rbAvailProducts(){return getProducts().filter(function(p){return p&&productInMarketplace(p)&&!p.withdrawn;});}
+function jarvisAvailableNames(n){var ps=rbAvailProducts();return ps.slice(0,n||6).map(function(p){return p.title||'a product';}).join(', ');}
 function jarvisFindProducts(term){
-  term=(term||'').toLowerCase().trim();var words=term.split(/\s+/).filter(function(w){return w.length>2;});if(!words.length)words=[term];
-  var prods=getProducts().filter(function(p){return p&&productInMarketplace(p)&&!p.withdrawn;});
-  return prods.filter(function(p){var hay=((p.title||'')+' '+(p.brand||'')+' '+(p.category||'')).toLowerCase();return words.some(function(w){return w&&hay.indexOf(w)>=0;});}).slice(0,5);
+  var prods=rbAvailProducts();
+  var tt=rbTok(term);if(!tt.length){var raw=(term||'').toLowerCase().trim();if(raw)tt=[raw];}
+  if(!tt.length)return prods.slice(0,5); // nothing said -> show some
+  var scored=[];
+  prods.forEach(function(p){
+    var fields=((p.title||'')+' '+(p.brand||'')+' '+(p.category||'')+' '+(p.pageName||'')+' '+(p.desc||'')).toLowerCase();
+    var ptoks=rbTok(fields);var score=0;
+    tt.forEach(function(t){
+      if(!t)return;
+      if(fields.indexOf(t)>=0){score+=10;return;}           // direct substring (e.g. "rice" in "basmati rice")
+      var best=9;
+      ptoks.forEach(function(pt){
+        if(pt.indexOf(t)>=0||t.indexOf(pt)>=0){best=Math.min(best,0.3);return;} // partial word
+        var d=rbLev(t,pt),norm=d/Math.max(t.length,pt.length);if(norm<best)best=norm; // mis-hearing distance
+      });
+      if(best<=0.34)score+=6;        // close fuzzy (rise->rice, tomatos->tomatoes)
+      else if(best<=0.5)score+=2;    // loose fuzzy
+    });
+    if(score>0)scored.push({p:p,s:score});
+  });
+  scored.sort(function(a,b){return b.s-a.s;});
+  return scored.map(function(x){return x.p;}).slice(0,5);
 }
 function jarvisCartCount(){return getCart().reduce(function(s,c){return s+(c.qty||1);},0);}
 function jarvisShopStart(term){
   __jarvis.flow={type:'shop',step:'search'};
   if(term&&term.length>1)return jarvisShopSearch(term);
-  var msg='Sure — what would you like to buy? Say a product name, like rice or shoes.';
+  var names=jarvisAvailableNames(6);
+  var msg=names?('Sure — what would you like to buy? In the shop right now we have: '+names+'. Just say one.'):('The shop has no products listed yet. Ask a seller to list something first.');
   jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
 }
 function jarvisShopSearch(term){
+  if(!rbAvailProducts().length){var z='There are no products in the shop yet.';jarvisLog('ai',z);jarvisSpeak(z,function(){if(__jarvis.on)jarvisListen();});return;}
   var found=jarvisFindProducts(term);
   if(!found.length){
-    var m='I couldn\'t find '+term+' in the shop right now. Try another product, or say checkout if you\'re done.';
+    var names=jarvisAvailableNames(6);
+    var m='I couldn\'t match "'+term+'". Here\'s what\'s in the shop: '+names+'. Which one would you like? Or say checkout.';
+    __jarvis.flow={type:'shop',step:'search'};
     jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});return;
   }
   var p=found[0];
   __jarvis.flow={type:'shop',step:'addconfirm',pid:p.id,pname:p.title};
   var price=(p.currency?p.currency+' ':'')+(p.offer||p.price||'');
-  var msg='I found '+(p.title||'a product')+' for '+price+'. Add it to your cart? Say yes or no.';
+  var alt=found.length>1?(' If that\'s not right, you can also say '+found.slice(1,3).map(function(x){return x.title;}).join(' or ')+'.'):'';
+  var msg='I found '+(p.title||'a product')+' for '+price+'. Add it to your cart? Say yes or no.'+alt;
   jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
 }
 function jarvisShopCheckout(){
@@ -16154,4 +16200,108 @@ function jarvisHabitLogStart(){
   __jarvis.flow={type:'habitlog',idx:0,ids:habits.map(function(h){return h.id;})};
   jarvisHabitLogAsk();
 }
+
+/* ===== v258: human-voice PICKER — hear & choose the best on-device voice (free) ===== */
+function rbVoiceSample(name){
+  rbLoadVoices();var v=(__rbVoices||[]).find(function(x){return x.name===name;});
+  try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance('Hi, I am your Reedbi assistant. I can help you shop, find a job, and get things delivered.');if(v){u.voice=v;if(v.lang)u.lang=v.lang;}u.rate=0.98;u.pitch=1.02;window.speechSynthesis.speak(u);}catch(e){}
+}
+function rbUseVoice(name){try{LS.set('rb_voice',name);}catch(e){}toast('Voice set — this is your agent\'s voice','success');var box=document.getElementById('vpick-list');if(box)renderVoicePicker();rbVoiceSample(name);}
+function rbClearVoice(){try{LS.set('rb_voice','');}catch(e){}toast('Back to automatic best voice','info');renderVoicePicker();}
+function rbVoiceScore(v){var n=(v.name||'').toLowerCase();var pref=['natural','neural','enhanced','premium','wavenet','siri','google','samsung','microsoft'];for(var i=0;i<pref.length;i++)if(n.indexOf(pref[i])>=0)return i;if(/compact|espeak|robot/.test(n))return 99;return 60;}
+function renderVoicePicker(){
+  var box=document.getElementById('vpick-list');if(!box)return;
+  rbLoadVoices();var vs=(__rbVoices||[]).slice();
+  var lang=(navigator.language||'en').toLowerCase().split('-')[0];
+  vs.sort(function(a,b){var la=(a.lang||'').toLowerCase().indexOf(lang)===0?0:1,lb=(b.lang||'').toLowerCase().indexOf(lang)===0?0:1;if(la!==lb)return la-lb;return rbVoiceScore(a)-rbVoiceScore(b);});
+  var cur=LS.get('rb_voice','');
+  if(!vs.length){box.innerHTML='<p style="font-size:12.5px;color:var(--mt);padding:10px">No extra voices found on this device yet. On Android: Settings → Accessibility → Text-to-speech → install voice data. On iPhone: Settings → Accessibility → Spoken Content → Voices.</p>';return;}
+  var human=vs.filter(function(v){return rbVoiceScore(v)<60;});
+  var head=human.length?('<div style="font-size:11px;color:var(--mt2);margin:2px 0 8px">'+human.length+' natural voice'+(human.length!==1?'s':'')+' found on your device — tap ▶ to hear, then Use.</div>'):('<div style="font-size:11px;color:var(--mt2);margin:2px 0 8px">Tap ▶ to hear each voice, then Use the one that sounds best.</div>');
+  box.innerHTML=head+vs.map(function(v){
+    var sel=(v.name===cur);
+    var natural=rbVoiceScore(v)<60;
+    return '<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid '+(sel?'#0a66c2':'var(--b)')+';border-radius:10px;margin-bottom:7px;background:'+(sel?'rgba(10,102,194,.06)':'var(--sf)')+'">'
+      +'<button class="btn" onclick="rbVoiceSample(\''+escJS(v.name)+'\')" style="border:1px solid var(--b);width:38px;height:38px;border-radius:50%;flex:0 0 auto;font-size:14px"><i class="ti ti-player-play-filled"></i></button>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(v.name)+(natural?' <span style="color:#15803d;font-size:10px">• natural</span>':'')+'</div><div style="font-size:10.5px;color:var(--mt)">'+esc(v.lang||'')+(sel?' • selected':'')+'</div></div>'
+      +'<button class="btn'+(sel?' btnok':'')+'" onclick="rbUseVoice(\''+escJS(v.name)+'\')" style="flex:0 0 auto;padding:8px 12px;font-size:12px;'+(sel?'':'border:1px solid #0a66c2;color:#0a66c2')+'">'+(sel?'Using':'Use')+'</button>'
+      +'</div>';
+  }).join('');
+}
+function openVoicePicker(){
+  rbLoadVoices();
+  var cur=LS.get('rb_voice','');
+  var html='<div class="ovl" id="vpick-ovl" onclick="if(event.target===this)closeOvl(\'vpick-ovl\')">'
+    +'<div class="sheet" onclick="event.stopPropagation()" style="max-width:520px">'
+    +'<div class="sheet-h"><b><i class="ti ti-microphone-2"></i> Choose your agent\'s voice</b><button onclick="closeOvl(\'vpick-ovl\')" class="x">&times;</button></div>'
+    +'<div class="mbd" style="padding:14px">'
+    +'<p style="font-size:12.5px;color:var(--mt);margin:0 0 10px">These voices run on your phone, so they are free for everyone. Pick the one that sounds most human to you.</p>'
+    +'<div style="margin-bottom:10px"><button class="btn" onclick="rbClearVoice()" style="border:1px solid var(--b);font-size:11.5px;padding:7px 11px">'+(cur?'↺ Use automatic best voice':'✓ Automatic best voice (default)')+'</button></div>'
+    +'<div id="vpick-list"></div>'
+    +'<p style="font-size:11px;color:var(--mt2);margin:12px 0 0">Want an even more natural voice? You can self-host the open-source Piper voice (free, no Blaze) — see the voice guide.</p>'
+    +'</div></div></div>';
+  var d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstChild);
+  renderVoicePicker();
+}
+
+/* ===== v259: professional, dedicated "My CV" manager ===== */
+function openMyCV(){
+  if(!requireAuth('manage your CV'))return;
+  if(document.getElementById('mycv-ovl'))closeOvl('mycv-ovl');
+  var html='<div class="ovl" id="mycv-ovl" onclick="if(event.target===this)closeOvl(\'mycv-ovl\')">'
+    +'<div class="sheet" onclick="event.stopPropagation()" style="max-width:520px">'
+    +'<div class="sheet-h"><b><i class="ti ti-file-cv" style="color:#7c3aed"></i> My CV / Resume</b><button onclick="closeOvl(\'mycv-ovl\')" class="x">&times;</button></div>'
+    +'<div class="mbd" style="padding:16px">'
+    +'<p style="font-size:12.5px;color:var(--mt);margin:0 0 13px;line-height:1.5">Upload your CV once. Your Reedbi agent will use it to apply to matching jobs for you — just say <b>“I need a [role] job.”</b></p>'
+    +'<label id="cv-drop" for="cv-file-input" ondragover="cvDrag(event,true)" ondragleave="cvDrag(event,false)" ondrop="cvDrop(event)" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:2px dashed #0a66c2;border-radius:14px;padding:26px 16px;cursor:pointer;background:rgba(10,102,194,.04);transition:.15s">'
+    +'<i class="ti ti-cloud-upload" style="font-size:32px;color:#0a66c2"></i>'
+    +'<div style="font-weight:700;font-size:14px;margin-top:8px;color:var(--tx)">Tap to upload your CV</div>'
+    +'<div style="font-size:11.5px;color:var(--mt)">or drag a file here</div>'
+    +'<div style="font-size:10.5px;color:var(--mt2);margin-top:7px"><i class="ti ti-file-type-pdf"></i> PDF &nbsp;·&nbsp; <i class="ti ti-file-type-doc"></i> Word &nbsp;·&nbsp; <i class="ti ti-photo"></i> Image &nbsp;·&nbsp; up to 5 MB</div>'
+    +'<div id="cv-fname" style="font-size:11px;color:#0a66c2;margin-top:6px;font-weight:600"></div>'
+    +'</label>'
+    +'<input id="cv-file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="cvSel(this)">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--mt2);margin:14px 0 5px"><span style="font-weight:700;color:var(--tx)">Your documents · <span id="cv-ct">0 CVs</span></span><span id="cv-sz">0 KB</span></div>'
+    +'<div style="height:6px;background:var(--b);border-radius:3px;overflow:hidden;margin-bottom:11px"><div id="cv-fill" style="height:100%;width:0;background:linear-gradient(90deg,#0a66c2,#7c3aed);transition:.3s"></div></div>'
+    +'<div id="cv-list"></div>'
+    +'<div id="mycv-action"></div>'
+    +'<div style="font-size:10.5px;color:var(--mt2);margin-top:12px;display:flex;gap:6px;align-items:flex-start"><i class="ti ti-shield-check" style="color:#15803d;margin-top:1px"></i><span>Stored privately on your device and synced to your account. Only shared with an employer when <b>you</b> apply to their job.</span></div>'
+    +'</div></div></div>';
+  var d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstChild);
+  try{renderCVList();}catch(e){}
+  try{renderCVAction();}catch(e){}
+  requestAnimationFrame(function(){var o=document.getElementById('mycv-ovl');if(o)o.classList.add('open');});
+}
+
+/* ===== v260: per-application voice status + agent keeps working after CV ===== */
+function jarvisJobStatusSpoken(){
+  var apps=getAllApps().filter(function(a){return a.uid===(CU&&CU.uid);});
+  if(!apps.length)return 'You haven\'t applied to any jobs yet. Upload your CV, then say "I need a [role] job" and I\'ll apply for you.';
+  apps.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  var parts=['You have '+apps.length+' job application'+(apps.length!==1?'s':'')+'.'];
+  apps.slice(0,8).forEach(function(a,i){
+    var st=statusObj(a.status).label;
+    parts.push((i+1)+'. '+(a.postTitle||'a role')+(a.company?' at '+a.company:'')+': '+st+'.');
+  });
+  if(apps.length>8)parts.push('And '+(apps.length-8)+' more.');
+  var iv=apps.filter(function(a){return a.status==='interview';});
+  var sel=apps.filter(function(a){return a.status==='selected';});
+  if(sel.length)parts.push('Congratulations — you were selected for '+sel.length+'! Check your email.');
+  else if(iv.length)parts.push('Good news — you have '+iv.length+' interview call'+(iv.length!==1?'s':'')+'! Check your email.');
+  return parts.join(' ');
+}
+function jarvisEnableJobAgent(role){
+  try{var c=getAgentCfg();c.enabled=true;if(role)c.role=role;if(c.minMatch==null)c.minMatch=70;saveAgentCfg(c);}catch(e){}
+}
+
+/* ===== v261: CV -> job hand-off (after upload, the agent takes over) ===== */
+function renderCVAction(){
+  var el=document.getElementById('mycv-action');if(!el)return;
+  var uid=CU?CU.uid:'guest';var cvs=getCVs(uid);
+  if(cvs.length){
+    el.innerHTML='<button class="btn btnok" style="width:100%;padding:13px;font-size:14px;font-weight:800;margin-top:15px;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;border:none;border-radius:12px" onclick="rbStartJobFromCV()"><i class="ti ti-microphone"></i> Find me a job with this CV</button>'
+      +'<div style="font-size:11px;color:var(--mt2);text-align:center;margin-top:7px">The agent will ask your role, then find &amp; apply to matches — and keep working until you\'re hired.</div>';
+  }else{el.innerHTML='';}
+}
+function rbStartJobFromCV(){try{closeOvl('mycv-ovl');}catch(e){}try{openJarvis('job');}catch(e){}}
 </script></body></html>
