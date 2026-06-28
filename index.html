@@ -402,6 +402,18 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 .modal>*{flex-shrink:0}
 summary{list-style:none}summary::-webkit-details-marker{display:none}
 .overlay{overscroll-behavior:contain}
+/* v270 fix: style the .ovl/.sheet modals (CV manager, voice picker, live tracking) that were rendering unstyled */
+.ovl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9000;align-items:flex-end;justify-content:center;overscroll-behavior:contain}
+.ovl.open{display:flex;animation:rbFade .18s ease}
+.sheet{background:var(--sf);border:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.ovl.open>.sheet{animation:rbModalIn .24s cubic-bezier(.16,1,.3,1)}
+.sheet-h{padding:14px 16px 11px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;font-size:15px;font-weight:700}
+.sheet .x,.sheet-h .x{background:none;border:none;font-size:26px;line-height:1;color:var(--mt);cursor:pointer;padding:0 4px;flex:0 0 auto}
+@media(min-width:560px){.ovl{align-items:center}.sheet{border-radius:16px}}
+/* v271: style the close button (.modal-x) used across ~60 modals — was unstyled default button */
+.modal-x{background:none;border:none;color:var(--mt);font-size:20px;line-height:1;cursor:pointer;padding:7px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .15s,color .15s}
+.modal-x:hover{background:var(--card2);color:var(--tx)}
+.modal-x:active{transform:scale(.92)}
 @media(min-width:760px){
   .overlay{align-items:center}
   .modal{max-width:600px;border-radius:18px;max-height:88vh;box-shadow:0 24px 60px rgba(0,0,0,.45)}
@@ -1313,7 +1325,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v261</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v271</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1850,7 +1862,7 @@ body.dark .spin-wheel{border-color:#2a333f}
   <button class="bn-orders" onclick="rbTab('orders')"><i class="ti ti-package"></i><span>Orders</span></button>
   <button class="bn-account" onclick="rbTab('account')"><i class="ti ti-user"></i><span>Account</span><span class="bn-badge" id="bn-acct-badge" style="display:none">0</span></button>
 </nav>
-<button id="ragent-fab" onclick="openReedbiAgent()" aria-label="Reedbi Agent" style="position:fixed;right:16px;bottom:74px;z-index:8500;width:54px;height:54px;border-radius:50%;border:none;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;box-shadow:0 6px 18px rgba(124,58,237,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px">✨</button>
+<button id="ragent-fab" onclick="rbLaunchAgent()" aria-label="Talk to your Reedbi agent" title="Talk to your agent" style="position:fixed;right:16px;bottom:74px;z-index:8500;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;box-shadow:0 6px 18px rgba(124,58,237,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px"><i class="ti ti-microphone"></i></button>
 <button class="care-fab" id="care-fab" onclick="openCareAi()" title="Reedbi Care — help with orders, delivery, returns"><i class="ti ti-headset"></i></button>
 <div class="scroll-btns" id="scroll-btns"><button onclick="rbScrollTo('up')" title="Scroll to top"><i class="ti ti-chevron-up"></i></button><button onclick="rbScrollTo('down')" title="Scroll to bottom"><i class="ti ti-chevron-down"></i></button></div>
 <div class="tstack" id="tstack"></div>
@@ -6026,7 +6038,7 @@ function createTag_DISABLED(){
 function autoResize(ta){if(!ta)return;ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,80)+'px';}
 function onKey(e){if(e.key==='Enter'&&!e.shiftKey&&window.innerWidth>700){e.preventDefault();sendPost();}}
 function goBack(){stopLive();stopPoll();var _f=document.getElementById('fab');if(_f)_f.style.display='';document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';activeTagId=null;pendingPosts=[];renderTagList(document.getElementById('tsr').value);}
-function goHome(){stopLive();stopPoll();try{document.body.classList.add('rb-home');}catch(e){}activeTagId=null;var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;try{renderHomeProducts();}catch(e){}}
+function goHome(){stopLive();stopPoll();try{document.body.classList.add('rb-home');}catch(e){}activeTagId=null;var _fh=document.getElementById('fab');if(_fh)_fh.style.display='';activeTagId=null;pendingPosts=[];document.getElementById('leftpanel').classList.remove('hidden');document.getElementById('cv-view').style.display='none';document.getElementById('es').style.display='flex';document.getElementById('tsr').value='';showFolOnly=false;document.getElementById('folbtn').classList.remove('on');renderTagList();var box=document.getElementById('tlist');if(box)box.scrollTop=0;try{renderHomeProducts();}catch(e){}try{setTimeout(rbFabHint,1200);}catch(e){}}
 ['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('open');});});
 document.getElementById('pmb').addEventListener('click',function(e){if(e.target===document.getElementById('pmb'))closePM();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','ap-ovl','ma-ovl','boost-ovl','pay-ovl','ok-ovl','pg-ovl','mkpg-ovl'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('open');});closePM();}});
@@ -6034,7 +6046,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v261 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v271 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6676,6 +6688,7 @@ function showMyProducts(tab){
     +'<button class="btn" style="border-radius:18px;flex:1;border:1px solid #0a66c2;color:#0a66c2;background:rgba(10,102,194,.08)" onclick="closeOvl(\'seller-ovl\');openBulkList()"><i class="ti ti-list-details"></i> Bulk add</button></div>'
     +'<button class="btn" style="border-radius:18px;width:100%;margin-top:8px;border:1px solid #16a34a;color:#16a34a;background:rgba(22,163,74,.08)" onclick="closeOvl(\'seller-ovl\');openBulkExcel()"><i class="ti ti-file-spreadsheet"></i> Import from Excel (vendor stock + invoices)</button>'
     +'<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid var(--gold);background:var(--card2);color:var(--gold)" onclick="openDelivSettings()"><i class="ti ti-truck-delivery"></i> Delivery fees &amp; commission (geo-based)</button>'
+    +'<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid #0a66c2;background:'+(droneOn(CU.uid)?'rgba(10,102,194,.14)':'var(--card2)')+';color:#0a66c2;font-weight:700" onclick="toggleMyDrone()"><i class="ti ti-drone"></i> '+(droneOn(CU.uid)?'🚁 Drone delivery: ON — buyers see it on your products':'Offer drone delivery (buyers will see the option)')+'</button>'
     +(function(){var pg=(typeof myOwnedPage==='function')&&myOwnedPage();if(!pg)return '';return '<button class="btn" style="margin-top:6px;border-radius:18px;width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="closeOvl(\'seller-ovl\');openPageTeam(\''+escJS(pg.name)+'\')"><i class="ti ti-users"></i> '+esc(pg.name)+' — manage page team (assign staff for listings)</button>';})()
     +'</div>';
   head+='<div class="seller-tabs">'
@@ -7162,6 +7175,7 @@ function showMyOrders(){
       +(o.notAvailable?'<div class="col-track" style="border-left:3px solid #e23b3b;padding-left:8px"><i class="ti ti-bag-x" style="color:#e23b3b"></i> <b>Item not available</b> — out of stock at the shop'+(o.refundDue?'<br><span style="color:#16a34a"><i class="ti ti-cash-banknote"></i> Refund started: '+esc(o.currency||'')+' '+o.refundDue+(o.refundStatus==='paid'?' (refunded)':' (processing)')+'</span>':(o.payMethod==='cod'?'<br><span style="color:var(--mt2)">Not charged (cash on delivery)</span>':''))+'</div>':'')+(o.collectedConfirmed&&!o.notAvailable?'<div class="col-track">'+(o.byWeight?('<i class="ti ti-scale-outline" style="color:#0a8f5c"></i> <b>Weighed '+o.actualWeight+' '+weightUnitLabel(o.weightUnit||"kg")+'</b> (you ordered '+o.orderedWeight+')'+(o.weightExtraDue?' · <span style="color:#c2410c">extra '+esc(o.currency||"")+' '+o.weightExtraDue+(o.payMethod==="online"?" payable at delivery":"")+'</span>':'')+(o.refundDue?' · <span style="color:#16a34a">refund '+esc(o.currency||"")+' '+o.refundDue+'</span>':'')):('<i class="ti ti-clipboard-check" style="color:#16a34a"></i> <b>'+(o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty+' items confirmed</b> by agent'+(o.refundDue?' · <span style="color:#e23b3b">refund '+esc(o.currency||'')+' '+o.refundDue+' for '+o.collectedShort+' short</span>':'')))+'</div>':'')
       +(o.agentName?'<div style="font-size:11px;color:var(--g)"><i class="ti ti-moped"></i> Agent: '+esc(o.agentName)+(o.agentPhone?' · <a href="https://wa.me/'+esc((o.agentPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(o.agentPhone)+'</a>':'')+'</div>':'')
       +((o.status==='out_delivery'&&o.deliveryOtp)?'<div class="otp-box"><i class="ti ti-shield-lock"></i> Delivery OTP: <b>'+esc(o.deliveryOtp)+'</b><div style="font-size:9px;color:var(--mt2);font-weight:400">Give this to the agent to confirm delivery</div></div>':'')
+      +(o.status==='out_delivery'?'<button class="ord-qr" style="border-color:#0a66c2;color:#0a66c2;font-weight:700" onclick="liveTrackOrder(\''+o.id+'\')"><i class="ti ti-map-pin-filled"></i> '+(o.agentLat?'Track live location on map':'Track live (waiting for agent)')+'</button>':'')
       +'<div style="font-size:11px;color:var(--g);font-weight:700;margin-top:3px"><i class="ti ti-'+so.icon+'"></i> '+so.label+'</div>'
       +'<div class="trk">'+track+'</div>'
       +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Show tracking QR &amp; order #</button>'
@@ -7730,6 +7744,7 @@ function psCard(p){
     +'<div style="font-weight:700;font-size:13px">'+esc(p.title)+(p.brand?' <span style="font-size:9px;color:var(--mt2);font-weight:600">'+esc(p.brand)+'</span>':'')+'</div>'
     +'<div style="font-size:13px">'+priceHtml(p)+' '+((typeof reviewSummary==='function')?reviewSummary(p):'')+(p.vatPct?'<small style="color:var(--mt2)"> +VAT '+p.vatPct+'%</small>':'')+(p.payOpts==='cod'?'<small style="color:var(--gold)"> · COD only</small>':p.payOpts==='online'?'<small style="color:var(--g)"> · Online only</small>':'')+'</div>'
     +'<div style="font-size:10px;color:var(--mt2)">by '+sellerLink+(p.category?' · '+esc(p.category):'')+' · <a href="#" onclick="shareProduct(\''+escJS(p.id)+'\');return false" style="color:#1a8f3c"><i class="ti ti-brand-whatsapp"></i> Share</a> · <a href="#" onclick="copyProductLink(\''+escJS(p.id)+'\');return false" style="color:var(--g)"><i class="ti ti-link"></i> Copy link</a>'+(mine?'':' · <a href="#" onclick="openReview(\''+escJS(p.id)+'\');return false" style="color:var(--gold)"><i class="ti ti-star"></i> Review</a>')+'</div>'
+    +(droneOn(p.sellerUid)?'<div style="font-size:10px;color:#0a66c2;font-weight:700;margin-top:2px"><i class="ti ti-drone"></i> Drone delivery available</div>':'')
     +(p.location?'<div style="font-size:10px;color:var(--g)"><i class="ti ti-map-pin"></i> '+esc(p.location)+'</div>':'')
     +(mine?'<button class="ps-btn" style="background:var(--card2);color:var(--g);border:1px solid var(--g)" onclick="closeOvl(\'prodsearch-ovl\');showMyProducts(\'listings\')"><i class="ti ti-building-store"></i> Manage</button>'
           :(avail?'<button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button>'
@@ -8472,6 +8487,10 @@ function showAgentDashboard(){
       +(deliveryTimeStr(o)?'<div style="margin-top:5px">'+deliveryTimeStr(o)+'</div>':'')
       +(function(){var sib=(getOrders()||[]).filter(function(x){return x.agentUid===CU.uid&&x.buyerUid&&x.buyerUid===o.buyerUid&&x.status!=='delivered'&&x.status!=='cancelled';});return sib.length>1?'<button class="ord-next" style="background:#0a8f5c;margin-bottom:5px" onclick="openAgentBasket(\''+esc(o.buyerUid)+'\')"><i class="ti ti-basket"></i> View buyer\'s full basket ('+sib.length+' items)</button>':'';})()
       +(!o.collectedConfirmed?'<button class="ord-next" style="background:#0a66c2" onclick="openCollection(\''+o.id+'\')"><i class="ti ti-scan"></i> Pick &amp; Collect at shop'+((o.collectedQty||0)>0?' ('+(o.collectedQty||0)+'/'+o.qty+')':'')+'</button>':'<div style="font-size:11px;color:#16a34a;margin-top:5px"><i class="ti ti-circle-check"></i> Collected '+(o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty+(o.refundDue?' · refund '+esc(o.currency||'')+' '+o.refundDue:'')+' <button style="background:none;border:none;color:#0a66c2;font-weight:700;cursor:pointer" onclick="openCollection(\''+o.id+'\')">view</button></div>')
+      +(o.status!=='delivered'&&o.status!=='cancelled'&&o.status!=='returned'?'<div style="display:flex;gap:6px;margin-top:5px">'
+        +'<button class="ord-next" style="background:#0d9488;flex:1;margin:0" onclick="rbNavigate(\''+escJS(o.buyerMap||o.buyerAddr||o.buyerName||'')+'\')"><i class="ti ti-map-2"></i> Navigate</button>'
+        +'<button class="ord-next" style="background:'+(o.agentSharing?'#16a34a':'#0a66c2')+';flex:1;margin:0" onclick="'+(o.agentSharing?'rbStopShareLoc(\''+o.id+'\')':'rbShareLoc(\''+o.id+'\')')+'"><i class="ti ti-broadcast"></i> '+(o.agentSharing?'Sharing… tap to stop':'Share live location')+'</button>'
+        +'</div>':'')
       +(next?(next.id==='delivered'
           ?'<button class="ord-next" onclick="agentConfirmDelivery(\''+o.id+'\')"><i class="ti ti-shield-check"></i> Confirm delivery (enter OTP)</button>'
           :'<button class="ord-next" onclick="agentUpdateStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark: '+next.label+'</button>')
@@ -9967,7 +9986,7 @@ function renderProductDetail(pid){
     +rate
     +'<div class="pd-price"><span class="pd-now">'+cur+' '+base.toLocaleString()+'</span>'+(off?'<span class="pd-mrp">'+cur+' '+mrp.toLocaleString()+'</span><span class="pd-off">'+off+'% off</span>':'')+'</div>'
     +'<div style="font-size:11px;color:#878787">Inclusive of all taxes shown below</div>'
-    +colorSec+sizeSec+qtySec+vatSec+store+cmpSec+desc+barcodeSec+reviews
+    +colorSec+sizeSec+qtySec+vatSec+(droneOn(p.sellerUid)?'<div class="pd-sec"><h4>Delivery options</h4><div style="display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid #0a66c2;border-radius:11px;background:rgba(10,102,194,.05)"><i class="ti ti-drone" style="font-size:24px;color:#0a66c2"></i><div><div style="font-weight:700;font-size:13px;color:#0a66c2">Drone delivery available 🚁</div><div style="font-size:11px;color:var(--mt)">This shop offers fast drone delivery — choose it at checkout.</div></div></div></div>':'')+store+cmpSec+desc+barcodeSec+reviews
     +'</div>'+buybar+'</div>';
   box.scrollTop=0;rbStoreTop();
 }
@@ -10280,7 +10299,7 @@ function rbVoiceSearch(btn){
   if(!SR){toast('Voice search needs Chrome, Edge or Android browser','err');return;}
   try{
     if(__rbRec){__rbRec.stop();__rbRec=null;if(btn)btn.classList.remove('rec');return;}
-    var rec=new SR();rec.lang=(navigator.language||'en-US');rec.interimResults=false;rec.maxAlternatives=1;
+    var rec=new SR();rec.lang=rbSpeechLang();rec.interimResults=false;rec.maxAlternatives=1;
     __rbRec=rec;if(btn)btn.classList.add('rec');toast('Listening… say a product','info');
     rec.onresult=function(e){
       var said=(e.results[0][0].transcript||'').trim();
@@ -15744,6 +15763,7 @@ function jarvisRoute(text){
   var q=text.toLowerCase();
   var has=function(a){return a.some(function(w){return q.indexOf(w)>=0;});};
   if(has(['stop','exit','goodbye','good bye','close','quit','shut down','that is all','thats all']))return {close:true};
+  if(has(['practice interview','interview practice','prepare for interview','mock interview','practise interview','interview prep','practice for interview','help me prepare for','do a mock']))return {interview:true, role:''};
   if(has(['job status','application status','my applications','status of my application','status of my job','did i get the job','any interview','am i selected','where did i apply','how are my applications','my job applications']))return {jobStatus:true};
   if(has(['status','how am i doing','overview','how is everything','my dashboard','how are things']))return {reply:jarvisStatusSpoken(),stay:true};
   if(has(['find a job','find job','search job','look for job','jobs',' job','job ','job hub','find work','hiring','vacancy','apply for','get a job','need a job','want a job','need job','i need work'])){
@@ -15770,6 +15790,25 @@ function jarvisRoute(text){
     return {shop:true, term:bterm};
   }
   if(/\b(go shopping|start shopping|i want to shop)\b/.test(q))return {shop:true,term:''};
+  // ===== v263: full app navigation by voice (open any screen) =====
+  if(has(['my order','my orders','track my order','order status','where is my order','where are my orders','track order','my purchases','my deliveries status']))return {reply:'Opening your orders.',action:function(){closeJarvis();try{showMyOrders();}catch(e){}}};
+  if(has(['my cart','view cart','show cart','open cart','what is in my cart','my basket','checkout','check out','go to checkout']))return {reply:'Opening your cart.',action:function(){closeJarvis();try{checkoutCart();}catch(e){}}};
+  if(has(['my account','account settings','open account','my settings','open settings','go to settings','account page']))return {reply:'Opening your account.',action:function(){closeJarvis();try{rbTab('account');}catch(e){}}};
+  if(has(['my profile','view my profile','open my profile','my public profile']))return {reply:'Opening your profile.',action:function(){closeJarvis();try{openProfile(CU.name,CU.co,'',CU.avIdx);}catch(e){}}};
+  if(has(['my activity','my dashboard','activity page','everything in one place']))return {reply:'Opening My Activity.',action:function(){closeJarvis();try{showMyActivity();}catch(e){}}};
+  if(has(['my address','my addresses','address book','delivery address','saved address','manage address']))return {reply:'Opening your address book.',action:function(){closeJarvis();try{openAddressBook();}catch(e){}}};
+  if(has(['notification','notifications','notification settings','alerts settings']))return {reply:'Opening notifications.',action:function(){closeJarvis();try{openNotifSettings();}catch(e){}}};
+  if(has(['daily spin','spin the wheel','spin wheel','my rewards','reward','spin','play the wheel','claim reward']))return {reply:'Opening your daily spin and rewards.',action:function(){closeJarvis();try{openSpin();}catch(e){}}};
+  if(has(['my cv','upload cv','my resume','upload resume','update my cv','manage my cv']))return {reply:'Opening your CV manager.',action:function(){closeJarvis();try{openMyCV();}catch(e){}}};
+  if(has(['change voice','choose voice','choose a voice','voice settings','set voice','human voice','change the voice']))return {reply:'Opening the voice picker — choose the one that sounds best.',action:function(){closeJarvis();try{openVoicePicker();}catch(e){}}};
+  if(has(['job hub','jobs hub','open jobs','jobs page','jobs board']))return {reply:'Opening the Job Hub.',action:function(){closeJarvis();try{openJobHub();}catch(e){}}};
+  if(has(['shop hub','my shop','seller tools','sell tools','seller hub','manage my shop','my products','list a product']))return {reply:'Opening your Shop Hub.',action:function(){closeJarvis();try{openShopHub();}catch(e){}}};
+  if(has(['delivery hub','become a delivery','delivery agent','driver hub','become a driver','delivery partner']))return {reply:'Opening the Delivery Hub.',action:function(){closeJarvis();try{openDeliveryHub();}catch(e){}}};
+  if(has(['open shop','go to shop','open store','main store','browse products','browse the shop','go shopping page','open the shop','show me the shop','marketplace']))return {reply:'Opening the shop.',action:function(){closeJarvis();try{openMainStore();}catch(e){}}};
+  if(has(['dark mode','night mode','turn on dark']))return {reply:'Switching to dark mode.',action:function(){try{rbSetTheme('dark');}catch(e){}if(__jarvis.on)jarvisListen();}};
+  if(has(['light mode','day mode','turn on light','bright mode']))return {reply:'Switching to light mode.',action:function(){try{rbSetTheme('light');}catch(e){}if(__jarvis.on)jarvisListen();}};
+  if(has(['help','how does this work','how to use','support','i need help','how do i','guide me','what can you do','what can i do']))return {reply:'I can help you shop, find and apply to jobs, prepare for interviews, deliver orders, and track habits — all by voice. Just tell me what you need, like "buy rice", "I need a driver job", "what is my job status", or "mark gym done". I can also open your orders, cart, account, or rewards. What would you like?',stay:true};
+  if(has(['go home','take me home','home screen','main screen','home page','back home']))return {reply:'Going to the home screen.',action:function(){closeJarvis();try{goHome();}catch(e){}}};
   var m=text.match(/(?:find|search for|search|show me|looking for|look for|i want|get me|do you have|need|where can i get)\s+(?:a |an |the |some |me )?(.+)/i);
   if(m){
     var term=m[1].replace(/\b(product|products|item|items|please|for me|on reedbi|to buy)\b/gi,'').replace(/[?.!]+$/,'').trim();
@@ -15795,7 +15834,7 @@ function jarvisListen(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){jarvisSetStatus('Voice not supported','idle');return;}
   try{
     if(__jarvis.rec){try{__jarvis.rec.stop();}catch(e){}}
-    var rec=new SR();rec.lang=(navigator.language||'en-US');rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
+    var rec=new SR();rec.lang=rbSpeechLang();rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
     __jarvis.rec=rec;jarvisSetStatus('Listening…','listening');
     var finalT='';
     rec.onresult=function(e){
@@ -15827,6 +15866,7 @@ function jarvisHandle(text){
   if(route.habitDone){jarvisHabitDoneStart(route.name);return;}
   if(route.habitLog){jarvisHabitLogStart();return;}
   if(route.jobStatus){var js=jarvisJobStatusSpoken();jarvisLog('ai',js);jarvisSpeak(js,function(){if(__jarvis.on)jarvisListen();});return;}
+  if(route.interview){jarvisInterviewStart(route.role);return;}
   if(route.ai){
     if(rbAIEndpoint()){askAgentAI(text).then(function(r){var reply=r||jarvisFallback(text);jarvisLog('ai',reply);jarvisSpeak(reply,function(){if(__jarvis.on)jarvisListen();});});}
     else{var reply=jarvisFallback(text);jarvisLog('ai',reply);jarvisSpeak(reply,function(){if(__jarvis.on)jarvisListen();});}
@@ -15853,17 +15893,22 @@ function openJarvis(starter){
     +'<button class="modal-x" onclick="closeJarvis()" style="position:absolute;top:12px;right:12px;z-index:3"><i class="ti ti-x"></i></button>'
     +'<div class="mbd" style="padding:30px 20px;text-align:center">'
     +'<div style="font-weight:800;font-size:15px;margin-bottom:4px">✨ Reedbi Voice Assistant</div>'
-    +'<div style="font-size:11.5px;color:var(--mt2);margin-bottom:24px">Say “my status”, “find a job”, or “find rice”</div>'
+    +'<div style="font-size:11.5px;color:var(--mt2);margin-bottom:24px">Say anything — “buy rice”, “I need a driver job”, “my job status”, “my orders”, “mark gym done”</div>'
     +'<div id="jarvis-orb" class="jarvis-orb" onclick="jarvisListen()"><i class="ti ti-microphone"></i></div>'
     +'<div id="jarvis-status" style="font-size:13px;font-weight:700;margin-top:18px">Starting…</div>'
     +'<div id="jarvis-heard" style="font-size:12px;color:var(--mt);margin-top:8px;min-height:18px"></div>'
     +'<div id="jarvis-log" style="margin-top:16px;text-align:left;max-height:170px;overflow-y:auto"></div>'
+    +'<div style="display:flex;gap:6px;margin-top:14px">'
+    +'<input id="jarvis-input" type="text" placeholder="…or type your request" autocomplete="off" onkeydown="if(event.key===\'Enter\')jarvisType()" style="flex:1;padding:11px 12px;border:1px solid var(--b);border-radius:10px;font-size:13px;background:var(--sf);color:var(--tx);min-width:0">'
+    +'<button onclick="jarvisType()" aria-label="Send" style="padding:0 15px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;border:none;cursor:pointer;flex:0 0 auto"><i class="ti ti-send"></i></button>'
+    +'</div>'
+    +'<div style="font-size:10px;color:var(--mt2);text-align:center;margin-top:6px">If it mishears you, just type it here — it works the same way.</div>'
     +'</div></div>';
   ov.classList.add('open');
   __jarvis.on=true;
   __jarvis.flow=null;
   if(starter==='job'){jarvisSpeak('Hi '+((CU&&CU.name)?CU.name:'there')+', let\'s find you a job.',function(){if(typeof jarvisJobStart==='function')jarvisJobStart('');});return;}
-  jarvisSpeak('Hi '+((CU&&CU.name)?CU.name:'there')+', I am your Reedbi assistant. Ask me for your status, to find a job, or to find a product.',function(){jarvisListen();});
+  jarvisSpeak(jarvisBriefing(),function(){jarvisListen();});
 }
 function closeJarvis(){
   __jarvis.on=false;
@@ -16056,6 +16101,19 @@ function jarvisFlowStep(text){
       var h2='You can say navigate, call customer, message customer, repeat, next, or done.';jarvisLog('ai',h2);jarvisSpeak(h2,function(){if(__jarvis.on)jarvisListen();});return;
     }
   }
+  if(f&&f.type==='interview'){
+    var ack=['Good answer.','Nice — that\'s a solid example.','Great, keep that structure.','Well put.','Good — specific and clear.','Strong answer.'];
+    if(f.idx+1<f.qs.length){
+      f.idx++;
+      var iq=f.qs[f.idx];var msg=ack[f.idx%ack.length]+' Next question: '+(iq.q||iq);
+      jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
+    }else{
+      __jarvis.flow=null;
+      var done='Great practice — you answered all '+f.qs.length+' questions! You sound ready. Remember to give a specific example and the result for each answer. Good luck in the real interview!';
+      jarvisLog('ai',done);jarvisSpeak(done,function(){if(__jarvis.on)jarvisListen();});
+    }
+    return;
+  }
   if(f&&f.type==='habitdone'){__jarvis.flow=null;var hres=jarvisHabitMarkDone(text);jarvisLog('ai',hres.msg);jarvisSpeak(hres.msg,function(){if(__jarvis.on)jarvisListen();});return;}
   if(f&&f.type==='habitlog'){
     var habits=getHabits();var h=habits.find(function(x){return x.id===f.ids[f.idx];});
@@ -16230,24 +16288,33 @@ function renderVoicePicker(){
 }
 function openVoicePicker(){
   rbLoadVoices();
+  var _exv=document.getElementById('vpick-ovl');if(_exv)_exv.remove();
   var cur=LS.get('rb_voice','');
   var html='<div class="ovl" id="vpick-ovl" onclick="if(event.target===this)closeOvl(\'vpick-ovl\')">'
     +'<div class="sheet" onclick="event.stopPropagation()" style="max-width:520px">'
     +'<div class="sheet-h"><b><i class="ti ti-microphone-2"></i> Choose your agent\'s voice</b><button onclick="closeOvl(\'vpick-ovl\')" class="x">&times;</button></div>'
     +'<div class="mbd" style="padding:14px">'
     +'<p style="font-size:12.5px;color:var(--mt);margin:0 0 10px">These voices run on your phone, so they are free for everyone. Pick the one that sounds most human to you.</p>'
+    +'<div style="background:var(--sf);border:1px solid var(--b);border-radius:12px;padding:12px;margin-bottom:14px">'
+    +'<div style="font-size:12.5px;font-weight:700;margin-bottom:3px"><i class="ti ti-language"></i> Your accent / language</div>'
+    +'<div style="font-size:10.5px;color:var(--mt2);margin-bottom:8px">If the agent mishears you, set this to how you speak — e.g. English (India) understands an Indian accent far better.</div>'
+    +'<select id="rb-srlang" onchange="setSpeechLang(this.value)" style="width:100%;padding:10px;border:1px solid var(--b);border-radius:9px;font-size:13px;background:var(--bg);color:var(--tx)">'
+    +rbSrLangOptions()
+    +'</select>'
+    +'</div>'
     +'<div style="margin-bottom:10px"><button class="btn" onclick="rbClearVoice()" style="border:1px solid var(--b);font-size:11.5px;padding:7px 11px">'+(cur?'↺ Use automatic best voice':'✓ Automatic best voice (default)')+'</button></div>'
     +'<div id="vpick-list"></div>'
     +'<p style="font-size:11px;color:var(--mt2);margin:12px 0 0">Want an even more natural voice? You can self-host the open-source Piper voice (free, no Blaze) — see the voice guide.</p>'
     +'</div></div></div>';
   var d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstChild);
   renderVoicePicker();
+  requestAnimationFrame(function(){var ov=document.getElementById('vpick-ovl');if(ov)ov.classList.add('open');});
 }
 
 /* ===== v259: professional, dedicated "My CV" manager ===== */
 function openMyCV(){
   if(!requireAuth('manage your CV'))return;
-  if(document.getElementById('mycv-ovl'))closeOvl('mycv-ovl');
+  var _exm=document.getElementById('mycv-ovl');if(_exm)_exm.remove();
   var html='<div class="ovl" id="mycv-ovl" onclick="if(event.target===this)closeOvl(\'mycv-ovl\')">'
     +'<div class="sheet" onclick="event.stopPropagation()" style="max-width:520px">'
     +'<div class="sheet-h"><b><i class="ti ti-file-cv" style="color:#7c3aed"></i> My CV / Resume</b><button onclick="closeOvl(\'mycv-ovl\')" class="x">&times;</button></div>'
@@ -16287,7 +16354,7 @@ function jarvisJobStatusSpoken(){
   var iv=apps.filter(function(a){return a.status==='interview';});
   var sel=apps.filter(function(a){return a.status==='selected';});
   if(sel.length)parts.push('Congratulations — you were selected for '+sel.length+'! Check your email.');
-  else if(iv.length)parts.push('Good news — you have '+iv.length+' interview call'+(iv.length!==1?'s':'')+'! Check your email.');
+  else if(iv.length)parts.push('Good news — you have '+iv.length+' interview call'+(iv.length!==1?'s':'')+'! Check your email. Say "practice interview" and I\'ll prepare you right now.');
   return parts.join(' ');
 }
 function jarvisEnableJobAgent(role){
@@ -16304,4 +16371,144 @@ function renderCVAction(){
   }else{el.innerHTML='';}
 }
 function rbStartJobFromCV(){try{closeOvl('mycv-ovl');}catch(e){}try{openJarvis('job');}catch(e){}}
+
+/* ===== v262: voice interview practice — completes the agent-based job journey ===== */
+function jarvisInterviewStart(role){
+  var cvs=getCVs(CU&&CU.uid);var cv=cvs.length?cvs[cvs.length-1]:null;
+  var qs=[];try{qs=genInterviewQuestions(cv?cv.text:'',cv?(cv.skills||''):'',role||'');}catch(e){}
+  if(!qs||!qs.length)qs=[{q:'Tell me about yourself and your experience.'},{q:'Why do you want this role?'},{q:'What is your greatest strength, with an example?'},{q:'Describe a challenge you overcame at work.'},{q:'Where do you see yourself in two to three years?'}];
+  var picks=qs.slice(0,6);
+  __jarvis.flow={type:'interview',idx:0,qs:picks};
+  var intro='Let\'s practice your interview. I\'ll ask you '+picks.length+' questions — answer out loud, like a real interview. Here is the first question. '+(picks[0].q||picks[0]);
+  jarvisLog('ai',intro);jarvisSpeak(intro,function(){if(__jarvis.on)jarvisListen();});
+}
+
+/* ===== v264: typed-command fallback for the voice agent (reliable when mis-heard) ===== */
+function jarvisType(){
+  var inp=document.getElementById('jarvis-input');if(!inp)return;
+  var text=(inp.value||'').trim();if(!text)return;
+  inp.value='';
+  try{if(__jarvis.rec){__jarvis.rec.onend=null;__jarvis.rec.onresult=null;__jarvis.rec.stop();}}catch(e){}
+  try{window.speechSynthesis.cancel();}catch(e){}
+  __jarvis.on=true;
+  jarvisHandle(text);
+}
+
+/* ===== v265: speech recognition accent/language selector (better for non-native English + global) ===== */
+function rbSpeechLang(){try{return LS.get('rb_voicelang','')||navigator.language||'en-US';}catch(e){return 'en-US';}}
+function setSpeechLang(code){try{LS.set('rb_voicelang',code||'');}catch(e){}toast(code?'Recognition language set':'Using device language','success');}
+var RB_SR_LANGS=[['','Auto (device default)'],['en-US','English — US'],['en-GB','English — UK'],['en-IN','English — India'],['en-AU','English — Australia'],['en-NG','English — Nigeria'],['en-PH','English — Philippines'],['en-ZA','English — South Africa'],['en-PK','English — Pakistan'],['ar-SA','Arabic'],['hi-IN','Hindi'],['ur-PK','Urdu'],['bn-IN','Bengali'],['ta-IN','Tamil'],['ml-IN','Malayalam'],['te-IN','Telugu'],['fil-PH','Filipino'],['id-ID','Indonesian'],['ms-MY','Malay'],['es-ES','Spanish'],['es-MX','Spanish — Mexico'],['pt-BR','Portuguese — Brazil'],['fr-FR','French'],['de-DE','German'],['ru-RU','Russian'],['zh-CN','Chinese'],['ja-JP','Japanese'],['ko-KR','Korean'],['tr-TR','Turkish'],['sw-KE','Swahili']];
+function rbSrLangOptions(){
+  var cur=LS.get('rb_voicelang','');
+  return RB_SR_LANGS.map(function(l){return '<option value="'+l[0]+'"'+(cur===l[0]?' selected':'')+'>'+esc(l[1])+'</option>';}).join('');
+}
+
+/* ===== v266: world-class proactive agent briefing (engaging, celebrates wins) ===== */
+function rbHabitStreak(hb){
+  var done=hb&&hb.done?hb.done:[];if(!done.length)return 0;
+  var set={};done.forEach(function(d){set[d]=1;});var t=Date.now(),day=86400000;
+  var start=set[dayKey(t)]?0:1,streak=0;
+  for(var i=start;i<400;i++){if(set[dayKey(t-i*day)])streak++;else break;}
+  return streak;
+}
+function jarvisBriefing(){
+  var name=(CU&&CU.name)?CU.name.split(' ')[0]:'there';
+  var hh=new Date().getHours();
+  var greet=hh<12?'Good morning':(hh<17?'Good afternoon':'Good evening');
+  var lines=[];
+  try{var apps=getAllApps().filter(function(a){return a.uid===(CU&&CU.uid);});
+    var sel=apps.filter(function(a){return a.status==='selected';});
+    var iv=apps.filter(function(a){return a.status==='interview';});
+    if(sel.length)lines.push('Congratulations — you were selected for '+sel.length+' job'+(sel.length!==1?'s':'')+'! That\'s fantastic.');
+    if(iv.length)lines.push('You have '+iv.length+' interview call'+(iv.length!==1?'s':'')+' waiting. Say "practice interview" and I\'ll get you ready.');
+  }catch(e){}
+  try{var orders=getOrders().filter(function(o){return o.buyerUid===(CU&&CU.uid)&&o.status&&o.status!=='delivered'&&o.status!=='cancelled';});if(orders.length)lines.push('You have '+orders.length+' order'+(orders.length!==1?'s':'')+' on the way.');}catch(e){}
+  try{var cn=getCart().reduce(function(s,c){return s+(c.qty||1);},0);if(cn)lines.push(cn+' item'+(cn!==1?'s':'')+' are waiting in your cart — say "checkout" when you\'re ready.');}catch(e){}
+  try{var habits=getHabits();var best=0;habits.forEach(function(hb){var st=rbHabitStreak(hb);if(st>best)best=st;});
+    var k=dayKey();var left=habits.filter(function(hb){return (hb.done||[]).indexOf(k)<0;}).length;
+    if(best>=3)lines.push('You\'re on a '+best+'-day habit streak — amazing, keep it alive!');
+    if(left>0&&habits.length)lines.push('You have '+left+' habit'+(left!==1?'s':'')+' left to tick off today.');
+  }catch(e){}
+  var msg=greet+' '+name+'! ';
+  if(lines.length)msg+=lines.join(' ')+' What would you like to do?';
+  else msg+='Great to see you. What would you like to do? You can say buy something, find a job, check your status, or start a delivery.';
+  return msg;
+}
+
+/* ===== v267: shop-controlled DRONE delivery option ===== */
+function rbDroneMap(){return LS.get('rb_drone_sellers',{})||{};}
+function droneOn(uid){if(!uid)return false;return !!rbDroneMap()[uid];}
+function toggleMyDrone(){if(!CU)return;var m=rbDroneMap();if(m[CU.uid])delete m[CU.uid];else m[CU.uid]=true;LS.set('rb_drone_sellers',m);try{if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED)FB.db.collection('sellerPrefs').doc(CU.uid).set({drone:!!m[CU.uid]},{merge:true}).catch(function(){});}catch(e){}toast(m[CU.uid]?'🚁 Drone delivery enabled — buyers will see it on your products':'Drone delivery turned off','success');if(document.getElementById('myprod-body')||document.getElementById('shophub-ovl'))try{showMyProducts();}catch(e){}}
+function droneBadgeFor(p){return (p&&droneOn(p.sellerUid))?'<span class="drone-badge"><i class="ti ti-drone"></i> Drone delivery</span>':'';}
+
+/* ===== v268: live delivery location tracking (agent shares -> customer sees on map) ===== */
+var __rbLocWatch=null;
+function rbAgo(ts){if(!ts)return '';var s=Math.round((Date.now()-ts)/1000);if(s<60)return 'just now';var m=Math.round(s/60);if(m<60)return m+' min ago';var h=Math.round(m/60);return h+' hr ago';}
+function rbShareLoc(orderId){
+  if(!navigator.geolocation){toast('Location not available on this device','err');return;}
+  toast('Sharing your live location with the customer…','success');
+  try{if(__rbLocWatch!=null)navigator.geolocation.clearWatch(__rbLocWatch);}catch(e){}
+  __rbLocWatch=navigator.geolocation.watchPosition(function(pos){
+    var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});if(!o)return;
+    o.agentLat=pos.coords.latitude;o.agentLng=pos.coords.longitude;o.agentLocTs=Date.now();o.agentSharing=true;
+    saveOrders(orders);
+  },function(err){toast('Could not get location'+(err&&err.message?': '+err.message:''),'err');},{enableHighAccuracy:true,maximumAge:8000,timeout:15000});
+}
+function rbStopShareLoc(orderId){
+  try{if(__rbLocWatch!=null){navigator.geolocation.clearWatch(__rbLocWatch);__rbLocWatch=null;}}catch(e){}
+  if(orderId){var orders=getOrders();var o=orders.find(function(x){return x.id===orderId;});if(o){o.agentSharing=false;saveOrders(orders);}}
+  toast('Stopped sharing location','info');
+}
+function liveTrackBody(o){
+  if(o&&o.agentLat&&o.agentLng){
+    var src='https://maps.google.com/maps?q='+o.agentLat+','+o.agentLng+'&z=15&output=embed';
+    return '<iframe title="Live delivery map" src="'+src+'" style="width:100%;height:300px;border:0;display:block" loading="lazy"></iframe>'
+      +'<div style="padding:14px 16px">'
+      +'<div style="font-weight:800;font-size:14px"><i class="ti ti-truck-delivery" style="color:#0a66c2"></i> Your delivery is on the way</div>'
+      +'<div style="font-size:11.5px;color:var(--mt);margin-top:2px">Agent location updated '+rbAgo(o.agentLocTs)+'</div>'
+      +'<div style="display:flex;gap:8px;margin-top:12px">'
+      +'<a href="https://www.google.com/maps/search/?api=1&query='+o.agentLat+','+o.agentLng+'" target="_blank" rel="noopener" class="btn btnok" style="flex:1;text-align:center;text-decoration:none;padding:11px"><i class="ti ti-map-2"></i> Open in Maps</a>'
+      +'<button class="btn" onclick="refreshLiveTrack(\''+o.id+'\')" style="flex:1;border:1px solid #0a66c2;color:#0a66c2;padding:11px"><i class="ti ti-refresh"></i> Refresh</button>'
+      +'</div></div>';
+  }
+  return '<div style="padding:34px 18px;text-align:center"><i class="ti ti-map-pin" style="font-size:36px;color:var(--mt2)"></i><div style="font-weight:700;margin-top:10px">Waiting for the agent to start sharing</div><div style="font-size:11.5px;color:var(--mt);margin-top:3px">Their live position will appear here once they begin the delivery.</div><button class="btn" onclick="refreshLiveTrack(\''+(o&&o.id||'')+'\')" style="margin-top:14px;border:1px solid #0a66c2;color:#0a66c2"><i class="ti ti-refresh"></i> Refresh</button></div>';
+}
+function renderLiveTrack(o){var b=document.getElementById('livetrack-body');if(b)b.innerHTML=liveTrackBody(o);}
+function refreshLiveTrack(orderId){
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
+    FB.db.collection('orders').doc(orderId).get().then(function(d){
+      if(d&&d.exists){var data=d.data();var orders=getOrders();var idx=orders.findIndex(function(x){return x.id===orderId;});if(idx>=0){orders[idx]=Object.assign({},orders[idx],data);saveOrders(orders);renderLiveTrack(orders[idx]);}else renderLiveTrack(data);}
+      else{renderLiveTrack(getOrders().find(function(x){return x.id===orderId;}));}
+    }).catch(function(){renderLiveTrack(getOrders().find(function(x){return x.id===orderId;}));});
+  }else{renderLiveTrack(getOrders().find(function(x){return x.id===orderId;}));}
+}
+function liveTrackOrder(orderId){
+  var o=getOrders().find(function(x){return x.id===orderId;});if(!o){toast('Order not found','err');return;}
+  var _exl=document.getElementById('livetrack-ovl');if(_exl)_exl.remove();
+  var html='<div class="ovl" id="livetrack-ovl" onclick="if(event.target===this)closeOvl(\'livetrack-ovl\')">'
+    +'<div class="sheet" onclick="event.stopPropagation()" style="max-width:520px;overflow:hidden">'
+    +'<div class="sheet-h"><b><i class="ti ti-map-pin-filled" style="color:#0a66c2"></i> Live delivery tracking</b><button onclick="closeOvl(\'livetrack-ovl\')" class="x">&times;</button></div>'
+    +'<div id="livetrack-body" style="max-height:70vh;overflow-y:auto"></div>'
+    +'</div></div>';
+  var d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstChild);
+  renderLiveTrack(o);
+  requestAnimationFrame(function(){var ov=document.getElementById('livetrack-ovl');if(ov)ov.classList.add('open');});
+  refreshLiveTrack(orderId);
+}
+
+/* ===== v269: always-on agent launcher (voice-first, text fallback) + first-time hint ===== */
+function rbLaunchAgent(){
+  if(('speechSynthesis' in window)&&(window.SpeechRecognition||window.webkitSpeechRecognition)){try{openJarvis();return;}catch(e){}}
+  try{openReedbiAgent('');}catch(e){}
+}
+function rbFabHint(){
+  try{if(LS.get('rb_fabhint',false))return;if(!CU||CU.guest)return;LS.set('rb_fabhint',true);}catch(e){return;}
+  if(document.getElementById('rb-fabhint'))return;
+  var b=document.createElement('div');b.id='rb-fabhint';
+  b.style.cssText='position:fixed;right:78px;bottom:80px;z-index:8600;background:#0f172a;color:#fff;padding:10px 13px;border-radius:13px;font-size:12.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.32);max-width:210px;line-height:1.45;font-family:var(--fn);cursor:pointer';
+  b.innerHTML='👋 Tap to talk to your agent — try “buy rice” or “I need a job”';
+  b.onclick=function(){try{b.remove();}catch(e){}rbLaunchAgent();};
+  document.body.appendChild(b);
+  setTimeout(function(){try{var el=document.getElementById('rb-fabhint');if(el)el.remove();}catch(e){}},8000);
+}
 </script></body></html>
