@@ -1280,6 +1280,29 @@ body.dark .spin-wheel{border-color:#2a333f}
 }
 .backbtn{display:none;width:38px;height:38px;border-radius:50%;border:none;background:var(--card2);cursor:pointer;color:var(--g);align-items:center;justify-content:center;font-size:19px;touch-action:manipulation}
 .av0{background:#1a3a2a;color:#4ade80}.av1{background:#1a2a4a;color:#60a5fa}.av2{background:#3a1a3a;color:#e879f9}.av3{background:#3a2a1a;color:#fb923c}.av4{background:#2a1a3a;color:#a78bfa}.av5{background:#1a3a3a;color:#34d399}.av6{background:#3a1a1a;color:#fb7185}
+/* ===== v272: global UI / graphics fine-tune — additive, non-breaking polish ===== */
+.btn{transition:transform .12s ease,box-shadow .15s ease,filter .15s ease}
+.btn:active{transform:translateY(1px) scale(.985)}
+.ps-card,.fk-tile,.home-card{transition:box-shadow .18s ease,transform .14s ease}
+.ps-card:active,.fk-tile:active,.home-card:active{transform:scale(.992)}
+@media(hover:hover){
+  .ps-card:hover{box-shadow:0 7px 20px rgba(10,102,194,.11);transform:translateY(-1px)}
+  .fk-tile:hover{box-shadow:0 7px 18px rgba(0,0,0,.09)}
+  .home-card:hover{box-shadow:0 7px 18px rgba(10,102,194,.10)}
+  .btn:hover{filter:brightness(1.04)}
+  .hub-tile:hover,.seller-tab:hover{filter:brightness(1.02)}
+}
+/* cleaner, consistent focus rings across all inputs (premium + accessible) */
+input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(10,102,194,.13)}
+/* softer, more modern depth on modals + sheets */
+.modal{box-shadow:0 -10px 44px rgba(0,0,0,.20)}
+.sheet{box-shadow:0 -10px 44px rgba(0,0,0,.20)}
+@media(min-width:560px){.modal{box-shadow:0 24px 64px rgba(0,0,0,.30)}.sheet{box-shadow:0 24px 64px rgba(0,0,0,.30)}}
+/* crisper image rendering for product/graphics */
+.ps-img,.fk-img,.pd-main img,.home-card img{image-rendering:auto}
+/* smoother bottom-nav active feedback */
+.btmnav button{transition:color .15s ease,transform .1s ease}
+.btmnav button:active{transform:scale(.9)}
 </style>
 </head>
 <body class="rb-home">
@@ -1325,7 +1348,7 @@ body.dark .spin-wheel{border-color:#2a333f}
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v271</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v278</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6046,7 +6069,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v271 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v278 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -14280,7 +14303,7 @@ function agentJobFlow(role){
   var footer='<div style="margin-top:12px;border-top:1px solid var(--b);padding-top:11px;display:flex;flex-direction:column;gap:8px">'
     +'<button class="btn" style="background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;font-weight:800;padding:11px;border:none" onclick="agentOpenAgent()">🤖 AI Job Agent — auto-apply with my CV</button>'
     +'<button class="btn" style="border:1px solid #16a34a;color:#16a34a;font-weight:700;padding:10px" onclick="agentPostJob()">➕ Post a job (I\'m hiring)</button>'
-    +'<button class="btn" style="border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:10px" onclick="agentInterviewPrep()">🎤 Practice interview — AI questions from my CV</button>'
+    +'<button class="btn" style="border:1px solid #7c3aed;color:#7c3aed;font-weight:700;padding:10px" onclick="startInterviewPractice()">🎤 Practice interview by voice — new questions each time</button>'
     +'<button class="btn btnok" style="font-weight:800;padding:10px" onclick="closeOvl(\'ragent-ovl\');openJobHub()">💼 Open Job Hub — all my jobs in one place</button>'
     +'</div>';
   return {a:1,t:(role?'Jobs for "<b>'+esc(role)+'</b>":':'Latest jobs ('+matches.length+'):'),actions:listing+footer};
@@ -14523,7 +14546,7 @@ function genInterviewQuestions(cvText, skills, jobTitle){
   var sk=(skills||'').split(/[,;\n|]/).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
   var known=['javascript','typescript','python','java','react','node','angular','vue','sql','mongodb','excel','powerpoint','marketing','sales','design','figma','management','communication','leadership','accounting','finance','customer service','project management','data analysis','html','css','aws','azure','docker','kubernetes','photoshop','illustrator','seo','content writing','copywriting','testing','qa','android','ios','flutter','swift','kotlin','c++','c#','machine learning','tensorflow','sap','tally','logistics','supply chain','nursing','teaching','git','rest api','agile','scrum','tableau','power bi','negotiation','branding'];
   known.forEach(function(k){if(cv.indexOf(k)>=0&&sk.map(function(x){return x.toLowerCase();}).indexOf(k)<0)sk.push(k);});
-  sk=sk.slice(0,6);
+  sk=rbShuffleArr(sk).slice(0,6);
   // varied per-skill templates — each skill gets a DIFFERENT style by rotating
   var skillTpls=[
     function(s){return 'Walk me through a specific project where you used '+s+'. What was your exact role and the measurable result?';},
@@ -14534,9 +14557,10 @@ function genInterviewQuestions(cvText, skills, jobTitle){
     function(s){return 'Tell me about a mistake you made while working with '+s+' and what you learned from it.';},
     function(s){return 'How would you rate your depth in '+s+', and what would it take for you to reach the next level?';}
   ];
+  var tplOrder=rbShuffleArr(skillTpls);
   var qs=[];
   if(jobTitle)qs.push({c:'Role fit',q:'What specifically attracts you to the '+jobTitle+' role, and which parts of your experience map most directly to it?'});
-  sk.forEach(function(s,i){qs.push({c:'Skill: '+s,q:skillTpls[i%skillTpls.length](s)});});
+  sk.forEach(function(s,i){qs.push({c:'Skill: '+s,q:tplOrder[i%tplOrder.length](s)});});
   // CV-signal-based questions (different for each candidate)
   var seniorWords=['senior','lead','manager','head of','principal','architect','supervisor','director'];
   if(seniorWords.some(function(w){return cv.indexOf(w)>=0;})){
@@ -14550,12 +14574,24 @@ function genInterviewQuestions(cvText, skills, jobTitle){
   if(/(sales|revenue|target|quota|client|deal)/.test(cv))qs.push({c:'Results',q:'Tell me about a time you exceeded a target or won an important client. What did you do differently?'});
   if(/(customer|support|service|helpdesk)/.test(cv))qs.push({c:'Customer focus',q:'Describe a difficult customer situation you turned around. What was the outcome?'});
   if(/(design|ui|ux|figma|photoshop|illustrator|brand)/.test(cv))qs.push({c:'Craft',q:'Walk me through your design process from brief to final delivery on a piece of work you are proud of.'});
-  // universal behavioral (varied, no overlap with the above)
-  qs.push({c:'Achievement',q:'Walk me through the professional achievement you are most proud of and the impact it had.'});
-  qs.push({c:'Pressure',q:'Describe a situation where you had to deliver under a tight deadline. How did you prioritise?'});
-  qs.push({c:'Conflict',q:'Give an example of a disagreement with a colleague and how you resolved it.'});
-  qs.push({c:'Growth',q:'What is one skill you are actively working to improve right now, and how?'});
-  qs.push({c:'Motivation',q:'Where do you want to be professionally in two to three years?'});
+  // universal behavioral — large pool, randomly sampled so each session differs
+  var behavioral=[
+    {c:'Achievement',q:'Walk me through the professional achievement you are most proud of and the impact it had.'},
+    {c:'Pressure',q:'Describe a situation where you had to deliver under a tight deadline. How did you prioritise?'},
+    {c:'Conflict',q:'Give an example of a disagreement with a colleague and how you resolved it.'},
+    {c:'Growth',q:'What is one skill you are actively working to improve right now, and how?'},
+    {c:'Motivation',q:'Where do you want to be professionally in two to three years?'},
+    {c:'Failure',q:'Tell me about a time something went wrong on your watch. What did you do, and what changed afterwards?'},
+    {c:'Initiative',q:'Describe a time you went beyond what was asked of you. What prompted it, and what happened?'},
+    {c:'Teamwork',q:'Tell me about the best team you have worked on. What made it work so well?'},
+    {c:'Adaptability',q:'Describe a time priorities changed suddenly. How did you adjust?'},
+    {c:'Decision',q:'Walk me through a tough decision you made with incomplete information.'},
+    {c:'Feedback',q:'Tell me about a time you received hard feedback. How did you respond to it?'},
+    {c:'Ownership',q:'Describe a project you owned from start to finish. What were you most responsible for?'},
+    {c:'Communication',q:'Tell me about a time you had to explain something complex to a non-expert. How did you do it?'},
+    {c:'Problem-solving',q:'Describe the hardest problem you solved this year and how you cracked it.'}
+  ];
+  rbShuffleArr(behavioral).slice(0,5).forEach(function(b){qs.push(b);});
   qs.push({c:'Candidate Q',q:'What questions do you have for us about the role, the team, or the company?'});
   return qs;
 }
@@ -14742,10 +14778,10 @@ function openJobHub(){
     +'<div style="background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;border-radius:13px;padding:14px 16px;margin-bottom:14px"><div style="font-weight:800;font-size:15px">Everything jobs, in one place</div><div style="font-size:12px;opacity:.9;margin-top:3px">Search, apply, post, track, and report — with the AI agent.</div></div>'
     +'<div style="display:grid;gap:9px">'
     +tile('🤖','Auto Job Agent','Upload your CV/photo — I scan, match &amp; apply for you','closeOvl(\'jobhub-ovl\');openAutoJobAgent()')
-    +tile('🔍','Find a job (AI agent)','Scan &amp; match jobs to your CV, auto-apply','closeOvl(\'jobhub-ovl\');openJobAgent()')
+    +tile('🔍','Find a job','Search all jobs — matched to your CV, with posted time','closeOvl(\'jobhub-ovl\');openJobSearch()')
     +tile('📄','My CV','Upload or update your CV','closeOvl(\'jobhub-ovl\');openMyCV()',myCV.length?myCV.length+'':'')
     +tile('📊','My applications','Jobs you applied to &amp; their status','closeOvl(\'jobhub-ovl\');showMyApps()',apps.length?apps.length+'':'')
-    +tile('🎤','Practice interview','AI questions from your CV','closeOvl(\'jobhub-ovl\');agentInterviewPrep()')
+    +tile('🎤','Practice interview','Mock interview by voice or text — new questions each time','closeOvl(\'jobhub-ovl\');startInterviewPractice()')
     +tile('📢','Post a job','Hire — publish a job post','closeOvl(\'jobhub-ovl\');openTag(\'jobs\')')
     +tile('🧑‍💼','Employer Agent','Agent auto-screens &amp; shortlists your applicants','closeOvl(\'jobhub-ovl\');openEmployerAgent()')
     +tile('👥','Manage applicants','Review people who applied to your posts','closeOvl(\'jobhub-ovl\');openCompanyPage((CU&&CU.co)||\'\')',posts.length?posts.length+'':'')
@@ -15766,6 +15802,8 @@ function jarvisRoute(text){
   if(has(['practice interview','interview practice','prepare for interview','mock interview','practise interview','interview prep','practice for interview','help me prepare for','do a mock']))return {interview:true, role:''};
   if(has(['job status','application status','my applications','status of my application','status of my job','did i get the job','any interview','am i selected','where did i apply','how are my applications','my job applications']))return {jobStatus:true};
   if(has(['status','how am i doing','overview','how is everything','my dashboard','how are things']))return {reply:jarvisStatusSpoken(),stay:true};
+  if(has(['post a job','post job','post a vacancy','advertise a job','create a job','add a job','i want to hire','i need to hire','hire someone','put up a job','list a job','publish a job','post a new job','post jobs'])){return {postJob:true};}
+  if(has(['show me jobs','show jobs','see jobs','browse jobs','view jobs','all jobs','list jobs','search jobs','job openings','jobs for me','jobs matching','jobs related to my cv','jobs for my cv','what jobs'])){return {reply:'Here are the jobs, with the best matches for your CV first.',action:function(){closeJarvis();try{openJobSearch();}catch(e){}}};}
   if(has(['find a job','find job','search job','look for job','jobs',' job','job ','job hub','find work','hiring','vacancy','apply for','get a job','need a job','want a job','need job','i need work'])){
     var role='';
     var jm=text.match(/(?:need|want|find|looking for|get me|apply for)\s+(?:a |an |me a |me an )?([a-z ]+?)\s*(?:job|work|role|position)/i)||text.match(/(?:job|work|role|position)\s+(?:as|for|in)\s+(?:a |an )?([a-z ]+)/i);
@@ -15775,7 +15813,8 @@ function jarvisRoute(text){
   if(has(['sell','selling','what to sell','sell to demand','list a product','promote my']))return {reply:'Opening the sell helper, where I match your products to what people are searching for.',action:function(){closeJarvis();openSellAgent();}};
   if(has(['my orders','my order','track order','track my','where is my','order status']))return {reply:'Opening your orders.',action:function(){closeJarvis();showMyOrders();}};
   // HABIT voice commands (specific actions win over just opening habits)
-  if(has(['log my habits','log habits','check my habits','go through my habits','track my habits','review my habits']))return {habitLog:true};
+  if(has(['complete my habits','complete habits','finish my habits','help me with my habits','help me complete','habit coach','coach me','do my habits','work on my habits','complete each habit','complete goals','complete my goals'])){return {habitCoach:true};}
+  if(has(['log my habits','log habits','check my habits','go through my habits','track my habits','review my habits','tick my habits','update my habits']))return {habitCoach:true};
   if(has(['habit status','my habits','how are my habits','habits today','habit progress','did i do my habits','habits done','how am i doing']))return {habitStatus:true};
   var hmd=text.match(/(?:mark|complete|completed|finish|finished|log)\s+(?:my |the )?([a-z ]+?)\s*(?:habit\s*)?(?:as )?(?:done|complete|completed|finished)?\s*$/i);
   if(/\b(mark|complete|completed|finish|finished)\b/.test(q)&&hmd){var hn1=(hmd[1]||'').replace(/\b(habit|today|my|as|the|done|complete|completed|finish|finished)\b/gi,'').replace(/\s+/g,' ').trim();return {habitDone:true,name:hn1};}
@@ -15804,6 +15843,7 @@ function jarvisRoute(text){
   if(has(['job hub','jobs hub','open jobs','jobs page','jobs board']))return {reply:'Opening the Job Hub.',action:function(){closeJarvis();try{openJobHub();}catch(e){}}};
   if(has(['shop hub','my shop','seller tools','sell tools','seller hub','manage my shop','my products','list a product']))return {reply:'Opening your Shop Hub.',action:function(){closeJarvis();try{openShopHub();}catch(e){}}};
   if(has(['delivery hub','become a delivery','delivery agent','driver hub','become a driver','delivery partner']))return {reply:'Opening the Delivery Hub.',action:function(){closeJarvis();try{openDeliveryHub();}catch(e){}}};
+  if(has(['show all products','show me products','show me all products','list all products','list products','all products','see all products','view products','products with price','show prices'])){return {reply:'Here are the products in the shop, with prices.',action:function(){closeJarvis();try{openProductSearch();}catch(e){try{openMainStore();}catch(_){}}}};}
   if(has(['open shop','go to shop','open store','main store','browse products','browse the shop','go shopping page','open the shop','show me the shop','marketplace']))return {reply:'Opening the shop.',action:function(){closeJarvis();try{openMainStore();}catch(e){}}};
   if(has(['dark mode','night mode','turn on dark']))return {reply:'Switching to dark mode.',action:function(){try{rbSetTheme('dark');}catch(e){}if(__jarvis.on)jarvisListen();}};
   if(has(['light mode','day mode','turn on light','bright mode']))return {reply:'Switching to light mode.',action:function(){try{rbSetTheme('light');}catch(e){}if(__jarvis.on)jarvisListen();}};
@@ -15842,11 +15882,17 @@ function jarvisListen(){
       for(var i=e.resultIndex;i<e.results.length;i++){var tr=e.results[i][0].transcript;if(e.results[i].isFinal)finalT+=tr;else interim+=tr;}
       var h=document.getElementById('jarvis-heard');if(h)h.textContent=(finalT||interim);
     };
-    rec.onerror=function(){};
+    rec.onerror=function(ev){var err=(ev&&ev.error)||'';if(err==='not-allowed'||err==='service-not-allowed')__jarvis.permDenied=true;};
     rec.onend=function(){
       __jarvis.rec=null;var said=(finalT||'').trim();
-      if(said&&__jarvis.on)jarvisHandle(said);
-      else if(__jarvis.on)jarvisSetStatus('Tap the orb and speak','idle');
+      if(said&&__jarvis.on){__jarvis.empties=0;jarvisHandle(said);return;}
+      if(!__jarvis.on)return;
+      if(__jarvis.permDenied){jarvisSetStatus('Allow microphone access, then tap the orb','idle');return;}
+      // no speech this cycle — keep listening so a natural pause does not break the conversation
+      __jarvis.empties=(__jarvis.empties||0)+1;
+      if(__jarvis.empties>=6){__jarvis.empties=0;jarvisSetStatus('Still here — tap the orb to keep talking','idle');return;}
+      jarvisSetStatus('Listening…','listening');
+      setTimeout(function(){if(__jarvis.on&&!__jarvis.rec&&!(window.speechSynthesis&&window.speechSynthesis.speaking))jarvisListen();},300);
     };
     rec.start();
   }catch(e){jarvisSetStatus('Mic error — tap to retry','idle');}
@@ -15859,11 +15905,13 @@ function jarvisHandle(text){
   if(__jarvis.flow){return jarvisFlowStep(text);}  // continue a guided multi-turn flow
   var route=jarvisRoute(text);
   if(route.close){jarvisSpeak('Goodbye!',function(){closeJarvis();});return;}
+  if(route.postJob){jarvisPostJobStart();return;}  // conversational job posting
   if(route.job){jarvisJobStart(route.role);return;}  // start the guided voice job flow
   if(route.shop){jarvisShopStart(route.term);return;}  // start the guided voice shopping flow
   if(route.deliver){jarvisDeliverStart();return;}  // start the hands-free delivery flow
   if(route.habitStatus){var hs=jarvisHabitStatus();jarvisLog('ai',hs);jarvisSpeak(hs,function(){if(__jarvis.on)jarvisListen();});return;}
   if(route.habitDone){jarvisHabitDoneStart(route.name);return;}
+  if(route.habitCoach){jarvisHabitCoachStart();return;}
   if(route.habitLog){jarvisHabitLogStart();return;}
   if(route.jobStatus){var js=jarvisJobStatusSpoken();jarvisLog('ai',js);jarvisSpeak(js,function(){if(__jarvis.on)jarvisListen();});return;}
   if(route.interview){jarvisInterviewStart(route.role);return;}
@@ -15907,6 +15955,7 @@ function openJarvis(starter){
   ov.classList.add('open');
   __jarvis.on=true;
   __jarvis.flow=null;
+  if(starter==='interview'){if(typeof jarvisInterviewStart==='function')jarvisInterviewStart('');return;}
   if(starter==='job'){jarvisSpeak('Hi '+((CU&&CU.name)?CU.name:'there')+', let\'s find you a job.',function(){if(typeof jarvisJobStart==='function')jarvisJobStart('');});return;}
   jarvisSpeak(jarvisBriefing(),function(){jarvisListen();});
 }
@@ -16115,6 +16164,20 @@ function jarvisFlowStep(text){
     return;
   }
   if(f&&f.type==='habitdone'){__jarvis.flow=null;var hres=jarvisHabitMarkDone(text);jarvisLog('ai',hres.msg);jarvisSpeak(hres.msg,function(){if(__jarvis.on)jarvisListen();});return;}
+  if(f&&f.type==='postjob'){
+    var d=f.data||{};var val=(text||'').trim();var said=val.toLowerCase();
+    if(/\b(cancel|stop|never ?mind|quit|forget it|exit)\b/i.test(said)){__jarvis.flow=null;jarvisClearConfirm();var cc='No problem — I\'ve cancelled posting. What else can I help with?';jarvisLog('ai',cc);jarvisSpeak(cc,function(){if(__jarvis.on)jarvisListen();});return;}
+    var isYes=/^(yes|yeah|yep|yup|correct|right|perfect|confirm|confirmed|ok|okay|good|exactly|post it|sounds good|looks good|thats? right|that is correct|thats? correct|all correct)\b/i.test(said);
+    function reask(msg){jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});}
+    if(f.step==='title'){if(val.length<2){reask('Please tell me the job title — for example, Delivery Driver or Sales Executive.');return;}f.pend=val;f.step='title_confirm';var c1='I heard the job title as: \"'+val+'\". Is that correct? Say yes to confirm, or just say the title again.';jarvisLog('ai',c1);jarvisShowConfirm('Job title',val);jarvisSpeak(c1,function(){if(__jarvis.on)jarvisListen();});return;}
+    if(f.step==='title_confirm'){if(isYes){d.title=f.pend;f.data=d;f.pend='';f.step='company';jarvisClearConfirm();reask('Great. Which company name should it be posted under? Or say \"my name\" to use your own name.');return;}if(val.length<2){reask('No problem — please say the job title again, clearly.');return;}f.pend=val;var c1b='Okay, I now have: \"'+val+'\". Is that correct? Say yes, or say it again.';jarvisLog('ai',c1b);jarvisShowConfirm('Job title',val);jarvisSpeak(c1b,function(){if(__jarvis.on)jarvisListen();});return;}
+    if(f.step==='company'){var co=(/(my name|myself|my own|just me|no company|use my name)/i.test(said))?(CU.name||''):val;f.pend=co;f.step='company_confirm';var c2='The company will be: \"'+co+'\". Correct? Say yes, or say a different company name.';jarvisLog('ai',c2);jarvisShowConfirm('Company',co);jarvisSpeak(c2,function(){if(__jarvis.on)jarvisListen();});return;}
+    if(f.step==='company_confirm'){if(isYes){d.company=f.pend;f.data=d;f.pend='';f.step='desc';jarvisClearConfirm();reask('Got it. Now describe the job in a sentence or two — the role, responsibilities, and any requirements.');return;}var co2=(/(my name|myself|my own|just me|no company|use my name)/i.test(said))?(CU.name||''):val;f.pend=co2;var c2b='Okay: \"'+co2+'\". Correct? Say yes, or say it again.';jarvisLog('ai',c2b);jarvisShowConfirm('Company',co2);jarvisSpeak(c2b,function(){if(__jarvis.on)jarvisListen();});return;}
+    if(f.step==='desc'){if(val.length<3){reask('Please describe the job briefly — what the person will do and any requirements.');return;}f.pend=val;f.step='desc_confirm';var c3='Here is the description I have: \"'+val+'\". Should I post the job now? Say yes to post, or say the description again to change it.';jarvisLog('ai',c3);jarvisShowConfirm('Description',val);jarvisSpeak(c3,function(){if(__jarvis.on)jarvisListen();});return;}
+    if(f.step==='desc_confirm'){if(isYes){d.body=f.pend;var np=null;try{np=rbCreateJobPost(d.title,d.company,d.body);}catch(e){}__jarvis.flow=null;jarvisClearConfirm();var done=np?('Done! Your job \"'+d.title+'\"'+(d.company?(' at '+d.company):'')+' is now live for candidates. You\'ll see who applies in your Job Hub under Manage applicants. Want to post another or do something else?'):('Sorry, I could not post that just now. You can also use the Post a job button in the Job Hub.');jarvisLog('ai',done);jarvisSpeak(done,function(){if(__jarvis.on)jarvisListen();});return;}if(val.length<3){reask('No problem — please say the description again.');return;}f.pend=val;var c3b='Updated description: \"'+val+'\". Post it now? Say yes, or say it again.';jarvisLog('ai',c3b);jarvisShowConfirm('Description',val);jarvisSpeak(c3b,function(){if(__jarvis.on)jarvisListen();});return;}
+  }
+
+  if(f&&f.type==='habitcoach'){jarvisHabitCoachStep(text);return;}
   if(f&&f.type==='habitlog'){
     var habits=getHabits();var h=habits.find(function(x){return x.id===f.ids[f.idx];});
     if(h&&/\b(yes|yeah|yep|did|done|sure|ok|okay|i did)\b/.test(q)){h.done=h.done||[];var k=dayKey();if(h.done.indexOf(k)<0)h.done.push(k);saveHabits(habits);}
@@ -16157,24 +16220,27 @@ function jarvisCartCount(){return getCart().reduce(function(s,c){return s+(c.qty
 function jarvisShopStart(term){
   __jarvis.flow={type:'shop',step:'search'};
   if(term&&term.length>1)return jarvisShopSearch(term);
-  var names=jarvisAvailableNames(6);
-  var msg=names?('Sure — what would you like to buy? In the shop right now we have: '+names+'. Just say one.'):('The shop has no products listed yet. Ask a seller to list something first.');
+  var names=jarvisAvailableWithPrice(6);
+  var msg=names?('Sure — what would you like to buy? In the shop right now we have: '+names+'. Just say one, or say \'show all products\' to see them all.'):('The shop has no products listed yet. Ask a seller to list something first.');
   jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
 }
 function jarvisShopSearch(term){
   if(!rbAvailProducts().length){var z='There are no products in the shop yet.';jarvisLog('ai',z);jarvisSpeak(z,function(){if(__jarvis.on)jarvisListen();});return;}
-  var found=jarvisFindProducts(term);
+  var wantCheap=/\b(cheap|cheapest|lowest|least|low ?price|low ?cost|affordable|budget|best price|least price)\b/i.test(term||'');
+  var searchTerm=wantCheap?((term||'').replace(/\b(cheap|cheapest|lowest|least|low|price|cost|affordable|budget|best)\b/gi,' ').replace(/\s+/g,' ').trim()):term;
+  var found=jarvisFindProducts(searchTerm||term);
   if(!found.length){
     var names=jarvisAvailableNames(6);
     var m='I couldn\'t match "'+term+'". Here\'s what\'s in the shop: '+names+'. Which one would you like? Or say checkout.';
     __jarvis.flow={type:'shop',step:'search'};
     jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});return;
   }
+  if(wantCheap&&found.length>1){found=found.slice().sort(function(a,b){return (Number(a.offer||a.price)||1e12)-(Number(b.offer||b.price)||1e12);});}
   var p=found[0];
   __jarvis.flow={type:'shop',step:'addconfirm',pid:p.id,pname:p.title};
   var price=(p.currency?p.currency+' ':'')+(p.offer||p.price||'');
   var alt=found.length>1?(' If that\'s not right, you can also say '+found.slice(1,3).map(function(x){return x.title;}).join(' or ')+'.'):'';
-  var msg='I found '+(p.title||'a product')+' for '+price+'. Add it to your cart? Say yes or no.'+alt;
+  var msg=(wantCheap?'The lowest-priced option I found is ':'I found ')+(p.title||'a product')+' for '+price+'. Add it to your cart? Say yes or no.'+alt;
   jarvisLog('ai',msg);jarvisSpeak(msg,function(){if(__jarvis.on)jarvisListen();});
 }
 function jarvisShopCheckout(){
@@ -16328,6 +16394,7 @@ function openMyCV(){
     +'<div id="cv-fname" style="font-size:11px;color:#0a66c2;margin-top:6px;font-weight:600"></div>'
     +'</label>'
     +'<input id="cv-file-input" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="cvSel(this)">'
+    +'<button onclick="openCVPaste()" style="width:100%;margin-top:9px;padding:11px;border:1px solid var(--b2);border-radius:11px;background:var(--card2);color:var(--tx);font-weight:600;font-size:13px;cursor:pointer"><i class="ti ti-clipboard-text"></i> Or paste your CV as text</button>'
     +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--mt2);margin:14px 0 5px"><span style="font-weight:700;color:var(--tx)">Your documents · <span id="cv-ct">0 CVs</span></span><span id="cv-sz">0 KB</span></div>'
     +'<div style="height:6px;background:var(--b);border-radius:3px;overflow:hidden;margin-bottom:11px"><div id="cv-fill" style="height:100%;width:0;background:linear-gradient(90deg,#0a66c2,#7c3aed);transition:.3s"></div></div>'
     +'<div id="cv-list"></div>'
@@ -16377,9 +16444,9 @@ function jarvisInterviewStart(role){
   var cvs=getCVs(CU&&CU.uid);var cv=cvs.length?cvs[cvs.length-1]:null;
   var qs=[];try{qs=genInterviewQuestions(cv?cv.text:'',cv?(cv.skills||''):'',role||'');}catch(e){}
   if(!qs||!qs.length)qs=[{q:'Tell me about yourself and your experience.'},{q:'Why do you want this role?'},{q:'What is your greatest strength, with an example?'},{q:'Describe a challenge you overcame at work.'},{q:'Where do you see yourself in two to three years?'}];
-  var picks=qs.slice(0,6);
+  var picks=rbShuffleArr(qs).slice(0,6);
   __jarvis.flow={type:'interview',idx:0,qs:picks};
-  var intro='Let\'s practice your interview. I\'ll ask you '+picks.length+' questions — answer out loud, like a real interview. Here is the first question. '+(picks[0].q||picks[0]);
+  var intro='Let\'s practice your interview. I\'ll ask you '+picks.length+' questions based on your CV, different each time. Answer out loud or type your answer. Here is the first question. '+(picks[0].q||picks[0]);
   jarvisLog('ai',intro);jarvisSpeak(intro,function(){if(__jarvis.on)jarvisListen();});
 }
 
@@ -16511,4 +16578,194 @@ function rbFabHint(){
   document.body.appendChild(b);
   setTimeout(function(){try{var el=document.getElementById('rb-fabhint');if(el)el.remove();}catch(e){}},8000);
 }
+
+/* ===== v273: manual EASY job search — CV-matched, shows posted time, one-tap apply ===== */
+function jarvisAllJobPosts(){var out=[];jarvisJobTags().forEach(function(t){(t.posts||[]).forEach(function(p){out.push({tag:t,post:p});});});return out;}
+function rbPosted(ts){if(!ts)return 'recently';var s=(Date.now()-ts)/1000;if(s<3600)return Math.max(1,Math.round(s/60))+'m ago';if(s<86400)return Math.round(s/3600)+'h ago';var d=Math.round(s/86400);if(d<30)return d+'d ago';try{return fmtDT(ts);}catch(e){return d+'d ago';}}
+function openJobSearch(prefill){
+  if(!requireAuth('search for jobs'))return;
+  var ex=document.getElementById('jobsearch-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='jobsearch-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:560px"><div class="mhd"><h3>🔍 Find a job</h3><button class="modal-x" onclick="closeOvl(\'jobsearch-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd">'
+    +'<input id="jobsearch-q" placeholder="Search by job title, skill or company…" oninput="renderJobSearchResults()" style="width:100%;padding:11px 13px;border:1px solid var(--b2);border-radius:10px;font-size:14px;box-sizing:border-box;background:var(--card2)">'
+    +'<div style="font-size:11px;color:var(--mt);margin:7px 2px 11px" id="jobsearch-hint"></div>'
+    +'<div id="jobsearch-results"></div>'
+    +'</div></div>';
+  document.body.appendChild(ov);
+  var qi=document.getElementById('jobsearch-q');if(prefill&&qi)qi.value=prefill;
+  renderJobSearchResults();
+  requestAnimationFrame(function(){ov.classList.add('open');});
+}
+function renderJobSearchResults(){
+  var qi=document.getElementById('jobsearch-q');var q=qi?qi.value.trim():'';
+  var box=document.getElementById('jobsearch-results');if(!box)return;
+  var hint=document.getElementById('jobsearch-hint');
+  var all=jarvisAllJobPosts();
+  if(!all.length){box.innerHTML='<div style="padding:26px 14px;text-align:center;color:var(--mt)"><i class="ti ti-briefcase-off" style="font-size:30px;color:var(--mt2)"></i><div style="margin-top:8px;font-weight:600">No jobs posted yet</div><div style="font-size:12px">New jobs will appear here as employers post them.</div></div>';if(hint)hint.textContent='';return;}
+  var cv=getCVs(CU.uid);cv=cv.length?cv[cv.length-1]:null;
+  var terms,cvBased=false;
+  if(q){terms=rbTok(q);if(!terms.length)terms=[q.toLowerCase()];}
+  else if(cv){terms=rbTok(((cv.skills||'')+' '+(cv.text||'')).slice(0,400));cvBased=true;}
+  else terms=[];
+  var hasTerms=terms.length>0;
+  var scored=all.map(function(x){
+    var fields=((x.post.title||'')+' '+(x.post.body||'')+' '+(x.post.co||'')).toLowerCase();var ftoks=rbTok(fields);var score=0;
+    terms.forEach(function(w){if(!w)return;if(fields.indexOf(w)>=0){score+=10;return;}var best=9;ftoks.forEach(function(ft){if(ft.indexOf(w)>=0||w.indexOf(ft)>=0){best=Math.min(best,0.3);return;}var d=rbLev(w,ft),norm=d/Math.max(w.length,ft.length);if(norm<best)best=norm;});if(best<=0.34)score+=6;else if(best<=0.5)score+=2;});
+    return {x:x,score:score};
+  });
+  var list=scored.filter(function(s){return hasTerms?s.score>0:true;});
+  if(cvBased&&list.length===0){list=scored;cvBased=false;hasTerms=false;} // CV gave no matches -> show all jobs
+  list.sort(function(a,b){if(b.score!==a.score)return b.score-a.score;return (b.x.post.ts||0)-(a.x.post.ts||0);});
+  if(hint)hint.textContent=q?(list.length+' job'+(list.length!==1?'s':'')+' matching “'+esc(q)+'”'):(cvBased?'⭐ '+list.length+' job'+(list.length!==1?'s':'')+' matched to your CV — or type to search all':list.length+' job'+(list.length!==1?'s':'')+' available — type to search');
+  var uid=CU.uid;var apps=getAllApps();var maxScore=terms.length*10;
+  box.innerHTML=list.map(function(s){
+    var p=s.x.post;var applied=apps.some(function(a){return a.uid===uid&&String(a.postId)===String(p.id);});
+    var matchPct=(hasTerms&&s.score>0&&maxScore)?Math.max(40,Math.min(99,Math.round(s.score/maxScore*100))):0;
+    return '<div style="border:1px solid var(--b);border-radius:12px;padding:13px;margin-bottom:9px;background:var(--sf)">'
+      +'<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div style="font-weight:700;font-size:14px;line-height:1.3">'+esc(p.title||'Job opening')+'</div>'+(matchPct?'<span style="font-size:10px;font-weight:700;color:#16a34a;white-space:nowrap;background:rgba(22,163,74,.1);padding:2px 7px;border-radius:20px">'+matchPct+'% match</span>':'')+'</div>'
+      +(p.co?'<div style="font-size:12px;color:var(--mt);margin-top:3px"><i class="ti ti-building"></i> '+esc(p.co)+'</div>':'')
+      +'<div style="font-size:10.5px;color:var(--mt2);margin:3px 0 8px"><i class="ti ti-clock"></i> Posted '+rbPosted(p.ts)+'</div>'
+      +(p.body?'<div style="font-size:12px;color:var(--tx);max-height:56px;overflow:hidden;line-height:1.55">'+esc((p.body||'').slice(0,170))+((p.body||'').length>170?'…':'')+'</div>':'')
+      +(applied?'<div style="margin-top:10px;font-size:12px;color:#16a34a;font-weight:700"><i class="ti ti-circle-check"></i> Applied with your CV</div>':'<button class="btn btnok" style="margin-top:10px;width:100%;padding:10px" onclick="jobSearchApply(\''+escJS(String(s.x.tag.id))+'\',\''+escJS(String(p.id))+'\')"><i class="ti ti-send"></i> Apply with my CV</button>')
+      +'</div>';
+  }).join('');
+}
+function jobSearchApply(tagId,postId){
+  var tag=jarvisJobTags().find(function(t){return String(t.id)===String(tagId);});if(!tag){toast('Job not found','err');return;}
+  var post=(tag.posts||[]).find(function(p){return String(p.id)===String(postId);});if(!post){toast('Job not found','err');return;}
+  if(!getCVs(CU.uid).length){toast('Upload your CV first so employers can review it','err');closeOvl('jobsearch-ovl');openMyCV();return;}
+  var okk=jarvisApplyToJob(tag,post);
+  toast(okk?'✅ Applied to '+(post.title||'job')+' with your CV':'You already applied to this job',okk?'success':'info');
+  renderJobSearchResults();
+}
+
+/* ===== v273: product listings WITH price for the agent ===== */
+function jarvisAvailableWithPrice(n){var ps=rbAvailProducts();return ps.slice(0,n||6).map(function(p){var pr=(p.offer||p.price);var cur=p.currency||'';return (p.title||'a product')+(pr?(' for '+cur+' '+pr):'');}).join(', ');}
+
+/* ===== v274: shuffle helper for varied interview questions ===== */
+function rbShuffleArr(a){a=(a||[]).slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+/* ===== v274: paste CV as text (alongside PDF/Word/image upload) ===== */
+function openCVPaste(){
+  if(!requireAuth('save your CV'))return;
+  var ex=document.getElementById('cvpaste-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='cvpaste-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>📝 Paste your CV text</h3><button class="modal-x" onclick="closeOvl(\'cvpaste-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd">'
+    +'<div style="font-size:12px;color:var(--mt);margin-bottom:9px">Paste your CV / resume text below. The agent uses it to match jobs and build your interview questions.</div>'
+    +'<input id="cvpaste-name" placeholder="Name this CV (e.g. My CV 2026)" style="width:100%;padding:10px 12px;border:1px solid var(--b2);border-radius:9px;font-size:13px;box-sizing:border-box;margin-bottom:8px;background:var(--card2)">'
+    +'<textarea id="cvpaste-text" placeholder="Paste your full CV text here — experience, skills, education…" style="width:100%;min-height:200px;padding:11px;border:1px solid var(--b2);border-radius:10px;font-size:13px;box-sizing:border-box;background:var(--card2);resize:vertical;font-family:var(--fn)"></textarea>'
+    +'<button class="btn btnok" style="width:100%;margin-top:11px;padding:12px" onclick="saveCVPaste()"><i class="ti ti-device-floppy"></i> Save CV</button>'
+    +'</div></div>';
+  document.body.appendChild(ov);
+  requestAnimationFrame(function(){ov.classList.add('open');});
+  setTimeout(function(){var ta=document.getElementById('cvpaste-text');if(ta)ta.focus();},120);
+}
+function saveCVPaste(){
+  var uid=CU?CU.uid:'guest';
+  var ta=document.getElementById('cvpaste-text');var txt=ta?(ta.value||'').trim():'';
+  if(txt.length<20){toast('Please paste a bit more of your CV','err');return;}
+  var ni=document.getElementById('cvpaste-name');var nm=(ni?(ni.value||'').trim():'')||('My CV '+new Date().getFullYear());
+  var id='cv'+Date.now();
+  var clean=(txt.match(/[A-Za-z][A-Za-z0-9\+\#\.\-]{1,}/g)||[]).join(' ').slice(0,4000);
+  try{saveCVData(uid,id,'TEXT:'+txt.slice(0,200000));}catch(e){}
+  saveCVMeta(uid,{id:id,name:(/\.(txt|pdf|docx?)$/i.test(nm)?nm:nm+'.txt').slice(0,84),type:'text/plain',size:txt.length,ts:Date.now(),cloudOk:true,text:clean||txt.slice(0,4000),pasted:true});
+  if(typeof selCVId!=='undefined')selCVId=id;
+  closeOvl('cvpaste-ovl');
+  toast('✅ CV text saved','success');
+  try{renderCVList();}catch(e){}
+}
+
+/* ===== v275: voice-first interview practice launcher (talk + text) ===== */
+function startInterviewPractice(){
+  if(!requireAuth('practice interview'))return;
+  if(!getCVs(CU.uid).length){toast('Add your CV first so I can tailor your questions','info');try{closeOvl('jobhub-ovl');}catch(e){}openMyCV();return;}
+  var voiceOK=('speechSynthesis' in window)&&(window.SpeechRecognition||window.webkitSpeechRecognition);
+  if(voiceOK){try{closeOvl('jobhub-ovl');}catch(e){}try{openJarvis('interview');return;}catch(e){}}
+  try{agentInterviewPrep();}catch(e){}
+}
+
+/* ===== v276: continuous HABIT COACH — completes each habit AND its goals, conversationally (voice + text) ===== */
+function rbHabitName(h){return h?(h.name||h.n||'your habit'):'your habit';}
+function habMarkHabitDone(h,dk){h.done=h.done||[];if(h.done.indexOf(dk)<0)h.done.push(dk);}
+function habMarkGoalDone(h,dk,gid){h.dayGoals=h.dayGoals||{};h.dayGoals[dk]=h.dayGoals[dk]||[];if(h.dayGoals[dk].indexOf(gid)<0)h.dayGoals[dk].push(gid);}
+function jarvisHabitCheer(){var c=['Awesome!','Great job!','Love that!','That\'s the way!','Proud of you!','Keep it going!','Nice work!','Brilliant!','Well done!','You\'re on fire!'];return c[Math.floor(Math.random()*c.length)];}
+function jarvisHabitCoachItemText(){
+  var f=__jarvis.flow;if(!f||!f.q)return '';var it=f.q[f.i];if(!it)return '';
+  var h=getHabits().find(function(x){return x.id===it.hid;});if(!h)return null;
+  var dk=dayKey();
+  if(it.kind==='habit'){
+    var done=(h.done||[]).indexOf(dk)>=0;var st=0;try{st=rbHabitStreak(h);}catch(e){}
+    return 'Did you do '+rbHabitName(h)+' today?'+(done?' You\'ve already ticked this one — say yes to confirm.':'')+(st>=2&&!done?' You\'re on a '+st+'-day streak — let\'s keep it alive!':'');
+  }
+  var g=(h.goals||[]).find(function(x){return x.id===it.gid;});if(!g)return null;
+  var gdone=!!(h.dayGoals&&h.dayGoals[dk]&&h.dayGoals[dk].indexOf(it.gid)>=0);
+  return 'For '+rbHabitName(h)+', did you complete the goal: '+(g.name||'this goal')+'?'+(gdone?' (Already marked.)':'');
+}
+function jarvisHabitCoachFinishMsg(prefix){
+  var habits=getHabits();var dk=dayKey();var dh=0;habits.forEach(function(h){if((h.done||[]).indexOf(dk)>=0)dh++;});
+  var gTot=0,gDone=0;habits.forEach(function(h){var gs=(h.goals||[]).length;gTot+=gs;if(gs){try{gDone+=habDayGoalsDone(h,dk);}catch(e){}}});
+  var msg=(prefix||'')+'Beautiful work! Today you\'ve completed '+dh+' of '+habits.length+' habit'+(habits.length!==1?'s':'');
+  if(gTot)msg+=' and '+gDone+' of '+gTot+' goals';
+  msg+='. '+(dh===habits.length&&habits.length?'A perfect day — I\'m so proud of you! ':'Every step counts — come back anytime and we\'ll finish the rest together. ');
+  return msg;
+}
+function jarvisHabitCoachStart(){
+  if(!requireAuth('go through your habits'))return;
+  var habits=getHabits();
+  if(!habits.length){var m='You don\'t have any habits yet. Let\'s open Habits so you can create your first one.';jarvisLog('ai',m);jarvisSpeak(m,function(){closeJarvis();try{openHabits();}catch(e){}});return;}
+  var queue=[];habits.forEach(function(h){queue.push({kind:'habit',hid:h.id});(h.goals||[]).forEach(function(g){queue.push({kind:'goal',hid:h.id,gid:g.id});});});
+  __jarvis.flow={type:'habitcoach',q:queue,i:0};
+  var first='';while(__jarvis.flow.i<queue.length){first=jarvisHabitCoachItemText();if(first)break;__jarvis.flow.i++;}
+  var full='Great — let\'s complete your habits and goals together, one at a time. Just say yes or no, and I\'ll cheer you on. '+(first||'');
+  jarvisLog('ai',full);jarvisSpeak(full,function(){if(__jarvis.on)jarvisListen();});
+}
+function jarvisHabitCoachStep(text){
+  var f=__jarvis.flow;var lower=(text||'').toLowerCase();
+  if(/\b(stop|cancel|quit|enough|exit|finish now|i\'m done|that\'s all)\b/.test(lower)){__jarvis.flow=null;var fm=jarvisHabitCoachFinishMsg('');jarvisLog('ai',fm);jarvisSpeak(fm,function(){if(__jarvis.on)jarvisListen();});return;}
+  var habits=getHabits();var it=f.q[f.i];var h=it?habits.find(function(x){return x.id===it.hid;}):null;
+  var yes=/\b(yes|yeah|yep|yup|did|done|sure|ok|okay|i did|completed|complete|finished|already|affirmative)\b/.test(lower);
+  var no=/\b(no|nope|not yet|didn\'t|did not|haven\'t|not done|skip|later|negative)\b/.test(lower);
+  var ack='';
+  if(h&&yes){if(it.kind==='habit')habMarkHabitDone(h,dayKey());else if(it.kind==='goal')habMarkGoalDone(h,dayKey(),it.gid);saveHabits(habits);ack=jarvisHabitCheer()+' ';}
+  else if(no){ack='No worries — there\'s always today and tomorrow. ';}
+  else {ack='Got it. ';}
+  f.i++;
+  var nextTxt='';while(f.i<f.q.length){nextTxt=jarvisHabitCoachItemText();if(nextTxt)break;f.i++;}
+  if(nextTxt){var say=ack+nextTxt;jarvisLog('ai',say);jarvisSpeak(say,function(){if(__jarvis.on)jarvisListen();});return;}
+  __jarvis.flow=null;var fin=jarvisHabitCoachFinishMsg(ack);jarvisLog('ai',fin);jarvisSpeak(fin,function(){if(__jarvis.on)jarvisListen();});
+}
+
+/* ===== v277: post a job by VOICE/agent (easy) — mirrors the manual composer ===== */
+function rbCreateJobPost(title,company,body){
+  if(!title||!CU)return null;
+  var co=(company||'').trim()||CU.co||CU.name||'My Company';
+  try{if(typeof getPageByName==='function'&&!getPageByName(co)){var pages=getPages();pages.push({id:'pg'+Date.now(),name:co,ownerUid:CU.uid,ownerName:CU.name,about:'',ts:Date.now()});savePages(pages);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){FB.db.collection('pages').doc(co).set({name:co,ownerUid:CU.uid,ownerName:CU.name,ts:Date.now()},{merge:true}).catch(function(){});}}}catch(e){}
+  var jt=tags.find(function(t){return t.id==='jobs';});
+  if(!jt){jt={id:'jobs',name:'Jobs',cat:'jobs',posts:[],followed:true};tags.push(jt);}
+  jt.posts=jt.posts||[];
+  try{pidCtr++;}catch(e){pidCtr=Date.now();}
+  var np={id:pidCtr,user:CU.name,co:co,avIdx:CU.avIdx,mine:true,uid:CU.uid,title:title,body:body||title,img:null,mediaType:null,region:CU.location||'',ts:Date.now(),likes:0,liked:false,comments:[],showComments:false,applied:false,boosted:null,boostExpiry:0};
+  jt.posts.push(np);
+  try{var stored=LS.get('rb_posts_jobs',[])||[];stored.push(Object.assign({},np,{comments:[]}));LS.set('rb_posts_jobs',stored.slice(-100));}catch(e){}
+  try{if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED)FB.db.collection('tags').doc('jobs').collection('posts').doc(String(np.id)).set(Object.assign({},np,{comments:[]})).catch(function(){});}catch(e){}
+  return np;
+}
+function jarvisPostJobStart(){
+  if(!requireAuth('post a job'))return;
+  __jarvis.flow={type:'postjob',step:'title',data:{}};
+  var m='Let\'s post a job — I\'ll ask a few quick things. First, what is the job title?';
+  jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});
+}
+
+/* ===== v278: voice-post confirmation window — shows exact words heard, confirm before posting ===== */
+function jarvisShowConfirm(label,value){
+  var log=document.getElementById('jarvis-log');if(!log)return;
+  var box=document.getElementById('jarvis-confirm');
+  if(!box){box=document.createElement('div');box.id='jarvis-confirm';box.style.cssText='margin:12px 0 4px;padding:11px 13px;border:1.5px solid #0a66c2;border-radius:11px;background:rgba(10,102,194,.07);text-align:left';log.parentNode.insertBefore(box,log);}
+  box.innerHTML='<div style="font-size:10px;font-weight:700;color:#0a66c2;text-transform:uppercase;letter-spacing:.5px"><i class="ti ti-microphone"></i> '+esc(label)+' — I heard</div><div style="font-size:14px;font-weight:700;margin-top:4px;line-height:1.4">\u201c'+esc(value)+'\u201d</div><div style="font-size:11px;color:var(--mt);margin-top:6px">Say <b>yes</b> to confirm, or just say it again to change it.</div>';
+  box.style.display='block';
+}
+function jarvisClearConfirm(){var box=document.getElementById('jarvis-confirm');if(box){box.style.display='none';box.innerHTML='';}}
 </script></body></html>
