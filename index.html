@@ -1348,7 +1348,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v284</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v287</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6069,7 +6069,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v284 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v287 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11678,7 +11678,7 @@ setInterval(rbUpdateNavBadge,1500);
 setTimeout(rbUpdateNavBadge,1000);
 // default: show the clean Home landing immediately on load
 try{document.body.classList.add('rb-home');}catch(e){}
-setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}try{rbOpenFromHash();}catch(e){}},400);
+setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}try{rbOpenFromHash();}catch(e){}try{rbShowVersion();}catch(e){}},400);
 
 /* ===== v135: confetti, daily spin wheel, shopper tiers, achievements =====
    Healthy delight: a once-a-day spin, celebratory confetti, and a level that
@@ -14289,7 +14289,7 @@ function agentMenuCard(){
   var opts=[['job','🔍','Find a Job','Search jobs · AI auto-apply · post a job'],['shop','🛍️','Shop Product','Find products to buy'],['habit','🔥','Build a Habit','Goals, streaks & reminders'],['order','📦','Track My Order','See your orders & delivery'],['sell','💼','Sell Something','List your product to buyers'],['care','🎧','Get Help','Orders, delivery, returns & refunds']];
   return '<div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">'+opts.map(function(o){
     return '<button onclick="agentPick(\''+o[0]+'\')" style="display:flex;align-items:center;gap:11px;text-align:left;background:var(--sf);border:1px solid var(--b);border-radius:12px;padding:12px;cursor:pointer;width:100%"><span style="font-size:22px">'+o[1]+'</span><span style="flex:1"><b style="font-size:13px;display:block">'+o[2]+'</b><small style="color:var(--mt2);font-size:11px">'+o[3]+'</small></span><i class="ti ti-chevron-right" style="color:var(--mt2)"></i></button>';
-  }).join('')+'<button onclick="closeOvl(\'ragent-ovl\');openJarvis()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;border:none;border-radius:12px;padding:12px;cursor:pointer;width:100%;font-size:12.5px;font-weight:700;margin-top:2px"><i class="ti ti-microphone"></i> Talk to me — hands-free voice</button><button onclick="closeOvl(\'ragent-ovl\');openVoicePicker()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:none;border:1px solid var(--b);border-radius:12px;padding:10px;cursor:pointer;width:100%;color:#0a66c2;font-size:11.5px;font-weight:700;margin-top:2px"><i class="ti ti-microphone-2"></i> Choose a human voice (free)</button><button onclick="openAISettings()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:none;border:1px dashed var(--b);border-radius:12px;padding:10px;cursor:pointer;width:100%;color:var(--mt2);font-size:11.5px;font-weight:600;margin-top:2px"><i class="ti ti-sparkles"></i> '+(rbAIEndpoint()?'AI brain connected ✓ · settings':'Connect AI brain (free) — make me smarter')+'</button></div>';
+  }).join('')+'<button onclick="closeOvl(\'ragent-ovl\');openJarvis()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;border:none;border-radius:12px;padding:12px;cursor:pointer;width:100%;font-size:12.5px;font-weight:700;margin-top:2px"><i class="ti ti-microphone"></i> Talk to me — hands-free voice</button><button onclick="closeOvl(\'ragent-ovl\');openVoicePicker()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:none;border:1px solid var(--b);border-radius:12px;padding:10px;cursor:pointer;width:100%;color:#0a66c2;font-size:11.5px;font-weight:700;margin-top:2px"><i class="ti ti-microphone-2"></i> Choose a human voice (free)</button><button onclick="openAISettings()" style="display:flex;align-items:center;gap:8px;justify-content:center;background:none;border:1px dashed var(--b);border-radius:12px;padding:10px;cursor:pointer;width:100%;color:var(--mt2);font-size:11.5px;font-weight:600;margin-top:2px"><i class="ti ti-sparkles"></i> '+(rbAIEndpoint()?'Advanced AI enabled ✓ · settings':'Enable advanced AI assistant (optional)')+'</button></div>';
 }
 function agentPick(opt){
   var labels={job:'Find a Job',shop:'Shop Product',habit:'Build a Habit',order:'Track My Order',sell:'Sell Something',care:'Get Help'};
@@ -15725,7 +15725,7 @@ function openSellAgent(){
 }
 function agentShowSellAgent(){closeOvl('ragent-ovl');openSellAgent();}
 
-/* ===== v247: AI brain integration — tries your free backend, falls back to the router ===== */
+/* ===== v247: Advanced AI integration — tries your free backend, falls back to the router ===== */
 function rbAIEndpoint(){return (LS.get('rb_ai_endpoint','')||'').trim();}
 function setReedbiAI(url){url=(url||'').trim();LS.set('rb_ai_endpoint',url);}
 function agentAIContext(){
@@ -15754,7 +15754,7 @@ function openAISettings(){
   var ov=document.getElementById('aiset-ovl');
   if(!ov){ov=document.createElement('div');ov.id='aiset-ovl';ov.className='overlay';document.body.appendChild(ov);}
   var cur=rbAIEndpoint();
-  ov.innerHTML='<div class="modal" style="max-width:480px"><div class="mhd"><h3>✨ Connect AI brain</h3><button class="modal-x" onclick="closeOvl(\'aiset-ovl\')"><i class="ti ti-x"></i></button></div>'
+  ov.innerHTML='<div class="modal" style="max-width:480px"><div class="mhd"><h3>✨ Advanced AI Assistant</h3><button class="modal-x" onclick="closeOvl(\'aiset-ovl\')"><i class="ti ti-x"></i></button></div>'
     +'<div class="mbd" style="padding:14px 16px">'
     +'<div style="font-size:12px;color:var(--mt);line-height:1.55;margin-bottom:12px">Paste your deployed Cloud Function URL. It works with any open-source model — Llama, Mistral or Qwen — whether self-hosted with Ollama (100% open source, free) or via a free host. Once connected, the agent answers with real AI and falls back to the built-in helper if the AI is ever unavailable.</div>'
     +'<input id="aiset-url" placeholder="https://...cloudfunctions.net/reedbiAgent" value="'+esc(cur)+'" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--b);background:var(--sf);color:var(--tx);font-size:13px">'
@@ -15796,7 +15796,7 @@ function aiSettingsTest(){
 
 /* ===== v249: "Jarvis" hands-free voice assistant — talk → answer → act ===== */
 var __jarvis={on:false,rec:null};
-var __jarvisHist=[];  /* v280: rolling conversation memory passed to the AI brain (Gemini/Hermes/etc.) */
+var __jarvisHist=[];  /* v280: rolling conversation memory passed to the AI assistant (Gemini/Hermes/etc.) */
 function jarvisStatusSpoken(){
   var d=agentStatusData();
   return 'Here is your status. Your shop has '+d.prods.length+' product'+(d.prods.length!==1?'s':'')+' and '+d.orders.length+' order'+(d.orders.length!==1?'s':'')+'. You have '+d.apps.length+' job application'+(d.apps.length!==1?'s':'')+'. Delivery: '+d.deliv.length+' in progress and '+d.delivered.length+' delivered. Habits: '+d.doneToday.length+' of '+d.habits.length+' done today.';
@@ -15933,6 +15933,9 @@ function jarvisHandle(text){
   if(route.textInterview){closeJarvis();openTextInterview('');return;}
   if(route.interview){jarvisInterviewStart(route.role);return;}
   if(route.ai){
+    var sf=jarvisSmartFallback(text);
+    if(sf&&sf.run){sf.run();return;}
+    if(sf&&sf.reply){jarvisLog('ai',sf.reply);jarvisSpeak(sf.reply,function(){if(__jarvis.on)jarvisListen();});return;}
     if(rbAIEndpoint()){askAgentAI(text).then(function(r){var reply=r||jarvisFallback(text);jarvisLog('ai',reply);jarvisSpeak(reply,function(){if(__jarvis.on)jarvisListen();});});}
     else{var reply=jarvisFallback(text);jarvisLog('ai',reply);jarvisSpeak(reply,function(){if(__jarvis.on)jarvisListen();});}
     return;
@@ -16209,11 +16212,13 @@ function jarvisFlowStep(text){
     if(f.step==='qty'){var qm=lval.replace(/,/g,'').match(/\d+/);ld.qty=qm?parseInt(qm[0],10):1;if(ld.qty<1)ld.qty=1;f.data=ld;f.step='confirm';var summ='I will list "'+ld.title+'" for AED '+ld.price+', '+ld.qty+' in stock. Shall I post it? Say yes to list it, or no to cancel.';jarvisLog('ai',summ);jarvisShowConfirm('New listing',ld.title+' — AED '+ld.price+' × '+ld.qty);jarvisSpeak(summ,function(){if(__jarvis.on)jarvisListen();});return;}
     if(f.step==='confirm'){
       var yesL=/^(yes|yeah|yep|yup|sure|ok|okay|post it|list it|do it|confirm|correct|go ahead|publish)\b/i.test(lsaid);
+      var noL=/^(no|nope|cancel|don't|do not|stop|remove|delete|wrong)\b/i.test(lsaid);
       if(yesL){var prod=null;try{prod=rbCreateProductVoice(ld);}catch(e){}__jarvis.flow=null;jarvisClearConfirm();
         var live=(prod&&prod.pageName)?' It is live in the marketplace now.':'';
         var donel=prod?('Listed! "'+ld.title+'" for AED '+ld.price+' is now in your shop.'+live+' To add a photo and make it stand out, open My Products. Want to list another or do something else?'):('Sorry, I could not list that. You can also use the List a product button.');
         jarvisLog('ai',donel);jarvisSpeak(donel,function(){if(__jarvis.on)jarvisListen();});return;}
-      __jarvis.flow=null;jarvisClearConfirm();var nm='Okay, I will not list it. What else can I help with?';jarvisLog('ai',nm);jarvisSpeak(nm,function(){if(__jarvis.on)jarvisListen();});return;
+      if(noL){__jarvis.flow=null;jarvisClearConfirm();var nm='Okay, I will not list it. What else can I help with?';jarvisLog('ai',nm);jarvisSpeak(nm,function(){if(__jarvis.on)jarvisListen();});return;}
+      var uc='Sorry, I did not catch that clearly. Please say yes to list it, or no to cancel.';jarvisLog('ai',uc);jarvisSpeak(uc,function(){if(__jarvis.on)jarvisListen();});return;
     }
   }
   if(f&&f.type==='postjob'){
@@ -16938,5 +16943,46 @@ function jarvisListProductStart(){
   __jarvis.flow={type:'listprod',step:'title',data:{}};
   var m='Let\'s list a product for sale. What is the product name?';
   jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});
+}
+
+/* ===== v285: unmissable on-load version banner (helps confirm you're not on a cached build) ===== */
+function rbShowVersion(){
+  try{
+    if(document.getElementById('rb-verbanner'))return;
+    var b=document.createElement('div');b.id='rb-verbanner';
+    b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
+    b.innerHTML='\u2713 Reedbi v287 loaded \u2014 you are on the latest version';
+    b.onclick=function(){try{b.remove();}catch(e){}};
+    document.body.appendChild(b);
+    setTimeout(function(){if(b)b.style.opacity='0';},3500);
+    setTimeout(function(){try{b.remove();}catch(e){}},4300);
+  }catch(e){}
+}
+
+/* ===== v286: smarter offline assistant — handle far more natural conversation for every activity ===== */
+function jarvisCapabilities(){
+  return 'Here is what I can do — just say it naturally. To shop, say buy rice or cheapest phone. To sell, say list a product. For jobs, say find a job, post a job, or show me jobs. To practise, say practice interview or text interview. For orders, say my orders or track my order. For habits, say complete my habits or do my habits for me. You can also type anything in the box. What would you like to do?';
+}
+function jarvisSmartFallback(text){
+  var q=(text||'').toLowerCase().trim();var name=(CU&&CU.name)?CU.name:'there';
+  if(!q)return null;
+  if(!/[a-z]/i.test(q)||q.length<2)return {reply:'Sorry, I did not catch that clearly. Could you please say it again?'};
+  if(/^(hi|hello|hey|yo|hiya|salaam|salam|good morning|good afternoon|good evening|greetings|howdy|hi there)\b/.test(q)&&q.length<30)return {reply:'Hi '+name+'! I can help you shop, find or post a job, practise interviews, list a product, or complete your habits. What would you like to do?'};
+  if(!/^(no|not|nope)\b/.test(q)&&/\b(thank you|thanks|thank u|thankyou|thx|appreciate|cheers|much obliged|well done|good job|nice)\b/.test(q)&&q.length<40)return {reply:'You are welcome, '+name+'! Anything else I can help with?'};
+  if(/\b(what can you do|what do you do|what are my options|show options|your options|capabilities|what can i say|what can i do|how can you help|help me|guide me|list options|menu|what else)\b/.test(q))return {reply:jarvisCapabilities()};
+  if(/^(yes|yeah|yep|yup|ok|okay|sure|alright|go on|continue|proceed)\b/.test(q)&&q.length<16)return {reply:'Sure — what would you like to do? For example: buy rice, find a job, list a product, practise interview, or complete my habits.'};
+  if(/^(no|nope|nothing|no thanks|i am good|im good|that is all|thats all|nevermind|never mind|later)\b/.test(q)&&q.length<22)return {reply:'No problem. I am here whenever you need me — just tap the mic or type. Have a great day!'};
+  if(/\b(who are you|what are you|your name|are you gemini|are you an ai|are you a robot)\b/.test(q))return {reply:'I am your Reedbi agent — I help you shop, find and post jobs, practise interviews, list products, and complete your habits, all by voice or text. What would you like to do?'};
+  // loose task intent -> start the right flow (brain + intelligence, offline)
+  if(/\b(sell|selling|put up for sale)\b/.test(q)&&/\b(product|item|something|goods|thing|my)\b/.test(q))return {run:function(){jarvisListProductStart();}};
+  if(/\b(cheapest|lowest price|least price|cheap|affordable|best price)\b/.test(q))return {run:function(){if(typeof jarvisShopStart==='function')jarvisShopStart(q);}};
+  if(/\b(buy|purchase|shopping|add to cart|get me|i want to buy|order a|do some shopping|shop for|looking to buy)\b/.test(q)){var term=q.replace(/.*?\b(buy|purchase|get me|want to buy|order a|shopping for|shop for|looking to buy)\b/,'').replace(/\b(for me|please|a|an|the|some|now)\b/g,' ').replace(/\s+/g,' ').trim();return {run:function(){if(typeof jarvisShopStart==='function')jarvisShopStart(term);}};}
+  if(/\b(post|advertise|publish)\b/.test(q)&&/\b(job|vacancy|position|role|opening)\b/.test(q))return {run:function(){jarvisPostJobStart();}};
+  if(/\b(job|jobs|work|employment|career|hiring|vacancy|position|recruit)\b/.test(q))return {run:function(){if(typeof jarvisJobStart==='function')jarvisJobStart('');}};
+  if(/\b(interview)\b/.test(q))return {run:function(){startInterviewPractice();}};
+  if(/\b(habit|habits|routine|my goals|streak|daily goals)\b/.test(q))return {run:function(){jarvisHabitCoachStart();}};
+  if(/\b(order|orders|delivery|package|parcel|my purchase|track|where is my|shipment)\b/.test(q))return {run:function(){closeJarvis();try{showMyOrders();}catch(e){}}};
+  if(/\b(cart|checkout|basket)\b/.test(q))return {run:function(){closeJarvis();try{checkoutCart();}catch(e){}}};
+  return null;
 }
 </script></body></html>
