@@ -1303,6 +1303,28 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 /* smoother bottom-nav active feedback */
 .btmnav button{transition:color .15s ease,transform .1s ease}
 .btmnav button:active{transform:scale(.9)}
+/* ===== v288: app-wide professional consistency pass (applies to every screen) ===== */
+/* Consistent modal & sheet header typography */
+.mhd h3,.sheet-h>b,.sheet-h b{font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
+/* Comfortable, uniform body padding */
+.mbd{padding:15px 16px}
+/* Unified buttons: consistent radius and weight across the app */
+.btn{border-radius:10px;font-weight:700;letter-spacing:.004em}
+/* Consistent section sub-headings inside any modal/sheet */
+.modal h4,.sheet h4{font-size:13px;font-weight:800;letter-spacing:-.01em;margin:2px 0 9px;color:var(--tx)}
+/* Consistent form controls everywhere */
+.modal input:not([type=checkbox]):not([type=radio]):not([type=range]),.modal select,.modal textarea,.sheet input:not([type=checkbox]):not([type=radio]):not([type=range]),.sheet select,.sheet textarea{border-radius:10px}
+.fg input,.fg select,.fg textarea{border-radius:10px;padding:9px 11px;font-size:13px}
+.fg label{font-size:10.5px;letter-spacing:.04em}
+/* Consistent card rounding for a tidy, ordered look */
+.modal .card,.sheet .card{border-radius:12px}
+/* Even vertical rhythm between stacked form groups */
+.fg{margin-bottom:12px}
+/* ===== v289: minimized voice agent pill — the conversation continues while you browse ===== */
+#jarvis-mini{position:fixed;left:50%;transform:translateX(-50%);bottom:88px;z-index:9350;display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;border-radius:999px;padding:9px 10px 9px 14px;font-size:12px;font-weight:700;font-family:var(--fn);box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer;max-width:92vw;white-space:nowrap}
+#jarvis-mini .jm-dot{width:9px;height:9px;border-radius:50%;background:#4ade80;flex:0 0 auto;animation:jmPulse 1.6s infinite}
+#jarvis-mini .jm-x{background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:50%;width:22px;height:22px;line-height:1;font-size:15px;cursor:pointer;padding:0;flex:0 0 auto}
+@keyframes jmPulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.7)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
 </style>
 </head>
 <body class="rb-home">
@@ -1348,7 +1370,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v287</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v291</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4498,7 +4520,7 @@ function dlCV(uid,id,name){
     toast('Loading CV from cloud…','info');
     FB.db.collection('cvs').doc(uid+'_'+id).get().then(function(doc){
       if(doc&&doc.exists){var cd=doc.data();
-        if(cd.url){window.open(cd.url,'_blank');}        // Firebase Storage download URL
+        if(cd.url){rbOpen(cd.url,'_blank');}        // Firebase Storage download URL
         else if(cd.data){openCVData(cd.data,name);}       // Firestore base64
         else{toast('CV not available','err');}
       }
@@ -4533,8 +4555,8 @@ function openCVData(d,name){
     document.getElementById('cvview-name').textContent=name||'CV';
     var dl=document.getElementById('cvview-dl');dl.href=bu;dl.setAttribute('download',name||'cv');
     var frame=document.getElementById('cvview-frame');
-    if(isImg){frame.innerHTML='<div style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:10px"><img src="'+bu+'" style="max-width:100%;height:auto;background:#fff"></div>';}
-    else{frame.innerHTML='<iframe src="'+bu+'" style="width:100%;height:100%;border:0;background:#fff"></iframe>';}
+    if(isImg){frame.innerHTML='<div style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:10px"><img src="'+escAttr(bu)+'" style="max-width:100%;height:auto;background:#fff"></div>';}
+    else{frame.innerHTML='<iframe src="'+escAttr(bu)+'" style="width:100%;height:100%;border:0;background:#fff"></iframe>';}
     ovl.classList.add('open');
   }catch(e){ // last-resort download
     try{var a=document.createElement('a');a.href=d;a.download=name||'cv';a.click();}catch(_){toast('Could not open CV','err');}
@@ -5174,7 +5196,7 @@ function imgSel(inp){
     pendingImg=b64;pendingMediaType=isVid?'video':'image';
     var pv=document.getElementById('img-preview');
     pv.style.display='inline-block';
-    pv.innerHTML=(isVid?'<video src="'+b64+'" style="max-height:90px;border-radius:10px" muted></video>':'<img src="'+b64+'">')+'<button class="img-x" onclick="clearImg()"><i class="ti ti-x"></i></button>';
+    pv.innerHTML=(isVid?'<video src="'+escAttr(b64)+'" style="max-height:90px;border-radius:10px" muted></video>':'<img src="'+escAttr(b64)+'">')+'<button class="img-x" onclick="clearImg()"><i class="ti ti-x"></i></button>';
   }).catch(function(){toast('Could not read file','err');});
   inp.value='';
 }
@@ -5289,7 +5311,7 @@ function buildBubble(t,p,isMine){
     +(p.title?'<div class="ptrow"><i class="ti ti-pencil"></i><span class="pttxt">'+esc(p.title)+'</span></div>':'')
     +'<div class="prow"><span class="pnm" onclick="openProfile(\''+escJS(p.user)+'\',\''+escJS(p.co||'')+'\',\''+escJS(t.name)+'\','+p.avIdx+')">'+esc(p.user)+'</span>'+coLink+'</div>'
     +(p.body?'<div class="pbody">'+esc(p.body)+'</div>':'')
-    +(p.img?(p.mediaType==='video'?'<video src="'+p.img+'" controls class="bub-media" style="margin-top:6px"></video>':'<img src="'+p.img+'" class="bub-media" style="margin-top:6px;cursor:pointer" onclick="window.open(this.src)" title="Tap to view full size">'):'')
+    +(p.img?(p.mediaType==='video'?'<video src="'+escAttr(p.img)+'" controls class="bub-media" style="margin-top:6px"></video>':'<img src="'+escAttr(p.img)+'" class="bub-media" style="margin-top:6px;cursor:pointer" onclick="rbOpen(this.src)" title="Tap to view full size">'):'')
     +(p.region?'<div class="rchip'+(actRegion===p.region?' selr':'')+'" onclick="setRegion(\''+escJS(p.region)+'\')"><i class="ti ti-map-pin" style="font-size:8px"></i>'+esc(p.region)+'</div>':'')
     +atsHtml
     +'<div class="pts"><i class="ti ti-clock" style="font-size:8px"></i>'+fmtT(p.ts)+' '+fmtC(p.ts)+'</div>'
@@ -5306,7 +5328,7 @@ function buildBubble(t,p,isMine){
     +'<div class="acmt"><div class="cav '+avC(CU?CU.avIdx:0)+'">'+ini(CU?CU.name:'ME')+'</div><input type="text" placeholder="Comment..." id="cin-'+t.id+'-'+pid+'" onkeydown="if(event.key===\'Enter\')submitC(\''+escJS(t.id)+'\','+pid+')"><button class="csnd" onclick="submitC(\''+escJS(t.id)+'\','+pid+')"><i class="ti ti-send"></i></button></div></div>'
     +'</div>';
 }
-function waShare(pid,title,body,region){var text=encodeURIComponent(title+'\n'+body+'\n\n'+region+'\n via Reedbi Global Tag Talk');window.open('https://wa.me/?text='+text,'_blank');}
+function waShare(pid,title,body,region){var text=encodeURIComponent(title+'\n'+body+'\n\n'+region+'\n via Reedbi Global Tag Talk');rbOpen('https://wa.me/?text='+text,'_blank');}
 
 function renderMsgs(t){
   var box=document.getElementById('msgs');if(!box)return;
@@ -6069,7 +6091,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v287 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v291 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -6495,7 +6517,7 @@ function openReview(prodId){
   ovl.classList.add('open');
 }
 function revSetStars(n){window.__revStars=n;var sp=document.querySelectorAll('#rev-stars span');sp.forEach(function(s,i){s.style.color=i<n?'var(--gold)':'var(--b2)';});}
-function revPhotoSel(inp){var f=inp.files&&inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){__revPhoto=r.result;document.getElementById('rev-ph').innerHTML='<img src="'+__revPhoto+'" style="max-width:90px;border-radius:8px">';};r.readAsDataURL(f);}
+function revPhotoSel(inp){var f=inp.files&&inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){__revPhoto=r.result;document.getElementById('rev-ph').innerHTML='<img src="'+escAttr(__revPhoto)+'" style="max-width:90px;border-radius:8px">';};r.readAsDataURL(f);}
 function submitReview(){
   var stars=window.__revStars||0;var txt=document.getElementById('rev-txt').value.trim();
   if(!stars){toast('Tap the stars to rate','err');return;}
@@ -6907,9 +6929,9 @@ function orderCardSeller(o){
     +'<div class="order-no">Order # '+esc(o.orderNo||o.id)+'</div>'+(o.ts?'<div style="font-size:10px;color:var(--mt2)"><i class="ti ti-clock"></i> Received: '+fmtDT(o.ts)+'</div>':'')
     +'<div style="font-size:11px;color:var(--mt)">Buyer: '+esc(o.buyerName)+'</div></div>'
     +'<span class="pay-badge '+(o.payMethod==='online'?'pay-online-b':'pay-cod-b')+'">'+(o.payMethod==='online'?'💳 Online'+(o.payStatus==='paid'?' ✓':''):'💵 COD')+'</span></div>'
-    +(o.buyerPhone?'<div style="font-size:11px;color:var(--g);margin-top:3px"><i class="ti ti-brand-whatsapp"></i> <a href="https://wa.me/'+esc((o.buyerPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">Message buyer: '+esc(o.buyerPhone)+'</a></div>':'')
+    +(o.buyerPhone?'<div style="font-size:11px;color:var(--g);margin-top:3px"><i class="ti ti-brand-whatsapp"></i> <a href="https://wa.me/'+esc((o.buyerPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" rel="noopener" style="color:var(--g)">Message buyer: '+esc(o.buyerPhone)+'</a></div>':'')
     +(o.buyerAddr?'<div style="font-size:11px;color:var(--mt2)">Ship to: '+esc(o.buyerAddr)+'</div>':'')
-    +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> View delivery location</a></div>':'')
+    +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(rbSafeURL(o.buyerMap))+'" target="_blank" rel="noopener" style="color:var(--blue)"><i class="ti ti-map-pin"></i> View delivery location</a></div>':'')
     +'<div class="ord-current"><i class="ti ti-'+cur.icon+'"></i> Status: <b>'+cur.label+'</b></div>'
     +(next?'<button class="ord-next" onclick="setOrderStatus(\''+o.id+'\','+(si+1)+')"><i class="ti ti-arrow-right"></i> Mark as: '+next.label+'</button>':'<div style="font-size:11px;color:var(--g);font-weight:600;margin-top:6px"><i class="ti ti-circle-check"></i> Order complete</div>')
     +'<button class="ord-qr" onclick="showOrderQR(\''+o.id+'\')"><i class="ti ti-qrcode"></i> Order QR (track)</button>'
@@ -7202,7 +7224,7 @@ function showMyOrders(){
       +'<div style="font-size:11px;color:var(--mt)">Seller: '+esc(o.sellerName)+'</div>'
       +trackStrip(o)
       +(o.notAvailable?'<div class="col-track" style="border-left:3px solid #e23b3b;padding-left:8px"><i class="ti ti-bag-x" style="color:#e23b3b"></i> <b>Item not available</b> — out of stock at the shop'+(o.refundDue?'<br><span style="color:#16a34a"><i class="ti ti-cash-banknote"></i> Refund started: '+esc(o.currency||'')+' '+o.refundDue+(o.refundStatus==='paid'?' (refunded)':' (processing)')+'</span>':(o.payMethod==='cod'?'<br><span style="color:var(--mt2)">Not charged (cash on delivery)</span>':''))+'</div>':'')+(o.collectedConfirmed&&!o.notAvailable?'<div class="col-track">'+(o.byWeight?('<i class="ti ti-scale-outline" style="color:#0a8f5c"></i> <b>Weighed '+o.actualWeight+' '+weightUnitLabel(o.weightUnit||"kg")+'</b> (you ordered '+o.orderedWeight+')'+(o.weightExtraDue?' · <span style="color:#c2410c">extra '+esc(o.currency||"")+' '+o.weightExtraDue+(o.payMethod==="online"?" payable at delivery":"")+'</span>':'')+(o.refundDue?' · <span style="color:#16a34a">refund '+esc(o.currency||"")+' '+o.refundDue+'</span>':'')):('<i class="ti ti-clipboard-check" style="color:#16a34a"></i> <b>'+(o.billQty!=null?o.billQty:o.collectedQty)+'/'+o.qty+' items confirmed</b> by agent'+(o.refundDue?' · <span style="color:#e23b3b">refund '+esc(o.currency||'')+' '+o.refundDue+' for '+o.collectedShort+' short</span>':'')))+'</div>':'')
-      +(o.agentName?'<div style="font-size:11px;color:var(--g)"><i class="ti ti-moped"></i> Agent: '+esc(o.agentName)+(o.agentPhone?' · <a href="https://wa.me/'+esc((o.agentPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(o.agentPhone)+'</a>':'')+'</div>':'')
+      +(o.agentName?'<div style="font-size:11px;color:var(--g)"><i class="ti ti-moped"></i> Agent: '+esc(o.agentName)+(o.agentPhone?' · <a href="https://wa.me/'+esc((o.agentPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" rel="noopener" style="color:var(--g)">'+esc(o.agentPhone)+'</a>':'')+'</div>':'')
       +((o.status==='out_delivery'&&o.deliveryOtp)?'<div class="otp-box"><i class="ti ti-shield-lock"></i> Delivery OTP: <b>'+esc(o.deliveryOtp)+'</b><div style="font-size:9px;color:var(--mt2);font-weight:400">Give this to the agent to confirm delivery</div></div>':'')
       +(o.status==='out_delivery'?'<button class="ord-qr" style="border-color:#0a66c2;color:#0a66c2;font-weight:700" onclick="liveTrackOrder(\''+o.id+'\')"><i class="ti ti-map-pin-filled"></i> '+(o.agentLat?'Track live location on map':'Track live (waiting for agent)')+'</button>':'')
       +'<div style="font-size:11px;color:var(--g);font-weight:700;margin-top:3px"><i class="ti ti-'+so.icon+'"></i> '+so.label+'</div>'
@@ -7384,7 +7406,7 @@ function openSharedStore(sname){
   var q=document.getElementById('ps-q');if(q){q.value=sname;runProductSearch(sname);}
   // also filter by seller name
   var prods=getProducts().filter(function(p){return (p.sellerName||'').toLowerCase()===String(sname).toLowerCase();});
-  if(prods.length){var box=document.getElementById('ps-results');if(box){box.innerHTML='<div style="font-size:11px;color:var(--g);font-weight:700;margin-bottom:8px"><i class="ti ti-building-store"></i> Store: '+esc(sname)+' ('+prods.length+' products)</div>'+prods.map(function(p){return '<div class="ps-card"><img src="'+(p.photos&&p.photos[0]||'')+'" class="ps-img"><div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div><div style="font-size:13px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div><button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button></div></div>';}).join('');}}
+  if(prods.length){var box=document.getElementById('ps-results');if(box){box.innerHTML='<div style="font-size:11px;color:var(--g);font-weight:700;margin-bottom:8px"><i class="ti ti-building-store"></i> Store: '+esc(sname)+' ('+prods.length+' products)</div>'+prods.map(function(p){return '<div class="ps-card"><img src="'+escAttr((p.photos&&p.photos[0]||''))+'" class="ps-img"><div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(p.title)+'</div><div style="font-size:13px;color:var(--g);font-weight:700">'+esc(p.currency)+' '+esc(p.price)+'</div><button class="ps-btn" onclick="closeOvl(\'prodsearch-ovl\');buyProduct(\''+p.id+'\')"><i class="ti ti-shopping-cart"></i> Buy Now</button></div></div>';}).join('');}}
 }
 function shareProduct(pid){
   var p=getProducts().find(function(x){return x.id===pid;});if(!p)return;
@@ -7599,7 +7621,7 @@ function renderBatches(p){
   var b=p.batches||[];
   box.innerHTML='<div style="font-size:11px;font-weight:700;margin:8px 0 6px">Stock batches ('+b.length+')</div>'
     +b.map(function(bt,i){return '<div class="appl-card" style="padding:9px"><div style="font-size:11px"><b>'+esc(bt.batchCode)+'</b> · '+bt.qty+' units · cost '+esc(p.currency)+' '+esc(bt.cost||'0')+'</div>'
-      +(bt.brand||bt.vendor?'<div style="font-size:10px;color:var(--mt2)">'+esc(bt.brand||'')+(bt.vendor?' · '+esc(bt.vendor):'')+(bt.vendorPhone?' · <a href="https://wa.me/'+esc((bt.vendorPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)">'+esc(bt.vendorPhone)+'</a>':'')+'</div>':'')
+      +(bt.brand||bt.vendor?'<div style="font-size:10px;color:var(--mt2)">'+esc(bt.brand||'')+(bt.vendor?' · '+esc(bt.vendor):'')+(bt.vendorPhone?' · <a href="https://wa.me/'+esc((bt.vendorPhone||'').replace(/[^0-9]/g,''))+'" target="_blank" rel="noopener" style="color:var(--g)">'+esc(bt.vendorPhone)+'</a>':'')+'</div>':'')
       +'<div style="font-size:10px;color:var(--mt2)">Received: '+new Date(bt.date).toLocaleDateString()+'</div></div>';}).join('');
 }
 function saveEditProduct(){
@@ -7835,7 +7857,7 @@ function adminEmailAll(){
   var rows=adminCrmRows().filter(function(u){return u.email;});
   if(!rows.length){toast('No users with email match the filter','err');return;}
   var bcc=rows.map(function(u){return u.email;}).join(',');
-  window.open('mailto:?bcc='+encodeURIComponent(bcc)+'&subject='+encodeURIComponent('Reedbi update'),'_blank');
+  rbOpen('mailto:?bcc='+encodeURIComponent(bcc)+'&subject='+encodeURIComponent('Reedbi update'),'_blank');
   toast('Opening your mail app with '+rows.length+' recipients (BCC)','ok');
 }
 function adminCopyWhatsApp(){
@@ -7892,10 +7914,10 @@ function userLink(name){return location.origin+location.pathname+'?u='+encodeURI
 function shareProduct(id){
   var p=getProducts().find(function(x){return x.id===id;});if(!p)return;
   var txt=p.title+' — '+(p.offer||p.price)+' '+(p.currency||'')+' — '+productLink(id);
-  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+  rbOpen('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 }
 function sharePage(name){
-  window.open('https://wa.me/?text='+encodeURIComponent(name+' — ReadBi store: '+pageLink(name)),'_blank');
+  rbOpen('https://wa.me/?text='+encodeURIComponent(name+' — ReadBi store: '+pageLink(name)),'_blank');
 }
 var DEEP_TRIES=0;
 function handleDeepLink(retryIgnored,urlStr){
@@ -8333,7 +8355,7 @@ function renderAgentDocs(){
   document.getElementById('ag-docs').innerHTML=defs.map(function(d){
     var has=agentDocs[d[0]];
     return '<div class="ag-doc">'
-      +(has?'<img src="'+has+'" class="ag-doc-img">':'<div class="ag-doc-ph"><i class="ti ti-'+d[2]+'"></i></div>')
+      +(has?'<img src="'+escAttr(has)+'" class="ag-doc-img">':'<div class="ag-doc-ph"><i class="ti ti-'+d[2]+'"></i></div>')
       +'<div class="ag-doc-lbl">'+d[1]+'</div>'
       +'<button class="ag-doc-btn" onclick="document.getElementById(\'ag-file-'+d[0]+'\').click()">'+(has?'Change':'Upload')+'</button>'
       +'<input type="file" id="ag-file-'+d[0]+'" accept="image/*" style="display:none" onchange="agentDocSel(\''+d[0]+'\',this)">'
@@ -8379,7 +8401,7 @@ function openAssignAgent(orderId){
     body.innerHTML=offerBtn+'<div style="font-size:10px;color:var(--mt2);text-transform:uppercase;margin-bottom:7px">Or assign one directly</div>'+agents.map(function(a){
       var rating=avgRating(a);
       return '<div class="act-row"><div style="display:flex;gap:8px;align-items:center">'
-        +(a.photo?'<img src="'+a.photo+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover">':'<div class="appl-av av1" style="width:34px;height:34px">'+ini(a.name)+'</div>')
+        +(a.photo?'<img src="'+escAttr(a.photo)+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover">':'<div class="appl-av av1" style="width:34px;height:34px">'+ini(a.name)+'</div>')
         +'<div><b>'+esc(a.name)+'</b><small>'+esc(a.phone)+(rating?' · ⭐ '+rating:'')+' · '+(a.deliveries||0)+' deliveries</small></div></div>'
         +'<button class="act-mini" onclick="assignAgent(\''+a.uid+'\')">Assign</button></div>';
     }).join('');
@@ -8473,7 +8495,7 @@ function showAgentDashboard(){
   var earnings=delivered.reduce(function(s,o){return s+orderCommission(o);},0);earnings=Math.round(earnings*10)/10;
   var rating=avgRating(p);
   var head='<div style="background:var(--card2);border-radius:10px;padding:12px;margin-bottom:11px;text-align:center">'
-    +(p.photo?'<img src="'+p.photo+'" style="width:54px;height:54px;border-radius:50%;object-fit:cover;margin:0 auto 6px;display:block">':'')
+    +(p.photo?'<img src="'+escAttr(p.photo)+'" style="width:54px;height:54px;border-radius:50%;object-fit:cover;margin:0 auto 6px;display:block">':'')
     +'<div style="font-weight:700">'+esc(p.name)+'</div><div style="font-size:11px;color:var(--mt2)">'+esc(p.phone)+(rating?' · ⭐ '+rating:'')+'</div>'+(p.agentCode?'<div class="order-no" style="margin-top:4px">Your code: '+esc(p.agentCode)+'</div>':'')+'</div>';
   head+='<div class="dispatch-row">'
     +'<div class="disp-box disp-pend" style="cursor:pointer;'+(__agentFilter==='pending'?'outline:2px solid var(--gold)':'')+'" onclick="agentSetFilter(\'pending\')"><b>'+pending.length+'</b><small>Pending</small></div>'
@@ -8510,7 +8532,7 @@ function showAgentDashboard(){
       +'</div></div>'
       +deliveryCountdown(o)
       +'<div style="font-size:11px;color:var(--mt)">To: '+esc(o.buyerName)+' · '+esc(o.buyerAddr||'')+'</div>'
-      +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(o.buyerMap)+'" target="_blank" style="color:var(--blue)"><i class="ti ti-map-pin"></i> Navigate</a></div>':'')
+      +(o.buyerMap?'<div style="font-size:11px"><a href="'+esc(rbSafeURL(o.buyerMap))+'" target="_blank" rel="noopener" style="color:var(--blue)"><i class="ti ti-map-pin"></i> Navigate</a></div>':'')
       +(typeof distancesHtml==='function'?distancesHtml(o):'')
       +'<div class="ord-current"><i class="ti ti-'+os.icon+'"></i> '+os.label+'</div>'
       +trackStrip(o)
@@ -8621,7 +8643,7 @@ function showAgentMonitor(){
         +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
         +'<div><div style="font-weight:700;font-size:13px">'+esc(a.name||'Agent')+'</div>'
         +(ag&&ag.agentCode?'<div class="order-no">'+esc(ag.agentCode)+'</div>':'')
-        +(a.phone?'<div style="font-size:11px"><a href="https://wa.me/'+esc((a.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)"><i class="ti ti-brand-whatsapp"></i> '+esc(a.phone)+'</a></div>':'')
+        +(a.phone?'<div style="font-size:11px"><a href="https://wa.me/'+esc((a.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" rel="noopener" style="color:var(--g)"><i class="ti ti-brand-whatsapp"></i> '+esc(a.phone)+'</a></div>':'')
         +'</div>'
         +(ag&&ag.ratings&&ag.ratings.length?'<span class="pay-badge pay-online-b">⭐ '+avgRating(ag)+'</span>':'')
         +'</div>'
@@ -8773,7 +8795,7 @@ function adminTab(t){
       return '<div class="appl-card" style="padding:8px 10px">'
         +'<div style="font-size:11.5px;white-space:nowrap;overflow-x:auto"><b>'+esc(u.name||'User')+'</b>'
         +(lic?' <span class="pay-badge pay-online-b" style="font-size:8px">✓</span>':'')
-        +(u.phone?' | <a href="https://wa.me/'+esc((u.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:#1a8f3c"><i class="ti ti-brand-whatsapp"></i>'+esc(u.phone)+'</a>':'')
+        +(u.phone?' | <a href="https://wa.me/'+esc((u.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" rel="noopener" style="color:#1a8f3c"><i class="ti ti-brand-whatsapp"></i>'+esc(u.phone)+'</a>':'')
         +(u.email?' | '+esc(u.email):'')
         +(u.location?' | 📍'+esc(u.location):'')
         +(u.interests?' | ❤'+esc(u.interests):'')
@@ -8794,7 +8816,7 @@ function adminTab(t){
       return '<div class="appl-card"><div style="font-weight:700;font-size:13px">'+esc(r.name)+(r.pageName?' <span class="pay-badge" style="font-size:9px;background:rgba(195,125,22,.12);color:#c37d16">PAGE: '+esc(r.pageName)+'</span>':'')+'</div>'
         +(r.email?'<div style="font-size:11px;color:var(--mt)">'+esc(r.email)+'</div>':'')
         +(r.co?'<div style="font-size:11px;color:var(--mt2)">Company: '+esc(r.co)+'</div>':'')
-        +(r.phone?'<div style="font-size:11px;color:var(--g)"><a href="https://wa.me/'+esc((r.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" style="color:var(--g)"><i class="ti ti-brand-whatsapp"></i> '+esc(r.phone)+'</a></div>':'')
+        +(r.phone?'<div style="font-size:11px;color:var(--g)"><a href="https://wa.me/'+esc((r.phone||'').replace(/[^0-9]/g,''))+'" target="_blank" rel="noopener" style="color:var(--g)"><i class="ti ti-brand-whatsapp"></i> '+esc(r.phone)+'</a></div>':'')
         +'<div style="font-size:10px;color:var(--mt2);margin-top:3px">Requested '+new Date(r.ts).toLocaleDateString()+'</div>'
         +'<div style="display:flex;gap:6px;margin-top:8px"><select id="lr-m-'+r.id+'" style="background:var(--card);border:1px solid var(--b);border-radius:7px;padding:6px;color:var(--tx);font-family:var(--fn);font-size:11px"><option value="1">1mo</option><option value="6">6mo</option><option value="12" selected>12mo</option><option value="24">24mo</option></select>'
         +'<button class="lbl-mini" style="flex:1;color:#1a8f3c;border-color:#1a8f3c" onclick="adminApproveLicense(\''+escJS(r.id)+'\')"><i class="ti ti-check"></i> Approve</button>'
@@ -9201,7 +9223,7 @@ function aisPhoto(inp){
   var f=inp.files&&inp.files[0];if(!f)return;
   var r=new FileReader();
   r.onload=function(){
-    document.getElementById('ais-ph').innerHTML='<img src="'+r.result+'" style="max-width:130px;border-radius:10px"><div style="font-size:10px;color:var(--mt2);margin-top:4px">Photo received — type 1–2 words about it (true image recognition needs the AI backend, Layer 7) and search.</div>';
+    document.getElementById('ais-ph').innerHTML='<img src="'+escAttr(r.result)+'" style="max-width:130px;border-radius:10px"><div style="font-size:10px;color:var(--mt2);margin-top:4px">Photo received — type 1–2 words about it (true image recognition needs the AI backend, Layer 7) and search.</div>';
     document.getElementById('ais-q').focus();
   };
   r.readAsDataURL(f);
@@ -9233,7 +9255,7 @@ function runAiSearch(){
   var enc=encodeURIComponent(q);
   rows+='<div style="font-size:11px;font-weight:700;margin:10px 0 5px;color:var(--mt)">Search the web for “'+esc(q)+'”</div>'
     +[['Google Shopping','https://www.google.com/search?tbm=shop&q='+enc],['Amazon','https://www.amazon.com/s?k='+enc],['Bing Images','https://www.bing.com/images/search?q='+enc]].map(function(s){
-      return '<div class="act-row" style="cursor:pointer" onclick="window.open(\''+s[1]+'\',\'_blank\')"><div><b style="font-size:12px">'+s[0]+'</b><small style="display:block;color:var(--mt2)">products · pictures · prices</small></div><i class="ti ti-external-link" style="color:var(--mt2)"></i></div>';
+      return '<div class="act-row" style="cursor:pointer" onclick="rbOpen(\''+s[1]+'\',\'_blank\')"><div><b style="font-size:12px">'+s[0]+'</b><small style="display:block;color:var(--mt2)">products · pictures · prices</small></div><i class="ti ti-external-link" style="color:var(--mt2)"></i></div>';
     }).join('');
   box.innerHTML=(prods.length?'<div style="font-size:11px;font-weight:700;margin-bottom:5px;color:#1a8f3c">'+prods.length+' found on Reedbi (shown first)</div>':'<div style="font-size:11px;color:var(--mt2);margin-bottom:5px">Nothing on Reedbi yet — try the web links below</div>')+rows;
 }
@@ -9283,7 +9305,7 @@ function doCancelOrder(orderId){
   var bd=encodeURIComponent('Your order "'+o.productTitle+'" ('+(o.currency||'')+' '+o.price+') has been cancelled.\n'+(online?'A refund has been initiated to your original payment method. It may take 5–7 business days.':'This was a cash order, so no refund is needed.')+'\n\nReedbi Customer Care');
   closeOvl('cancel-ovl');
   toast('Order cancelled'+(online?' — refund initiated to original payment':''),'ok');
-  if(o.buyerEmail||CU.email){try{window.open('mailto:'+(o.buyerEmail||CU.email)+'?subject='+sub+'&body='+bd,'_blank');}catch(e){}}
+  if(o.buyerEmail||CU.email){try{rbOpen('mailto:'+(o.buyerEmail||CU.email)+'?subject='+sub+'&body='+bd,'_blank');}catch(e){}}
   showMyOrders();
 }
 function openChangeAddr(orderId){
@@ -9323,7 +9345,7 @@ function openCustomerCare(orderId){
   var ref=o?('Order #'+(o.orderNo||o.id)+' — '+o.productTitle):'';
   document.getElementById('care-ovl-b').innerHTML=
     (ref?'<div style="font-size:12px;background:var(--card2);border-radius:8px;padding:9px;margin-bottom:10px">'+esc(ref)+'</div>':'')
-    +'<a class="btn btnok" style="width:100%;margin-bottom:8px;display:block;text-align:center;text-decoration:none" href="https://wa.me/'+careWa+'?text='+encodeURIComponent('Reedbi support: '+ref)+'" target="_blank"><i class="ti ti-brand-whatsapp"></i> Chat with care on WhatsApp</a>'
+    +'<a class="btn btnok" style="width:100%;margin-bottom:8px;display:block;text-align:center;text-decoration:none" href="https://wa.me/'+careWa+'?text='+encodeURIComponent('Reedbi support: '+ref)+'" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i> Chat with care on WhatsApp</a>'
     +'<a class="btn" style="width:100%;margin-bottom:8px;display:block;text-align:center;text-decoration:none;border:1px solid var(--b);background:var(--card2);color:var(--tx)" href="mailto:'+careEmail+'?subject='+encodeURIComponent(ref||'Reedbi support')+'"><i class="ti ti-mail"></i> Email care@reedbi.com</a>'
     +(o&&o.sellerUid?'<button class="btn" style="width:100%;border:1px solid var(--g);background:var(--card2);color:var(--g)" onclick="closeOvl(\'care-ovl\');openDM(\''+o.sellerUid+'\',\''+escJS(o.sellerName||'Seller')+'\')"><i class="ti ti-message"></i> Message the seller directly</button>':'');
   document.getElementById('care-ovl').classList.add('open');
@@ -9371,7 +9393,7 @@ function crmSendEmail(){
   var subj=(document.getElementById('crm-subj')||{value:''}).value||'Reedbi';
   var msg=(document.getElementById('crm-msg')||{value:''}).value||'';
   var bcc=rows.map(function(u){return u.email;}).join(',');
-  window.open('mailto:?bcc='+encodeURIComponent(bcc)+'&subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(msg),'_blank');
+  rbOpen('mailto:?bcc='+encodeURIComponent(bcc)+'&subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(msg),'_blank');
   toast('Opening mail with '+rows.length+' recipients in BCC','ok');
 }
 var __crmWaQueue=[],__crmWaMsg='';
@@ -9386,7 +9408,7 @@ function crmWaNext(){
   if(!__crmWaQueue.length){toast('Finished — all chats opened','ok');return;}
   var u=__crmWaQueue.shift();
   var num=(u.phone||'').replace(/[^0-9]/g,'');
-  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(__crmWaMsg),'_blank');
+  rbOpen('https://wa.me/'+num+'?text='+encodeURIComponent(__crmWaMsg),'_blank');
   if(__crmWaQueue.length)toast(__crmWaQueue.length+' more — tap "Next chat" after sending','info');
   // show a floating Next button
   var b=document.getElementById('crm-wa-next');
@@ -9882,7 +9904,9 @@ function togglePageLike(name,ev){
     var c=el.querySelector('.lc');if(c)c.textContent=pageLikeCount(name);
   });
 }
-function escAttr(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function escAttr(s){return String(s==null?'':s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function rbSafeURL(u){u=String(u==null?'':u).trim();return /^(https?:|mailto:|tel:|geo:|whatsapp:)/i.test(u)?u:(/^data:image\//i.test(u)?u:'#');}
+function rbOpen(u){try{var w=window.open(u,'_blank','noopener,noreferrer');if(w)w.opener=null;return w;}catch(e){return null;}}
 
 /* ---- Product Detail Page (PDP) ---- */
 function pdNum(v){return parseFloat(String(v==null?'':v).replace(/[^0-9.]/g,''))||0;}
@@ -10637,7 +10661,7 @@ function careDelivery(){
   var o=__careCtx.order||myRecentOrder();
   careRender([{me:true,html:'I have a delivery problem'},
    {html:'I can help with late, wrong-location or no-show deliveries. '+(o&&o.agentName?'Your agent is <b>'+esc(o.agentName)+'</b>'+(o.agentPhone?' — you can message them on WhatsApp.':'.'):'An agent will be assigned soon.')}],
-   [].concat(o&&o.agentPhone?[{label:'🛵 WhatsApp agent',act:'window.open(\'https://wa.me/'+String(o.agentPhone).replace(/[^0-9]/g,'')+'\',\'_blank\')'}]:[],
+   [].concat(o&&o.agentPhone?[{label:'🛵 WhatsApp agent',act:'rbOpen(\'https://wa.me/'+String(o.agentPhone).replace(/[^0-9]/g,'')+'\',\'_blank\')'}]:[],
     [{label:'🧑‍💼 Contact support',act:'careHuman()'},{label:'← Back',act:'careHome()'}]));
 }
 function careSeller(){
@@ -10649,7 +10673,7 @@ function careHuman(){ careOfferTicket(); }
 function careOfferTicket(){
   var email=(CU&&CU.email)||'';
   careRender([{html:'I can raise a <b>support ticket</b> to our human team. They\'ll review this whole chat and <b>email you the decision</b>'+(email?' at <b>'+esc(email)+'</b>':'')+'.<br><br>'+(email?'Shall I create the ticket?':'First, what email should we reply to?')}],
-    email?[{label:'🎫 Yes, create my ticket',act:'careCreateTicket()'},{label:'🟢 WhatsApp instead',act:'window.open(\'https://wa.me/971500000000\',\'_blank\')'},{label:'← Back',act:'careHome()'}]
+    email?[{label:'🎫 Yes, create my ticket',act:'careCreateTicket()'},{label:'🟢 WhatsApp instead',act:'rbOpen(\'https://wa.me/971500000000\',\'_blank\')'},{label:'← Back',act:'careHome()'}]
          :[{label:'✉️ Use my account email',act:'careCreateTicket()'},{label:'← Back',act:'careHome()'}]);
 }
 function ticketRef(){return 'TKT-'+Date.now().toString(36).toUpperCase().slice(-6)+Math.floor(Math.random()*90+10);}
@@ -10738,7 +10762,7 @@ function ticketResolve(id){
   var transTxt=(t.transcript||[]).map(function(m){return m.who+': '+m.text;}).join('\n');
   var bodyTxt='Hello '+(t.name||'')+',\n\nRegarding your Reedbi support ticket '+t.ref+(t.orderNo?' (order '+t.orderNo+')':'')+':\n\n'+msg+'\n\n— Reedbi Care Team\n\n----- Your conversation -----\n'+transTxt;
   var mailto='mailto:'+encodeURIComponent(t.email)+'?subject='+encodeURIComponent('Reedbi Care — Ticket '+t.ref+' resolved')+'&body='+encodeURIComponent(bodyTxt);
-  try{window.open(mailto,'_blank');}catch(e){}
+  try{rbOpen(mailto,'_blank');}catch(e){}
   try{notifyEvent('ticketres','✅ Ticket '+t.ref+' resolved — decision emailed to '+esc(t.email));}catch(e){}
   renderSupportDesk();
   toast('Decision sent to '+t.email,'ok');
@@ -12860,7 +12884,7 @@ function shareVideoBlob(blob,mime){
   ovl.innerHTML='<div class="modal" style="max-width:380px;text-align:center">'
     +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">🎬 Your video is ready!</div>'
     +'<div style="font-size:12px;color:var(--mt2);margin-bottom:10px">Preview it, then post it to your WhatsApp status</div>'
-    +(vurl?'<video id="vidresult-video" src="'+vurl+'" controls autoplay playsinline onloadedmetadata="fixVidDuration(this)" style="width:100%;max-height:420px;border-radius:14px;background:#000"></video>':'')
+    +(vurl?'<video id="vidresult-video" src="'+escAttr(vurl)+'" controls autoplay playsinline onloadedmetadata="fixVidDuration(this)" style="width:100%;max-height:420px;border-radius:14px;background:#000"></video>':'')
     +'<button onclick="doShareVideo()" style="display:block;width:100%;margin-top:12px;padding:13px;border:none;border-radius:12px;background:#25D366;color:#fff;font-weight:800;font-size:15px;cursor:pointer"><i class="ti ti-brand-whatsapp"></i> Share to WhatsApp status</button>'
     +'<button onclick="downloadVideo(__pendingVideo.blob,\''+ext+'\')" style="display:block;width:100%;margin-top:8px;padding:11px;border:1px solid var(--b);border-radius:12px;background:var(--sf);color:var(--tx);font-weight:700;font-size:14px;cursor:pointer"><i class="ti ti-download"></i> Save video to phone</button>'
     +'<button onclick="editThisVideo()" style="display:block;width:100%;margin-top:8px;padding:11px;border:1px solid #7c3aed;border-radius:12px;background:var(--sf);color:#7c3aed;font-weight:700;font-size:14px;cursor:pointer"><i class="ti ti-edit"></i> Edit this video (voice · text · photo)</button>'
@@ -13220,7 +13244,7 @@ function renderVStudio(id){
       +'<input id="vs-cap" maxlength="60" placeholder="e.g. Day 12 — never giving up 💪" value="'+esc(hb.vidText||'')+'" oninput="vsSetCap(\''+id+'\',this.value)" style="width:100%;padding:10px;border:1px solid var(--b);border-radius:10px;background:var(--sf);color:var(--tx)"><div style="font-size:10px;color:var(--mt2);margin-top:5px">This appears on your video.</div>'+'<div style="display:flex;align-items:center;gap:7px;margin-top:9px"><span style="font-size:11px;color:var(--mt2)">Text colour:</span>'+['#ffffff','#ffe600','#00e5ff','#ff3b3b','#000000'].map(function(C){var onsel=((hb.vidTextCol||'#ffffff')===C);return '<button onclick="vsSetTextCol(\''+id+'\',\''+C+'\')" style="width:24px;height:24px;border-radius:50%;cursor:pointer;background:'+C+';border:'+(onsel?'3px solid #0a66c2':'1px solid var(--b)')+'"></button>';}).join('')+'</div>'
       +'<div style="display:flex;gap:8px;align-items:center;margin-top:10px"><label class="btn" style="flex:1;border:1px solid #0a66c2;color:#0a66c2;font-weight:700;cursor:pointer;text-align:center;padding:9px"><i class="ti ti-photo"></i> '+((hb.vidImgs&&hb.vidImgs.length)?'Add another photo':'Add a photo')+'<input type="file" accept="image/*" style="display:none" onchange="vsAddImage(this,\''+id+'\')"></label>'+((hb.vidImgs&&hb.vidImgs.length)?'<button onclick="vsClearImage(\''+id+'\')" style="border:none;background:rgba(220,38,38,.12);color:#dc2626;font-weight:700;border-radius:10px;padding:9px 12px;cursor:pointer">Clear all</button>':'')+'</div>'
       +'<button class="btn" style="width:100%;margin-top:8px;border:1px solid var(--b);color:var(--mt);font-weight:600;padding:8px;font-size:12px" onclick="closeOvl(\'vstudio-ovl\');openFrameExtractor(\''+id+'\')"><i class="ti ti-photo-video"></i> …or grab a frame from a video</button>'
-      +(((hb.vidImgs&&hb.vidImgs.length)||hb.vidImg)?(function(){var arr=(hb.vidImgs&&hb.vidImgs.length)?hb.vidImgs:[hb.vidImg];return '<div style="margin-top:9px"><div style="font-size:10px;color:var(--mt2);margin-bottom:5px">'+(arr.length>1?('🎞️ '+arr.length+' photos play as a slideshow across your video'):'Your photo becomes the video background')+'</div><div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px">'+arr.map(function(im,ix){return '<div style="position:relative;flex:none"><img src="'+im+'" style="height:84px;border-radius:9px;border:1px solid var(--b);display:block"><button onclick="vsRemoveImage(\''+id+'\','+ix+')" style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(220,38,38,.92);color:#fff;font-size:12px;cursor:pointer;line-height:1">✕</button></div>';}).join('')+'</div></div>';})():'')+'</div>'
+      +(((hb.vidImgs&&hb.vidImgs.length)||hb.vidImg)?(function(){var arr=(hb.vidImgs&&hb.vidImgs.length)?hb.vidImgs:[hb.vidImg];return '<div style="margin-top:9px"><div style="font-size:10px;color:var(--mt2);margin-bottom:5px">'+(arr.length>1?('🎞️ '+arr.length+' photos play as a slideshow across your video'):'Your photo becomes the video background')+'</div><div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px">'+arr.map(function(im,ix){return '<div style="position:relative;flex:none"><img src="'+escAttr(im)+'" style="height:84px;border-radius:9px;border:1px solid var(--b);display:block"><button onclick="vsRemoveImage(\''+id+'\','+ix+')" style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(220,38,38,.92);color:#fff;font-size:12px;cursor:pointer;line-height:1">✕</button></div>';}).join('')+'</div></div>';})():'')+'</div>'
     +'<div class="vstep"><div class="ttl"><span class="num">3</span> Choose length</div>'
       +'<div class="vlen" style="display:flex;gap:8px"><button class="'+(__vsLen===30?'sel':'')+'" onclick="vsSetLen(30,\''+id+'\')">30 seconds</button><button class="'+(__vsLen===60?'sel':'')+'" onclick="vsSetLen(60,\''+id+'\')">60 seconds</button></div></div>'
     +'<button class="btn btnok" style="width:100%;font-size:15px;padding:14px" onclick="vsCreate(\''+id+'\')"><i class="ti ti-sparkles"></i> Create &amp; share my video</button>'
@@ -13497,7 +13521,7 @@ function renderVoiceReview(id,url){
   box.style.display='block';
   box.innerHTML='<div style="border:1px solid var(--b);border-radius:12px;padding:10px;margin-top:9px;background:var(--card2)">'
     +'<div style="font-size:11px;font-weight:700;color:var(--mt2);margin-bottom:6px">🎧 Your recording — play, pause or stop</div>'
-    +'<audio src="'+url+'" controls preload="metadata" style="width:100%"></audio>'
+    +'<audio src="'+escAttr(url)+'" controls preload="metadata" style="width:100%"></audio>'
     +'<div style="display:flex;gap:7px;margin-top:9px">'
       +'<button class="btn" style="flex:1;background:#16a34a;color:#fff;font-weight:700;padding:9px" onclick="saveVoiceToLibrary(\''+id+'\')"><i class="ti ti-cloud-upload"></i> Save to library</button>'
       +'<button class="btn" style="flex:1;border:1px solid #dc2626;color:#dc2626;font-weight:700;padding:9px" onclick="vsRecord(\''+id+'\')"><i class="ti ti-microphone"></i> Record again</button>'
@@ -13668,7 +13692,7 @@ function feLoad(input){
   try{if(__feUrl)URL.revokeObjectURL(__feUrl);}catch(e){}
   __feUrl=URL.createObjectURL(f);__feFrames=[];
   var stage=document.getElementById('fe-stage');
-  stage.innerHTML='<video id="fe-vid" src="'+__feUrl+'" controls playsinline style="width:100%;max-height:300px;border-radius:12px;background:#000"></video>'
+  stage.innerHTML='<video id="fe-vid" src="'+escAttr(__feUrl)+'" controls playsinline style="width:100%;max-height:300px;border-radius:12px;background:#000"></video>'
     +'<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap"><button class="hab-chip on" onclick="feGrab(6)">📸 Grab 6</button><button class="hab-chip on" onclick="feGrab(12)">Grab 12</button><button class="hab-chip on" onclick="feGrab(20)">Grab 20</button><button class="hab-chip" onclick="feGrabNow()">⭐ Current frame</button></div>'
     +'<div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap"><button class="btn" style="flex:1;border:1px solid #16a34a;color:#16a34a;font-weight:700;font-size:12px;padding:9px" onclick="feUseAudio()"><i class="ti ti-volume"></i> Use audio as voiceover</button><button class="btn" style="flex:1;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;font-size:12px;padding:9px" onclick="feAudioToLibrary()"><i class="ti ti-cloud-upload"></i> Add audio to library</button></div><button class="btn" style="width:100%;margin-top:7px;border:1px solid var(--b);color:var(--mt);font-size:12px;padding:8px" onclick="feDownloadAudio()"><i class="ti ti-download"></i> Download the clip (audio playable)</button><button class="btn" style="width:100%;margin-top:7px;border:1px solid #7c3aed;color:#7c3aed;font-weight:700;font-size:12px;padding:9px" onclick="openVoiceEditor(\''+encodeURIComponent(__feUrl)+'\',\'Audio from video\',\''+(__feHabit||'')+'\')"><i class="ti ti-scissors"></i> Trim / edit this audio</button>'
     +'<div id="fe-msg" style="font-size:11px;color:var(--mt2);margin-top:6px"></div>';
@@ -13703,7 +13727,7 @@ function feAddFrame(data){
   var grid=document.getElementById('fe-grid');if(!grid)return;
   var idx=__feFrames.length-1;
   var cell=document.createElement('div');cell.style.cssText='position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--b)';
-  cell.innerHTML='<img src="'+data+'" style="width:100%;display:block;aspect-ratio:9/16;object-fit:cover" onclick="feUseFrame('+idx+')">'
+  cell.innerHTML='<img src="'+escAttr(data)+'" style="width:100%;display:block;aspect-ratio:9/16;object-fit:cover" onclick="feUseFrame('+idx+')">'
     +'<div style="display:flex"><button onclick="feUseFrame('+idx+')" style="flex:1;border:none;background:#16a34a;color:#fff;font-size:10px;font-weight:700;padding:5px;cursor:pointer">Use</button><button onclick="feSaveFrame('+idx+')" style="flex:none;border:none;background:#0a66c2;color:#fff;font-size:10px;font-weight:700;padding:5px 9px;cursor:pointer">⬇ Save</button></div>';
   grid.appendChild(cell);
 }
@@ -13794,7 +13818,7 @@ function renderHabitMonitor(){
     +((hb.goals&&hb.goals.length)?('<div style="font-size:12px;font-weight:800;margin:14px 0 7px">📈 Each goal — last '+st.count+' day(s)</div>'+hb.goals.map(function(g){var gs=habGoalStats(hb,g.id,__hmonRange);return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">🎯 '+esc(g.name)+'</span><span style="font-weight:800;color:'+col+'">'+gs.done+'/'+gs.span+' · '+gs.pct+'%</span></div><div style="height:7px;background:var(--card2);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+gs.pct+'%;background:'+col+'"></div></div></div>';}).join('')):'')
     +'<div style="margin-top:14px;border:1px solid var(--b);border-radius:12px;padding:11px;background:var(--card2)">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:12.5px">📷 Progress photos</b><button class="btn btnln" style="padding:5px 10px;font-size:11.5px;font-weight:700" onclick="habAddPhoto(\''+hb.id+'\')"><i class="ti ti-camera-plus"></i> Add photo</button></div>'
-    +((hb.photos&&hb.photos.length)?'<div style="display:flex;gap:7px;flex-wrap:wrap">'+hb.photos.map(function(p,pi){return '<div style="position:relative"><img src="'+p.img+'" style="width:62px;height:62px;object-fit:cover;border-radius:8px;border:1px solid var(--b)"><button onclick="habRemovePhoto(\''+hb.id+'\','+pi+')" style="position:absolute;top:-6px;right:-6px;background:#dc2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1">×</button></div>';}).join('')+'</div>':'<div style="font-size:11px;color:var(--mt2)">No photos yet — add before/after or proof photos. They appear neatly arranged in your printable PDF report.</div>')
+    +((hb.photos&&hb.photos.length)?'<div style="display:flex;gap:7px;flex-wrap:wrap">'+hb.photos.map(function(p,pi){return '<div style="position:relative"><img src="'+escAttr(p.img)+'" style="width:62px;height:62px;object-fit:cover;border-radius:8px;border:1px solid var(--b)"><button onclick="habRemovePhoto(\''+hb.id+'\','+pi+')" style="position:absolute;top:-6px;right:-6px;background:#dc2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1">×</button></div>';}).join('')+'</div>':'<div style="font-size:11px;color:var(--mt2)">No photos yet — add before/after or proof photos. They appear neatly arranged in your printable PDF report.</div>')
     +'</div>'
     +'<button class="btn" style="width:100%;margin-top:14px;background:linear-gradient(135deg,#0a66c2,#7c3aed);color:#fff;font-weight:800;padding:11px" onclick="habReportPDF(\''+hb.id+'\')"><i class="ti ti-file-text"></i> Download progress report (PDF)</button>'
     +'<button class="btn" style="width:100%;margin-top:9px;border:1px solid #16a34a;color:#16a34a;font-weight:800;padding:11px" onclick="openHabitReportPicker()"><i class="ti ti-file-spreadsheet"></i> Export Excel report — daily · weekly · 30 · 90 days &amp; more</button>'
@@ -13940,7 +13964,7 @@ function habReportPDF(id){
     +(goals.length?('<h2>Goal completion (whole challenge)</h2><table><tr><th>Goal</th><th style="text-align:center">Days done</th><th style="text-align:center">%</th></tr>'+goalRows+'</table>'):'')
     +'<h2>Day-by-day log &amp; reflections</h2><table><tr><th>Day</th><th style="text-align:center">%</th><th>Reflection</th></tr>'+(dayRows||'<tr><td colspan="3" style="text-align:center;color:#999">No entries yet</td></tr>')+'</table>'
     +'<div class="foot">Made with Reedbi · keep going — you\'ve got this 🔥</div>'
-    +((hb.photos&&hb.photos.length)?'<h2 style="font-size:15px;color:'+col+';margin-top:22px;border-bottom:1px solid #eee;padding-bottom:4px">Progress photos</h2><div style="margin-top:8px">'+hb.photos.map(function(p){return '<div style="display:inline-block;margin:7px;text-align:center;vertical-align:top"><img src="'+p.img+'" style="width:180px;height:180px;object-fit:cover;border:1px solid #ddd;border-radius:8px"><div style="font-size:10px;color:#777;margin-top:3px">'+new Date(p.ts).toLocaleDateString()+'</div></div>';}).join('')+'</div>':'')
+    +((hb.photos&&hb.photos.length)?'<h2 style="font-size:15px;color:'+col+';margin-top:22px;border-bottom:1px solid #eee;padding-bottom:4px">Progress photos</h2><div style="margin-top:8px">'+hb.photos.map(function(p){return '<div style="display:inline-block;margin:7px;text-align:center;vertical-align:top"><img src="'+escAttr(p.img)+'" style="width:180px;height:180px;object-fit:cover;border:1px solid #ddd;border-radius:8px"><div style="font-size:10px;color:#777;margin-top:3px">'+new Date(p.ts).toLocaleDateString()+'</div></div>';}).join('')+'</div>':'')
     +'<div class="btnbar noprint"><button onclick="window.print()">🖨️ Save as PDF / Print</button></div></body></html>';
   try{var w=window.open('','_blank');if(!w){toast('Allow pop-ups to view the report','info');return;}w.document.open();w.document.write(html);w.document.close();toast('Report ready — choose “Save as PDF” 📄','ok');}
   catch(e){toast('Could not open report window','err');}
@@ -14049,7 +14073,7 @@ function veRenderResult(){
   var rl=Math.max(0,__veEnd-__veStart);
   box.innerHTML='<div style="border:2px solid #16a34a;border-radius:13px;padding:13px;margin-top:12px;background:rgba(22,163,74,.06)">'
     +'<div style="font-size:13px;font-weight:800;color:#16a34a;margin-bottom:8px">✅ Your trimmed clip ('+veFmt(rl)+'s) — listen here</div>'
-    +'<audio src="'+__veTrimUrl+'" controls preload="metadata" style="width:100%"></audio>'
+    +'<audio src="'+escAttr(__veTrimUrl)+'" controls preload="metadata" style="width:100%"></audio>'
     +'<div style="display:flex;gap:7px;margin-top:11px">'
       +'<button class="btn" style="flex:1;background:#0a66c2;color:#fff;font-weight:800;padding:11px" onclick="veDownloadTrim()"><i class="ti ti-download"></i> Download</button>'
       +'<button class="btn" style="flex:1;background:#16a34a;color:#fff;font-weight:800;padding:11px" onclick="veSaveTrimLibrary()"><i class="ti ti-cloud-upload"></i> Save to library</button>'
@@ -14206,7 +14230,7 @@ function renderHabitReminders(){
     +'</div>'
     +'<div style="display:flex;gap:9px;margin-bottom:12px"><div class="fg" style="flex:1;margin:0"><label>First reminder</label><input type="time" value="'+toHM(w.s)+'" onchange="hremSetWin(\'s\',this.value)"></div><div class="fg" style="flex:1;margin:0"><label>Last reminder</label><input type="time" value="'+toHM(w.e)+'" onchange="hremSetWin(\'e\',this.value)"></div></div>'
     +'<div style="border:1px solid var(--b);border-radius:12px;overflow:hidden;margin-bottom:13px">'
-      +times.map(function(g,i){return '<div style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:'+(i<times.length-1?'1px solid var(--b)':'none')+';background:var(--card2)"><div style="flex:none;font-weight:800;color:#0a66c2;font-size:13px;width:78px">'+fmtTime12(g.hh,g.mm)+'</div><div style="flex:1;font-size:13px;font-weight:600">🎯 '+esc(g.name)+'</div><a href="'+gcalLink(hb,g)+'" target="_blank" rel="noopener" style="flex:none;font-size:10px;color:#16a34a;font-weight:700;text-decoration:none;border:1px solid #16a34a;border-radius:7px;padding:4px 7px">+ Google</a></div>';}).join('')
+      +times.map(function(g,i){return '<div style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:'+(i<times.length-1?'1px solid var(--b)':'none')+';background:var(--card2)"><div style="flex:none;font-weight:800;color:#0a66c2;font-size:13px;width:78px">'+fmtTime12(g.hh,g.mm)+'</div><div style="flex:1;font-size:13px;font-weight:600">🎯 '+esc(g.name)+'</div><a href="'+escAttr(rbSafeURL(gcalLink(hb,g)))+'" target="_blank" rel="noopener" style="flex:none;font-size:10px;color:#16a34a;font-weight:700;text-decoration:none;border:1px solid #16a34a;border-radius:7px;padding:4px 7px">+ Google</a></div>';}).join('')
     +'</div>'
     +'<div style="font-size:12px;font-weight:800;color:var(--mt2);margin-bottom:6px">📲 Also want alarms when the app is fully closed?</div>'
     +'<button class="btn" style="width:100%;background:linear-gradient(135deg,#16a34a,#0a66c2);color:#fff;font-weight:800;padding:13px;margin-bottom:8px" onclick="habExportICS(\''+hb.id+'\')"><i class="ti ti-calendar-plus"></i> Add all '+goals.length+' to my phone calendar (1 tap)</button>'
@@ -14536,7 +14560,7 @@ function homeCard(p){
   if(p.reviews&&p.reviews.length){var avg=Math.round(p.reviews.reduce(function(s,r){return s+(r.stars||0);},0)/p.reviews.length*10)/10;rate='<span style="display:inline-flex;align-items:center;gap:3px;background:#388e3c;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px">'+avg+' ★</span>';}
   return '<div onclick="openProductDetail('+pidJ+')" style="background:var(--sf);border:1px solid var(--b);border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s" onmouseover="this.style.boxShadow=\'0 6px 18px rgba(0,0,0,.12)\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.boxShadow=\'\';this.style.transform=\'\'">'
     +'<div style="aspect-ratio:1;background:#f4f6f8;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative">'
-    +(img?'<img src="'+img+'" loading="lazy" decoding="async" onerror="this.style.display=\'none\';this.parentNode.setAttribute(\'data-ph\',\'1\')" style="width:100%;height:100%;object-fit:cover">':'')
+    +(img?'<img src="'+escAttr(img)+'" loading="lazy" decoding="async" onerror="this.style.display=\'none\';this.parentNode.setAttribute(\'data-ph\',\'1\')" style="width:100%;height:100%;object-fit:cover">':'')
     +'<span style="position:absolute;font-size:32px;opacity:.5">🛍️</span>'
     +'</div>'
     +'<div style="padding:9px 10px 11px;display:flex;flex-direction:column;gap:3px">'
@@ -14727,7 +14751,7 @@ function printHabitReport(){
   }).join('');
   var galleries=habits.filter(function(h){return h.photos&&h.photos.length;}).map(function(h){
     var imgs=h.photos.map(function(p){
-      return '<div style="display:inline-block;margin:7px;text-align:center;vertical-align:top"><img src="'+p.img+'" style="width:180px;height:180px;object-fit:cover;border:1px solid #ddd;border-radius:8px"><div style="font-size:10px;color:#777;margin-top:3px">'+new Date(p.ts).toLocaleDateString()+'</div></div>';
+      return '<div style="display:inline-block;margin:7px;text-align:center;vertical-align:top"><img src="'+escAttr(p.img)+'" style="width:180px;height:180px;object-fit:cover;border:1px solid #ddd;border-radius:8px"><div style="font-size:10px;color:#777;margin-top:3px">'+new Date(p.ts).toLocaleDateString()+'</div></div>';
     }).join('');
     return '<h2 style="font-size:15px;color:#0a66c2;margin-top:24px;border-bottom:1px solid #eee;padding-bottom:4px">'+esc(h.name||'Habit')+' — progress photos</h2><div style="margin-top:8px">'+imgs+'</div>';
   }).join('');
@@ -15691,7 +15715,7 @@ function openSellAgent(){
       body+='<div style="font-size:12.5px;font-weight:800;margin:2px 0 9px;color:#15803d">🎯 People want what you sell — reach them</div>';
       body+=matches.slice(0,8).map(function(m){
         var pidJ="'"+escJS(m.p.id)+"'";
-        var img=(m.p.photos&&m.p.photos[0])?'<img src="'+m.p.photos[0]+'" style="width:46px;height:46px;border-radius:9px;object-fit:cover;flex-shrink:0">':'<div style="width:46px;height:46px;border-radius:9px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0">🛍️</div>';
+        var img=(m.p.photos&&m.p.photos[0])?'<img src="'+escAttr(m.p.photos[0])+'" style="width:46px;height:46px;border-radius:9px;object-fit:cover;flex-shrink:0">':'<div style="width:46px;height:46px;border-radius:9px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0">🛍️</div>';
         return '<div style="border:1px solid var(--b);border-left:3px solid #15803d;border-radius:11px;padding:11px;margin-bottom:8px;background:var(--card2)">'
           +'<div style="display:flex;gap:10px;align-items:center">'+img
           +'<div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700">'+esc(m.p.title||'Product')+'</div>'
@@ -15815,15 +15839,15 @@ function jarvisRoute(text){
   if(has(['status','how am i doing','overview','how is everything','my dashboard','how are things']))return {reply:jarvisStatusSpoken(),stay:true};
   if(has(['list a product','list product','list an item','add a product','list my product','create a listing','i want to list','sell a product by voice','list something for sale','list a new product','add a listing','put up a product','list item for sale'])){return {listProduct:true};}
   if(has(['post a job','post job','post a vacancy','advertise a job','create a job','add a job','i want to hire','i need to hire','hire someone','put up a job','list a job','publish a job','post a new job','post jobs'])){return {postJob:true};}
-  if(has(['show me jobs','show jobs','see jobs','browse jobs','view jobs','all jobs','list jobs','search jobs','job openings','jobs for me','jobs matching','jobs related to my cv','jobs for my cv','what jobs'])){return {reply:'Here are the jobs, with the best matches for your CV first.',action:function(){closeJarvis();try{openJobSearch();}catch(e){}}};}
+  if(has(['show me jobs','show jobs','see jobs','browse jobs','view jobs','all jobs','list jobs','search jobs','job openings','jobs for me','jobs matching','jobs related to my cv','jobs for my cv','what jobs'])){return {reply:'Here are the jobs, with the best matches for your CV first.',action:function(){minimizeJarvis();try{openJobSearch();}catch(e){}}};}
   if(has(['find a job','find job','search job','look for job','jobs',' job','job ','job hub','find work','hiring','vacancy','apply for','get a job','need a job','want a job','need job','i need work'])){
     var role='';
     var jm=text.match(/(?:need|want|find|looking for|get me|apply for)\s+(?:a |an |me a |me an )?([a-z ]+?)\s*(?:job|work|role|position)/i)||text.match(/(?:job|work|role|position)\s+(?:as|for|in)\s+(?:a |an )?([a-z ]+)/i);
     if(jm)role=(jm[1]||'').replace(/\b(find|me|some|any|new)\b/gi,'').trim();
     return {job:true, role:role};
   }
-  if(has(['sell','selling','what to sell','sell to demand','list a product','promote my']))return {reply:'Opening the sell helper, where I match your products to what people are searching for.',action:function(){closeJarvis();openSellAgent();}};
-  if(has(['my orders','my order','track order','track my','where is my','order status']))return {reply:'Opening your orders.',action:function(){closeJarvis();showMyOrders();}};
+  if(has(['sell','selling','what to sell','sell to demand','list a product','promote my']))return {reply:'Opening the sell helper, where I match your products to what people are searching for.',action:function(){minimizeJarvis();openSellAgent();}};
+  if(has(['my orders','my order','track order','track my','where is my','order status']))return {reply:'Opening your orders.',action:function(){minimizeJarvis();showMyOrders();}};
   // HABIT voice commands (specific actions win over just opening habits)
   if(has(['complete all my habits','complete all habits','mark all my habits','mark all habits done','mark all habits','finish all my habits','do all my habits','complete everything','mark everything done','mark everything','complete all habits and goals','mark all my goals','complete all my goals','mark all my goals done','did all my habits','i did all my habits','do my habits for me','do it for me','complete them all','tick all my habits','mark all complete','mark them all done','complete all goals','finish everything','i finished all my habits','i completed all my habits'])){return {completeAll:true};}
   if(has(['complete my habits','complete habits','finish my habits','help me with my habits','help me complete','habit coach','coach me','do my habits','work on my habits','complete each habit','complete goals','complete my goals'])){return {habitCoach:true};}
@@ -15832,7 +15856,7 @@ function jarvisRoute(text){
   var hmd=text.match(/(?:mark|complete|completed|finish|finished|log)\s+(?:my |the )?([a-z ]+?)\s*(?:habit\s*)?(?:as )?(?:done|complete|completed|finished)?\s*$/i);
   if(/\b(mark|complete|completed|finish|finished)\b/.test(q)&&hmd){var hn1=(hmd[1]||'').replace(/\b(habit|today|my|as|the|done|complete|completed|finish|finished)\b/gi,'').replace(/\s+/g,' ').trim();return {habitDone:true,name:hn1};}
   if(/\bi (?:did|finished|completed)\b/.test(q)){var hm2=text.match(/i (?:did|finished|completed)\s+(?:my |the )?([a-z ]+)/i);return {habitDone:true,name:hm2?(hm2[1]||'').replace(/\b(habit|today|my)\b/gi,'').trim():''};}
-  if(has(['habit','habits','my goals']))return {reply:'Opening your habits.',action:function(){closeJarvis();openHabits();}};
+  if(has(['habit','habits','my goals']))return {reply:'Opening your habits.',action:function(){minimizeJarvis();openHabits();}};
   // DELIVERY agent intent -> hands-free drive-safe delivery flow
   if(has(['my deliveries','my delivery','start delivery','start delivering','deliver order','delivery mode','accept delivery','any deliveries','orders to deliver','i want to deliver','begin delivery','pickup order','next delivery','delivery job']))return {deliver:true};
   // SHOPPING (buy) intent -> guided voice cart flow (job intent is checked above, so "i want a job" still wins)
@@ -15843,25 +15867,25 @@ function jarvisRoute(text){
   }
   if(/\b(go shopping|start shopping|i want to shop)\b/.test(q))return {shop:true,term:''};
   // ===== v263: full app navigation by voice (open any screen) =====
-  if(has(['my order','my orders','track my order','order status','where is my order','where are my orders','track order','my purchases','my deliveries status']))return {reply:'Opening your orders.',action:function(){closeJarvis();try{showMyOrders();}catch(e){}}};
-  if(has(['my cart','view cart','show cart','open cart','what is in my cart','my basket','checkout','check out','go to checkout']))return {reply:'Opening your cart.',action:function(){closeJarvis();try{checkoutCart();}catch(e){}}};
-  if(has(['my account','account settings','open account','my settings','open settings','go to settings','account page']))return {reply:'Opening your account.',action:function(){closeJarvis();try{rbTab('account');}catch(e){}}};
-  if(has(['my profile','view my profile','open my profile','my public profile']))return {reply:'Opening your profile.',action:function(){closeJarvis();try{openProfile(CU.name,CU.co,'',CU.avIdx);}catch(e){}}};
-  if(has(['my activity','my dashboard','activity page','everything in one place']))return {reply:'Opening My Activity.',action:function(){closeJarvis();try{showMyActivity();}catch(e){}}};
-  if(has(['my address','my addresses','address book','delivery address','saved address','manage address']))return {reply:'Opening your address book.',action:function(){closeJarvis();try{openAddressBook();}catch(e){}}};
-  if(has(['notification','notifications','notification settings','alerts settings']))return {reply:'Opening notifications.',action:function(){closeJarvis();try{openNotifSettings();}catch(e){}}};
-  if(has(['daily spin','spin the wheel','spin wheel','my rewards','reward','spin','play the wheel','claim reward']))return {reply:'Opening your daily spin and rewards.',action:function(){closeJarvis();try{openSpin();}catch(e){}}};
-  if(has(['my cv','upload cv','my resume','upload resume','update my cv','manage my cv']))return {reply:'Opening your CV manager.',action:function(){closeJarvis();try{openMyCV();}catch(e){}}};
-  if(has(['change voice','choose voice','choose a voice','voice settings','set voice','human voice','change the voice']))return {reply:'Opening the voice picker — choose the one that sounds best.',action:function(){closeJarvis();try{openVoicePicker();}catch(e){}}};
-  if(has(['job hub','jobs hub','open jobs','jobs page','jobs board']))return {reply:'Opening the Job Hub.',action:function(){closeJarvis();try{openJobHub();}catch(e){}}};
-  if(has(['shop hub','my shop','seller tools','sell tools','seller hub','manage my shop','my products','list a product']))return {reply:'Opening your Shop Hub.',action:function(){closeJarvis();try{openShopHub();}catch(e){}}};
-  if(has(['delivery hub','become a delivery','delivery agent','driver hub','become a driver','delivery partner']))return {reply:'Opening the Delivery Hub.',action:function(){closeJarvis();try{openDeliveryHub();}catch(e){}}};
-  if(has(['show all products','show me products','show me all products','list all products','list products','all products','see all products','view products','products with price','show prices'])){return {reply:'Here are the products in the shop, with prices.',action:function(){closeJarvis();try{openProductSearch();}catch(e){try{openMainStore();}catch(_){}}}};}
-  if(has(['open shop','go to shop','open store','main store','browse products','browse the shop','go shopping page','open the shop','show me the shop','marketplace']))return {reply:'Opening the shop.',action:function(){closeJarvis();try{openMainStore();}catch(e){}}};
+  if(has(['my order','my orders','track my order','order status','where is my order','where are my orders','track order','my purchases','my deliveries status']))return {reply:'Opening your orders.',action:function(){minimizeJarvis();try{showMyOrders();}catch(e){}}};
+  if(has(['my cart','view cart','show cart','open cart','what is in my cart','my basket','checkout','check out','go to checkout']))return {reply:'Opening your cart.',action:function(){minimizeJarvis();try{checkoutCart();}catch(e){}}};
+  if(has(['my account','account settings','open account','my settings','open settings','go to settings','account page']))return {reply:'Opening your account.',action:function(){minimizeJarvis();try{rbTab('account');}catch(e){}}};
+  if(has(['my profile','view my profile','open my profile','my public profile']))return {reply:'Opening your profile.',action:function(){minimizeJarvis();try{openProfile(CU.name,CU.co,'',CU.avIdx);}catch(e){}}};
+  if(has(['my activity','my dashboard','activity page','everything in one place']))return {reply:'Opening My Activity.',action:function(){minimizeJarvis();try{showMyActivity();}catch(e){}}};
+  if(has(['my address','my addresses','address book','delivery address','saved address','manage address']))return {reply:'Opening your address book.',action:function(){minimizeJarvis();try{openAddressBook();}catch(e){}}};
+  if(has(['notification','notifications','notification settings','alerts settings']))return {reply:'Opening notifications.',action:function(){minimizeJarvis();try{openNotifSettings();}catch(e){}}};
+  if(has(['daily spin','spin the wheel','spin wheel','my rewards','reward','spin','play the wheel','claim reward']))return {reply:'Opening your daily spin and rewards.',action:function(){minimizeJarvis();try{openSpin();}catch(e){}}};
+  if(has(['my cv','upload cv','my resume','upload resume','update my cv','manage my cv']))return {reply:'Opening your CV manager.',action:function(){minimizeJarvis();try{openMyCV();}catch(e){}}};
+  if(has(['change voice','choose voice','choose a voice','voice settings','set voice','human voice','change the voice']))return {reply:'Opening the voice picker — choose the one that sounds best.',action:function(){minimizeJarvis();try{openVoicePicker();}catch(e){}}};
+  if(has(['job hub','jobs hub','open jobs','jobs page','jobs board']))return {reply:'Opening the Job Hub.',action:function(){minimizeJarvis();try{openJobHub();}catch(e){}}};
+  if(has(['shop hub','my shop','seller tools','sell tools','seller hub','manage my shop','my products','list a product']))return {reply:'Opening your Shop Hub.',action:function(){minimizeJarvis();try{openShopHub();}catch(e){}}};
+  if(has(['delivery hub','become a delivery','delivery agent','driver hub','become a driver','delivery partner']))return {reply:'Opening the Delivery Hub.',action:function(){minimizeJarvis();try{openDeliveryHub();}catch(e){}}};
+  if(has(['show all products','show me products','show me all products','list all products','list products','all products','see all products','view products','products with price','show prices'])){return {reply:'Here are the products in the shop, with prices.',action:function(){minimizeJarvis();try{openProductSearch();}catch(e){try{openMainStore();}catch(_){}}}};}
+  if(has(['open shop','go to shop','open store','main store','browse products','browse the shop','go shopping page','open the shop','show me the shop','marketplace']))return {reply:'Opening the shop.',action:function(){minimizeJarvis();try{openMainStore();}catch(e){}}};
   if(has(['dark mode','night mode','turn on dark']))return {reply:'Switching to dark mode.',action:function(){try{rbSetTheme('dark');}catch(e){}if(__jarvis.on)jarvisListen();}};
   if(has(['light mode','day mode','turn on light','bright mode']))return {reply:'Switching to light mode.',action:function(){try{rbSetTheme('light');}catch(e){}if(__jarvis.on)jarvisListen();}};
   if(has(['help','how does this work','how to use','support','i need help','how do i','guide me','what can you do','what can i do']))return {reply:'I can help you shop, find and apply to jobs, prepare for interviews, deliver orders, and track habits — all by voice. Just tell me what you need, like "buy rice", "I need a driver job", "what is my job status", or "mark gym done". I can also open your orders, cart, account, or rewards. What would you like?',stay:true};
-  if(has(['go home','take me home','home screen','main screen','home page','back home']))return {reply:'Going to the home screen.',action:function(){closeJarvis();try{goHome();}catch(e){}}};
+  if(has(['go home','take me home','home screen','main screen','home page','back home']))return {reply:'Going to the home screen.',action:function(){minimizeJarvis();try{goHome();}catch(e){}}};
   var m=text.match(/(?:find|search for|search|show me|looking for|look for|i want|get me|do you have|need|where can i get)\s+(?:a |an |the |some |me )?(.+)/i);
   if(m){
     var term=m[1].replace(/\b(product|products|item|items|please|for me|on reedbi|to buy)\b/gi,'').replace(/[?.!]+$/,'').trim();
@@ -15942,8 +15966,8 @@ function jarvisHandle(text){
   }
   jarvisLog('ai',route.reply);
   jarvisSpeak(route.reply,function(){
-    if(route.search){closeJarvis();jarvisDoSearch(route.search);return;}
-    if(route.action){route.action();return;}
+    if(route.search){minimizeJarvis();jarvisDoSearch(route.search);if(__jarvis.on)jarvisListen();return;}
+    if(route.action){route.action();if(__jarvis.on)setTimeout(function(){if(__jarvis.on&&!__jarvis.rec&&!(window.speechSynthesis&&window.speechSynthesis.speaking))jarvisListen();},350);return;}
     if(route.stay&&__jarvis.on)jarvisListen();
   });
 }
@@ -15983,6 +16007,7 @@ function openJarvis(starter){
 }
 function closeJarvis(){
   __jarvis.on=false;
+  try{var _jm=document.getElementById('jarvis-mini');if(_jm)_jm.remove();}catch(e){}
   try{if(__jarvis.rec)__jarvis.rec.stop();}catch(e){}__jarvis.rec=null;
   try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
   try{var _fb=document.getElementById('ragent-fab');if(_fb)_fb.style.display='';}catch(e){}
@@ -16061,8 +16086,8 @@ function aiVoiceSave(){
 
 /* ===== v253: guided voice JOB flow + hands-free call/WhatsApp/maps actions ===== */
 function rbCall(phone){if(!phone){toast('No phone number','info');return;}try{window.location.href='tel:'+String(phone).replace(/[^0-9+]/g,'');}catch(e){}}
-function rbWhatsApp(phone,msg){if(!phone){toast('No WhatsApp number','info');return;}var p=String(phone).replace(/[^0-9]/g,'');var u='https://wa.me/'+p+(msg?'?text='+encodeURIComponent(msg):'');try{window.open(u,'_blank');}catch(e){}}
-function rbNavigate(addr){if(!addr){toast('No address','info');return;}try{window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr),'_blank');}catch(e){}}
+function rbWhatsApp(phone,msg){if(!phone){toast('No WhatsApp number','info');return;}var p=String(phone).replace(/[^0-9]/g,'');var u='https://wa.me/'+p+(msg?'?text='+encodeURIComponent(msg):'');try{rbOpen(u,'_blank');}catch(e){}}
+function rbNavigate(addr){if(!addr){toast('No address','info');return;}try{rbOpen('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr),'_blank');}catch(e){}}
 
 function jarvisJobTags(){try{return tags.filter(function(t){return t.cat==='jobs';});}catch(e){return [];}}
 function jarvisFindJobs(role){
@@ -16104,14 +16129,14 @@ function jarvisJobAfterRole(){
   if(!cvs.length){
     __jarvis.flow=null;
     var m='Got it — '+role+'. But you haven\'t added a CV yet, and employers need it. I\'ll open the CV upload now. Add your CV, then just say "I need a '+role+' job" and I\'ll apply for you.';
-    jarvisLog('ai',m);jarvisSpeak(m,function(){closeJarvis();try{openJobHub();}catch(e){}});
+    jarvisLog('ai',m);jarvisSpeak(m,function(){minimizeJarvis();try{openJobHub();}catch(e){}if(__jarvis.on)jarvisListen();});
     return;
   }
   var matches=jarvisFindJobs(role);
   if(!matches.length){
     __jarvis.flow=null;
     var m2='I couldn\'t find jobs matching '+role+' right now. I\'ll open the Job Hub so you can browse and set up alerts.';
-    jarvisLog('ai',m2);jarvisSpeak(m2,function(){closeJarvis();try{openJobHub();}catch(e){}});
+    jarvisLog('ai',m2);jarvisSpeak(m2,function(){minimizeJarvis();try{openJobHub();}catch(e){}if(__jarvis.on)jarvisListen();});
     return;
   }
   __jarvis.flow={type:'job',step:'confirm',role:role,matches:matches};
@@ -16305,7 +16330,7 @@ function jarvisShopCheckout(){
   var n=jarvisCartCount();
   if(!n){__jarvis.flow={type:'shop',step:'search'};var m='Your cart is empty. What would you like to buy?';jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});return;}
   var msg='Great — you have '+n+' item'+(n!==1?'s':'')+' in your cart. I\'m opening checkout now. Choose your delivery address and payment to finish your order.';
-  jarvisLog('ai',msg);jarvisSpeak(msg,function(){closeJarvis();try{checkoutCart();}catch(e){}});
+  jarvisLog('ai',msg);jarvisSpeak(msg,function(){minimizeJarvis();try{checkoutCart();}catch(e){}if(__jarvis.on)jarvisListen();});
 }
 
 /* ===== v255: hands-free DELIVERY agent voice flow (drive-safe, all info at once) ===== */
@@ -16364,7 +16389,7 @@ function jarvisHabitStatus(){
 }
 function jarvisHabitDoneStart(name){
   var habits=getHabits();
-  if(!habits.length){var m='You don\'t have any habits yet. I\'ll open Habits so you can create one.';jarvisLog('ai',m);jarvisSpeak(m,function(){closeJarvis();try{openHabits();}catch(e){}});return;}
+  if(!habits.length){var m='You don\'t have any habits yet. I\'ll open Habits so you can create one.';jarvisLog('ai',m);jarvisSpeak(m,function(){minimizeJarvis();try{openHabits();}catch(e){}if(__jarvis.on)jarvisListen();});return;}
   if(!name||name.length<2){__jarvis.flow={type:'habitdone'};var qq='Which habit did you complete? Your habits are: '+habits.map(function(x){return x.name||x.n;}).join(', ')+'.';jarvisLog('ai',qq);jarvisSpeak(qq,function(){if(__jarvis.on)jarvisListen();});return;}
   var res=jarvisHabitMarkDone(name);jarvisLog('ai',res.msg);jarvisSpeak(res.msg,function(){if(__jarvis.on)jarvisListen();});
 }
@@ -16377,7 +16402,7 @@ function jarvisHabitLogAsk(){
 }
 function jarvisHabitLogStart(){
   var habits=getHabits();
-  if(!habits.length){var m='You have no habits yet. I\'ll open Habits to create one.';jarvisLog('ai',m);jarvisSpeak(m,function(){closeJarvis();try{openHabits();}catch(e){}});return;}
+  if(!habits.length){var m='You have no habits yet. I\'ll open Habits to create one.';jarvisLog('ai',m);jarvisSpeak(m,function(){minimizeJarvis();try{openHabits();}catch(e){}if(__jarvis.on)jarvisListen();});return;}
   __jarvis.flow={type:'habitlog',idx:0,ids:habits.map(function(h){return h.id;})};
   jarvisHabitLogAsk();
 }
@@ -16511,7 +16536,7 @@ function jarvisInterviewStart(role){
 function jarvisType(){
   var inp=document.getElementById('jarvis-input');if(!inp)return;
   var text=(inp.value||'').trim();if(!text)return;
-  inp.value='';
+  inp.value='';try{inp.focus();}catch(e){}
   try{if(__jarvis.rec){__jarvis.rec.onend=null;__jarvis.rec.onresult=null;__jarvis.rec.stop();}}catch(e){}
   try{window.speechSynthesis.cancel();}catch(e){}
   __jarvis.on=true;
@@ -16586,7 +16611,7 @@ function rbStopShareLoc(orderId){
 function liveTrackBody(o){
   if(o&&o.agentLat&&o.agentLng){
     var src='https://maps.google.com/maps?q='+o.agentLat+','+o.agentLng+'&z=15&output=embed';
-    return '<iframe title="Live delivery map" src="'+src+'" style="width:100%;height:300px;border:0;display:block" loading="lazy"></iframe>'
+    return '<iframe title="Live delivery map" src="'+escAttr(src)+'" style="width:100%;height:300px;border:0;display:block" loading="lazy"></iframe>'
       +'<div style="padding:14px 16px">'
       +'<div style="font-weight:800;font-size:14px"><i class="ti ti-truck-delivery" style="color:#0a66c2"></i> Your delivery is on the way</div>'
       +'<div style="font-size:11.5px;color:var(--mt);margin-top:2px">Agent location updated '+rbAgo(o.agentLocTs)+'</div>'
@@ -16674,7 +16699,7 @@ function renderJobSearchResults(){
   var list=scored.filter(function(s){return hasTerms?s.score>0:true;});
   if(cvBased&&list.length===0){list=scored;cvBased=false;hasTerms=false;} // CV gave no matches -> show all jobs
   list.sort(function(a,b){if(b.score!==a.score)return b.score-a.score;return (b.x.post.ts||0)-(a.x.post.ts||0);});
-  if(hint)hint.textContent=q?(list.length+' job'+(list.length!==1?'s':'')+' matching “'+esc(q)+'”'):(cvBased?'⭐ '+list.length+' job'+(list.length!==1?'s':'')+' matched to your CV — or type to search all':list.length+' job'+(list.length!==1?'s':'')+' available — type to search');
+  if(hint)hint.textContent=q?(list.length+' job'+(list.length!==1?'s':'')+' matching “'+q+'”'):(cvBased?'⭐ '+list.length+' job'+(list.length!==1?'s':'')+' matched to your CV — or type to search all':list.length+' job'+(list.length!==1?'s':'')+' available — type to search');
   var uid=CU.uid;var apps=getAllApps();var maxScore=terms.length*10;
   box.innerHTML=list.map(function(s){
     var p=s.x.post;var applied=apps.some(function(a){return a.uid===uid&&String(a.postId)===String(p.id);});
@@ -16687,6 +16712,7 @@ function renderJobSearchResults(){
       +(applied?'<div style="margin-top:10px;font-size:12px;color:#16a34a;font-weight:700"><i class="ti ti-circle-check"></i> Applied with your CV</div>':'<button class="btn btnok" style="margin-top:10px;width:100%;padding:10px" onclick="jobSearchApply(\''+escJS(String(s.x.tag.id))+'\',\''+escJS(String(p.id))+'\')"><i class="ti ti-send"></i> Apply with my CV</button>')
       +'</div>';
   }).join('');
+  if(!list.length)box.innerHTML='<div style="text-align:center;padding:26px 12px;color:var(--mt)"><i class="ti ti-zoom-cancel" style="font-size:26px"></i><div style="font-weight:700;margin-top:8px;font-size:13px;color:var(--tx)">No jobs found for that search</div><div style="font-size:12px;margin-top:4px;line-height:1.5">Try different words, or clear the search box to see all jobs matched to your CV.</div></div>';
 }
 function jobSearchApply(tagId,postId){
   var tag=jarvisJobTags().find(function(t){return String(t.id)===String(tagId);});if(!tag){toast('Job not found','err');return;}
@@ -16771,7 +16797,7 @@ function jarvisHabitCoachFinishMsg(prefix){
 function jarvisHabitCoachStart(){
   if(!requireAuth('go through your habits'))return;
   var habits=getHabits();
-  if(!habits.length){var m='You don\'t have any habits yet. Let\'s open Habits so you can create your first one.';jarvisLog('ai',m);jarvisSpeak(m,function(){closeJarvis();try{openHabits();}catch(e){}});return;}
+  if(!habits.length){var m='You don\'t have any habits yet. Let\'s open Habits so you can create your first one.';jarvisLog('ai',m);jarvisSpeak(m,function(){minimizeJarvis();try{openHabits();}catch(e){}if(__jarvis.on)jarvisListen();});return;}
   var queue=[];habits.forEach(function(h){queue.push({kind:'habit',hid:h.id});(h.goals||[]).forEach(function(g){queue.push({kind:'goal',hid:h.id,gid:g.id});});});
   __jarvis.flow={type:'habitcoach',q:queue,i:0};
   var first='';while(__jarvis.flow.i<queue.length){first=jarvisHabitCoachItemText();if(first)break;__jarvis.flow.i++;}
@@ -16818,7 +16844,7 @@ function jarvisPostJobStart(){
 }
 
 /* ===== v278: voice-post confirmation window — shows exact words heard, confirm before posting ===== */
-function jarvisShowConfirm(label,value){
+function jarvisShowConfirm(label,value){try{restoreJarvis();}catch(e){}
   var log=document.getElementById('jarvis-log');if(!log)return;
   var box=document.getElementById('jarvis-confirm');
   if(!box){box=document.createElement('div');box.id='jarvis-confirm';box.style.cssText='margin:12px 0 4px;padding:11px 13px;border:1.5px solid #0a66c2;border-radius:11px;background:rgba(10,102,194,.07);text-align:left';log.parentNode.insertBefore(box,log);}
@@ -16951,7 +16977,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v287 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v291 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -16981,8 +17007,26 @@ function jarvisSmartFallback(text){
   if(/\b(job|jobs|work|employment|career|hiring|vacancy|position|recruit)\b/.test(q))return {run:function(){if(typeof jarvisJobStart==='function')jarvisJobStart('');}};
   if(/\b(interview)\b/.test(q))return {run:function(){startInterviewPractice();}};
   if(/\b(habit|habits|routine|my goals|streak|daily goals)\b/.test(q))return {run:function(){jarvisHabitCoachStart();}};
-  if(/\b(order|orders|delivery|package|parcel|my purchase|track|where is my|shipment)\b/.test(q))return {run:function(){closeJarvis();try{showMyOrders();}catch(e){}}};
-  if(/\b(cart|checkout|basket)\b/.test(q))return {run:function(){closeJarvis();try{checkoutCart();}catch(e){}}};
+  if(/\b(order|orders|delivery|package|parcel|my purchase|track|where is my|shipment)\b/.test(q))return {run:function(){minimizeJarvis();try{showMyOrders();}catch(e){}}};
+  if(/\b(cart|checkout|basket)\b/.test(q))return {run:function(){minimizeJarvis();try{checkoutCart();}catch(e){}}};
   return null;
+}
+
+/* ===== v289: minimize (not close) the voice agent — continuous conversation while pages open ===== */
+function minimizeJarvis(){
+  try{closeOvl('jarvis-ovl');}catch(e){}
+  if(!__jarvis.on)return;
+  if(!document.getElementById('jarvis-mini')){
+    var p=document.createElement('div');p.id='jarvis-mini';
+    p.innerHTML='<span class="jm-dot"></span><span>Listening — tap to open chat</span><button class="jm-x" onclick="event.stopPropagation();closeJarvis()" title="End conversation">&times;</button>';
+    p.onclick=function(){restoreJarvis();};
+    document.body.appendChild(p);
+  }
+}
+function restoreJarvis(){
+  var p=document.getElementById('jarvis-mini');if(p)p.remove();
+  var ov=document.getElementById('jarvis-ovl');
+  if(ov){requestAnimationFrame(function(){ov.classList.add('open');});}
+  else if(__jarvis.on){try{openJarvis();}catch(e){}}
 }
 </script></body></html>
