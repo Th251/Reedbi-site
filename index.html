@@ -1405,7 +1405,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v299</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v300</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6144,7 +6144,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v299 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v300 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -15899,6 +15899,8 @@ function jarvisRoute(text){
   var q=text.toLowerCase();
   var has=function(a){return a.some(function(w){return q.indexOf(w)>=0;});};
   if(has(['stop','exit','goodbye','good bye','close','quit','shut down','that is all','thats all']))return {close:true};
+  if(has(['take a note','write a note','make a note','note this','start a note','new note','dictate a note','write this down','take notes','voice note'])){return {noteStart:true};}
+  if(has(['my notes','show my notes','open my notes','open notes','read my notes','list my notes','notes list','see my notes'])){return {notesList:true};}
   if(has(['transcribe','start transcribing','transcriber','record and transcribe','record everything','listen and type','type what you hear','record my video','transcribe the video'])){return {transcriber:true};}
   if(has(['interview me from my recording','interview from recording','questions from my recording','quiz me on the recording','ask me about the recording','interview from the video'])){return {trIntv:true};}
   if(has(['interview by text','text interview','type interview','interview by typing','written interview','practice by text','interview in text','interview without talking','interview by writing','interview by chat','chat interview']))return {textInterview:true};
@@ -16024,6 +16026,8 @@ function jarvisHandle(text){
   if(route.habitCoach){jarvisHabitCoachStart();return;}
   if(route.habitLog){jarvisHabitLogStart();return;}
   if(route.jobStatus){var js=jarvisJobStatusSpoken();jarvisLog('ai',js);jarvisSpeak(js,function(){if(__jarvis.on)jarvisListen();});return;}
+  if(route.noteStart){jarvisNoteStart();return;}
+  if(route.notesList){minimizeJarvis();openNotesList();if(__jarvis.on)jarvisListen();return;}
   if(route.transcriber){closeJarvis();openTranscriber();return;}
   if(route.trIntv){trInterviewStart();return;}
   if(route.textInterview){closeJarvis();openTextInterview('');return;}
@@ -16078,6 +16082,7 @@ function openJarvis(starter){
   if(starter==='listprod'){if(typeof jarvisListProductStart==='function')jarvisListProductStart();return;}
   if(starter==='postjob'){if(typeof jarvisPostJobStart==='function')jarvisPostJobStart();return;}
   if(starter==='trintv'){if(typeof trIntvBegin==='function')trIntvBegin();return;}
+  if(starter==='note'){if(typeof jarvisNoteBegin==='function')jarvisNoteBegin();return;}
   jarvisSpeak(jarvisBriefing(),function(){jarvisListen();});
 }
 function closeJarvis(){
@@ -16221,7 +16226,7 @@ function jarvisJobAfterRole(){
 }
 function jarvisFlowStep(text){
   var q=text.toLowerCase();var f=__jarvis.flow;
-  if(/cancel|never mind|forget it|stop that/.test(q)){__jarvis.flow=null;var m='Okay, cancelled. Anything else?';jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});return;}
+  if((!f||f.type!=='note')&&/cancel|never mind|forget it|stop that/.test(q)){__jarvis.flow=null;var m='Okay, cancelled. Anything else?';jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});return;}
   if(f&&f.type==='job'){
     if(f.step==='role'){f.role=text.trim();return jarvisJobAfterRole();}
     if(f.step==='confirm'){
@@ -16272,6 +16277,29 @@ function jarvisFlowStep(text){
       if(/\b(done|finish|close|stop|exit|that's all|thats all)\b/.test(q)){__jarvis.flow=null;var f2='Okay, drive safe. Tap the mic whenever you need me.';jarvisLog('ai',f2);jarvisSpeak(f2,function(){if(__jarvis.on)jarvisListen();});return;}
       var h2='You can say navigate, call customer, message customer, repeat, next, or done.';jarvisLog('ai',h2);jarvisSpeak(h2,function(){if(__jarvis.on)jarvisListen();});return;
     }
+  }
+  if(f&&f.type==='note'){
+    var nlow=(text||'').toLowerCase().trim();
+    function noteRelisten(){if(__jarvis.on)jarvisListen();}
+    if(f.step==='assign'){
+      if(/^(yes|yeah|yep|sure|ok|okay|add|attach|habit)/.test(nlow)){__jarvis.flow=null;openNoteAssign(f.id);var mA='Pick a habit on screen — the note is already saved.';jarvisLog('ai',mA);jarvisSpeak(mA,noteRelisten);return;}
+      if(/^(no|nope|not now|later|skip|finish|done)/.test(nlow)){__jarvis.flow=null;var mB='Done. Your note is saved — say my notes any time to hear or copy it.';jarvisLog('ai',mB);jarvisSpeak(mB,noteRelisten);return;}
+      var mC='Say yes to attach it to a habit, or no to finish.';jarvisLog('ai',mC);jarvisSpeak(mC,noteRelisten);return;
+    }
+    if(/^(cancel( the)? note|discard( it| the note)?|throw it away)\b/.test(nlow)||/^(never mind|forget it)$/.test(nlow)){saveNotes(getNotes().filter(function(x){return x.id!==f.id;}));__jarvis.flow=null;jarvisClearConfirm();var mD='Discarded — nothing kept. What next?';jarvisLog('ai',mD);jarvisSpeak(mD,noteRelisten);return;}
+    if(/^(save( the| my)? note|save it|done|finish( the note)?|that is all|thats all|that's all|stop( the)? note|end note)\b/.test(nlow)){
+      if(!f.title){var w=rbNoteText(f).trim().split(/\s+/).slice(0,5).join(' ');f.title=w?w+'…':'Voice note';}
+      var rec=rbNoteSave(f);f.step='assign';jarvisNoteShow(f);
+      var mE='Saved "'+f.title+'" — '+rec.words+' words, all auto-saved. Want me to attach it to a habit? Say yes or no.';
+      jarvisLog('ai',mE);jarvisSpeak(mE,noteRelisten);return;
+    }
+    if(/^(read (it |the note |my note )?back|read (the |my )?note)\b/.test(nlow)){var t=rbNoteText(f);var sp=t?('Here is your note so far: '+t.slice(0,400)+(t.length>400?' … and more.':'')):'The note is still empty — start speaking.';jarvisLog('ai',sp);jarvisSpeak(sp,noteRelisten);return;}
+    if(/^(undo( last)?|delete last|remove last|scratch that)\b/.test(nlow)){if(f.segs.length){f.segs.pop();rbNoteSave(f);jarvisNoteShow(f);}var mF='Removed the last part. Continue.';jarvisLog('ai',mF);jarvisSpeak(mF,noteRelisten);return;}
+    if(/^(new line|next line|new paragraph|line break)$/.test(nlow)){f.segs.push('\n');rbNoteSave(f);jarvisNoteShow(f);noteRelisten();return;}
+    var tm=nlow.match(/^(?:title|call it|name it)\s+(.+)/);
+    if(tm){f.title=(text.match(/^(?:title|call it|name it)\s+(.+)/i)||[])[1]||tm[1];rbNoteSave(f);jarvisNoteShow(f);var mG='Titled "'+f.title+'". Keep going.';jarvisLog('ai',mG);jarvisSpeak(mG,noteRelisten);return;}
+    if(nlow){f.segs.push(text+' ');rbNoteSave(f);jarvisNoteShow(f);}
+    noteRelisten();return;
   }
   if(f&&f.type==='trintv'){
     var lowT=(text||'').toLowerCase();
@@ -17083,7 +17111,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v299 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v300 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17185,13 +17213,14 @@ function rbSysChecks(){
     {n:'Quick-access tiles on Home',ok:fn('rbRenderQuickAccess')},
     {n:'Live delivery tracking + drone option',ok:fn('liveTrackOrder')&&fn('toggleMyDrone')},
     {n:'Cross-platform sync — orders, products & jobs reflect live on web, Android and iOS',ok:(typeof fbListenMarketData==='function')&&(typeof scanIncomingOrders==='function')},
-    {n:'Overnight transcriber — records & auto-types (English, Malayalam and more), interviews you from the recording',ok:(typeof openTranscriber==='function')&&(typeof trInterviewStart==='function')}
+    {n:'Overnight transcriber — records & auto-types (English, Malayalam and more), interviews you from the recording',ok:(typeof openTranscriber==='function')&&(typeof trInterviewStart==='function')},
+    {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')}
   ];
 }
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v299';var all=(pass===checks.length);
+  var ver='v300';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17352,4 +17381,77 @@ function rbInjectSEO(){try{
   if(!el){el=document.createElement('script');el.id='rb-jsonld';el.type='application/ld+json';document.head.appendChild(el);}
   el.textContent=JSON.stringify(data);
 }catch(e){}}
+
+/* ===== v300: CONVERSATIONAL VOICE NOTES — talk naturally, the agent writes & auto-saves ===== */
+function getNotes(){return LS.get('rb_notes',[])||[];}
+function saveNotes(n){LS.set('rb_notes',n);}
+function rbNoteText(f){return (f.segs||[]).join('');}
+function rbNoteSave(f){
+  var text=rbNoteText(f);var words=text.trim()?text.trim().split(/\s+/).length:0;
+  var all=getNotes();var i=all.findIndex(function(x){return x.id===f.id;});
+  var rec={id:f.id,title:f.title||'',text:text,words:words,ts:f.ts,up:Date.now()};
+  if(i<0)all.unshift(rec);else all[i]=rec;
+  saveNotes(all);return rec;
+}
+function jarvisNoteShow(f){
+  try{restoreJarvis();}catch(e){}
+  var log=document.getElementById('jarvis-log');if(!log)return;
+  var box=document.getElementById('jarvis-confirm');
+  if(!box){box=document.createElement('div');box.id='jarvis-confirm';box.style.cssText='margin:12px 0 4px;padding:11px 13px;border-radius:11px;text-align:left';log.parentNode.insertBefore(box,log);}
+  var text=rbNoteText(f);var tail=text.length>180?('…'+text.slice(-180)):text;
+  box.style.cssText='margin:12px 0 4px;padding:11px 13px;border:1.5px solid #16a34a;border-radius:11px;background:rgba(22,163,74,.07);text-align:left;display:block';
+  box.innerHTML='<div style="font-size:10px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.5px"><i class="ti ti-notes"></i> '+esc(f.title||'New note')+' — auto-saved ✓</div>'
+    +'<div style="font-size:13px;margin-top:4px;line-height:1.5;white-space:pre-wrap">'+(tail?esc(tail):'<i style="color:var(--mt)">Start speaking — I am writing…</i>')+'</div>'
+    +'<div style="font-size:10.5px;color:var(--mt);margin-top:6px">Keep talking · say <b>save note</b>, <b>read it back</b>, <b>undo last</b>, <b>new line</b>, or <b>title …</b></div>';
+}
+function jarvisNoteStart(){
+  if(!requireAuth('write a note'))return;
+  if(__jarvis&&__jarvis.on){jarvisNoteBegin();}else{openJarvis('note');}
+}
+function jarvisNoteBegin(){
+  if(!document.getElementById('jarvis-ovl')){try{openJarvis('note');}catch(e){}return;}
+  var f={type:'note',id:'nt'+Date.now(),segs:[],title:'',ts:Date.now()};
+  __jarvis.flow=f;rbNoteSave(f);jarvisNoteShow(f);
+  var m='New note — I am writing. Speak naturally; every sentence is saved automatically. Say save note when you finish, read it back, undo last, new line, or title followed by a name.';
+  jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});
+}
+function openNoteAssign(nid){
+  var ex=document.getElementById('noteassign-ovl');if(ex)ex.remove();
+  var habits=getHabits();
+  var rows=habits.map(function(h){return '<button class="btn" style="display:block;width:100%;text-align:left;margin-bottom:7px" onclick="noteDoAssign(\''+escJS(nid)+'\',\''+escJS(h.id)+'\')">✅ '+esc(h.name||h.n||'Habit')+'</button>';}).join('')||'<div style="font-size:12px;color:var(--mt);margin-bottom:8px">No habits yet — create one below.</div>';
+  var ov=document.createElement('div');ov.className='overlay';ov.id='noteassign-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:440px"><div class="mhd"><h3>🎯 Attach note to a habit</h3><button class="modal-x" onclick="closeOvl(\'noteassign-ovl\')"><i class="ti ti-x"></i></button></div><div class="mbd">'+rows
+    +'<div style="display:flex;gap:7px;margin-top:9px"><input id="noteassign-new" placeholder="New habit name" style="flex:1;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2)"><button class="btn btnok" onclick="noteAssignNew(\''+escJS(nid)+'\')">Create</button></div>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
+function noteDoAssign(nid,hid){var hs=getHabits();var h=hs.find(function(x){return x.id===hid;});if(!h)return;h.noteIds=h.noteIds||[];if(h.noteIds.indexOf(nid)<0)h.noteIds.push(nid);saveHabits(hs);closeOvl('noteassign-ovl');toast('Note attached to "'+(h.name||h.n)+'" ✓','ok');}
+function noteAssignNew(nid){var inp=document.getElementById('noteassign-new');var nm=(inp&&inp.value||'').trim();if(!nm){toast('Type a habit name','info');return;}var hs=getHabits();hs.push({id:'h'+Date.now(),name:nm,n:nm,done:[],goals:[],dayGoals:{},noteIds:[nid]});saveHabits(hs);closeOvl('noteassign-ovl');toast('Habit "'+nm+'" created with your note ✓','ok');}
+function noteCopy(nid){var n=getNotes().find(function(x){return x.id===nid;});if(!n)return;function done(){toast('Note copied ✓','ok');}
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(n.text).then(done).catch(function(){trCopyFallback(n.text);done();});return;}}catch(e){}
+  trCopyFallback(n.text);done();}
+function notePrint(nid){var n=getNotes().find(function(x){return x.id===nid;});if(!n)return;
+  var html='<html><head><title>'+esc(n.title||'Note')+'</title></head><body style="font-family:Arial,sans-serif;max-width:680px;margin:24px auto;line-height:1.6"><h2>'+esc(n.title||'Note')+'</h2><div style="color:#777;font-size:12px;margin-bottom:14px">Reedbi note · '+new Date(n.ts).toLocaleString()+' · '+n.words+' words</div><div style="white-space:pre-wrap">'+esc(n.text)+'</div></body></html>';
+  try{var w=window.open('','_blank');if(w){w.document.write(html);w.document.close();try{w.print();}catch(e){}}}catch(e){}}
+function noteDelete(nid){saveNotes(getNotes().filter(function(x){return x.id!==nid;}));toast('Note deleted','ok');openNotesList();}
+function noteSpeak(nid){var n=getNotes().find(function(x){return x.id===nid;});if(!n)return;var t=n.text.slice(0,600)+(n.text.length>600?' … and more.':'');try{if(typeof rbSpeakSmart==='function')rbSpeakSmart((n.title?n.title+'. ':'')+t);}catch(e){}}
+function openNotesList(){
+  if(!requireAuth('see your notes'))return;
+  var ex=document.getElementById('notes-ovl');if(ex)ex.remove();
+  var notes=getNotes();
+  var rows=notes.map(function(n){return '<div style="padding:9px 2px;border-bottom:1px solid var(--b)"><div style="font-weight:800;font-size:13px">'+esc(n.title||n.text.slice(0,34)||'Untitled note')+'</div><div style="font-size:10px;color:var(--mt);margin:2px 0 6px">'+new Date(n.ts).toLocaleString()+' · '+n.words+' words · auto-saved</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
+    +'<button class="btn" style="padding:6px 9px" onclick="noteSpeak(\''+escJS(n.id)+'\')"><i class="ti ti-volume"></i> Read</button>'
+    +'<button class="btn" style="padding:6px 9px" onclick="noteCopy(\''+escJS(n.id)+'\')"><i class="ti ti-copy"></i> Copy</button>'
+    +'<button class="btn" style="padding:6px 9px" onclick="notePrint(\''+escJS(n.id)+'\')"><i class="ti ti-printer"></i> Print</button>'
+    +'<button class="btn" style="padding:6px 9px" onclick="openNoteAssign(\''+escJS(n.id)+'\')"><i class="ti ti-target-arrow"></i> Habit</button>'
+    +'<button class="btn" style="padding:6px 9px;color:#dc2626" onclick="noteDelete(\''+escJS(n.id)+'\')"><i class="ti ti-trash"></i></button>'
+    +'</div></div>';}).join('')||'<div style="text-align:center;color:var(--mt);padding:22px 8px">No notes yet. Tap below and just start talking — I will write and save everything.</div>';
+  var ov=document.createElement('div');ov.className='overlay';ov.id='notes-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:520px;max-height:86vh;display:flex;flex-direction:column"><div class="mhd"><h3>🗒️ My notes</h3><button class="modal-x" onclick="closeOvl(\'notes-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="overflow-y:auto">'
+    +'<button class="btn btnok" style="width:100%;margin-bottom:10px" onclick="closeOvl(\'notes-ovl\');jarvisNoteStart()"><i class="ti ti-microphone"></i> New voice note — just talk</button>'
+    +rows+'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
 </script></body></html>
