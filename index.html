@@ -12,6 +12,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Reedbi">
 <link rel="apple-touch-icon" href="icon-180.png">
+<meta name="description" content="Reedbi — shop products, find & post jobs, build habits, with a voice AI agent. UAE & worldwide.">
+<meta property="og:title" content="Reedbi — Shop · Jobs · Habits · Voice Agent">
+<meta property="og:description" content="One app for shopping, jobs and habit building, with a talking AI agent. Orders sync live across web, Android and iOS.">
+<meta property="og:url" content="https://www.reedbi.com">
+<meta property="og:image" content="https://www.reedbi.com/icon-512.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
 <title>Reedbi — Online Shopping: Mobiles, Electronics, Fashion, Grocery, Home &amp; Kitchen | Best Offers &amp; Real-time 3D</title>
 <meta name="description" content="Reedbi is a global marketplace for mobiles, electronics, fashion, grocery, home &amp; kitchen and more — from approved local and worldwide sellers. Shop in real-time 3D, Touch &amp; Collect, nearby-first delivery and the best offers.">
 <meta name="keywords" content="online shopping, ecommerce, marketplace, 3D shopping, touch and collect, grocery, fashion, electronics, home and kitchen, Reedbi, best offers, nearby sellers">
@@ -1398,7 +1405,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v298</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v299</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6137,7 +6144,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v298 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v299 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11761,7 +11768,7 @@ setInterval(rbUpdateNavBadge,1500);
 setTimeout(rbUpdateNavBadge,1000);
 // default: show the clean Home landing immediately on load
 try{document.body.classList.add('rb-home');}catch(e){}
-setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}try{rbOpenFromHash();}catch(e){}try{rbShowVersion();}catch(e){}try{rbInstallPWA();}catch(e){}},400);
+setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}try{rbOpenFromHash();}catch(e){}try{rbShowVersion();}catch(e){}try{rbInstallPWA();}catch(e){}try{rbInjectSEO();}catch(e){}},400);
 
 /* ===== v135: confetti, daily spin wheel, shopper tiers, achievements =====
    Healthy delight: a once-a-day spin, celebratory confetti, and a level that
@@ -15892,6 +15899,8 @@ function jarvisRoute(text){
   var q=text.toLowerCase();
   var has=function(a){return a.some(function(w){return q.indexOf(w)>=0;});};
   if(has(['stop','exit','goodbye','good bye','close','quit','shut down','that is all','thats all']))return {close:true};
+  if(has(['transcribe','start transcribing','transcriber','record and transcribe','record everything','listen and type','type what you hear','record my video','transcribe the video'])){return {transcriber:true};}
+  if(has(['interview me from my recording','interview from recording','questions from my recording','quiz me on the recording','ask me about the recording','interview from the video'])){return {trIntv:true};}
   if(has(['interview by text','text interview','type interview','interview by typing','written interview','practice by text','interview in text','interview without talking','interview by writing','interview by chat','chat interview']))return {textInterview:true};
   if(has(['practice interview','interview practice','prepare for interview','mock interview','practise interview','interview prep','practice for interview','help me prepare for','do a mock']))return {interview:true, role:''};
   if(has(['job status','application status','my applications','status of my application','status of my job','did i get the job','any interview','am i selected','where did i apply','how are my applications','my job applications']))return {jobStatus:true};
@@ -16015,6 +16024,8 @@ function jarvisHandle(text){
   if(route.habitCoach){jarvisHabitCoachStart();return;}
   if(route.habitLog){jarvisHabitLogStart();return;}
   if(route.jobStatus){var js=jarvisJobStatusSpoken();jarvisLog('ai',js);jarvisSpeak(js,function(){if(__jarvis.on)jarvisListen();});return;}
+  if(route.transcriber){closeJarvis();openTranscriber();return;}
+  if(route.trIntv){trInterviewStart();return;}
   if(route.textInterview){closeJarvis();openTextInterview('');return;}
   if(route.interview){jarvisInterviewStart(route.role);return;}
   if(route.ai){
@@ -16066,6 +16077,7 @@ function openJarvis(starter){
   if(starter==='job'){jarvisSpeak('Hi '+((CU&&CU.name)?CU.name:'there')+', let\'s find you a job.',function(){if(typeof jarvisJobStart==='function')jarvisJobStart('');});return;}
   if(starter==='listprod'){if(typeof jarvisListProductStart==='function')jarvisListProductStart();return;}
   if(starter==='postjob'){if(typeof jarvisPostJobStart==='function')jarvisPostJobStart();return;}
+  if(starter==='trintv'){if(typeof trIntvBegin==='function')trIntvBegin();return;}
   jarvisSpeak(jarvisBriefing(),function(){jarvisListen();});
 }
 function closeJarvis(){
@@ -16260,6 +16272,37 @@ function jarvisFlowStep(text){
       if(/\b(done|finish|close|stop|exit|that's all|thats all)\b/.test(q)){__jarvis.flow=null;var f2='Okay, drive safe. Tap the mic whenever you need me.';jarvisLog('ai',f2);jarvisSpeak(f2,function(){if(__jarvis.on)jarvisListen();});return;}
       var h2='You can say navigate, call customer, message customer, repeat, next, or done.';jarvisLog('ai',h2);jarvisSpeak(h2,function(){if(__jarvis.on)jarvisListen();});return;
     }
+  }
+  if(f&&f.type==='trintv'){
+    var lowT=(text||'').toLowerCase();
+    if(f.awaitMore){
+      if(/\b(yes|yeah|yep|sure|ok|okay|more|continue|next|go on)\b/i.test(lowT)){
+        var sz=trIntvBatchSize(f.batch+1);
+        var txt2=trFullText(f.sid);
+        var qs2=trGenQuestions(txt2,f.asked,sz);
+        if(!qs2.length)qs2=trGenQuestions(txt2,{},sz);
+        f.batch++;f.qs=qs2;f.idx=0;f.awaitMore=false;
+        var mmT='Great — '+qs2.length+' more, all different. '+qs2[0];
+        jarvisLog('ai',mmT);jarvisSpeak(mmT,function(){if(__jarvis.on)jarvisListen();});return;
+      }
+      __jarvis.flow=null;
+      var finT='Excellent work! All your answers are saved with the recording. Open the Transcriber to copy or print the full interview.';
+      jarvisLog('ai',finT);jarvisSpeak(finT,function(){if(__jarvis.on)jarvisListen();});return;
+    }
+    var qNow=f.qs[f.idx];
+    f.asked[qNow]=1;trIntvSaveAnswer(f.sid,qNow,text||'');
+    var ackT=['Saved.','Noted and saved.','Good — saved.','Got it.','Saved that answer.'];
+    if(f.idx+1<f.qs.length){
+      f.idx++;
+      var m2T=ackT[f.idx%ackT.length]+' Next: '+f.qs[f.idx];
+      jarvisLog('ai',m2T);jarvisSpeak(m2T,function(){if(__jarvis.on)jarvisListen();});
+    }else{
+      f.awaitMore=true;
+      var nsz=trIntvBatchSize(f.batch+1);
+      var m3T=ackT[f.idx%ackT.length]+' That is '+f.qs.length+' questions answered and saved. Want '+(nsz===20?'twenty':'seven')+' more? Say yes for more, or no to finish.';
+      jarvisLog('ai',m3T);jarvisSpeak(m3T,function(){if(__jarvis.on)jarvisListen();});
+    }
+    return;
   }
   if(f&&f.type==='interview'){
     var lowerI=(text||'').toLowerCase();
@@ -17040,7 +17083,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v298 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v299 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17108,10 +17151,11 @@ function rbRenderQuickAccess(){
       +tile('📦','Orders','Track & re-order','showMyOrders()')
       +'</div>'
       +'<div class="rbq-h">Create in one tap</div>'
-      +'<div class="rbq-row three">'
+      +'<div class="rbq-row">'
       +tile('🛒','List product','Speak or type','openJarvis(\'listprod\')')
       +tile('📢','Post a job','Speak or type','openJarvis(\'postjob\')')
       +tile('➕','Add habit','Build a streak','openHabits()')
+      +tile('🎙️','Transcribe','Record & auto-type','openTranscriber(true)')
       +'</div>';
     shop.parentElement.insertBefore(q,shop);
   }catch(e){}
@@ -17140,13 +17184,14 @@ function rbSysChecks(){
     {n:'Security hardening (safe links, escaped content)',ok:fn('rbSafeURL')&&fn('rbOpen')&&fn('escAttr')},
     {n:'Quick-access tiles on Home',ok:fn('rbRenderQuickAccess')},
     {n:'Live delivery tracking + drone option',ok:fn('liveTrackOrder')&&fn('toggleMyDrone')},
-    {n:'Cross-platform sync — orders, products & jobs reflect live on web, Android and iOS',ok:(typeof fbListenMarketData==='function')&&(typeof scanIncomingOrders==='function')}
+    {n:'Cross-platform sync — orders, products & jobs reflect live on web, Android and iOS',ok:(typeof fbListenMarketData==='function')&&(typeof scanIncomingOrders==='function')},
+    {n:'Overnight transcriber — records & auto-types (English, Malayalam and more), interviews you from the recording',ok:(typeof openTranscriber==='function')&&(typeof trInterviewStart==='function')}
   ];
 }
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v298';var all=(pass===checks.length);
+  var ver='v299';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17159,4 +17204,152 @@ function openSystemCheck(){
   requestAnimationFrame(function(){ov.classList.add('open');});
 }
 
+
+/* ===== v299: OVERNIGHT TRANSCRIBER — single tap record, live transcript (any language), auto-save, interview from recording ===== */
+var __tr={on:false,rec:null,sid:null,lang:(LS.get('rb_tr_lang','en-US')||'en-US'),wl:null,restarts:0};
+var TR_PART_LIMIT=900000;
+function trSessions(){return LS.get('rb_tr_sessions',[])||[];}
+function trSaveSessions(s){LS.set('rb_tr_sessions',s);}
+function trGet(sid){return trSessions().find(function(x){return x.id===sid;});}
+function trPartKey(sid,n){return 'rb_trp_'+sid+'_'+n;}
+function trFullText(sid){var s=trGet(sid);if(!s)return '';var out='';for(var i=0;i<(s.parts||1);i++){out+=(LS.get(trPartKey(sid,i),'')||'');}return out;}
+function trUpdate(s){trSaveSessions(trSessions().map(function(x){return x.id===s.id?s:x;}));}
+function trAppend(sid,txt){var s=trGet(sid);if(!s||!txt)return;var n=(s.parts||1)-1;var cur=LS.get(trPartKey(sid,n),'')||'';var lim=(window.__TR_PART||TR_PART_LIMIT);if(cur.length+txt.length>lim){n++;s.parts=n+1;cur='';}try{LS.set(trPartKey(sid,n),cur+txt);}catch(e){toast('Storage is full — download this recording as .txt to free space','err');}s.chars=(s.chars||0)+txt.length;s.up=Date.now();trUpdate(s);}
+function trNewSession(name){var id='tr'+Date.now();var s={id:id,name:name||('Recording '+new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString().slice(0,5)),lang:__tr.lang,ts:Date.now(),up:Date.now(),parts:1,chars:0,interview:[]};var all=trSessions();all.unshift(s);trSaveSessions(all);LS.set(trPartKey(id,0),'');return s;}
+function trStart(sid){
+  if(!requireAuth('use the transcriber'))return;
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Voice recognition is not supported in this browser — try Chrome','err');return;}
+  if(sid&&trGet(sid))__tr.sid=sid;
+  if(!__tr.sid||!trGet(__tr.sid))__tr.sid=trNewSession().id;
+  __tr.on=true;__tr.restarts=0;trWakeLock();trLoop();trRenderStatus();
+}
+function trLoop(){
+  if(!__tr.on)return;
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
+  var r=new SR();__tr.rec=r;
+  r.continuous=true;r.interimResults=true;if(__tr.lang)r.lang=__tr.lang;
+  r.onresult=function(ev){try{var fin='',inter='';for(var i=ev.resultIndex;i<ev.results.length;i++){var t=(ev.results[i][0]&&ev.results[i][0].transcript)||'';if(ev.results[i].isFinal)fin+=t+' ';else inter+=t;}if(fin)trAppend(__tr.sid,fin);trRenderLive(fin,inter);}catch(e){}};
+  r.onerror=function(e){};
+  r.onend=function(){__tr.rec=null;if(__tr.on){__tr.restarts++;setTimeout(function(){if(__tr.on)trLoop();},250);}trRenderStatus();};
+  try{r.start();}catch(e){}
+  trRenderStatus();
+}
+function trStop(silent){__tr.on=false;try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trReleaseWake();if(!silent)toast('Paused — everything is saved automatically','ok');trRenderStatus();}
+function trWakeLock(){try{if(navigator.wakeLock&&navigator.wakeLock.request){navigator.wakeLock.request('screen').then(function(w){__tr.wl=w;}).catch(function(){});}}catch(e){}}
+function trReleaseWake(){try{if(__tr.wl&&__tr.wl.release)__tr.wl.release();}catch(e){}__tr.wl=null;}
+function trSetLang(l){__tr.lang=l;LS.set('rb_tr_lang',l);if(__tr.on){try{if(__tr.rec)__tr.rec.stop();}catch(e){}}trRenderStatus();}
+function trRenderLive(fin,inter){var box=document.getElementById('tr-live');if(box&&fin){box.textContent=(box.textContent+fin).slice(-6000);box.scrollTop=box.scrollHeight;}var it=document.getElementById('tr-interim');if(it)it.textContent=inter||'';}
+function trRenderStatus(){var st=document.getElementById('tr-status');if(st)st.innerHTML=__tr.on?'<span style="color:#16a34a;font-weight:800">● Recording — I keep listening and typing. Auto-saving.</span>':'<span style="color:var(--mt);font-weight:700">Paused</span>';var tb=document.getElementById('tr-toggle');if(tb)tb.innerHTML=__tr.on?'<i class="ti ti-player-pause"></i> Pause':'<i class="ti ti-microphone"></i> Start';var ch=document.getElementById('tr-chips');if(ch)ch.querySelectorAll('button[data-l]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===__tr.lang);});}
+function trToggle(){if(__tr.on)trStop();else trStart(__tr.sid);}
+function rbCopyAll(sid){var t=trFullText(sid||__tr.sid);if(!t){toast('Nothing recorded yet','info');return;}
+  function done(){toast('Copied '+t.length.toLocaleString()+' characters','ok');}
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(function(){trCopyFallback(t);done();});return;}}catch(e){}
+  trCopyFallback(t);done();}
+function trCopyFallback(t){try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}catch(e){}}
+function trDownload(sid){sid=sid||__tr.sid;var s=trGet(sid);var t=trFullText(sid);if(!t){toast('Nothing recorded yet','info');return;}try{var b=new Blob([t],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=((s&&s.name)||'transcript').replace(/[^\w\- ]+/g,'')+'.txt';document.body.appendChild(a);a.click();a.remove();}catch(e){toast('Download failed on this browser','err');}}
+/* ---- interview FROM the recording ---- */
+var TR_STOPW={'the':1,'and':1,'for':1,'that':1,'this':1,'with':1,'you':1,'your':1,'are':1,'was':1,'were':1,'have':1,'has':1,'had':1,'not':1,'but':1,'they':1,'them':1,'then':1,'than':1,'from':1,'into':1,'about':1,'will':1,'would':1,'could':1,'should':1,'there':1,'their':1,'what':1,'when':1,'where':1,'which':1,'while':1,'been':1,'being':1,'because':1,'very':1,'just':1,'like':1,'also':1,'more':1,'some':1,'such':1,'only':1,'over':1,'after':1,'before':1,'these':1,'those':1,'here':1,'going':1,'okay':1,'yeah':1,'know':1,'want':1,'need':1,'make':1,'made':1,'many':1,'much':1,'other':1,'people':1,'thing':1,'things':1,'time':1,'really':1,'right':1,'well':1,'said':1,'says':1,'can':1,'cannot':1,'dont':1,'its':1,'itself':1};
+function trTopics(text,max){var f={};String(text||'').toLowerCase().replace(/[^a-z\u0d00-\u0d7f0-9 ]+/g,' ').split(/\s+/).forEach(function(w){if(w.length>3&&!TR_STOPW[w])f[w]=(f[w]||0)+1;});return Object.keys(f).sort(function(a,b){return f[b]-f[a];}).slice(0,max||40);}
+function trGenQuestions(text,asked,count){
+  var topics=rbShuffleArr(trTopics(text,40));
+  var tpl=[function(t){return 'The recording talked about "'+t+'". Explain "'+t+'" in your own words.';},
+           function(t){return 'What did the recording say about "'+t+'"?';},
+           function(t){return 'Why is "'+t+'" important in what you listened to?';},
+           function(t){return 'Give one example from the recording related to "'+t+'".';},
+           function(t){return 'How would you use the idea of "'+t+'" in real life?';},
+           function(t){return 'Summarise the part about "'+t+'" in two sentences.';},
+           function(t){return 'What did you learn about "'+t+'" that you did not know before?';}];
+  var generic=['What was the main message of the recording?','Summarise everything you listened to in three sentences.','What was the most surprising point?','Which part would you replay again, and why?','What action will you take after listening to this?','What was the weakest argument you heard?','If you had to teach this to a friend, where would you start?','What question would you ask the speaker?','Which three keywords best describe the recording?','What did the ending conclude?'];
+  var qs=[];var a=asked||{};var ti=0,pi=0;
+  while(qs.length<count&&ti<topics.length*tpl.length){var t=topics[ti%topics.length];var q=tpl[(ti+pi)%tpl.length](t);ti++;if(!a[q]&&qs.indexOf(q)<0)qs.push(q);}
+  rbShuffleArr(generic).forEach(function(q){if(qs.length<count&&!a[q])qs.push(q);});
+  return qs.slice(0,count);
+}
+var __trIntvSid=null;
+function trIntvBatchSize(n){var sizes=[20,20,7];return n<sizes.length?sizes[n]:7;}
+function trInterviewStart(sid){
+  sid=sid||__tr.sid||((trSessions()[0]||{}).id);
+  var s=trGet(sid);if(!s){toast('Record something first, then I can interview you on it','info');try{openTranscriber();}catch(e){}return;}
+  if(trFullText(sid).trim().length<40){toast('The recording is still too short for questions — let it listen a bit more','info');return;}
+  __trIntvSid=sid;
+  if(__jarvis&&__jarvis.on){trIntvBegin();}else{openJarvis('trintv');}
+}
+function trIntvBegin(){
+  var sid=__trIntvSid;var s=trGet(sid);if(!s)return;
+  var text=trFullText(sid);var asked={};(s.interview||[]).forEach(function(x){asked[x.q]=1;});
+  var qs=trGenQuestions(text,asked,trIntvBatchSize(0));
+  __jarvis.flow={type:'trintv',sid:sid,qs:qs,idx:0,batch:0,asked:asked};
+  var m='I read your saved recording "'+s.name+'". I will ask you '+qs.length+' questions about it — answer by voice or type. Everything is saved automatically. Question one: '+qs[0];
+  jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});
+}
+function trIntvSaveAnswer(sid,q,a){var s=trGet(sid);if(!s)return;s.interview=s.interview||[];s.interview.push({q:q,a:a,ts:Date.now()});trUpdate(s);}
+function rbPrintTrInterview(sid){
+  sid=sid||__trIntvSid||((trSessions()[0]||{}).id);var s=trGet(sid);if(!s){toast('No recording found','info');return;}
+  var rows=(s.interview||[]).map(function(x,i){return '<div style="margin:0 0 14px"><div style="font-weight:700">Q'+(i+1)+'. '+esc(x.q)+'</div><div style="margin-top:4px">'+esc(x.a)+'</div></div>';}).join('')||'<i>No interview answers yet.</i>';
+  var html='<html><head><title>'+esc(s.name)+' — Interview</title></head><body style="font-family:Arial,sans-serif;max-width:720px;margin:24px auto;line-height:1.5"><h2>Reedbi — Interview from recording</h2><div style="color:#555;margin-bottom:16px">'+esc(s.name)+' · '+(s.chars||0).toLocaleString()+' characters transcribed</div>'+rows+'<hr><div style="font-size:12px;color:#777">Transcript excerpt:</div><div style="font-size:12px;white-space:pre-wrap">'+esc(trFullText(sid).slice(0,2000))+'</div></body></html>';
+  try{var w=window.open('','_blank');if(w){w.document.write(html);w.document.close();try{w.print();}catch(e){}}}catch(e){}
+}
+function assignTranscriptToHabit(sid){
+  sid=sid||__tr.sid||((trSessions()[0]||{}).id);if(!trGet(sid)){toast('No recording to assign','info');return;}
+  var ex=document.getElementById('trassign-ovl');if(ex)ex.remove();
+  var habits=getHabits();
+  var rows=habits.map(function(h){return '<button class="btn" style="display:block;width:100%;text-align:left;margin-bottom:7px" onclick="trDoAssign(\''+escJS(sid)+'\',\''+escJS(h.id)+'\')">✅ '+esc(h.name||h.n||'Habit')+'</button>';}).join('')||'<div style="font-size:12px;color:var(--mt);margin-bottom:8px">You have no habits yet — create one below.</div>';
+  var ov=document.createElement('div');ov.className='overlay';ov.id='trassign-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:440px"><div class="mhd"><h3>➕ Assign recording to a habit</h3><button class="modal-x" onclick="closeOvl(\'trassign-ovl\')"><i class="ti ti-x"></i></button></div><div class="mbd">'+rows
+    +'<div style="display:flex;gap:7px;margin-top:9px"><input id="trassign-new" placeholder="New habit name (e.g. Daily listening)" style="flex:1;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2)"><button class="btn btnok" onclick="trAssignNew(\''+escJS(sid)+'\')">Create</button></div>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
+function trDoAssign(sid,hid){var hs=getHabits();var h=hs.find(function(x){return x.id===hid;});if(!h)return;h.trs=h.trs||[];if(h.trs.indexOf(sid)<0)h.trs.push(sid);saveHabits(hs);closeOvl('trassign-ovl');toast('Recording attached to "'+(h.name||h.n)+'" ✓','ok');}
+function trAssignNew(sid){var inp=document.getElementById('trassign-new');var nm=(inp&&inp.value||'').trim();if(!nm){toast('Type a habit name','info');return;}var hs=getHabits();var h={id:'h'+Date.now(),name:nm,n:nm,done:[],goals:[],dayGoals:{},trs:[sid]};hs.push(h);saveHabits(hs);closeOvl('trassign-ovl');toast('Habit "'+nm+'" created with your recording ✓','ok');}
+function openTranscriber(startNow){
+  if(!requireAuth('use the transcriber'))return;
+  var ex=document.getElementById('transcriber-ovl');if(ex)ex.remove();
+  if(!__tr.sid||!trGet(__tr.sid)){var s0=trSessions()[0];__tr.sid=s0?s0.id:trNewSession().id;}
+  var chips=[['en-US','English'],['en-IN','English (India)'],['ml-IN','Malayalam'],['hi-IN','Hindi'],['ar-SA','Arabic']].map(function(l){return '<button class="cat-chip'+(__tr.lang===l[0]?' on':'')+'" data-l="'+l[0]+'" onclick="trSetLang(\''+l[0]+'\')">'+esc(l[1])+'</button>';}).join('');
+  var sess=trSessions().slice(0,8).map(function(s){return '<div style="display:flex;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px solid var(--b)"><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12.5px">'+esc(s.name)+'</div><div style="font-size:10px;color:var(--mt)">'+(s.chars||0).toLocaleString()+' chars · '+(s.interview&&s.interview.length?s.interview.length+' answers · ':'')+new Date(s.ts).toLocaleDateString()+'</div></div>'
+    +'<button class="btn" style="padding:6px 9px" title="Continue" onclick="trStart(\''+escJS(s.id)+'\')"><i class="ti ti-microphone"></i></button>'
+    +'<button class="btn" style="padding:6px 9px" title="Interview me" onclick="trInterviewStart(\''+escJS(s.id)+'\')"><i class="ti ti-messages"></i></button>'
+    +'<button class="btn" style="padding:6px 9px" title="Copy all" onclick="rbCopyAll(\''+escJS(s.id)+'\')"><i class="ti ti-copy"></i></button>'
+    +'<button class="btn" style="padding:6px 9px" title="Print interview" onclick="rbPrintTrInterview(\''+escJS(s.id)+'\')"><i class="ti ti-printer"></i></button>'
+    +'<button class="btn" style="padding:6px 9px" title="Assign to habit" onclick="assignTranscriptToHabit(\''+escJS(s.id)+'\')"><i class="ti ti-target-arrow"></i></button>'
+    +'</div>';}).join('');
+  var ov=document.createElement('div');ov.className='overlay';ov.id='transcriber-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:560px;display:flex;flex-direction:column;height:88vh;max-height:88vh">'
+    +'<div class="mhd"><h3>🎙️ Transcriber — records & types everything</h3><button class="modal-x" onclick="closeOvl(\'transcriber-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding-top:10px">'
+    +'<div id="tr-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+chips+'</div>'
+    +'<div id="tr-status" style="font-size:12px;margin-bottom:6px"></div>'
+    +'<div id="tr-live" style="flex:1;overflow-y:auto;background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:11px;font-size:13px;line-height:1.6;white-space:pre-wrap">'+esc(trFullText(__tr.sid).slice(-4000))+'</div>'
+    +'<div id="tr-interim" style="font-size:12px;color:var(--mt);font-style:italic;min-height:16px;margin-top:4px"></div>'
+    +'<div style="display:flex;gap:7px;margin-top:8px;flex-wrap:wrap">'
+    +'<button id="tr-toggle" class="btn btnok" style="flex:1" onclick="trToggle()"><i class="ti ti-microphone"></i> Start</button>'
+    +'<button class="btn" onclick="__tr.sid=trNewSession().id;openTranscriber()"><i class="ti ti-plus"></i> New</button>'
+    +'</div>'
+    +'<div style="display:flex;gap:7px;margin-top:7px;flex-wrap:wrap">'
+    +'<button class="btn" style="flex:1" onclick="rbCopyAll()"><i class="ti ti-copy"></i> Copy all</button>'
+    +'<button class="btn" style="flex:1" onclick="trDownload()"><i class="ti ti-download"></i> .txt</button>'
+    +'<button class="btn" style="flex:1" onclick="trInterviewStart()"><i class="ti ti-messages"></i> Interview me</button>'
+    +'<button class="btn" style="flex:1" onclick="assignTranscriptToHabit()"><i class="ti ti-target-arrow"></i> To habit</button>'
+    +'</div>'
+    +'<div style="font-size:10px;color:var(--mt);margin-top:7px;line-height:1.5">Keep this page open with the screen on (I request a screen wake-lock for you). It transcribes the language you pick — Malayalam and English both work when the device supports them. Long recordings auto-split and auto-save; use .txt to export.</div>'
+    +(sess?('<div style="margin-top:9px;font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em">Saved recordings</div><div style="max-height:150px;overflow-y:auto">'+sess+'</div>'):'')
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+  trRenderStatus();
+  if(startNow)trStart(__tr.sid);
+}
+/* ===== v299: site-level structured data for search engines & AI agents ===== */
+function rbInjectSEO(){try{
+  var prods=[];try{prods=getProducts().filter(function(p){return productInMarketplace(p);}).slice(0,10);}catch(e){}
+  var data=[
+    {'@context':'https://schema.org','@type':'Organization','name':'Reedbi','url':'https://www.reedbi.com','logo':'https://www.reedbi.com/icon-512.png'},
+    {'@context':'https://schema.org','@type':'WebSite','name':'Reedbi','url':'https://www.reedbi.com','description':'Reedbi — shop products, find and post jobs, build habits, with a voice AI agent. UAE and worldwide.','potentialAction':{'@type':'SearchAction','target':'https://www.reedbi.com/#shop?q={search_term_string}','query-input':'required name=search_term_string'}}
+  ];
+  if(prods.length)data.push({'@context':'https://schema.org','@type':'ItemList','itemListElement':prods.map(function(p,i){return {'@type':'ListItem','position':i+1,'item':{'@type':'Product','name':String(p.title||''),'description':String(p.desc||p.title||''),'image':'https://www.reedbi.com/icon-512.png','offers':{'@type':'Offer','price':String(p.offer||p.price||''),'priceCurrency':String(p.currency||'AED'),'availability':'https://schema.org/'+((typeof productAvailable==='function'&&productAvailable(p))?'InStock':'OutOfStock')}}};})});
+  var el=document.getElementById('rb-jsonld');
+  if(!el){el=document.createElement('script');el.id='rb-jsonld';el.type='application/ld+json';document.head.appendChild(el);}
+  el.textContent=JSON.stringify(data);
+}catch(e){}}
 </script></body></html>
