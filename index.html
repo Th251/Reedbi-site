@@ -1405,7 +1405,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v300</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v301</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6144,7 +6144,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v300 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v301 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17111,7 +17111,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v300 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v301 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17220,7 +17220,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v300';var all=(pass===checks.length);
+  var ver='v301';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17248,28 +17248,78 @@ function trNewSession(name){var id='tr'+Date.now();var s={id:id,name:name||('Rec
 function trStart(sid){
   if(!requireAuth('use the transcriber'))return;
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){toast('Voice recognition is not supported in this browser — try Chrome','err');return;}
+  if(!SR){__tr.errMsg='Voice recognition is not supported in this browser — please use Chrome.';trRenderStatus();toast(__tr.errMsg,'err');return;}
   if(sid&&trGet(sid))__tr.sid=sid;
   if(!__tr.sid||!trGet(__tr.sid))__tr.sid=trNewSession().id;
-  __tr.on=true;__tr.restarts=0;trWakeLock();trLoop();trRenderStatus();
+  __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;
+  trRenderStatus();
+  trAcquireMic(function(okStream){
+    if(!__tr.on)return;
+    if(okStream){try{trStartAudioRec(okStream);}catch(e){}}
+    trWakeLock();trLoop();trRenderStatus();
+  });
 }
+function trAcquireMic(cb){
+  try{
+    if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+      navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){__tr.stream=stream;cb(stream);}).catch(function(err){
+        var name=(err&&err.name)||'';
+        if(/NotAllowed|Permission/i.test(name)){trFatal('Microphone permission is blocked. Tap the 🔒 icon in the address bar and allow the microphone, then press Start again. If you opened a downloaded file, use https://www.reedbi.com instead.');}
+        else if(/NotFound|Devices/i.test(name)){trFatal('No microphone was found on this device.');}
+        else{cb(null);}
+      });
+      return;
+    }
+  }catch(e){}
+  cb(null);
+}
+function trFatal(msg){__tr.on=false;__tr.errMsg=msg;try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trStopAudioRec();trReleaseWake();trRenderStatus();toast(msg,'err');}
+function trStartAudioRec(stream){
+  __tr.chunks=[];__tr.lastAudio=null;
+  if(typeof MediaRecorder==='undefined')return;
+  var mr;try{mr=new MediaRecorder(stream,{mimeType:'audio/webm'});}catch(e){try{mr=new MediaRecorder(stream);}catch(e2){return;}}
+  __tr.mediaRec=mr;
+  mr.ondataavailable=function(ev){try{if(ev.data&&ev.data.size)__tr.chunks.push(ev.data);}catch(e){}};
+  mr.onstop=function(){try{if(__tr.chunks&&__tr.chunks.length){__tr.lastAudio={sid:__tr.sid,blob:new Blob(__tr.chunks,{type:(mr.mimeType||'audio/webm')}),ts:Date.now()};}}catch(e){}trRenderStatus();};
+  try{mr.start(10000);}catch(e){}
+}
+function trStopAudioRec(){try{if(__tr.mediaRec&&__tr.mediaRec.state!=='inactive')__tr.mediaRec.stop();}catch(e){}__tr.mediaRec=null;try{if(__tr.stream)__tr.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}__tr.stream=null;}
 function trLoop(){
   if(!__tr.on)return;
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
   var r=new SR();__tr.rec=r;
   r.continuous=true;r.interimResults=true;if(__tr.lang)r.lang=__tr.lang;
-  r.onresult=function(ev){try{var fin='',inter='';for(var i=ev.resultIndex;i<ev.results.length;i++){var t=(ev.results[i][0]&&ev.results[i][0].transcript)||'';if(ev.results[i].isFinal)fin+=t+' ';else inter+=t;}if(fin)trAppend(__tr.sid,fin);trRenderLive(fin,inter);}catch(e){}};
-  r.onerror=function(e){};
+  r.onresult=function(ev){try{var fin='',inter='';for(var i=ev.resultIndex;i<ev.results.length;i++){var t=(ev.results[i][0]&&ev.results[i][0].transcript)||'';if(ev.results[i].isFinal)fin+=t+' ';else inter+=t;}if(fin){__tr.typed=true;__tr.errCount=0;__tr.errMsg='';trAppend(__tr.sid,fin);}trRenderLive(fin,inter);if(fin)trRenderStatus();}catch(e){}};
+  r.onstart=function(){__tr.heard=true;if(!__tr.typed)trRenderStatus();};
+  r.onerror=function(e){
+    var code=(e&&e.error)||'';
+    if(code==='no-speech'||code==='aborted')return;
+    if(code==='not-allowed'||code==='service-not-allowed'){trFatal('Microphone permission is blocked for this page. Tap the 🔒 icon and allow the microphone, then press Start. If you opened a downloaded file, use https://www.reedbi.com.');return;}
+    if(code==='audio-capture'){trFatal('No microphone was found on this device.');return;}
+    if(code==='language-not-supported'){trFatal('This device does not support speech recognition for the selected language. Try English (India) — Malayalam works on most Android Chrome phones.');return;}
+    if(code==='network'){__tr.errCount=(__tr.errCount||0)+1;if(__tr.errCount>=5){trFatal('The speech service is unreachable — recognition needs an internet connection. Check your connection and press Start.');}else{__tr.errMsg='Connection hiccup — retrying…';trRenderStatus();}return;}
+    __tr.errCount=(__tr.errCount||0)+1;if(__tr.errCount>=6)trFatal('Speech recognition keeps failing on this device ('+code+'). Try Chrome on https://www.reedbi.com.');
+  };
   r.onend=function(){__tr.rec=null;if(__tr.on){__tr.restarts++;setTimeout(function(){if(__tr.on)trLoop();},250);}trRenderStatus();};
   try{r.start();}catch(e){}
   trRenderStatus();
 }
-function trStop(silent){__tr.on=false;try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trReleaseWake();if(!silent)toast('Paused — everything is saved automatically','ok');trRenderStatus();}
+function trStop(silent){__tr.on=false;try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trStopAudioRec();trReleaseWake();if(!silent)toast('Paused — text saved. Audio for this session is ready below.','ok');trRenderStatus();}
 function trWakeLock(){try{if(navigator.wakeLock&&navigator.wakeLock.request){navigator.wakeLock.request('screen').then(function(w){__tr.wl=w;}).catch(function(){});}}catch(e){}}
 function trReleaseWake(){try{if(__tr.wl&&__tr.wl.release)__tr.wl.release();}catch(e){}__tr.wl=null;}
 function trSetLang(l){__tr.lang=l;LS.set('rb_tr_lang',l);if(__tr.on){try{if(__tr.rec)__tr.rec.stop();}catch(e){}}trRenderStatus();}
 function trRenderLive(fin,inter){var box=document.getElementById('tr-live');if(box&&fin){box.textContent=(box.textContent+fin).slice(-6000);box.scrollTop=box.scrollHeight;}var it=document.getElementById('tr-interim');if(it)it.textContent=inter||'';}
-function trRenderStatus(){var st=document.getElementById('tr-status');if(st)st.innerHTML=__tr.on?'<span style="color:#16a34a;font-weight:800">● Recording — I keep listening and typing. Auto-saving.</span>':'<span style="color:var(--mt);font-weight:700">Paused</span>';var tb=document.getElementById('tr-toggle');if(tb)tb.innerHTML=__tr.on?'<i class="ti ti-player-pause"></i> Pause':'<i class="ti ti-microphone"></i> Start';var ch=document.getElementById('tr-chips');if(ch)ch.querySelectorAll('button[data-l]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===__tr.lang);});}
+function trRenderStatus(){var st=document.getElementById('tr-status');
+  if(st){
+    if(__tr.errMsg){st.innerHTML='<span style="color:#dc2626;font-weight:800">⚠ '+esc(__tr.errMsg)+'</span>';}
+    else if(!__tr.on){st.innerHTML='<span style="color:var(--mt);font-weight:700">Paused'+(__tr.lastAudio?' — audio ready to share below':'')+'</span>';}
+    else if(__tr.typed){st.innerHTML='<span style="color:#16a34a;font-weight:800">✓ Working — typing what I hear ('+esc(__tr.lang)+'). No replies, only text. Auto-saving.</span>';}
+    else if(__tr.heard){st.innerHTML='<span style="color:#16a34a;font-weight:800">🎤 Microphone is live — speak now and watch the text appear…</span>';}
+    else{st.innerHTML='<span style="color:#d4a017;font-weight:800">… Starting the microphone — if the browser asks for permission, tap Allow.</span>';}
+  }
+  var tb=document.getElementById('tr-toggle');if(tb)tb.innerHTML=__tr.on?'<i class="ti ti-player-pause"></i> Pause':'<i class="ti ti-microphone"></i> Start';
+  var au=document.getElementById('tr-audiorow');if(au)au.style.display=(__tr.lastAudio?'flex':'none');
+  var ch=document.getElementById('tr-chips');if(ch)ch.querySelectorAll('button[data-l]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===__tr.lang);});}
 function trToggle(){if(__tr.on)trStop();else trStart(__tr.sid);}
 function rbCopyAll(sid){var t=trFullText(sid||__tr.sid);if(!t){toast('Nothing recorded yet','info');return;}
   function done(){toast('Copied '+t.length.toLocaleString()+' characters','ok');}
@@ -17340,7 +17390,9 @@ function openTranscriber(startNow){
   var sess=trSessions().slice(0,8).map(function(s){return '<div style="display:flex;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px solid var(--b)"><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12.5px">'+esc(s.name)+'</div><div style="font-size:10px;color:var(--mt)">'+(s.chars||0).toLocaleString()+' chars · '+(s.interview&&s.interview.length?s.interview.length+' answers · ':'')+new Date(s.ts).toLocaleDateString()+'</div></div>'
     +'<button class="btn" style="padding:6px 9px" title="Continue" onclick="trStart(\''+escJS(s.id)+'\')"><i class="ti ti-microphone"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Interview me" onclick="trInterviewStart(\''+escJS(s.id)+'\')"><i class="ti ti-messages"></i></button>'
+    +'<button class="btn" style="padding:6px 9px" title="Rename" onclick="trRename(\''+escJS(s.id)+'\')"><i class="ti ti-pencil"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Copy all" onclick="rbCopyAll(\''+escJS(s.id)+'\')"><i class="ti ti-copy"></i></button>'
+    +'<button class="btn" style="padding:6px 9px" title="Share text" onclick="trShareText(\''+escJS(s.id)+'\')"><i class="ti ti-share"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Print interview" onclick="rbPrintTrInterview(\''+escJS(s.id)+'\')"><i class="ti ti-printer"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Assign to habit" onclick="assignTranscriptToHabit(\''+escJS(s.id)+'\')"><i class="ti ti-target-arrow"></i></button>'
     +'</div>';}).join('');
@@ -17361,8 +17413,10 @@ function openTranscriber(startNow){
     +'<button class="btn" style="flex:1" onclick="trDownload()"><i class="ti ti-download"></i> .txt</button>'
     +'<button class="btn" style="flex:1" onclick="trInterviewStart()"><i class="ti ti-messages"></i> Interview me</button>'
     +'<button class="btn" style="flex:1" onclick="assignTranscriptToHabit()"><i class="ti ti-target-arrow"></i> To habit</button>'
+    +'<button class="btn" style="flex:1" onclick="trShareText()"><i class="ti ti-share"></i> Share</button>'
     +'</div>'
-    +'<div style="font-size:10px;color:var(--mt);margin-top:7px;line-height:1.5">Keep this page open with the screen on (I request a screen wake-lock for you). It transcribes the language you pick — Malayalam and English both work when the device supports them. Long recordings auto-split and auto-save; use .txt to export.</div>'
+    +'<div id="tr-audiorow" style="display:'+(__tr.lastAudio?'flex':'none')+';gap:7px;margin-top:7px"><button class="btn" style="flex:1" onclick="trDownloadAudio()"><i class="ti ti-file-music"></i> Audio (.webm)</button><button class="btn" style="flex:1" onclick="trShareAudio()"><i class="ti ti-share"></i> Share audio</button></div>'
+    +'<div style="font-size:10px;color:var(--mt);margin-top:7px;line-height:1.5">Keep this page open with the screen on (I request a screen wake-lock for you). It transcribes the language you pick — Malayalam and English both work when the device supports them. Long recordings auto-split and auto-save; use .txt to export. It writes the language you speak — Malayalam stays Malayalam, English stays English (no translation). Audio is kept in memory for the latest session only: press Pause, then download or share it.</div>'
     +(sess?('<div style="margin-top:9px;font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em">Saved recordings</div><div style="max-height:150px;overflow-y:auto">'+sess+'</div>'):'')
     +'</div></div>';
   document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
@@ -17453,5 +17507,51 @@ function openNotesList(){
     +'<button class="btn btnok" style="width:100%;margin-bottom:10px" onclick="closeOvl(\'notes-ovl\');jarvisNoteStart()"><i class="ti ti-microphone"></i> New voice note — just talk</button>'
     +rows+'</div></div>';
   document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
+
+/* ===== v301: rename recordings + share text & audio ===== */
+function trRename(sid){
+  var s=trGet(sid);if(!s)return;
+  var ex=document.getElementById('trrename-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='trrename-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:420px"><div class="mhd"><h3>✏️ Rename recording</h3><button class="modal-x" onclick="closeOvl(\'trrename-ovl\')"><i class="ti ti-x"></i></button></div><div class="mbd">'
+    +'<input id="trrename-in" value="'+escAttr(s.name)+'" style="width:100%;padding:11px;border:1px solid var(--b2);border-radius:10px;background:var(--card2);box-sizing:border-box">'
+    +'<button class="btn btnok" style="width:100%;margin-top:9px" onclick="trRenameSave(\''+escJS(sid)+'\')">Save name</button>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+  setTimeout(function(){var i=document.getElementById('trrename-in');if(i)i.focus();},120);
+}
+function trRenameSave(sid){
+  var i=document.getElementById('trrename-in');var nm=(i&&i.value||'').trim();
+  if(!nm){toast('Type a name','info');return;}
+  var s=trGet(sid);if(!s)return;s.name=nm;trUpdate(s);closeOvl('trrename-ovl');toast('Renamed ✓','ok');
+  try{openTranscriber();}catch(e){}
+}
+function trShareText(sid){
+  sid=sid||__tr.sid;var s=trGet(sid);var t=trFullText(sid);
+  if(!t){toast('Nothing recorded yet','info');return;}
+  var title=(s&&s.name)||'Reedbi transcript';
+  try{
+    if(navigator.share){navigator.share({title:title,text:(title+'\n\n'+t).slice(0,60000)}).catch(function(){});return;}
+  }catch(e){}
+  var body=(title+'\n\n'+t);var cut=body.length>1500;
+  rbOpen('https://wa.me/?text='+encodeURIComponent(body.slice(0,1500)+(cut?'…':'')));
+  if(cut)toast('Shared the first part via WhatsApp — use Copy all or .txt for the full text','info');
+}
+function trDownloadAudio(){
+  var a=__tr.lastAudio;if(!a||!a.blob){toast('No audio yet — audio is kept for the latest session only, after you press Pause','info');return;}
+  var s=trGet(a.sid);
+  try{var el=document.createElement('a');el.href=URL.createObjectURL(a.blob);el.download=(((s&&s.name)||'recording').replace(/[^\w\- ]+/g,''))+'.webm';document.body.appendChild(el);el.click();el.remove();}catch(e){toast('Audio download failed on this browser','err');}
+}
+function trShareAudio(){
+  var a=__tr.lastAudio;if(!a||!a.blob){toast('No audio yet — press Pause first; audio is kept for the latest session only','info');return;}
+  var s=trGet(a.sid);var name=(((s&&s.name)||'recording').replace(/[^\w\- ]+/g,''))+'.webm';
+  try{
+    if(navigator.canShare&&navigator.share){
+      var f=new File([a.blob],name,{type:a.blob.type||'audio/webm'});
+      if(navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).catch(function(){});return;}
+    }
+  }catch(e){}
+  trDownloadAudio();
 }
 </script></body></html>
