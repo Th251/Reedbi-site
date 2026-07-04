@@ -1405,7 +1405,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v306</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v307</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6144,7 +6144,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v306 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v307 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17131,7 +17131,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v306 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v307 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17260,13 +17260,14 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
+    {n:'Live transcription diagnostics — word counter + plain-language “why nothing appears” explainer',ok:(typeof trWhyBlank==='function')},
     {n:'Clear View + Post/List entry points for products and jobs (agent or manual)',ok:(typeof openListChooser==='function')&&(typeof openPostJobChooser==='function')}
   ];
 }
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v306';var all=(pass===checks.length);
+  var ver='v307';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17289,7 +17290,7 @@ function trGet(sid){return trSessions().find(function(x){return x.id===sid;});}
 function trPartKey(sid,n){return 'rb_trp_'+sid+'_'+n;}
 function trFullText(sid){var s=trGet(sid);if(!s)return '';var out='';for(var i=0;i<(s.parts||1);i++){out+=(LS.get(trPartKey(sid,i),'')||'');}return out;}
 function trUpdate(s){trSaveSessions(trSessions().map(function(x){return x.id===s.id?s:x;}));}
-function trAppend(sid,txt){var s=trGet(sid);if(!s||!txt)return;var n=(s.parts||1)-1;var cur=LS.get(trPartKey(sid,n),'')||'';var lim=(window.__TR_PART||TR_PART_LIMIT);if(cur.length+txt.length>lim){trCloudSavePart(sid,n);n++;s.parts=n+1;cur='';}try{LS.set(trPartKey(sid,n),cur+txt);}catch(e){toast('Storage is full — download this recording as .txt to free space','err');}s.chars=(s.chars||0)+txt.length;s.up=Date.now();trUpdate(s);try{clearTimeout(__tr.cloudT);}catch(e){}__tr.cloudT=setTimeout(function(){trCloudSaveMeta(s);trCloudSavePart(sid,(s.parts||1)-1);},(window.__TR_CLOUD_MS||6000));}
+function trAppend(sid,txt){var s=trGet(sid);if(!s||!txt)return;var n=(s.parts||1)-1;var cur=LS.get(trPartKey(sid,n),'')||'';var lim=(window.__TR_PART||TR_PART_LIMIT);if(cur.length+txt.length>lim){trCloudSavePart(sid,n);n++;s.parts=n+1;cur='';}try{LS.set(trPartKey(sid,n),cur+txt);}catch(e){toast('Storage is full — download this recording as .txt to free space','err');}s.chars=(s.chars||0)+txt.length;s.up=Date.now();trUpdate(s);__tr.wordCount=(__tr.wordCount||0)+(txt.trim()?txt.trim().split(/\s+/).length:0);try{var _wc=document.getElementById('tr-wc');if(_wc)_wc.textContent=__tr.wordCount.toLocaleString()+' words captured';}catch(e){}try{clearTimeout(__tr.cloudT);}catch(e){}__tr.cloudT=setTimeout(function(){trCloudSaveMeta(s);trCloudSavePart(sid,(s.parts||1)-1);},(window.__TR_CLOUD_MS||6000));}
 function trNewSession(name){var id='tr'+Date.now();var s={id:id,name:name||('Recording '+new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString().slice(0,5)),lang:__tr.lang,ts:Date.now(),up:Date.now(),parts:1,chars:0,interview:[]};var all=trSessions();all.unshift(s);trSaveSessions(all);LS.set(trPartKey(id,0),'');return s;}
 function trStart(sid){
   if(!requireAuth('use the transcriber'))return;
@@ -17297,7 +17298,7 @@ function trStart(sid){
   if(!SR){__tr.errMsg='Voice recognition is not supported in this browser — please use Chrome.';trRenderStatus();toast(__tr.errMsg,'err');return;}
   if(sid&&trGet(sid))__tr.sid=sid;
   if(!__tr.sid||!trGet(__tr.sid))__tr.sid=trNewSession().id;
-  __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;__tr.detected='';
+  __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;__tr.detected='';__tr.wordCount=0;
   trWakeLock();
   if(__tr.engine==='oss'){
     trRenderStatus();
@@ -17475,6 +17476,7 @@ function openTranscriber(startNow){
     +'<div id="tr-status" style="font-size:12px;margin-bottom:6px"></div>'
     +'<div id="tr-live" style="flex:1;overflow-y:auto;background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:11px;font-size:13px;line-height:1.6;white-space:pre-wrap">'+esc(trFullText(__tr.sid).slice(-4000))+'</div>'
     +'<div id="tr-interim" style="font-size:12px;color:var(--mt);font-style:italic;min-height:16px;margin-top:4px"></div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px"><span id="tr-wc" style="font-size:11px;color:#16a34a;font-weight:700">0 words captured</span><button class="btn" style="padding:4px 9px;font-size:11px" onclick="trWhyBlank()">Nothing appearing?</button></div>'
     +'<div style="display:flex;gap:7px;margin-top:8px;flex-wrap:wrap">'
     +'<button id="tr-toggle" class="btn btnok" style="flex:1" onclick="trToggle()"><i class="ti ti-microphone"></i> Start</button>'
     +'<button class="btn" onclick="__tr.sid=trNewSession().id;openTranscriber()"><i class="ti ti-plus"></i> New</button>'
@@ -17910,5 +17912,25 @@ function admVendorRows(){
   var q=admVendorQueue();
   if(!q.length)return '<div style="font-size:12px;color:var(--mt);padding:8px">No pending vendor orders right now.</div>';
   return q.slice(0,40).map(function(o){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:7px 2px;border-bottom:1px solid var(--b);font-size:12px"><span style="flex:1;min-width:0">'+esc(o.productTitle||'Item')+' <span style="color:var(--mt2)">×'+(o.qty||1)+'</span></span><span style="color:var(--mt)">'+esc(o.buyerName||'Customer')+'</span><span style="font-weight:700;color:'+(o.status==='confirmed'?'#16a34a':'#d4a017')+'">'+esc(o.status||'pending')+'</span></div>';}).join('');
+}
+
+/* ===== v307: plain-language "why is nothing appearing" explainer ===== */
+function trWhyBlank(){
+  var ex=document.getElementById('trwhy-ovl');if(ex)ex.remove();
+  var reasons=[];
+  if(location.protocol==='file:')reasons.push('❌ You opened the DOWNLOADED FILE. Voice never works here — open <b>https://www.reedbi.com</b>.');
+  if(__tr.engine==='oss'&&!(window.rbWhisper&&window.rbWhisper.ready))reasons.push('❌ You are on the 🌐 Auto-detect engine but <b>whisper-engine.js</b> is not uploaded to your site yet. Switch to <b>⚡ Online</b> (top of the Transcriber) or upload that file.');
+  if(!(window.SpeechRecognition||window.webkitSpeechRecognition)&&__tr.engine!=='oss')reasons.push('❌ This browser has no speech recognition. Use <b>Chrome</b> on Android or desktop.');
+  if(__tr.permOK===false)reasons.push('❌ Microphone permission is blocked. Tap 🔒 in the address bar → Permissions → Microphone → Allow, then reload.');
+  if(__tr.on&&!__tr.heard&&!__tr.typed)reasons.push('⏳ The recognizer has not started hearing yet — wait 2–3 seconds after Start, then speak clearly.');
+  if(__tr.on&&__tr.heard&&!__tr.typed)reasons.push('🎤 The mic is live but no words yet — speak louder/closer, and check the correct language chip is selected.');
+  if(!reasons.length)reasons.push('If it still will not type: 1) make sure the status shows “🎤 Microphone is live”, 2) speak clearly for 3–4 seconds, 3) confirm you are on https://www.reedbi.com in Chrome. The word counter above increases the moment text is captured.');
+  var ov=document.createElement('div');ov.className='overlay';ov.id='trwhy-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:480px"><div class="mhd"><h3>🔎 Why isn’t text appearing?</h3><button class="modal-x" onclick="closeOvl(\'trwhy-ovl\')"><i class="ti ti-x"></i></button></div><div class="mbd" style="font-size:13px;line-height:1.7">'
+    +reasons.map(function(r){return '<div style="margin-bottom:10px">'+r+'</div>';}).join('')
+    +'<div style="margin-top:6px;padding-top:10px;border-top:1px solid var(--b);font-size:12px;color:var(--mt)">Current engine: <b>'+(__tr.engine==='oss'?'Auto-detect (open source)':'Online')+'</b> · Language: <b>'+esc(__tr.lang)+'</b> · Status: '+(__tr.on?'listening':'paused')+'</div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="closeOvl(\'trwhy-ovl\');openMicHelp()">Open microphone fix guide</button>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
 }
 </script></body></html>
