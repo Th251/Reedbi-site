@@ -1405,7 +1405,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v301</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v303</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6144,7 +6144,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v301 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v303 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11768,7 +11768,7 @@ setInterval(rbUpdateNavBadge,1500);
 setTimeout(rbUpdateNavBadge,1000);
 // default: show the clean Home landing immediately on load
 try{document.body.classList.add('rb-home');}catch(e){}
-setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}try{rbOpenFromHash();}catch(e){}try{rbShowVersion();}catch(e){}try{rbInstallPWA();}catch(e){}try{rbInjectSEO();}catch(e){}},400);
+setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}try{rbOpenFromHash();}catch(e){}try{rbShowVersion();}catch(e){}try{rbInstallPWA();}catch(e){}try{rbInjectSEO();}catch(e){}try{rbFileWarn();}catch(e){}},400);
 
 /* ===== v135: confetti, daily spin wheel, shopper tiers, achievements =====
    Healthy delight: a once-a-day spin, celebratory confetti, and a level that
@@ -16322,12 +16322,12 @@ function jarvisFlowStep(text){
     var ackT=['Saved.','Noted and saved.','Good — saved.','Got it.','Saved that answer.'];
     if(f.idx+1<f.qs.length){
       f.idx++;
-      var m2T=ackT[f.idx%ackT.length]+' Next: '+f.qs[f.idx];
+      var m2T=trIntvReact(text,ackT,f.idx)+' Next: '+f.qs[f.idx];
       jarvisLog('ai',m2T);jarvisSpeak(m2T,function(){if(__jarvis.on)jarvisListen();});
     }else{
       f.awaitMore=true;
       var nsz=trIntvBatchSize(f.batch+1);
-      var m3T=ackT[f.idx%ackT.length]+' That is '+f.qs.length+' questions answered and saved. Want '+(nsz===20?'twenty':'seven')+' more? Say yes for more, or no to finish.';
+      var m3T=trIntvReact(text,ackT,f.idx)+' That is '+f.qs.length+' questions answered and saved. Want '+(nsz===20?'twenty':'seven')+' more? Say yes for more, or no to finish.';
       jarvisLog('ai',m3T);jarvisSpeak(m3T,function(){if(__jarvis.on)jarvisListen();});
     }
     return;
@@ -17111,7 +17111,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v301 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v303 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17214,13 +17214,14 @@ function rbSysChecks(){
     {n:'Live delivery tracking + drone option',ok:fn('liveTrackOrder')&&fn('toggleMyDrone')},
     {n:'Cross-platform sync — orders, products & jobs reflect live on web, Android and iOS',ok:(typeof fbListenMarketData==='function')&&(typeof scanIncomingOrders==='function')},
     {n:'Overnight transcriber — records & auto-types (English, Malayalam and more), interviews you from the recording',ok:(typeof openTranscriber==='function')&&(typeof trInterviewStart==='function')},
-    {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')}
+    {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
+    {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')}
   ];
 }
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v301';var all=(pass===checks.length);
+  var ver='v303';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17235,7 +17236,7 @@ function openSystemCheck(){
 
 
 /* ===== v299: OVERNIGHT TRANSCRIBER — single tap record, live transcript (any language), auto-save, interview from recording ===== */
-var __tr={on:false,rec:null,sid:null,lang:(LS.get('rb_tr_lang','en-US')||'en-US'),wl:null,restarts:0};
+var __tr={on:false,rec:null,sid:null,lang:(LS.get('rb_tr_lang','')||rbTrDefaultLang()),wl:null,restarts:0};
 var TR_PART_LIMIT=900000;
 function trSessions(){return LS.get('rb_tr_sessions',[])||[];}
 function trSaveSessions(s){LS.set('rb_tr_sessions',s);}
@@ -17243,7 +17244,7 @@ function trGet(sid){return trSessions().find(function(x){return x.id===sid;});}
 function trPartKey(sid,n){return 'rb_trp_'+sid+'_'+n;}
 function trFullText(sid){var s=trGet(sid);if(!s)return '';var out='';for(var i=0;i<(s.parts||1);i++){out+=(LS.get(trPartKey(sid,i),'')||'');}return out;}
 function trUpdate(s){trSaveSessions(trSessions().map(function(x){return x.id===s.id?s:x;}));}
-function trAppend(sid,txt){var s=trGet(sid);if(!s||!txt)return;var n=(s.parts||1)-1;var cur=LS.get(trPartKey(sid,n),'')||'';var lim=(window.__TR_PART||TR_PART_LIMIT);if(cur.length+txt.length>lim){n++;s.parts=n+1;cur='';}try{LS.set(trPartKey(sid,n),cur+txt);}catch(e){toast('Storage is full — download this recording as .txt to free space','err');}s.chars=(s.chars||0)+txt.length;s.up=Date.now();trUpdate(s);}
+function trAppend(sid,txt){var s=trGet(sid);if(!s||!txt)return;var n=(s.parts||1)-1;var cur=LS.get(trPartKey(sid,n),'')||'';var lim=(window.__TR_PART||TR_PART_LIMIT);if(cur.length+txt.length>lim){trCloudSavePart(sid,n);n++;s.parts=n+1;cur='';}try{LS.set(trPartKey(sid,n),cur+txt);}catch(e){toast('Storage is full — download this recording as .txt to free space','err');}s.chars=(s.chars||0)+txt.length;s.up=Date.now();trUpdate(s);try{clearTimeout(__tr.cloudT);}catch(e){}__tr.cloudT=setTimeout(function(){trCloudSaveMeta(s);trCloudSavePart(sid,(s.parts||1)-1);},(window.__TR_CLOUD_MS||6000));}
 function trNewSession(name){var id='tr'+Date.now();var s={id:id,name:name||('Recording '+new Date().toLocaleDateString()+' '+new Date().toLocaleTimeString().slice(0,5)),lang:__tr.lang,ts:Date.now(),up:Date.now(),parts:1,chars:0,interview:[]};var all=trSessions();all.unshift(s);trSaveSessions(all);LS.set(trPartKey(id,0),'');return s;}
 function trStart(sid){
   if(!requireAuth('use the transcriber'))return;
@@ -17252,11 +17253,11 @@ function trStart(sid){
   if(sid&&trGet(sid))__tr.sid=sid;
   if(!__tr.sid||!trGet(__tr.sid))__tr.sid=trNewSession().id;
   __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;
-  trRenderStatus();
+  trWakeLock();trLoop();trRenderStatus();
   trAcquireMic(function(okStream){
     if(!__tr.on)return;
     if(okStream){try{trStartAudioRec(okStream);}catch(e){}}
-    trWakeLock();trLoop();trRenderStatus();
+    trRenderStatus();
   });
 }
 function trAcquireMic(cb){
@@ -17304,15 +17305,18 @@ function trLoop(){
   try{r.start();}catch(e){}
   trRenderStatus();
 }
-function trStop(silent){__tr.on=false;try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trStopAudioRec();trReleaseWake();if(!silent)toast('Paused — text saved. Audio for this session is ready below.','ok');trRenderStatus();}
+function trStop(silent){__tr.on=false;try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trStopAudioRec();var _sf=trGet(__tr.sid);if(_sf){trCloudSaveMeta(_sf);trCloudSavePart(_sf.id,(_sf.parts||1)-1);}trReleaseWake();if(!silent)toast('Paused — text saved. Audio for this session is ready below.','ok');trRenderStatus();}
 function trWakeLock(){try{if(navigator.wakeLock&&navigator.wakeLock.request){navigator.wakeLock.request('screen').then(function(w){__tr.wl=w;}).catch(function(){});}}catch(e){}}
 function trReleaseWake(){try{if(__tr.wl&&__tr.wl.release)__tr.wl.release();}catch(e){}__tr.wl=null;}
 function trSetLang(l){__tr.lang=l;LS.set('rb_tr_lang',l);if(__tr.on){try{if(__tr.rec)__tr.rec.stop();}catch(e){}}trRenderStatus();}
 function trRenderLive(fin,inter){var box=document.getElementById('tr-live');if(box&&fin){box.textContent=(box.textContent+fin).slice(-6000);box.scrollTop=box.scrollHeight;}var it=document.getElementById('tr-interim');if(it)it.textContent=inter||'';}
 function trRenderStatus(){var st=document.getElementById('tr-status');
   if(st){
-    if(__tr.errMsg){st.innerHTML='<span style="color:#dc2626;font-weight:800">⚠ '+esc(__tr.errMsg)+'</span>';}
-    else if(!__tr.on){st.innerHTML='<span style="color:var(--mt);font-weight:700">Paused'+(__tr.lastAudio?' — audio ready to share below':'')+'</span>';}
+    if(__tr.errMsg){st.innerHTML='<span style="color:#dc2626;font-weight:800">⚠ '+esc(__tr.errMsg)+'</span>'+(/[Mm]icrophone/.test(__tr.errMsg)?' <button class="btn" style="padding:5px 10px;margin-top:5px" onclick="openMicHelp()">Fix microphone →</button>':'');}
+    else if(!__tr.on){var _ex=(__tr.lastAudio?' — audio ready to share below':'');
+      if(__tr.permOK)st.innerHTML='<span style="color:#16a34a;font-weight:800">Mic permission OK ✅ — press Start and just speak.'+_ex+'</span>';
+      else if(__tr.permPrompt)st.innerHTML='<span style="color:#d4a017;font-weight:800">Press Start — when Chrome asks, tap Allow.'+_ex+'</span>';
+      else st.innerHTML='<span style="color:var(--mt);font-weight:700">Paused'+_ex+'</span>';}
     else if(__tr.typed){st.innerHTML='<span style="color:#16a34a;font-weight:800">✓ Working — typing what I hear ('+esc(__tr.lang)+'). No replies, only text. Auto-saving.</span>';}
     else if(__tr.heard){st.innerHTML='<span style="color:#16a34a;font-weight:800">🎤 Microphone is live — speak now and watch the text appear…</span>';}
     else{st.innerHTML='<span style="color:#d4a017;font-weight:800">… Starting the microphone — if the browser asks for permission, tap Allow.</span>';}
@@ -17321,7 +17325,7 @@ function trRenderStatus(){var st=document.getElementById('tr-status');
   var au=document.getElementById('tr-audiorow');if(au)au.style.display=(__tr.lastAudio?'flex':'none');
   var ch=document.getElementById('tr-chips');if(ch)ch.querySelectorAll('button[data-l]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===__tr.lang);});}
 function trToggle(){if(__tr.on)trStop();else trStart(__tr.sid);}
-function rbCopyAll(sid){var t=trFullText(sid||__tr.sid);if(!t){toast('Nothing recorded yet','info');return;}
+function rbCopyAll(sid){sid=sid||__tr.sid;var sC=trGet(sid);if(sC&&sC.cloud&&!(LS.get(trPartKey(sid,0),'')||'')){trEnsureParts(sid,function(){rbCopyAll(sid);});return;}var t=trFullText(sid);if(!t){toast('Nothing recorded yet','info');return;}
   function done(){toast('Copied '+t.length.toLocaleString()+' characters','ok');}
   try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(function(){trCopyFallback(t);done();});return;}}catch(e){}
   trCopyFallback(t);done();}
@@ -17351,6 +17355,7 @@ function trInterviewStart(sid){
   sid=sid||__tr.sid||((trSessions()[0]||{}).id);
   var s=trGet(sid);if(!s){toast('Record something first, then I can interview you on it','info');try{openTranscriber();}catch(e){}return;}
   if(trFullText(sid).trim().length<40){toast('The recording is still too short for questions — let it listen a bit more','info');return;}
+  var sI=trGet(sid);if(sI&&sI.cloud&&!(LS.get(trPartKey(sid,0),'')||'')){trEnsureParts(sid,function(){trInterviewStart(sid);});return;}
   __trIntvSid=sid;
   if(__jarvis&&__jarvis.on){trIntvBegin();}else{openJarvis('trintv');}
 }
@@ -17373,7 +17378,7 @@ function assignTranscriptToHabit(sid){
   sid=sid||__tr.sid||((trSessions()[0]||{}).id);if(!trGet(sid)){toast('No recording to assign','info');return;}
   var ex=document.getElementById('trassign-ovl');if(ex)ex.remove();
   var habits=getHabits();
-  var rows=habits.map(function(h){return '<button class="btn" style="display:block;width:100%;text-align:left;margin-bottom:7px" onclick="trDoAssign(\''+escJS(sid)+'\',\''+escJS(h.id)+'\')">✅ '+esc(h.name||h.n||'Habit')+'</button>';}).join('')||'<div style="font-size:12px;color:var(--mt);margin-bottom:8px">You have no habits yet — create one below.</div>';
+  var rows=habits.map(function(h){var hb='<button class="btn" style="display:block;width:100%;text-align:left;margin-bottom:5px" onclick="trDoAssign(\''+escJS(sid)+'\',\''+escJS(h.id)+'\')">✅ '+esc(h.name||h.n||'Habit')+'</button>';var gs=(h.goals||[]).map(function(g){return '<button class="btn" style="display:block;width:92%;margin-left:8%;text-align:left;margin-bottom:5px;font-size:12px" onclick="trDoAssignGoal(\''+escJS(sid)+'\',\''+escJS(h.id)+'\',\''+escJS(g.id)+'\')">↳ 🎯 '+esc(g.name||'Goal')+'</button>';}).join('');return hb+gs;}).join('')||'<div style="font-size:12px;color:var(--mt);margin-bottom:8px">You have no habits yet — create one below.</div>';
   var ov=document.createElement('div');ov.className='overlay';ov.id='trassign-ovl';
   ov.innerHTML='<div class="modal" style="max-width:440px"><div class="mhd"><h3>➕ Assign recording to a habit</h3><button class="modal-x" onclick="closeOvl(\'trassign-ovl\')"><i class="ti ti-x"></i></button></div><div class="mbd">'+rows
     +'<div style="display:flex;gap:7px;margin-top:9px"><input id="trassign-new" placeholder="New habit name (e.g. Daily listening)" style="flex:1;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2)"><button class="btn btnok" onclick="trAssignNew(\''+escJS(sid)+'\')">Create</button></div>'
@@ -17386,15 +17391,17 @@ function openTranscriber(startNow){
   if(!requireAuth('use the transcriber'))return;
   var ex=document.getElementById('transcriber-ovl');if(ex)ex.remove();
   if(!__tr.sid||!trGet(__tr.sid)){var s0=trSessions()[0];__tr.sid=s0?s0.id:trNewSession().id;}
-  var chips=[['en-US','English'],['en-IN','English (India)'],['ml-IN','Malayalam'],['hi-IN','Hindi'],['ar-SA','Arabic']].map(function(l){return '<button class="cat-chip'+(__tr.lang===l[0]?' on':'')+'" data-l="'+l[0]+'" onclick="trSetLang(\''+l[0]+'\')">'+esc(l[1])+'</button>';}).join('');
-  var sess=trSessions().slice(0,8).map(function(s){return '<div style="display:flex;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px solid var(--b)"><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12.5px">'+esc(s.name)+'</div><div style="font-size:10px;color:var(--mt)">'+(s.chars||0).toLocaleString()+' chars · '+(s.interview&&s.interview.length?s.interview.length+' answers · ':'')+new Date(s.ts).toLocaleDateString()+'</div></div>'
+  var chips=[['en-US','English'],['en-IN','English (India)'],['ml-IN','Malayalam'],['hi-IN','Hindi'],['ar-SA','Arabic']].map(function(l){return '<button class="cat-chip'+(__tr.lang===l[0]?' on':'')+'" data-l="'+l[0]+'" onclick="trSetLang(\''+l[0]+'\')">'+esc(l[1])+'</button>';}).join('')+'<button class="cat-chip" onclick="openMicHelp()"><i class="ti ti-headset"></i> Mic help</button>';
+  var sess=trSessions().slice(0,8).map(function(s){return '<div style="display:flex;align-items:center;gap:6px;padding:8px 2px;border-bottom:1px solid var(--b);flex-wrap:wrap"><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12.5px">'+esc(s.name)+'</div><div style="font-size:10px;color:var(--mt)">'+(s.chars||0).toLocaleString()+' chars · '+(s.cloud?'☁ ':'')+(s.interview&&s.interview.length?s.interview.length+' answers · ':'')+new Date(s.ts).toLocaleDateString()+'</div></div>'
     +'<button class="btn" style="padding:6px 9px" title="Continue" onclick="trStart(\''+escJS(s.id)+'\')"><i class="ti ti-microphone"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Interview me" onclick="trInterviewStart(\''+escJS(s.id)+'\')"><i class="ti ti-messages"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Rename" onclick="trRename(\''+escJS(s.id)+'\')"><i class="ti ti-pencil"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Copy all" onclick="rbCopyAll(\''+escJS(s.id)+'\')"><i class="ti ti-copy"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Share text" onclick="trShareText(\''+escJS(s.id)+'\')"><i class="ti ti-share"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Print interview" onclick="rbPrintTrInterview(\''+escJS(s.id)+'\')"><i class="ti ti-printer"></i></button>'
-    +'<button class="btn" style="padding:6px 9px" title="Assign to habit" onclick="assignTranscriptToHabit(\''+escJS(s.id)+'\')"><i class="ti ti-target-arrow"></i></button>'
+    +'<button class="btn" style="padding:6px 9px" title="Assign to habit or goal" onclick="assignTranscriptToHabit(\''+escJS(s.id)+'\')"><i class="ti ti-target-arrow"></i></button>'
+    +'<button class="btn" style="padding:6px 9px" title="Edit text" onclick="trEditText(\''+escJS(s.id)+'\')"><i class="ti ti-edit"></i></button>'
+    +'<button class="btn" style="padding:6px 9px;color:#dc2626" title="Delete" onclick="trDelete(\''+escJS(s.id)+'\')"><i class="ti ti-trash"></i></button>'
     +'</div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='transcriber-ovl';
   ov.innerHTML='<div class="modal" style="max-width:560px;display:flex;flex-direction:column;height:88vh;max-height:88vh">'
@@ -17415,12 +17422,14 @@ function openTranscriber(startNow){
     +'<button class="btn" style="flex:1" onclick="assignTranscriptToHabit()"><i class="ti ti-target-arrow"></i> To habit</button>'
     +'<button class="btn" style="flex:1" onclick="trShareText()"><i class="ti ti-share"></i> Share</button>'
     +'</div>'
-    +'<div id="tr-audiorow" style="display:'+(__tr.lastAudio?'flex':'none')+';gap:7px;margin-top:7px"><button class="btn" style="flex:1" onclick="trDownloadAudio()"><i class="ti ti-file-music"></i> Audio (.webm)</button><button class="btn" style="flex:1" onclick="trShareAudio()"><i class="ti ti-share"></i> Share audio</button></div>'
-    +'<div style="font-size:10px;color:var(--mt);margin-top:7px;line-height:1.5">Keep this page open with the screen on (I request a screen wake-lock for you). It transcribes the language you pick — Malayalam and English both work when the device supports them. Long recordings auto-split and auto-save; use .txt to export. It writes the language you speak — Malayalam stays Malayalam, English stays English (no translation). Audio is kept in memory for the latest session only: press Pause, then download or share it.</div>'
+    +'<div id="tr-audiorow" style="display:'+(__tr.lastAudio?'flex':'none')+';gap:7px;margin-top:7px"><button class="btn" style="flex:1" onclick="trDownloadAudio()"><i class="ti ti-file-music"></i> Audio (.webm)</button><button class="btn" style="flex:1" onclick="trShareAudio()"><i class="ti ti-share"></i> Share audio</button><button class="btn" style="flex:1" onclick="trCropAudio()"><i class="ti ti-scissors"></i> Crop</button></div>'
+    +'<div style="font-size:10px;color:var(--mt);margin-top:7px;line-height:1.5">Keep this page open with the screen on (I request a screen wake-lock for you). It transcribes the language you pick — Malayalam and English both work when the device supports them. Long recordings auto-split and auto-save; use .txt to export. It writes the language you speak — Malayalam stays Malayalam, English stays English (no translation). Audio is kept in memory for the latest session only: press Pause, then download or share it. With your Reedbi account, the text also backs up to the cloud automatically — capacity grows to gigabytes per person, far beyond any phone, so week-long recordings are safe.</div>'
     +(sess?('<div style="margin-top:9px;font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em">Saved recordings</div><div style="max-height:150px;overflow-y:auto">'+sess+'</div>'):'')
     +'</div></div>';
   document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
   trRenderStatus();
+  trPermCheck();
+  trCloudPull();
   if(startNow)trStart(__tr.sid);
 }
 /* ===== v299: site-level structured data for search engines & AI agents ===== */
@@ -17528,7 +17537,7 @@ function trRenameSave(sid){
   try{openTranscriber();}catch(e){}
 }
 function trShareText(sid){
-  sid=sid||__tr.sid;var s=trGet(sid);var t=trFullText(sid);
+  sid=sid||__tr.sid;var s=trGet(sid);if(s&&s.cloud&&!(LS.get(trPartKey(sid,0),'')||'')){trEnsureParts(sid,function(){trShareText(sid);});return;}var t=trFullText(sid);
   if(!t){toast('Nothing recorded yet','info');return;}
   var title=(s&&s.name)||'Reedbi transcript';
   try{
@@ -17553,5 +17562,180 @@ function trShareAudio(){
     }
   }catch(e){}
   trDownloadAudio();
+}
+
+/* ===== v302: mic help, delete/edit, goals, brainy replies, audio crop, CLOUD-BACKED unlimited text ===== */
+function rbTrDefaultLang(){var n=(navigator.language||'').toLowerCase();if(n.indexOf('ml')===0)return 'ml-IN';if(n.indexOf('hi')===0)return 'hi-IN';if(n.indexOf('ar')===0)return 'ar-SA';if(n==='en-in')return 'en-IN';return 'en-US';}
+function openMicHelp(){
+  var ex=document.getElementById('michelp-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='michelp-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:480px"><div class="mhd"><h3>🎙️ Fix the microphone — 1 minute</h3><button class="modal-x" onclick="closeOvl(\'michelp-ovl\')"><i class="ti ti-x"></i></button></div><div class="mbd" style="font-size:13px;line-height:1.65">'
+    +'<b>On the website (https://www.reedbi.com), Chrome Android:</b><br>1. Tap the icon at the LEFT of the address bar (🔒 or ⓘ or sliders).<br>2. Tap <b>Permissions</b> → <b>Microphone</b> → <b>Allow</b>.<br>3. Reload the page → open Transcriber → <b>Start</b>.<br><br>'
+    +'<b>If Microphone is not listed there:</b> Chrome ⋮ menu → Settings → Site settings → Microphone → find <b>reedbi.com</b> under Blocked → tap it → Allow.<br><br>'
+    +'<b>Installed Reedbi app (Add to Home screen):</b> long-press the Reedbi icon → App info → Permissions → Microphone → Allow.<br><br>'
+    +'<b>Opened a downloaded file?</b> Voice cannot work from a saved file — open <b>https://www.reedbi.com</b> instead.<br><br>'
+    +'✅ You are done when the status shows <b style="color:#16a34a">“🎤 Microphone is live — speak now”</b>.'
+    +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="rbMicTest()"><i class="ti ti-microphone-2"></i> Test my mic now</button><div id="michelp-result"></div>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
+function trDelete(sid){
+  var s=trGet(sid);if(!s)return;
+  if(__tr.sid===sid&&__tr.on)trStop(true);
+  for(var i=0;i<(s.parts||1);i++){try{LS.del(trPartKey(sid,i));}catch(e){}}
+  trSaveSessions(trSessions().filter(function(x){return x.id!==sid;}));
+  if(__tr.lastAudio&&__tr.lastAudio.sid===sid)__tr.lastAudio=null;
+  if(__tr.sid===sid)__tr.sid=null;
+  toast('Recording deleted','ok');try{openTranscriber();}catch(e){}
+}
+function trEditText(sid){
+  var s=trGet(sid);if(!s)return;
+  var go=function(){
+    var ex=document.getElementById('tredit-ovl');if(ex)ex.remove();
+    var ov=document.createElement('div');ov.className='overlay';ov.id='tredit-ovl';
+    ov.innerHTML='<div class="modal" style="max-width:560px;height:80vh;display:flex;flex-direction:column"><div class="mhd"><h3>✎ Edit transcript — '+esc(s.name)+'</h3><button class="modal-x" onclick="closeOvl(\'tredit-ovl\')"><i class="ti ti-x"></i></button></div>'
+      +'<div class="mbd" style="flex:1;display:flex;flex-direction:column"><textarea id="tredit-ta" style="flex:1;width:100%;box-sizing:border-box;padding:11px;border:1px solid var(--b2);border-radius:11px;background:var(--card2);font-size:13px;line-height:1.6;resize:none">'+esc(trFullText(sid))+'</textarea>'
+      +'<button class="btn btnok" style="margin-top:9px" onclick="trEditSave(\''+escJS(sid)+'\')">Save changes</button></div></div>';
+    document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+  };
+  if(s.cloud&&!(LS.get(trPartKey(sid,0),'')||'')){trEnsureParts(sid,go);}else{go();}
+}
+function trEditSave(sid){
+  var ta=document.getElementById('tredit-ta');var s=trGet(sid);if(!ta||!s)return;
+  var txt=ta.value;var lim=(window.__TR_PART||TR_PART_LIMIT);
+  for(var i=0;i<(s.parts||1);i++){try{LS.del(trPartKey(sid,i));}catch(e){}}
+  var n=0;for(var p=0;p<txt.length||n===0;p+=lim){LS.set(trPartKey(sid,n),txt.slice(p,p+lim));n++;if(p+lim>=txt.length)break;}
+  s.parts=n;s.chars=txt.length;s.up=Date.now();trUpdate(s);
+  for(var k=0;k<n;k++)trCloudSavePart(sid,k);
+  trCloudSaveMeta(s);
+  closeOvl('tredit-ovl');toast('Transcript updated ✓','ok');
+  var lv=document.getElementById('tr-live');if(lv&&__tr.sid===sid)lv.textContent=txt.slice(-6000);
+  try{openTranscriber();}catch(e){}
+}
+function trDoAssignGoal(sid,hid,gid){
+  var hs=getHabits();var h=hs.find(function(x){return x.id===hid;});if(!h)return;
+  var g=(h.goals||[]).find(function(x){return x.id===gid;});
+  h.goalTrs=h.goalTrs||{};h.goalTrs[gid]=h.goalTrs[gid]||[];
+  if(h.goalTrs[gid].indexOf(sid)<0)h.goalTrs[gid].push(sid);
+  saveHabits(hs);closeOvl('trassign-ovl');
+  toast('Recording attached to goal "'+((g&&g.name)||'goal')+'" ✓','ok');
+}
+function trIntvReact(ans,ackT,idx){
+  var kw='';String(ans||'').toLowerCase().replace(/[^a-z\u0d00-\u0d7f0-9 ]+/g,' ').split(/\s+/).forEach(function(w){if(w.length>4&&!TR_STOPW[w]&&w.length>kw.length)kw=w;});
+  if(kw){var v=['Interesting — you mentioned "'+kw+'"; that connects well.','Good point about "'+kw+'" — saved.','"'+kw+'" — strong detail, noted.','Nice, especially the part on "'+kw+'".'];return v[idx%v.length];}
+  return ackT[idx%ackT.length];
+}
+function rbBufToWav(buf){
+  var ch=buf.numberOfChannels,len=buf.length,rate=buf.sampleRate,n=len*ch*2;
+  var ab=new ArrayBuffer(44+n),v=new DataView(ab);
+  function ws(o,s){for(var i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));}
+  ws(0,'RIFF');v.setUint32(4,36+n,true);ws(8,'WAVE');ws(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,rate,true);v.setUint32(28,rate*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);ws(36,'data');v.setUint32(40,n,true);
+  var off=44;
+  for(var i=0;i<len;i++)for(var c=0;c<ch;c++){var x=Math.max(-1,Math.min(1,buf.getChannelData(c)[i]));v.setInt16(off,x<0?x*0x8000:x*0x7FFF,true);off+=2;}
+  return new Blob([ab],{type:'audio/wav'});
+}
+function trCropAudio(){
+  var a=__tr.lastAudio;if(!a||!a.blob){toast('No audio yet — press Pause first','info');return;}
+  var ex=document.getElementById('trcrop-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='trcrop-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:420px"><div class="mhd"><h3>✂ Crop audio</h3><button class="modal-x" onclick="closeOvl(\'trcrop-ovl\')"><i class="ti ti-x"></i></button></div><div class="mbd">'
+    +'<div id="trcrop-dur" style="font-size:12px;color:var(--mt);margin-bottom:9px">Length: measuring…</div>'
+    +'<div style="display:flex;gap:8px"><div style="flex:1"><label style="font-size:11px;color:var(--mt)">Start (seconds)</label><input id="trcrop-s" type="number" min="0" value="0" style="width:100%;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2);box-sizing:border-box"></div>'
+    +'<div style="flex:1"><label style="font-size:11px;color:var(--mt)">End (seconds)</label><input id="trcrop-e" type="number" min="1" value="60" style="width:100%;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2);box-sizing:border-box"></div></div>'
+    +'<button class="btn btnok" style="width:100%;margin-top:10px" onclick="trCropApply()">Crop & keep this part</button>'
+    +'<div style="font-size:10.5px;color:var(--mt);margin-top:8px">The cropped clip is saved as a .wav you can share or download. The original text is not affected.</div>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+  try{
+    a.blob.arrayBuffer().then(function(ab){
+      var AC=window.AudioContext||window.webkitAudioContext;var ctx=new AC();
+      ctx.decodeAudioData(ab.slice(0),function(buf){var d=document.getElementById('trcrop-dur');if(d)d.textContent='Length: '+Math.round(buf.duration)+' seconds';var e=document.getElementById('trcrop-e');if(e)e.value=Math.round(buf.duration);__tr.cropBuf=buf;},function(){var d=document.getElementById('trcrop-dur');if(d)d.textContent='Length: unknown on this browser';});
+    });
+  }catch(e){}
+}
+function trCropApply(){
+  var buf=__tr.cropBuf;
+  if(!buf){toast('This browser cannot decode the audio for cropping — use Share/Download for the full clip','err');return;}
+  var s=parseFloat((document.getElementById('trcrop-s')||{}).value)||0;
+  var e=parseFloat((document.getElementById('trcrop-e')||{}).value)||buf.duration;
+  if(e<=s){toast('End must be after start','info');return;}
+  var rate=buf.sampleRate,from=Math.floor(s*rate),to=Math.min(buf.length,Math.floor(e*rate)),len=to-from;
+  if(len<=0){toast('Nothing selected','info');return;}
+  var ch=buf.numberOfChannels,slices=[];
+  for(var c=0;c<ch;c++)slices.push(buf.getChannelData(c).slice(from,to));
+  var fake={numberOfChannels:ch,length:len,sampleRate:rate,getChannelData:function(c){return slices[c];}};
+  var wav=rbBufToWav(fake);
+  __tr.lastAudio={sid:__tr.lastAudio.sid,blob:wav,ts:Date.now()};
+  closeOvl('trcrop-ovl');trRenderStatus();
+  toast('Cropped ✓ '+Math.round(e-s)+'s clip ready — use Share audio or Audio (.wav)','ok');
+}
+/* ---- cloud backup: text capacity grows with your account, not your phone ---- */
+function trCloudOK(){return !!(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest);}
+function trCloudSaveMeta(s){try{if(!trCloudOK()||!s)return;FB.db.collection('trsessions').doc(CU.uid+'_'+s.id).set({uid:CU.uid,id:s.id,name:s.name,lang:s.lang,ts:s.ts,up:s.up,parts:s.parts||1,chars:s.chars||0},{merge:true}).catch(function(){});}catch(e){}}
+function trCloudSavePart(sid,n){try{if(!trCloudOK())return;var t=LS.get(trPartKey(sid,n),'')||'';FB.db.collection('trparts').doc(CU.uid+'_'+sid+'_'+n).set({uid:CU.uid,sid:sid,n:n,text:t},{merge:true}).catch(function(){});}catch(e){}}
+function trCloudPull(){
+  try{
+    if(!trCloudOK())return;
+    var now=Date.now();if(__tr.pulledAt&&now-__tr.pulledAt<30000)return;__tr.pulledAt=now;
+    FB.db.collection('trsessions').where('uid','==',CU.uid).get().then(function(snap){
+      var have={};trSessions().forEach(function(x){have[x.id]=1;});var added=0;
+      snap.forEach(function(d){var m=d.data();if(m&&m.id&&!have[m.id]){var all=trSessions();all.push({id:m.id,name:m.name||'Cloud recording',lang:m.lang||'en-US',ts:m.ts||now,up:m.up||now,parts:m.parts||1,chars:m.chars||0,interview:[],cloud:true});trSaveSessions(all);added++;}});
+      if(added&&document.getElementById('transcriber-ovl'))try{openTranscriber();}catch(e){}
+    }).catch(function(){});
+  }catch(e){}
+}
+function trEnsureParts(sid,cb){
+  var s=trGet(sid);
+  if(!s||!trCloudOK()||(LS.get(trPartKey(sid,0),'')||'')!==''){if(cb)cb();return;}
+  FB.db.collection('trparts').where('sid','==',sid).get().then(function(snap){
+    var mx=0;snap.forEach(function(d){var p=d.data();if(p&&p.uid===CU.uid){LS.set(trPartKey(sid,p.n||0),p.text||'');if((p.n||0)+1>mx)mx=(p.n||0)+1;}});
+    if(mx){s.parts=mx;s.chars=trFullText(sid).length;trUpdate(s);}
+    if(cb)cb();
+  }).catch(function(){if(cb)cb();});
+}
+
+/* ===== v303: catch the two real blockers automatically — file:// opening and mic permission ===== */
+function rbFileWarn(){
+  try{
+    if(location.protocol!=='file:')return;
+    if(document.getElementById('rb-filewarn'))return;
+    var b=document.createElement('div');b.id='rb-filewarn';
+    b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99998;background:#dc2626;color:#fff;text-align:center;padding:10px 12px;font-size:12.5px;font-weight:800;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.3);cursor:pointer';
+    b.innerHTML='⚠ You opened the DOWNLOADED FILE — voice & microphone cannot work here. Tap to open <u>https://www.reedbi.com</u> and use it there.';
+    b.onclick=function(){try{rbOpen('https://www.reedbi.com');}catch(e){}};
+    document.body.appendChild(b);
+  }catch(e){}
+}
+function trPermCheck(){
+  try{
+    if(!(navigator.permissions&&navigator.permissions.query))return;
+    navigator.permissions.query({name:'microphone'}).then(function(res){
+      function apply(){
+        if(res.state==='denied'){__tr.permOK=false;__tr.errMsg='Microphone permission is blocked for this page. Tap the 🔒 icon and allow the microphone, then press Start. If you opened a downloaded file, use https://www.reedbi.com.';}
+        else if(res.state==='granted'){__tr.permOK=true;__tr.permPrompt=false;if(__tr.errMsg&&/Microphone permission/.test(__tr.errMsg))__tr.errMsg='';}
+        else{__tr.permOK=false;__tr.permPrompt=true;}
+        trRenderStatus();
+      }
+      apply();try{res.onchange=apply;}catch(e){}
+    }).catch(function(){});
+  }catch(e){}
+}
+function rbMicTest(){
+  var out=document.getElementById('michelp-result');
+  function show(ok,msg){if(out)out.innerHTML='<div style="margin-top:10px;padding:10px 12px;border-radius:10px;font-weight:800;font-size:13px;'+(ok?'background:rgba(22,163,74,.10);color:#16a34a':'background:rgba(220,38,38,.10);color:#dc2626')+'">'+msg+'</div>';}
+  try{
+    if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){show(false,'❌ This browser cannot access a microphone here'+(location.protocol==='file:'?' — you opened a downloaded file. Use https://www.reedbi.com.':' — try Chrome.'));return;}
+    if(out)out.innerHTML='<div style="margin-top:10px;font-size:12px;color:var(--mt)">Testing… if Chrome asks, tap <b>Allow</b>.</div>';
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){
+      try{st.getTracks().forEach(function(t){t.stop();});}catch(e){}
+      __tr.permOK=true;__tr.permPrompt=false;if(__tr.errMsg&&/Microphone permission/.test(__tr.errMsg))__tr.errMsg='';trRenderStatus();
+      show(true,'✅ Your microphone works! Close this and press Start — then just speak.');
+    }).catch(function(err){
+      var name=(err&&err.name)||'';
+      if(/NotAllowed|Permission/i.test(name))show(false,'❌ Still blocked. Follow step 1–2 above (🔒 → Permissions → Microphone → Allow), reload, and test again.');
+      else if(/NotFound/i.test(name))show(false,'❌ No microphone was found on this device.');
+      else show(false,'❌ Could not start the microphone ('+esc(name||'unknown')+').');
+    });
+  }catch(e){show(false,'❌ Microphone test failed on this browser.');}
 }
 </script></body></html>
