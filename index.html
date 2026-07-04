@@ -1405,7 +1405,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v303</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v306</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6144,7 +6144,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v303 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v306 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -8804,15 +8804,31 @@ function renderAdminPanel(){
     +'<button class="seller-tab" onclick="adminTab(\'content\')">Content</button>'
     +'<button class="seller-tab" onclick="adminTab(\'cancels\')">Cancellations</button>'
     +'<button class="seller-tab" onclick="adminTab(\'demand\')">User Demand</button>'
+    +'<button class="seller-tab" onclick="adminTab(\'bulkops\')">🤖 Bulk Ops</button>'
     +'</div><div id="admin-tabbody"></div>';
   body.innerHTML=h;
   adminTab('overview');
 }
 var adminCurrentTab='overview';
 function adminTab(t){
-  adminCurrentTab=t;
+  adminCurrentTab=t;if(t!=='bulkops'){try{admScanStop();}catch(e){}}
   var tb=document.getElementById('admin-tabbody');if(!tb)return;
   var pages=getPages();var prods=getProducts();var orders=getOrders();var agents=getAgents();var users=getAllUsersIndex();
+  if(t==='bulkops'){admScanStop();
+    tb.innerHTML='<div style="font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:10px">Agent-driven hypermarket operations. This is the control panel a stocking robot or warehouse team takes orders from — list hundreds of products at once, scan barcodes with the camera, and manage vendor fulfilment. <b>Physical robots are separate hardware;</b> this software issues and tracks the work.</div>'
+      +'<div style="font-weight:800;font-size:13px;margin:6px 0"><i class="ti ti-barcode"></i> Scan to list</div>'
+      +'<video id="adm-scan-video" style="width:100%;max-height:190px;background:#000;border-radius:12px;object-fit:cover"></video>'
+      +'<div id="adm-scan-status" style="font-size:12px;margin:6px 0;min-height:16px"></div>'
+      +'<div style="display:flex;gap:7px;margin-bottom:12px"><button class="btn btnok" style="flex:1" onclick="admScanStart()"><i class="ti ti-camera"></i> Start camera</button><button class="btn" style="flex:1" onclick="admScanStop()"><i class="ti ti-camera-off"></i> Stop</button></div>'
+      +'<div style="font-weight:800;font-size:13px;margin:6px 0"><i class="ti ti-list-details"></i> Bulk product list</div>'
+      +'<textarea id="adm-bulk-in" oninput="admBulkPreview()" placeholder="One product per line:\nBasmati Rice 5kg, 24.90, 100, Grocery, 6291000001234\nOlive Oil 1L, 32, 60, Grocery\nHand Soap, 8.5, 200, Household" style="width:100%;height:120px;box-sizing:border-box;padding:11px;border:1px solid var(--b2);border-radius:11px;background:var(--card2);font-size:12px;line-height:1.5;font-family:monospace"></textarea>'
+      +'<div style="display:flex;gap:7px;margin-top:8px"><input id="adm-bulk-shelf" placeholder="Shelf / aisle (e.g. A3)" style="flex:1;padding:9px;border:1px solid var(--b2);border-radius:9px;background:var(--card2)"><input id="adm-bulk-cur" value="AED" style="width:70px;padding:9px;border:1px solid var(--b2);border-radius:9px;background:var(--card2)"></div>'
+      +'<div id="adm-bulk-preview"></div>'
+      +'<button class="btn btnok" style="width:100%;margin-top:10px" onclick="admBulkSubmit()"><i class="ti ti-cloud-upload"></i> List all products</button>'
+      +'<div style="font-weight:800;font-size:13px;margin:16px 0 6px"><i class="ti ti-truck-delivery"></i> Vendor fulfilment queue</div>'
+      +'<div id="adm-vendor-q">'+admVendorRows()+'</div>';
+    admBulkPreview();return;
+  }
   if(t==='overview'){
     tb.innerHTML='<div class="dispatch-row"><div class="disp-box disp-ship"><b>'+users.length+'</b><small>Users</small></div>'
       +'<div class="disp-box disp-done"><b>'+pages.length+'</b><small>Pages</small></div>'
@@ -15901,6 +15917,8 @@ function jarvisRoute(text){
   if(has(['stop','exit','goodbye','good bye','close','quit','shut down','that is all','thats all']))return {close:true};
   if(has(['take a note','write a note','make a note','note this','start a note','new note','dictate a note','write this down','take notes','voice note'])){return {noteStart:true};}
   if(has(['my notes','show my notes','open my notes','open notes','read my notes','list my notes','notes list','see my notes'])){return {notesList:true};}
+  if(has(['view products','view all products','see products','browse products','open shop','show products list']))return {viewProducts:true};
+  if(has(['view jobs','see jobs','browse jobs','open jobs','jobs list','view all jobs']))return {viewJobs:true};
   if(has(['transcribe','start transcribing','transcriber','record and transcribe','record everything','listen and type','type what you hear','record my video','transcribe the video'])){return {transcriber:true};}
   if(has(['interview me from my recording','interview from recording','questions from my recording','quiz me on the recording','ask me about the recording','interview from the video'])){return {trIntv:true};}
   if(has(['interview by text','text interview','type interview','interview by typing','written interview','practice by text','interview in text','interview without talking','interview by writing','interview by chat','chat interview']))return {textInterview:true};
@@ -16028,6 +16046,8 @@ function jarvisHandle(text){
   if(route.jobStatus){var js=jarvisJobStatusSpoken();jarvisLog('ai',js);jarvisSpeak(js,function(){if(__jarvis.on)jarvisListen();});return;}
   if(route.noteStart){jarvisNoteStart();return;}
   if(route.notesList){minimizeJarvis();openNotesList();if(__jarvis.on)jarvisListen();return;}
+  if(route.viewProducts){closeJarvis();openProductSearch();return;}
+  if(route.viewJobs){closeJarvis();openJobSearch();return;}
   if(route.transcriber){closeJarvis();openTranscriber();return;}
   if(route.trIntv){trInterviewStart();return;}
   if(route.textInterview){closeJarvis();openTextInterview('');return;}
@@ -17111,7 +17131,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v303 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v306 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17171,22 +17191,45 @@ function rbRenderQuickAccess(){
     var ex=document.getElementById('rb-quick');if(ex)ex.remove();
     var q=document.createElement('div');q.id='rb-quick';q.className='rb-quick';
     function tile(ic,label,sub,fn){return '<div class="rbq-tile" onclick="'+fn+'"><div class="rbq-ic">'+ic+'</div><b>'+label+'</b><span>'+sub+'</span></div>';}
-    q.innerHTML='<div class="rbq-h">Explore</div>'
+    q.innerHTML='<div class="rbq-h">View</div>'
       +'<div class="rbq-row">'
-      +tile('🛍️','Shop','All products','openProductSearch()')
-      +tile('💼','Jobs','Matched to you','openJobSearch()')
+      +tile('🛍️','View products','Browse & buy','openProductSearch()')
+      +tile('💼','View jobs','Find & apply','openJobSearch()')
       +tile('✅','Habits','Daily goals','openHabits()')
       +tile('📦','Orders','Track & re-order','showMyOrders()')
       +'</div>'
-      +'<div class="rbq-h">Create in one tap</div>'
+      +'<div class="rbq-h">Post &amp; list</div>'
       +'<div class="rbq-row">'
-      +tile('🛒','List product','Speak or type','openJarvis(\'listprod\')')
-      +tile('📢','Post a job','Speak or type','openJarvis(\'postjob\')')
-      +tile('➕','Add habit','Build a streak','openHabits()')
-      +tile('🎙️','Transcribe','Record & auto-type','openTranscriber(true)')
+      +tile('🛒','List a product','Sell an item','openListChooser()')
+      +tile('📢','Post a job','Hire someone','openPostJobChooser()')
+      +tile('📷','Bulk / scan','Many at once','openBulkListChooser()')
+      +tile('🎙️','Transcribe','Record & type','openTranscriber(true)')
       +'</div>';
     shop.parentElement.insertBefore(q,shop);
   }catch(e){}
+}
+/* v306: give each Post/List tile a clear choice of Agent (voice/type) OR Manual form */
+function rbChooser(title,intro,opts){
+  var ex=document.getElementById('chooser-ovl');if(ex)ex.remove();
+  var rows=opts.map(function(o){return '<button class="btn" style="display:flex;align-items:center;gap:11px;width:100%;text-align:left;margin-bottom:9px;padding:13px" onclick="closeOvl(\'chooser-ovl\');('+o.fn+')()"><span style="font-size:22px">'+o.ic+'</span><span><b style="display:block;font-size:13px">'+esc(o.label)+'</b><span style="font-size:11px;color:var(--mt)">'+esc(o.sub)+'</span></span></button>';}).join('');
+  var ov=document.createElement('div');ov.className='overlay';ov.id='chooser-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:440px"><div class="mhd"><h3>'+esc(title)+'</h3><button class="modal-x" onclick="closeOvl(\'chooser-ovl\')"><i class="ti ti-x"></i></button></div><div class="mbd">'+(intro?'<div style="font-size:12px;color:var(--mt);margin-bottom:11px">'+esc(intro)+'</div>':'')+rows+'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
+function openListChooser(){rbChooser('List a product','How would you like to add your product?',[
+  {ic:'🎙️',label:'Talk or type to the agent',sub:'Say the name, price and stock — it lists it for you',fn:"function(){openJarvis('listprod')}"},
+  {ic:'📝',label:'Fill the form myself',sub:'Add photos, full details manually',fn:'openListProduct'}
+]);}
+function openPostJobChooser(){rbChooser('Post a job','How would you like to post the job?',[
+  {ic:'🎙️',label:'Talk or type to the agent',sub:'It reads back the exact words before posting',fn:"function(){openJarvis('postjob')}"},
+  {ic:'📝',label:'Fill the form myself',sub:'Type the title, company and description',fn:"function(){openTag('jobs')}"}
+]);}
+function openBulkListChooser(){rbChooser('Bulk list / scan','List many products at once, or scan barcodes.',[
+  {ic:'📷',label:'Scan & bulk list (owner)',sub:'Camera barcode scan + paste many rows',fn:'openBulkListing'},
+  {ic:'🎙️',label:'Add one by voice instead',sub:'List a single product by talking',fn:"function(){openJarvis('listprod')}"}
+]);}
+function openBulkListing(){
+  if(typeof openAdminPanel==='function'){openAdminPanel();setTimeout(function(){try{if(typeof adminTab==='function'&&document.getElementById('admin-tabbody'))adminTab('bulkops');}catch(e){}},350);}
 }
 
 /* ===== v294: in-app SYSTEM CHECK — proves every requested feature is present on the device ===== */
@@ -17215,13 +17258,15 @@ function rbSysChecks(){
     {n:'Cross-platform sync — orders, products & jobs reflect live on web, Android and iOS',ok:(typeof fbListenMarketData==='function')&&(typeof scanIncomingOrders==='function')},
     {n:'Overnight transcriber — records & auto-types (English, Malayalam and more), interviews you from the recording',ok:(typeof openTranscriber==='function')&&(typeof trInterviewStart==='function')},
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
-    {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')}
+    {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
+    {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
+    {n:'Clear View + Post/List entry points for products and jobs (agent or manual)',ok:(typeof openListChooser==='function')&&(typeof openPostJobChooser==='function')}
   ];
 }
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v303';var all=(pass===checks.length);
+  var ver='v306';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17236,7 +17281,7 @@ function openSystemCheck(){
 
 
 /* ===== v299: OVERNIGHT TRANSCRIBER — single tap record, live transcript (any language), auto-save, interview from recording ===== */
-var __tr={on:false,rec:null,sid:null,lang:(LS.get('rb_tr_lang','')||rbTrDefaultLang()),wl:null,restarts:0};
+var __tr={on:false,rec:null,sid:null,lang:(LS.get('rb_tr_lang','')||rbTrDefaultLang()),wl:null,restarts:0,engine:(LS.get('rb_tr_engine','ws')||'ws')};
 var TR_PART_LIMIT=900000;
 function trSessions(){return LS.get('rb_tr_sessions',[])||[];}
 function trSaveSessions(s){LS.set('rb_tr_sessions',s);}
@@ -17252,8 +17297,19 @@ function trStart(sid){
   if(!SR){__tr.errMsg='Voice recognition is not supported in this browser — please use Chrome.';trRenderStatus();toast(__tr.errMsg,'err');return;}
   if(sid&&trGet(sid))__tr.sid=sid;
   if(!__tr.sid||!trGet(__tr.sid))__tr.sid=trNewSession().id;
-  __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;
-  trWakeLock();trLoop();trRenderStatus();
+  __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;__tr.detected='';
+  trWakeLock();
+  if(__tr.engine==='oss'){
+    trRenderStatus();
+    trAcquireMic(function(okStream){
+      if(!__tr.on)return;
+      if(okStream){try{trStartAudioRec(okStream);}catch(e){}}
+      else if(!__tr.errMsg){trFatal('The microphone is required for the auto-detect engine.');}
+      trRenderStatus();
+    });
+    return;
+  }
+  trLoop();trRenderStatus();
   trAcquireMic(function(okStream){
     if(!__tr.on)return;
     if(okStream){try{trStartAudioRec(okStream);}catch(e){}}
@@ -17280,9 +17336,9 @@ function trStartAudioRec(stream){
   if(typeof MediaRecorder==='undefined')return;
   var mr;try{mr=new MediaRecorder(stream,{mimeType:'audio/webm'});}catch(e){try{mr=new MediaRecorder(stream);}catch(e2){return;}}
   __tr.mediaRec=mr;
-  mr.ondataavailable=function(ev){try{if(ev.data&&ev.data.size)__tr.chunks.push(ev.data);}catch(e){}};
+  mr.ondataavailable=function(ev){try{if(ev.data&&ev.data.size){__tr.chunks.push(ev.data);if(__tr.engine==='oss'&&__tr.on)rbOSSQueue(ev.data);}}catch(e){}};
   mr.onstop=function(){try{if(__tr.chunks&&__tr.chunks.length){__tr.lastAudio={sid:__tr.sid,blob:new Blob(__tr.chunks,{type:(mr.mimeType||'audio/webm')}),ts:Date.now()};}}catch(e){}trRenderStatus();};
-  try{mr.start(10000);}catch(e){}
+  try{mr.start(__tr.engine==='oss'?6000:10000);}catch(e){}
 }
 function trStopAudioRec(){try{if(__tr.mediaRec&&__tr.mediaRec.state!=='inactive')__tr.mediaRec.stop();}catch(e){}__tr.mediaRec=null;try{if(__tr.stream)__tr.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}__tr.stream=null;}
 function trLoop(){
@@ -17305,7 +17361,7 @@ function trLoop(){
   try{r.start();}catch(e){}
   trRenderStatus();
 }
-function trStop(silent){__tr.on=false;try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trStopAudioRec();var _sf=trGet(__tr.sid);if(_sf){trCloudSaveMeta(_sf);trCloudSavePart(_sf.id,(_sf.parts||1)-1);}trReleaseWake();if(!silent)toast('Paused — text saved. Audio for this session is ready below.','ok');trRenderStatus();}
+function trStop(silent){__tr.on=false;__tr.q=[];__tr.qBusy=false;try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trStopAudioRec();var _sf=trGet(__tr.sid);if(_sf){trCloudSaveMeta(_sf);trCloudSavePart(_sf.id,(_sf.parts||1)-1);}trReleaseWake();if(!silent)toast('Paused — text saved. Audio for this session is ready below.','ok');trRenderStatus();}
 function trWakeLock(){try{if(navigator.wakeLock&&navigator.wakeLock.request){navigator.wakeLock.request('screen').then(function(w){__tr.wl=w;}).catch(function(){});}}catch(e){}}
 function trReleaseWake(){try{if(__tr.wl&&__tr.wl.release)__tr.wl.release();}catch(e){}__tr.wl=null;}
 function trSetLang(l){__tr.lang=l;LS.set('rb_tr_lang',l);if(__tr.on){try{if(__tr.rec)__tr.rec.stop();}catch(e){}}trRenderStatus();}
@@ -17317,6 +17373,9 @@ function trRenderStatus(){var st=document.getElementById('tr-status');
       if(__tr.permOK)st.innerHTML='<span style="color:#16a34a;font-weight:800">Mic permission OK ✅ — press Start and just speak.'+_ex+'</span>';
       else if(__tr.permPrompt)st.innerHTML='<span style="color:#d4a017;font-weight:800">Press Start — when Chrome asks, tap Allow.'+_ex+'</span>';
       else st.innerHTML='<span style="color:var(--mt);font-weight:700">Paused'+_ex+'</span>';}
+    else if(__tr.engine==='oss'&&__tr.typed){st.innerHTML='<span style="color:#16a34a;font-weight:800">✓ Auto-detect typing — language detected: '+esc(__tr.detected||'…')+'. No replies, only text. Auto-saving.</span>';}
+    else if(__tr.engine==='oss'&&__tr.warm&&!(window.rbWhisper&&window.rbWhisper.ready)){st.innerHTML='<span style="color:#d4a017;font-weight:800">… Loading the open-source engine — the first time downloads its model (~40 MB). Keep this open.</span>';}
+    else if(__tr.engine==='oss'){st.innerHTML='<span style="color:#16a34a;font-weight:800">🎤 Auto-detect is listening — speak any language; text appears every ~6 seconds.</span>';}
     else if(__tr.typed){st.innerHTML='<span style="color:#16a34a;font-weight:800">✓ Working — typing what I hear ('+esc(__tr.lang)+'). No replies, only text. Auto-saving.</span>';}
     else if(__tr.heard){st.innerHTML='<span style="color:#16a34a;font-weight:800">🎤 Microphone is live — speak now and watch the text appear…</span>';}
     else{st.innerHTML='<span style="color:#d4a017;font-weight:800">… Starting the microphone — if the browser asks for permission, tap Allow.</span>';}
@@ -17391,7 +17450,7 @@ function openTranscriber(startNow){
   if(!requireAuth('use the transcriber'))return;
   var ex=document.getElementById('transcriber-ovl');if(ex)ex.remove();
   if(!__tr.sid||!trGet(__tr.sid)){var s0=trSessions()[0];__tr.sid=s0?s0.id:trNewSession().id;}
-  var chips=[['en-US','English'],['en-IN','English (India)'],['ml-IN','Malayalam'],['hi-IN','Hindi'],['ar-SA','Arabic']].map(function(l){return '<button class="cat-chip'+(__tr.lang===l[0]?' on':'')+'" data-l="'+l[0]+'" onclick="trSetLang(\''+l[0]+'\')">'+esc(l[1])+'</button>';}).join('')+'<button class="cat-chip" onclick="openMicHelp()"><i class="ti ti-headset"></i> Mic help</button>';
+  var chips=[['en-US','English'],['en-IN','English (India)'],['ml-IN','Malayalam'],['hi-IN','Hindi'],['ar-SA','Arabic']].map(function(l){return '<button class="cat-chip'+(__tr.lang===l[0]?' on':'')+'" data-l="'+l[0]+'" onclick="trSetLang(\''+l[0]+'\')">'+esc(l[1])+'</button>';}).join('');
   var sess=trSessions().slice(0,8).map(function(s){return '<div style="display:flex;align-items:center;gap:6px;padding:8px 2px;border-bottom:1px solid var(--b);flex-wrap:wrap"><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12.5px">'+esc(s.name)+'</div><div style="font-size:10px;color:var(--mt)">'+(s.chars||0).toLocaleString()+' chars · '+(s.cloud?'☁ ':'')+(s.interview&&s.interview.length?s.interview.length+' answers · ':'')+new Date(s.ts).toLocaleDateString()+'</div></div>'
     +'<button class="btn" style="padding:6px 9px" title="Continue" onclick="trStart(\''+escJS(s.id)+'\')"><i class="ti ti-microphone"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Interview me" onclick="trInterviewStart(\''+escJS(s.id)+'\')"><i class="ti ti-messages"></i></button>'
@@ -17407,7 +17466,12 @@ function openTranscriber(startNow){
   ov.innerHTML='<div class="modal" style="max-width:560px;display:flex;flex-direction:column;height:88vh;max-height:88vh">'
     +'<div class="mhd"><h3>🎙️ Transcriber — records & types everything</h3><button class="modal-x" onclick="closeOvl(\'transcriber-ovl\')"><i class="ti ti-x"></i></button></div>'
     +'<div class="mbd" style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding-top:10px">'
-    +'<div id="tr-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+chips+'</div>'
+    +'<div id="tr-engine" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px">'
+    +'<button class="cat-chip'+(__tr.engine!=='oss'?' on':'')+'" onclick="rbTrEngine(\'ws\')">⚡ Online — fast, per-language</button>'
+    +'<button class="cat-chip'+(__tr.engine==='oss'?' on':'')+'" onclick="rbTrEngine(\'oss\')">🌐 Auto-detect — open source</button>'
+    +'<button class="cat-chip" onclick="openMicHelp()"><i class="ti ti-headset"></i> Mic help</button>'
+    +'</div>'
+    +'<div id="tr-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;'+(__tr.engine==='oss'?'opacity:.45;pointer-events:none':'')+'">'+chips+(__tr.engine==='oss'?'<span style="font-size:10px;color:var(--mt);align-self:center">language is detected automatically</span>':'')+'</div>'
     +'<div id="tr-status" style="font-size:12px;margin-bottom:6px"></div>'
     +'<div id="tr-live" style="flex:1;overflow-y:auto;background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:11px;font-size:13px;line-height:1.6;white-space:pre-wrap">'+esc(trFullText(__tr.sid).slice(-4000))+'</div>'
     +'<div id="tr-interim" style="font-size:12px;color:var(--mt);font-style:italic;min-height:16px;margin-top:4px"></div>'
@@ -17575,7 +17639,6 @@ function openMicHelp(){
     +'<b>Installed Reedbi app (Add to Home screen):</b> long-press the Reedbi icon → App info → Permissions → Microphone → Allow.<br><br>'
     +'<b>Opened a downloaded file?</b> Voice cannot work from a saved file — open <b>https://www.reedbi.com</b> instead.<br><br>'
     +'✅ You are done when the status shows <b style="color:#16a34a">“🎤 Microphone is live — speak now”</b>.'
-    +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="rbMicTest()"><i class="ti ti-microphone-2"></i> Test my mic now</button><div id="michelp-result"></div>'
     +'</div></div>';
   document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
 }
@@ -17720,22 +17783,132 @@ function trPermCheck(){
     }).catch(function(){});
   }catch(e){}
 }
-function rbMicTest(){
-  var out=document.getElementById('michelp-result');
-  function show(ok,msg){if(out)out.innerHTML='<div style="margin-top:10px;padding:10px 12px;border-radius:10px;font-weight:800;font-size:13px;'+(ok?'background:rgba(22,163,74,.10);color:#16a34a':'background:rgba(220,38,38,.10);color:#dc2626')+'">'+msg+'</div>';}
-  try{
-    if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){show(false,'❌ This browser cannot access a microphone here'+(location.protocol==='file:'?' — you opened a downloaded file. Use https://www.reedbi.com.':' — try Chrome.'));return;}
-    if(out)out.innerHTML='<div style="margin-top:10px;font-size:12px;color:var(--mt)">Testing… if Chrome asks, tap <b>Allow</b>.</div>';
-    navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){
-      try{st.getTracks().forEach(function(t){t.stop();});}catch(e){}
-      __tr.permOK=true;__tr.permPrompt=false;if(__tr.errMsg&&/Microphone permission/.test(__tr.errMsg))__tr.errMsg='';trRenderStatus();
-      show(true,'✅ Your microphone works! Close this and press Start — then just speak.');
-    }).catch(function(err){
-      var name=(err&&err.name)||'';
-      if(/NotAllowed|Permission/i.test(name))show(false,'❌ Still blocked. Follow step 1–2 above (🔒 → Permissions → Microphone → Allow), reload, and test again.');
-      else if(/NotFound/i.test(name))show(false,'❌ No microphone was found on this device.');
-      else show(false,'❌ Could not start the microphone ('+esc(name||'unknown')+').');
-    });
-  }catch(e){show(false,'❌ Microphone test failed on this browser.');}
+function rbTrEngine(m){
+  if(__tr.engine===m)return;
+  __tr.engine=m;LS.set('rb_tr_engine',m);
+  if(__tr.on)trStop(true);
+  __tr.errMsg='';__tr.detected='';
+  try{openTranscriber();}catch(e){}
+}
+function rbOSSQueue(blob){__tr.q=__tr.q||[];__tr.q.push(blob);rbOSSPump();}
+function rbOSSPump(){
+  if(__tr.qBusy||!__tr.q||!__tr.q.length)return;
+  __tr.qBusy=true;var b=__tr.q.shift();
+  rbOSSLoad(function(ok){
+    if(!ok||!window.rbWhisper||!window.rbWhisper.ready){__tr.qBusy=false;return;}
+    window.rbWhisper.transcribe(b).then(function(r){
+      if(r&&r.text){__tr.typed=true;__tr.errMsg='';if(r.language)__tr.detected=r.language;
+        trAppend(__tr.sid,r.text+' ');trRenderLive(r.text+' ','');}
+      trRenderStatus();
+    }).catch(function(){}).then(function(){__tr.qBusy=false;rbOSSPump();});
+  });
+}
+function rbOSSMissing(){
+  __tr.ossFail=true;
+  __tr.errMsg='The auto-detect engine is not installed on your site yet. Upload the provided whisper-engine.js next to index.html (2-minute step in the transcription guide), or switch back to ⚡ Online.';
+  trRenderStatus();
+}
+function rbOSSLoad(cb){
+  if(window.rbWhisper&&window.rbWhisper.ready){cb(true);return;}
+  if(window.rbWhisper&&!window.rbWhisper.ready){rbOSSMissing();cb(false);return;}
+  if(__tr.ossFail){cb(false);return;}
+  __tr.osscbs=__tr.osscbs||[];__tr.osscbs.push(cb);
+  if(__tr.ossInj)return;
+  __tr.ossInj=true;__tr.warm=true;trRenderStatus();
+  window.rbOSSReady=function(){
+    var ok=!!(window.rbWhisper&&window.rbWhisper.ready);
+    if(!ok)rbOSSMissing();
+    (__tr.osscbs||[]).splice(0).forEach(function(f){try{f(ok);}catch(e){}});
+  };
+  var s=document.createElement('script');s.src='whisper-engine.js';s.setAttribute('data-rboss','1');
+  s.onerror=function(){rbOSSMissing();(__tr.osscbs||[]).splice(0).forEach(function(f){try{f(false);}catch(e){}});};
+  document.head.appendChild(s);
+}
+
+/* ===== v305: Admin "Bulk Ops" — agent-driven bulk listing, barcode scan-to-list, vendor/delivery queue (real software) ===== */
+function admBulkParse(text){
+  var rows=[];String(text||'').split(/\n/).forEach(function(ln){
+    ln=ln.trim();if(!ln)return;
+    var p=ln.split(/\t|,|;|\|/).map(function(x){return x.trim();});
+    if(!p[0])return;
+    var title=p[0];var price=parseFloat(String(p[1]||'').replace(/[^0-9.]/g,''))||0;
+    var qty=parseInt(String(p[2]||'').replace(/[^0-9]/g,''),10);if(!qty||qty<1)qty=1;
+    var cat=p[3]||'Grocery';var bc=p[4]||'';
+    rows.push({title:title,price:price,qty:qty,category:cat,barcode:bc});
+  });
+  return rows;
+}
+function admBulkCreate(rows,opts){
+  opts=opts||{};var made=0,skipped=0;var page=null;try{page=myOwnedPage();}catch(e){}
+  var pageName=(page&&pageLicenseValid(page.name))?page.name:'';
+  var prods=getProducts();
+  rows.forEach(function(r){
+    if(!r.title||r.price<=0){skipped++;return;}
+    var prodNo='';try{prodNo=fmtProdNo(nextProdNoSeq());}catch(e){prodNo='P'+Date.now()+made;}
+    prods.unshift({id:'prd'+Date.now()+'_'+made,prodNo:prodNo,sellerUid:CU.uid,sellerName:CU.name,pageName:pageName,title:r.title,desc:opts.desc||'',price:String(r.price),currency:opts.currency||'AED',qty:r.qty,sold:0,category:r.category||'Grocery',location:(CU.location||''),photos:[],barcode:r.barcode||'',shelf:opts.shelf||'',addr:'',phone:'',map:'',ts:Date.now()+made,interest:0,interestLog:[],batches:[],bulk:true});
+    made++;
+  });
+  saveProducts(prods);
+  try{if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED)prods.slice(0,made).forEach(function(p){FB.db.collection('products').doc(p.id).set(p).catch(function(){});});}catch(e){}
+  return {made:made,skipped:skipped};
+}
+function admBulkPreview(){
+  var ta=document.getElementById('adm-bulk-in');if(!ta)return;
+  var rows=admBulkParse(ta.value);
+  var box=document.getElementById('adm-bulk-preview');if(!box)return;
+  if(!rows.length){box.innerHTML='<div style="color:var(--mt);font-size:12px;padding:8px">Paste rows above, one product per line: <b>Title, Price, Qty, Category, Barcode</b></div>';return;}
+  var head='<div style="font-size:11px;color:var(--mt);margin:6px 0">'+rows.length+' products ready:</div>';
+  var list=rows.slice(0,60).map(function(r,i){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:5px 2px;border-bottom:1px solid var(--b);font-size:12px"><span style="flex:1;min-width:0">'+esc(r.title)+(r.barcode?' <span style="color:var(--mt2)">#'+esc(r.barcode)+'</span>':'')+'</span><span style="font-weight:700">'+esc(String(r.price))+' × '+r.qty+'</span><span style="color:var(--mt)">'+esc(r.category)+'</span></div>';}).join('');
+  box.innerHTML=head+list+(rows.length>60?'<div style="font-size:11px;color:var(--mt);padding:6px">…and '+(rows.length-60)+' more</div>':'');
+}
+function admBulkSubmit(){
+  var ta=document.getElementById('adm-bulk-in');var rows=admBulkParse(ta?ta.value:'');
+  if(!rows.length){toast('Nothing to list — paste product rows first','info');return;}
+  var shelf=(document.getElementById('adm-bulk-shelf')||{}).value||'';
+  var cur=(document.getElementById('adm-bulk-cur')||{}).value||'AED';
+  var res=admBulkCreate(rows,{shelf:shelf,currency:cur});
+  toast('Listed '+res.made+' products'+(res.skipped?(' · '+res.skipped+' skipped (no title/price)'):'')+' ✓','ok');
+  if(ta)ta.value='';admBulkPreview();adminTab('bulkops');
+}
+var __scanStream=null,__scanTimer=null,__scanDetector=null;
+function admScanStart(){
+  var v=document.getElementById('adm-scan-video');var st=document.getElementById('adm-scan-status');
+  if(!v)return;
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){if(st)st.textContent='Camera not available in this browser — use the website on a phone.';return;}
+  if(typeof window.BarcodeDetector==='undefined'){if(st)st.innerHTML='This browser has no barcode reader. You can still type barcodes into the bulk list. (Chrome on Android supports scanning.)';}
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(stream){
+    __scanStream=stream;v.srcObject=stream;v.setAttribute('playsinline','');try{v.play();}catch(e){}
+    if(st)st.innerHTML='<span style="color:#16a34a;font-weight:700">📷 Point at a barcode…</span>';
+    try{if(window.BarcodeDetector){__scanDetector=new window.BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','qr_code']});admScanLoop();}}catch(e){}
+  }).catch(function(err){
+    if(st)st.innerHTML='<span style="color:#dc2626;font-weight:700">Camera blocked — tap the 🔒 icon and allow Camera, then retry.</span>';
+  });
+}
+function admScanLoop(){
+  var v=document.getElementById('adm-scan-video');if(!v||!__scanStream||!__scanDetector)return;
+  __scanDetector.detect(v).then(function(codes){
+    if(codes&&codes.length){admScanHit(codes[0].rawValue);}
+  }).catch(function(){}).then(function(){__scanTimer=setTimeout(admScanLoop,700);});
+}
+function admScanHit(code){
+  if(!code)return;var last=window.__scanLastCode;var now=Date.now();
+  if(last===code&&window.__scanLastAt&&now-window.__scanLastAt<2500)return;
+  var ta=document.getElementById('adm-bulk-in');
+  if(ta&&(ta.value||'').indexOf(code)>=0){window.__scanLastCode=code;window.__scanLastAt=now;var st0=document.getElementById('adm-scan-status');if(st0)st0.innerHTML='<span style="color:var(--mt);font-weight:700">'+esc(code)+' is already in the list.</span>';return;}
+  window.__scanLastCode=code;window.__scanLastAt=now;
+  if(ta){var line='Item (edit name), 0, 1, Grocery, '+code;ta.value=(ta.value?ta.value.replace(/\s*$/,'')+'\n':'')+line;admBulkPreview();}
+  var st=document.getElementById('adm-scan-status');if(st)st.innerHTML='<span style="color:#16a34a;font-weight:800">✓ Scanned '+esc(code)+' — added below. Set its title & price, scan the next.</span>';
+  try{if(navigator.vibrate)navigator.vibrate(60);}catch(e){}
+}
+function admScanStop(){try{if(__scanTimer)clearTimeout(__scanTimer);}catch(e){}__scanTimer=null;__scanDetector=null;try{if(__scanStream)__scanStream.getTracks().forEach(function(t){t.stop();});}catch(e){}__scanStream=null;var v=document.getElementById('adm-scan-video');if(v)v.srcObject=null;}
+function admVendorQueue(){
+  var orders=getOrders();var pending=orders.filter(function(o){return o.status==='pending'||o.status==='confirmed';});
+  return pending;
+}
+
+function admVendorRows(){
+  var q=admVendorQueue();
+  if(!q.length)return '<div style="font-size:12px;color:var(--mt);padding:8px">No pending vendor orders right now.</div>';
+  return q.slice(0,40).map(function(o){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:7px 2px;border-bottom:1px solid var(--b);font-size:12px"><span style="flex:1;min-width:0">'+esc(o.productTitle||'Item')+' <span style="color:var(--mt2)">×'+(o.qty||1)+'</span></span><span style="color:var(--mt)">'+esc(o.buyerName||'Customer')+'</span><span style="font-weight:700;color:'+(o.status==='confirmed'?'#16a34a':'#d4a017')+'">'+esc(o.status||'pending')+'</span></div>';}).join('');
 }
 </script></body></html>
