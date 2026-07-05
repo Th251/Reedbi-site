@@ -1405,7 +1405,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v307</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v310</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6144,7 +6144,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v307 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v310 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17131,7 +17131,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v307 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v310 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17260,6 +17260,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
+    {n:'Correction memory + AI export — learns word fixes across all recordings, sends transcript to ChatGPT/Gemini/Claude/GLM',ok:(typeof trLearnCorrection==='function')&&(typeof trAIExport==='function')},
     {n:'Live transcription diagnostics — word counter + plain-language “why nothing appears” explainer',ok:(typeof trWhyBlank==='function')},
     {n:'Clear View + Post/List entry points for products and jobs (agent or manual)',ok:(typeof openListChooser==='function')&&(typeof openPostJobChooser==='function')}
   ];
@@ -17267,7 +17268,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v307';var all=(pass===checks.length);
+  var ver='v310';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17298,8 +17299,8 @@ function trStart(sid){
   if(!SR){__tr.errMsg='Voice recognition is not supported in this browser — please use Chrome.';trRenderStatus();toast(__tr.errMsg,'err');return;}
   if(sid&&trGet(sid))__tr.sid=sid;
   if(!__tr.sid||!trGet(__tr.sid))__tr.sid=trNewSession().id;
-  __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;__tr.detected='';__tr.wordCount=0;
-  trWakeLock();
+  __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;__tr.detected='';__tr.wordCount=trWordCountOf(__tr.sid);__tr.lastActivity=Date.now();
+  trWakeLock();trStartWatchdog();
   if(__tr.engine==='oss'){
     trRenderStatus();
     trAcquireMic(function(okStream){
@@ -17347,8 +17348,8 @@ function trLoop(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
   var r=new SR();__tr.rec=r;
   r.continuous=true;r.interimResults=true;if(__tr.lang)r.lang=__tr.lang;
-  r.onresult=function(ev){try{var fin='',inter='';for(var i=ev.resultIndex;i<ev.results.length;i++){var t=(ev.results[i][0]&&ev.results[i][0].transcript)||'';if(ev.results[i].isFinal)fin+=t+' ';else inter+=t;}if(fin){__tr.typed=true;__tr.errCount=0;__tr.errMsg='';trAppend(__tr.sid,fin);}trRenderLive(fin,inter);if(fin)trRenderStatus();}catch(e){}};
-  r.onstart=function(){__tr.heard=true;if(!__tr.typed)trRenderStatus();};
+  r.onresult=function(ev){__tr.lastActivity=Date.now();try{var fin='',inter='';for(var i=ev.resultIndex;i<ev.results.length;i++){var t=(ev.results[i][0]&&ev.results[i][0].transcript)||'';if(ev.results[i].isFinal)fin+=t+' ';else inter+=t;}if(fin){__tr.typed=true;__tr.errCount=0;__tr.errMsg='';trAppend(__tr.sid,trApplyCorrections(fin));}trRenderLive(fin,inter);if(fin)trRenderStatus();}catch(e){}};
+  r.onstart=function(){__tr.heard=true;__tr.lastActivity=Date.now();if(!__tr.typed)trRenderStatus();};
   r.onerror=function(e){
     var code=(e&&e.error)||'';
     if(code==='no-speech'||code==='aborted')return;
@@ -17358,11 +17359,11 @@ function trLoop(){
     if(code==='network'){__tr.errCount=(__tr.errCount||0)+1;if(__tr.errCount>=5){trFatal('The speech service is unreachable — recognition needs an internet connection. Check your connection and press Start.');}else{__tr.errMsg='Connection hiccup — retrying…';trRenderStatus();}return;}
     __tr.errCount=(__tr.errCount||0)+1;if(__tr.errCount>=6)trFatal('Speech recognition keeps failing on this device ('+code+'). Try Chrome on https://www.reedbi.com.');
   };
-  r.onend=function(){__tr.rec=null;if(__tr.on){__tr.restarts++;setTimeout(function(){if(__tr.on)trLoop();},250);}trRenderStatus();};
+  r.onend=function(){__tr.rec=null;if(__tr.on){__tr.restarts++;setTimeout(function(){if(__tr.on&&!__tr.rec)trLoop();},150);}trRenderStatus();};
   try{r.start();}catch(e){}
   trRenderStatus();
 }
-function trStop(silent){__tr.on=false;__tr.q=[];__tr.qBusy=false;try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trStopAudioRec();var _sf=trGet(__tr.sid);if(_sf){trCloudSaveMeta(_sf);trCloudSavePart(_sf.id,(_sf.parts||1)-1);}trReleaseWake();if(!silent)toast('Paused — text saved. Audio for this session is ready below.','ok');trRenderStatus();}
+function trStop(silent){__tr.on=false;__tr.q=[];__tr.qBusy=false;trStopWatchdog();try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trStopAudioRec();var _sf=trGet(__tr.sid);if(_sf){trCloudSaveMeta(_sf);trCloudSavePart(_sf.id,(_sf.parts||1)-1);}trReleaseWake();if(!silent)toast('Paused — text saved. Audio for this session is ready below.','ok');trRenderStatus();}
 function trWakeLock(){try{if(navigator.wakeLock&&navigator.wakeLock.request){navigator.wakeLock.request('screen').then(function(w){__tr.wl=w;}).catch(function(){});}}catch(e){}}
 function trReleaseWake(){try{if(__tr.wl&&__tr.wl.release)__tr.wl.release();}catch(e){}__tr.wl=null;}
 function trSetLang(l){__tr.lang=l;LS.set('rb_tr_lang',l);if(__tr.on){try{if(__tr.rec)__tr.rec.stop();}catch(e){}}trRenderStatus();}
@@ -17461,6 +17462,7 @@ function openTranscriber(startNow){
     +'<button class="btn" style="padding:6px 9px" title="Print interview" onclick="rbPrintTrInterview(\''+escJS(s.id)+'\')"><i class="ti ti-printer"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Assign to habit or goal" onclick="assignTranscriptToHabit(\''+escJS(s.id)+'\')"><i class="ti ti-target-arrow"></i></button>'
     +'<button class="btn" style="padding:6px 9px" title="Edit text" onclick="trEditText(\''+escJS(s.id)+'\')"><i class="ti ti-edit"></i></button>'
+    +'<button class="btn" style="padding:6px 9px" title="Send to AI" onclick="trAIExport(\''+escJS(s.id)+'\')"><i class="ti ti-robot"></i></button>'
     +'<button class="btn" style="padding:6px 9px;color:#dc2626" title="Delete" onclick="trDelete(\''+escJS(s.id)+'\')"><i class="ti ti-trash"></i></button>'
     +'</div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='transcriber-ovl';
@@ -17485,17 +17487,20 @@ function openTranscriber(startNow){
     +'<button class="btn" style="flex:1" onclick="rbCopyAll()"><i class="ti ti-copy"></i> Copy all</button>'
     +'<button class="btn" style="flex:1" onclick="trDownload()"><i class="ti ti-download"></i> .txt</button>'
     +'<button class="btn" style="flex:1" onclick="trInterviewStart()"><i class="ti ti-messages"></i> Interview me</button>'
+    +'<button class="btn" style="flex:1" onclick="trAIExport()"><i class="ti ti-robot"></i> Send to AI</button>'
+    +'<button class="btn" style="flex:1" onclick="openCorrections()"><i class="ti ti-brain"></i> Fix words</button>'
     +'<button class="btn" style="flex:1" onclick="assignTranscriptToHabit()"><i class="ti ti-target-arrow"></i> To habit</button>'
     +'<button class="btn" style="flex:1" onclick="trShareText()"><i class="ti ti-share"></i> Share</button>'
     +'</div>'
     +'<div id="tr-audiorow" style="display:'+(__tr.lastAudio?'flex':'none')+';gap:7px;margin-top:7px"><button class="btn" style="flex:1" onclick="trDownloadAudio()"><i class="ti ti-file-music"></i> Audio (.webm)</button><button class="btn" style="flex:1" onclick="trShareAudio()"><i class="ti ti-share"></i> Share audio</button><button class="btn" style="flex:1" onclick="trCropAudio()"><i class="ti ti-scissors"></i> Crop</button></div>'
-    +'<div style="font-size:10px;color:var(--mt);margin-top:7px;line-height:1.5">Keep this page open with the screen on (I request a screen wake-lock for you). It transcribes the language you pick — Malayalam and English both work when the device supports them. Long recordings auto-split and auto-save; use .txt to export. It writes the language you speak — Malayalam stays Malayalam, English stays English (no translation). Audio is kept in memory for the latest session only: press Pause, then download or share it. With your Reedbi account, the text also backs up to the cloud automatically — capacity grows to gigabytes per person, far beyond any phone, so week-long recordings are safe.</div>'
+    +'<div style="font-size:10px;color:var(--mt);margin-top:7px;line-height:1.5">Keep this page open with the screen on (I request a screen wake-lock for you). It transcribes the language you pick — Malayalam and English both work when the device supports them. Long recordings auto-split and auto-save; use .txt to export. It writes the language you speak — Malayalam stays Malayalam, English stays English (no translation). Audio is kept in memory for the latest session only: press Pause, then download or share it. With your Reedbi account, the text also backs up to the cloud automatically. A 12-hour video is roughly 100,000–130,000 spoken words (~1 MB of text) — easily handled here; your account holds gigabytes per person, enough for hundreds of such videos. (No system on earth stores "a trillion words" for one file — but you will never hit a limit for real recordings.)</div>'
     +(sess?('<div style="margin-top:9px;font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em">Saved recordings</div><div style="max-height:150px;overflow-y:auto">'+sess+'</div>'):'')
     +'</div></div>';
   document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
   trRenderStatus();
   trPermCheck();
   trCloudPull();
+  trPullCorrections();
   if(startNow)trStart(__tr.sid);
 }
 /* ===== v299: site-level structured data for search engines & AI agents ===== */
@@ -17667,13 +17672,13 @@ function trEditText(sid){
 }
 function trEditSave(sid){
   var ta=document.getElementById('tredit-ta');var s=trGet(sid);if(!ta||!s)return;
-  var txt=ta.value;var lim=(window.__TR_PART||TR_PART_LIMIT);
+  var txt=ta.value;var _learned=trDiffLearn(sid,txt);var lim=(window.__TR_PART||TR_PART_LIMIT);
   for(var i=0;i<(s.parts||1);i++){try{LS.del(trPartKey(sid,i));}catch(e){}}
   var n=0;for(var p=0;p<txt.length||n===0;p+=lim){LS.set(trPartKey(sid,n),txt.slice(p,p+lim));n++;if(p+lim>=txt.length)break;}
   s.parts=n;s.chars=txt.length;s.up=Date.now();trUpdate(s);
   for(var k=0;k<n;k++)trCloudSavePart(sid,k);
   trCloudSaveMeta(s);
-  closeOvl('tredit-ovl');toast('Transcript updated ✓','ok');
+  closeOvl('tredit-ovl');toast('Transcript updated ✓'+(_learned?(' · learned '+_learned+' correction'+(_learned>1?'s':'')+' for future recordings'):''),'ok');
   var lv=document.getElementById('tr-live');if(lv&&__tr.sid===sid)lv.textContent=txt.slice(-6000);
   try{openTranscriber();}catch(e){}
 }
@@ -17800,7 +17805,7 @@ function rbOSSPump(){
     if(!ok||!window.rbWhisper||!window.rbWhisper.ready){__tr.qBusy=false;return;}
     window.rbWhisper.transcribe(b).then(function(r){
       if(r&&r.text){__tr.typed=true;__tr.errMsg='';if(r.language)__tr.detected=r.language;
-        trAppend(__tr.sid,r.text+' ');trRenderLive(r.text+' ','');}
+        var _ct=trApplyCorrections(r.text+' ');trAppend(__tr.sid,_ct);trRenderLive(_ct,'');}
       trRenderStatus();
     }).catch(function(){}).then(function(){__tr.qBusy=false;rbOSSPump();});
   });
@@ -17932,5 +17937,163 @@ function trWhyBlank(){
     +'<button class="btn btnok" style="width:100%;margin-top:12px" onclick="closeOvl(\'trwhy-ovl\');openMicHelp()">Open microphone fix guide</button>'
     +'</div></div>';
   document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
+
+/* ===== v307: watchdog — the real fix for long recordings silently stopping on phones ===== */
+function trStartWatchdog(){
+  trStopWatchdog();
+  __tr.watchdog=setInterval(function(){
+    if(!__tr.on){trStopWatchdog();return;}
+    if(__tr.engine==='oss')return; // oss uses its own chunk pump
+    var idle=Date.now()-(__tr.lastActivity||0);
+    // Chrome often silently ends a long session without firing onend. If no activity for 8s, force a fresh recognizer.
+    if(idle>8000){
+      __tr.forcedRestarts=(__tr.forcedRestarts||0)+1;
+      try{if(__tr.rec){__tr.rec.onend=null;__tr.rec.stop();}}catch(e){}
+      __tr.rec=null;
+      __tr.lastActivity=Date.now();
+      if(__tr.on)trLoop();
+      trRenderStatus();
+    }
+  },3000);
+}
+function trStopWatchdog(){try{if(__tr.watchdog)clearInterval(__tr.watchdog);}catch(e){}__tr.watchdog=null;}
+function trWhyBlank(){
+  var lines=[];
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(location.protocol==='file:')lines.push('❌ You opened the downloaded FILE. Voice cannot work here — open https://www.reedbi.com.');
+  if(__tr.engine==='oss'&&!(window.rbWhisper&&window.rbWhisper.ready))lines.push('⏳ The open-source engine model is still loading (first use downloads ~40 MB). Wait, or switch to ⚡ Online.');
+  if(!SR&&__tr.engine!=='oss')lines.push('❌ This browser has no speech recognition. Use Chrome, or switch to 🌐 Auto-detect.');
+  if(__tr.errMsg)lines.push('⚠ '+__tr.errMsg);
+  if(!__tr.heard&&__tr.on)lines.push('🎤 Waiting for the microphone to start — if Chrome shows a permission prompt, tap Allow.');
+  if(__tr.heard&&!__tr.typed&&__tr.on)lines.push('🔊 Microphone is on but no speech recognized yet — make sure the video volume is up and the phone mic isn\'t covered. For Malayalam, confirm the language chip is set to Malayalam (or use 🌐 Auto-detect).');
+  if(__tr.on&&__tr.typed)lines.push('✅ It IS writing — '+(__tr.wordCount||0).toLocaleString()+' words so far. If it paused, the watchdog restarts it automatically every few seconds.');
+  if(!__tr.on)lines.push('⏸ Recording is paused. Press Start to continue — your saved text is safe.');
+  lines.push('ℹ For very long videos (hours), keep this screen ON and in front; phones suspend the microphone when the screen sleeps or another app covers it. The watchdog auto-restarts within ~8 seconds whenever the phone cuts the mic.');
+  var ex=document.getElementById('trwhy-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='trwhy-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:460px"><div class="mhd"><h3>Why isn\'t it writing?</h3><button class="modal-x" onclick="closeOvl(\'trwhy-ovl\')"><i class="ti ti-x"></i></button></div><div class="mbd" style="font-size:13px;line-height:1.65">'+lines.map(function(l){return '<div style="margin-bottom:9px">'+esc(l)+'</div>';}).join('')+'<div style="font-size:11px;color:var(--mt);margin-top:6px">Engine: '+(__tr.engine==='oss'?'🌐 Auto-detect':'⚡ Online')+' · Language: '+esc(__tr.lang)+' · Status: '+(__tr.on?'listening':'paused')+'</div></div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
+
+/* ===== v309: cumulative word counter (survives breaks) + honest large-capacity guidance ===== */
+function trWordCountOf(sid){try{var t=trFullText(sid);return t.trim()?t.trim().split(/\s+/).length:0;}catch(e){return 0;}}
+
+/* ===== v310: correction memory (learns fixes), AI export, full copy/share ===== */
+function trCorrections(){return LS.get('rb_tr_corrections',{})||{};}
+function trSaveCorrections(m){LS.set('rb_tr_corrections',m);try{if(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest)FB.db.collection('trcorrections').doc(CU.uid).set({map:m,up:Date.now()},{merge:true}).catch(function(){});}catch(e){}}
+function trApplyCorrections(text){
+  var m=trCorrections();var keys=Object.keys(m);if(!keys.length||!text)return text;
+  keys.sort(function(a,b){return b.length-a.length;});
+  keys.forEach(function(wrong){
+    var right=m[wrong];if(!wrong||right==null)return;
+    try{
+      var esc=wrong.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      // word-ish boundary that also works around non-Latin scripts (Malayalam etc.)
+      var re=new RegExp('(^|[^\\p{L}\\p{N}])('+esc+')(?=$|[^\\p{L}\\p{N}])','giu');
+      text=text.replace(re,function(_,pre){return pre+right;});
+    }catch(e){
+      try{text=text.split(wrong).join(right);}catch(e2){}
+    }
+  });
+  return text;
+}
+function trLearnCorrection(wrong,right){
+  wrong=(wrong||'').trim();right=(right||'').trim();
+  if(!wrong||!right||wrong===right)return false;
+  var m=trCorrections();m[wrong]=right;trSaveCorrections(m);
+  // apply retroactively to every saved recording
+  var fixedCount=0;
+  trSessions().forEach(function(s){
+    var changed=false;
+    for(var i=0;i<(s.parts||1);i++){
+      var k=trPartKey(s.id,i);var t=LS.get(k,'');if(t==null)continue;
+      var nt=trApplyCorrections(t);
+      if(nt!==t){LS.set(k,nt);changed=true;fixedCount++;}
+    }
+    if(changed){s.chars=trFullText(s.id).length;s.up=Date.now();trUpdate(s);for(var j=0;j<(s.parts||1);j++)trCloudSavePart(s.id,j);trCloudSaveMeta(s);}
+  });
+  // refresh the live view if open
+  try{var lv=document.getElementById('tr-live');if(lv&&__tr.sid)lv.textContent=trFullText(__tr.sid).slice(-6000);}catch(e){}
+  return true;
+}
+function trDiffLearn(sid,newText){
+  // when the user edits a transcript, learn word-level replacements (old->new) automatically
+  var oldText=trFullText(sid);
+  var ow=oldText.split(/\s+/),nw=newText.split(/\s+/);
+  var learned=0;
+  if(ow.length===nw.length){
+    for(var i=0;i<ow.length;i++){
+      var a=ow[i].replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,''),b=nw[i].replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,'');
+      if(a&&b&&a!==b&&a.length>1){var m=trCorrections();if(m[a]!==b){m[a]=b;trSaveCorrections(m);learned++;}}
+    }
+  }
+  return learned;
+}
+function openCorrections(){
+  var ex=document.getElementById('trcorr-ovl');if(ex)ex.remove();
+  var m=trCorrections();var keys=Object.keys(m);
+  var rows=keys.length?keys.map(function(w){return '<div style="display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px solid var(--b);font-size:13px"><span style="flex:1;min-width:0"><s style="color:#dc2626">'+esc(w)+'</s> → <b style="color:#16a34a">'+esc(m[w])+'</b></span><button class="btn" style="padding:4px 8px;color:#dc2626" onclick="trDelCorrection(\''+escJS(w)+'\')"><i class="ti ti-x"></i></button></div>';}).join(''):'<div style="color:var(--mt);font-size:12px;padding:8px">No corrections learned yet. Add one below — it fixes that word in every recording, past and future.</div>';
+  var ov=document.createElement('div');ov.className='overlay';ov.id='trcorr-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:480px;max-height:82vh;display:flex;flex-direction:column"><div class="mhd"><h3>🧠 Correction memory</h3><button class="modal-x" onclick="closeOvl(\'trcorr-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="overflow-y:auto">'
+    +'<div style="font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:10px">Teach the transcriber a fix once. Every place that wrong word appears — in this recording and all your saved ones — is corrected, and future recordings apply it automatically. Works for Malayalam, English and Hindi words, and for slang.</div>'
+    +'<div style="display:flex;gap:7px;margin-bottom:6px"><input id="trcorr-wrong" placeholder="Wrong word (as written)" style="flex:1;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2)"><input id="trcorr-right" placeholder="Correct word" style="flex:1;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2)"></div>'
+    +'<button class="btn btnok" style="width:100%;margin-bottom:12px" onclick="trAddCorrection()"><i class="ti ti-check"></i> Learn & fix everywhere</button>'
+    +'<div style="font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Learned corrections</div>'
+    +rows
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
+function trAddCorrection(){
+  var w=(document.getElementById('trcorr-wrong')||{}).value||'';
+  var r=(document.getElementById('trcorr-right')||{}).value||'';
+  if(!trLearnCorrection(w,r)){toast('Type both the wrong word and the correct word','info');return;}
+  toast('Learned "'+w.trim()+'" → "'+r.trim()+'" and fixed it everywhere ✓','ok');
+  openCorrections();
+}
+function trDelCorrection(w){var m=trCorrections();delete m[w];trSaveCorrections(m);openCorrections();}
+/* ---- export the transcript to an AI model (ChatGPT, Gemini, Claude, GLM, …) ---- */
+function trAIExport(sid){
+  sid=sid||__tr.sid||((trSessions()[0]||{}).id);
+  var s=trGet(sid);var t=trFullText(sid);
+  if(!t){toast('Nothing recorded yet','info');return;}
+  var ex=document.getElementById('traiexp-ovl');if(ex)ex.remove();
+  var prompt='Here is a transcript I recorded'+(s&&s.name?(' ("'+s.name+'")'):'')+'. Please read it, correct any obvious transcription errors, summarise the key points, and then ask me interview questions to test my understanding:\n\n'+t;
+  var ov=document.createElement('div');ov.className='overlay';ov.id='traiexp-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:520px;max-height:84vh;display:flex;flex-direction:column"><div class="mhd"><h3>🤖 Send to an AI model</h3><button class="modal-x" onclick="closeOvl(\'traiexp-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="overflow-y:auto">'
+    +'<div style="font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:10px">Copy your transcript (with a ready-made prompt) and open any AI to paste it — it will correct, summarise and quiz you. For very long transcripts, use “Copy for AI”, then paste into the model.</div>'
+    +'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">'
+    +'<button class="btn btnok" style="flex:1;min-width:130px" onclick="trCopyForAI(\''+escJS(sid)+'\')"><i class="ti ti-copy"></i> Copy for AI</button>'
+    +'<button class="btn" style="flex:1;min-width:130px" onclick="trShareText(\''+escJS(sid)+'\')"><i class="ti ti-share"></i> Share transcript</button>'
+    +'</div>'
+    +'<div style="font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Open a model</div>'
+    +'<div style="display:flex;flex-direction:column;gap:7px">'
+    +'<button class="btn" onclick="rbOpen(\'https://chatgpt.com/\')">ChatGPT ↗</button>'
+    +'<button class="btn" onclick="rbOpen(\'https://gemini.google.com/app\')">Gemini ↗</button>'
+    +'<button class="btn" onclick="rbOpen(\'https://claude.ai/new\')">Claude ↗</button>'
+    +'<button class="btn" onclick="rbOpen(\'https://chat.z.ai/\')">GLM (Z.ai) ↗</button>'
+    +'</div>'
+    +'<div style="font-size:10.5px;color:var(--mt);margin-top:10px">Tip: paste right after opening the model. The copied text already includes the instruction to correct, summarise and quiz you.</div>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+  __tr.aiPrompt=prompt;
+}
+function trCopyForAI(sid){
+  var t=__tr.aiPrompt||trFullText(sid);
+  function done(){toast('Copied for AI — now open a model and paste','ok');}
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(function(){trCopyFallback(t);done();});return;}}catch(e){}
+  trCopyFallback(t);done();
+}
+
+function trPullCorrections(){
+  try{
+    if(!(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest))return;
+    if(__tr.corrPulled&&Date.now()-__tr.corrPulled<60000)return;__tr.corrPulled=Date.now();
+    FB.db.collection('trcorrections').doc(CU.uid).get().then(function(d){
+      var data=d&&d.data&&d.data();if(data&&data.map){var local=trCorrections();var merged=Object.assign({},data.map,local);LS.set('rb_tr_corrections',merged);}
+    }).catch(function(){});
+  }catch(e){}
 }
 </script></body></html>
