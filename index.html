@@ -1405,7 +1405,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v310</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v311</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6144,7 +6144,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v310 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v311 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17131,7 +17131,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v310 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v311 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17260,7 +17260,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'Correction memory + AI export — learns word fixes across all recordings, sends transcript to ChatGPT/Gemini/Claude/GLM',ok:(typeof trLearnCorrection==='function')&&(typeof trAIExport==='function')},
+    {n:'Correction memory + lifetime vocabulary — a word confirmed once auto-corrects wrong variants forever; AI export to ChatGPT/Gemini/Claude/GLM',ok:(typeof trLearnCorrection==='function')&&(typeof trSmartFix==='function')&&(typeof trAIExport==='function')},
     {n:'Live transcription diagnostics — word counter + plain-language “why nothing appears” explainer',ok:(typeof trWhyBlank==='function')},
     {n:'Clear View + Post/List entry points for products and jobs (agent or manual)',ok:(typeof openListChooser==='function')&&(typeof openPostJobChooser==='function')}
   ];
@@ -17268,7 +17268,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v310';var all=(pass===checks.length);
+  var ver='v311';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17348,7 +17348,7 @@ function trLoop(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
   var r=new SR();__tr.rec=r;
   r.continuous=true;r.interimResults=true;if(__tr.lang)r.lang=__tr.lang;
-  r.onresult=function(ev){__tr.lastActivity=Date.now();try{var fin='',inter='';for(var i=ev.resultIndex;i<ev.results.length;i++){var t=(ev.results[i][0]&&ev.results[i][0].transcript)||'';if(ev.results[i].isFinal)fin+=t+' ';else inter+=t;}if(fin){__tr.typed=true;__tr.errCount=0;__tr.errMsg='';trAppend(__tr.sid,trApplyCorrections(fin));}trRenderLive(fin,inter);if(fin)trRenderStatus();}catch(e){}};
+  r.onresult=function(ev){__tr.lastActivity=Date.now();try{var fin='',inter='';for(var i=ev.resultIndex;i<ev.results.length;i++){var t=(ev.results[i][0]&&ev.results[i][0].transcript)||'';if(ev.results[i].isFinal)fin+=t+' ';else inter+=t;}if(fin){__tr.typed=true;__tr.errCount=0;__tr.errMsg='';var _fx=trSmartFix(trApplyCorrections(fin));trVocabAbsorb(_fx,1);trAppend(__tr.sid,_fx);}trRenderLive(fin,inter);if(fin)trRenderStatus();}catch(e){}};
   r.onstart=function(){__tr.heard=true;__tr.lastActivity=Date.now();if(!__tr.typed)trRenderStatus();};
   r.onerror=function(e){
     var code=(e&&e.error)||'';
@@ -17501,6 +17501,7 @@ function openTranscriber(startNow){
   trPermCheck();
   trCloudPull();
   trPullCorrections();
+  trPullVocab();
   if(startNow)trStart(__tr.sid);
 }
 /* ===== v299: site-level structured data for search engines & AI agents ===== */
@@ -17672,7 +17673,7 @@ function trEditText(sid){
 }
 function trEditSave(sid){
   var ta=document.getElementById('tredit-ta');var s=trGet(sid);if(!ta||!s)return;
-  var txt=ta.value;var _learned=trDiffLearn(sid,txt);var lim=(window.__TR_PART||TR_PART_LIMIT);
+  var txt=ta.value;var _learned=trDiffLearn(sid,txt);trVocabAbsorb(txt,2);var lim=(window.__TR_PART||TR_PART_LIMIT);
   for(var i=0;i<(s.parts||1);i++){try{LS.del(trPartKey(sid,i));}catch(e){}}
   var n=0;for(var p=0;p<txt.length||n===0;p+=lim){LS.set(trPartKey(sid,n),txt.slice(p,p+lim));n++;if(p+lim>=txt.length)break;}
   s.parts=n;s.chars=txt.length;s.up=Date.now();trUpdate(s);
@@ -17805,7 +17806,7 @@ function rbOSSPump(){
     if(!ok||!window.rbWhisper||!window.rbWhisper.ready){__tr.qBusy=false;return;}
     window.rbWhisper.transcribe(b).then(function(r){
       if(r&&r.text){__tr.typed=true;__tr.errMsg='';if(r.language)__tr.detected=r.language;
-        var _ct=trApplyCorrections(r.text+' ');trAppend(__tr.sid,_ct);trRenderLive(_ct,'');}
+        var _ct=trSmartFix(trApplyCorrections(r.text+' '));trVocabAbsorb(_ct,1);trAppend(__tr.sid,_ct);trRenderLive(_ct,'');}
       trRenderStatus();
     }).catch(function(){}).then(function(){__tr.qBusy=false;rbOSSPump();});
   });
@@ -17990,7 +17991,7 @@ function trApplyCorrections(text){
     try{
       var esc=wrong.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
       // word-ish boundary that also works around non-Latin scripts (Malayalam etc.)
-      var re=new RegExp('(^|[^\\p{L}\\p{N}])('+esc+')(?=$|[^\\p{L}\\p{N}])','giu');
+      var re=new RegExp('(^|[^\\p{L}\\p{M}\\p{N}])('+esc+')(?=$|[^\\p{L}\\p{M}\\p{N}])','giu');
       text=text.replace(re,function(_,pre){return pre+right;});
     }catch(e){
       try{text=text.split(wrong).join(right);}catch(e2){}
@@ -18001,7 +18002,7 @@ function trApplyCorrections(text){
 function trLearnCorrection(wrong,right){
   wrong=(wrong||'').trim();right=(right||'').trim();
   if(!wrong||!right||wrong===right)return false;
-  var m=trCorrections();m[wrong]=right;trSaveCorrections(m);
+  var m=trCorrections();m[wrong]=right;trSaveCorrections(m);trVocabAbsorb(right,2);
   // apply retroactively to every saved recording
   var fixedCount=0;
   trSessions().forEach(function(s){
@@ -18024,7 +18025,7 @@ function trDiffLearn(sid,newText){
   var learned=0;
   if(ow.length===nw.length){
     for(var i=0;i<ow.length;i++){
-      var a=ow[i].replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,''),b=nw[i].replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,'');
+      var a=ow[i].replace(/^[^\p{L}\p{M}\p{N}]+|[^\p{L}\p{M}\p{N}]+$/gu,''),b=nw[i].replace(/^[^\p{L}\p{M}\p{N}]+|[^\p{L}\p{M}\p{N}]+$/gu,'');
       if(a&&b&&a!==b&&a.length>1){var m=trCorrections();if(m[a]!==b){m[a]=b;trSaveCorrections(m);learned++;}}
     }
   }
@@ -18037,7 +18038,7 @@ function openCorrections(){
   var ov=document.createElement('div');ov.className='overlay';ov.id='trcorr-ovl';
   ov.innerHTML='<div class="modal" style="max-width:480px;max-height:82vh;display:flex;flex-direction:column"><div class="mhd"><h3>🧠 Correction memory</h3><button class="modal-x" onclick="closeOvl(\'trcorr-ovl\')"><i class="ti ti-x"></i></button></div>'
     +'<div class="mbd" style="overflow-y:auto">'
-    +'<div style="font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:10px">Teach the transcriber a fix once. Every place that wrong word appears — in this recording and all your saved ones — is corrected, and future recordings apply it automatically. Works for Malayalam, English and Hindi words, and for slang.</div>'
+    +'<div style="font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:10px">Teach the transcriber a fix once. Every place that wrong word appears — in this recording and all your saved ones — is corrected, and future recordings apply it automatically. Works for Malayalam, English and Hindi words, and for slang. Lifetime memory: a word you confirm once (by editing or adding a fix) — or that appears twice — becomes trusted, and close wrong variants auto-correct to it forever.</div>'
     +'<div style="display:flex;gap:7px;margin-bottom:6px"><input id="trcorr-wrong" placeholder="Wrong word (as written)" style="flex:1;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2)"><input id="trcorr-right" placeholder="Correct word" style="flex:1;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2)"></div>'
     +'<button class="btn btnok" style="width:100%;margin-bottom:12px" onclick="trAddCorrection()"><i class="ti ti-check"></i> Learn & fix everywhere</button>'
     +'<div style="font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Learned corrections</div>'
@@ -18093,6 +18094,94 @@ function trPullCorrections(){
     if(__tr.corrPulled&&Date.now()-__tr.corrPulled<60000)return;__tr.corrPulled=Date.now();
     FB.db.collection('trcorrections').doc(CU.uid).get().then(function(d){
       var data=d&&d.data&&d.data();if(data&&data.map){var local=trCorrections();var merged=Object.assign({},data.map,local);LS.set('rb_tr_corrections',merged);}
+    }).catch(function(){});
+  }catch(e){}
+}
+
+/* ===== v311: LIFETIME VOCABULARY — a word confirmed once is trusted forever; wrong variants auto-correct toward it ===== */
+function trVocab(){return LS.get('rb_tr_vocab',{})||{};}
+function trSaveVocab(v){
+  LS.set('rb_tr_vocab',v);__tr.vB=null;
+  try{clearTimeout(__tr.vocabT);}catch(e){}
+  __tr.vocabT=setTimeout(function(){try{if(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest)FB.db.collection('trvocab').doc(CU.uid).set({map:trVocab(),up:Date.now()},{merge:true}).catch(function(){});}catch(e){}},(window.__TR_CLOUD_MS||8000));
+}
+function trNormWord(w){return String(w||'').replace(/^[^\p{L}\p{M}\p{N}]+|[^\p{L}\p{M}\p{N}]+$/gu,'').toLowerCase();}
+function trVocabAbsorb(text,weight){
+  var v=trVocab();var ch=false;
+  String(text||'').split(/\s+/).forEach(function(w){
+    w=trNormWord(w);if(!w||w.length<3)return;
+    var nw=Math.min(999,(v[w]||0)+(weight||1));
+    if(v[w]!==nw){v[w]=nw;ch=true;}
+  });
+  if(ch)trSaveVocab(v);
+}
+function trBuckets(){
+  var v=trVocab();var ks=Object.keys(v);
+  if(__tr.vB&&__tr.vBn===ks.length)return __tr.vB;
+  var b={};ks.forEach(function(w){var k=(w[0]||'')+':'+w.length;(b[k]=b[k]||[]).push(w);});
+  __tr.vB=b;__tr.vBn=ks.length;return b;
+}
+function trLev(a,b,max){
+  if(Math.abs(a.length-b.length)>max)return max+1;
+  var prev=[],cur=[],i,j;
+  for(j=0;j<=b.length;j++)prev[j]=j;
+  for(i=1;i<=a.length;i++){
+    cur[0]=i;var best=cur[0];
+    for(j=1;j<=b.length;j++){
+      var cost=a[i-1]===b[j-1]?0:1;
+      cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+cost);
+      if(cur[j]<best)best=cur[j];
+    }
+    if(best>max)return max+1;
+    var t=prev;prev=cur;cur=t;
+  }
+  return prev[b.length];
+}
+function trSmartFix(text){
+  var v=trVocab();if(!text)return text;var vk=Object.keys(v);if(!vk.length)return text;
+  var b=trBuckets();var m=trCorrections();var mapChanged=false;
+  var out=String(text).split(/(\s+)/).map(function(tok){
+    if(!tok||/^\s+$/.test(tok))return tok;
+    var mm=tok.match(/^([^\p{L}\p{M}\p{N}]*)([\s\S]*?)([^\p{L}\p{M}\p{N}]*)$/u);
+    var pre=mm?mm[1]:'',core=mm?mm[2]:tok,post=mm?mm[3]:'';
+    if(!core||core.length<4)return tok;
+    var key=core.toLowerCase();
+    if((v[key]||0)>=2)return tok;                 // already a trusted word
+    if(m[key]!=null||m[core]!=null)return tok;    // explicit correction already covers it
+    var max=core.length>=7?2:1;
+    var cands=[];var f=key[0];
+    outer:
+    for(var dl=-max;dl<=max;dl++){
+      var arr=b[f+':'+(key.length+dl)]||[];
+      for(var x=0;x<arr.length;x++){
+        var cw=arr[x];
+        if((v[cw]||0)<2)continue;
+        if(cw===key){cands=[];break outer;}       // exact trusted match under different count path — leave as-is
+        if(trLev(key,cw,max)<=max){cands.push(cw);if(cands.length>1)break outer;}
+      }
+    }
+    if(cands.length===1){
+      var right=cands[0];if(right===key)return tok;
+      var rep=right;
+      if(core.charAt(0)===core.charAt(0).toUpperCase()&&/[a-z]/i.test(core.charAt(0)))rep=right.charAt(0).toUpperCase()+right.slice(1);
+      if(m[key]!==rep){m[key]=rep;mapChanged=true;}   // remember for life — instant next time
+      return pre+rep+post;
+    }
+    return tok;
+  }).join('');
+  if(mapChanged)trSaveCorrections(m);
+  return out;
+}
+
+function trPullVocab(){
+  try{
+    if(!(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest))return;
+    if(__tr.vocPulled&&Date.now()-__tr.vocPulled<60000)return;__tr.vocPulled=Date.now();
+    FB.db.collection('trvocab').doc(CU.uid).get().then(function(d){
+      var data=d&&d.data&&d.data();if(!(data&&data.map))return;
+      var local=trVocab();var ch=false;
+      Object.keys(data.map).forEach(function(w){var n=Math.max(local[w]||0,data.map[w]||0);if(local[w]!==n){local[w]=n;ch=true;}});
+      if(ch){LS.set('rb_tr_vocab',local);__tr.vB=null;}
     }).catch(function(){});
   }catch(e){}
 }
