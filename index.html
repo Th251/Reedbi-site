@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v316</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v318</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6177,7 +6177,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v316 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v318 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17164,7 +17164,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v316 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v318 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17304,7 +17304,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v316';var all=(pass===checks.length);
+  var ver='v318';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17337,7 +17337,7 @@ function trStart(sid){
   if(!SR){__tr.errMsg='Voice recognition is not supported in this browser — please use Chrome.';trRenderStatus();toast(__tr.errMsg,'err');return;}
   if(sid&&trGet(sid))__tr.sid=sid;
   if(!__tr.sid||!trGet(__tr.sid))__tr.sid=trNewSession().id;
-  __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;__tr.detected='';__tr.wordCount=trWordCountOf(__tr.sid);__tr.lastActivity=Date.now();
+  __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;__tr.detected='';__tr.wordCount=trWordCountOf(__tr.sid);__tr.lastActivity=Date.now();__tr.recordAudio=!!LS.get('rb_tr_audio',false);
   trWakeLock();trStartWatchdog();
   if(__tr.engine==='oss'){
     trRenderStatus();
@@ -17350,11 +17350,16 @@ function trStart(sid){
     return;
   }
   trLoop();trRenderStatus();
-  trAcquireMic(function(okStream){
-    if(!__tr.on)return;
-    if(okStream){try{trStartAudioRec(okStream);}catch(e){}}
-    trRenderStatus();
-  });
+  // On Android Chrome, an open getUserMedia stream competes with SpeechRecognition for the mic and
+  // blocks live text. So for the Online engine we let SpeechRecognition own the mic by default, and
+  // only open a parallel audio stream if the user explicitly turned on "Also save audio".
+  if(__tr.recordAudio){
+    trAcquireMic(function(okStream){
+      if(!__tr.on)return;
+      if(okStream){try{trStartAudioRec(okStream);}catch(e){}}
+      trRenderStatus();
+    });
+  }
 }
 function trAcquireMic(cb){
   try{
@@ -17383,6 +17388,7 @@ function trStartAudioRec(stream){
 function trStopAudioRec(){try{if(__tr.mediaRec&&__tr.mediaRec.state!=='inactive')__tr.mediaRec.stop();}catch(e){}__tr.mediaRec=null;try{if(__tr.stream)__tr.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}__tr.stream=null;}
 function trLoop(){
   if(!__tr.on)return;
+  if(__tr.rec)return;
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
   var r=new SR();__tr.rec=r;
   r.continuous=true;r.interimResults=true;if(__tr.lang)r.lang=__tr.lang;
@@ -17513,6 +17519,7 @@ function openTranscriber(startNow){
     +'<button class="cat-chip'+(__tr.engine==='oss'?' on':'')+'" onclick="rbTrEngine(\'oss\')">🌐 Auto-detect — open source</button>'
     +'<button class="cat-chip" onclick="openMicHelp()"><i class="ti ti-headset"></i> Mic help</button>'
     +'<button class="cat-chip" onclick="openTrDiag()"><i class="ti ti-stethoscope"></i> Why no text?</button>'
+    +'<button class="cat-chip'+(LS.get('rb_tr_audio',false)?' on':'')+'" onclick="rbTrAudioToggle()"><i class="ti ti-microphone-2"></i> '+(LS.get('rb_tr_audio',false)?'Saving audio too':'Also save audio')+'</button>'
     +'</div>'
     +'<div id="tr-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;'+(__tr.engine==='oss'?'opacity:.45;pointer-events:none':'')+'">'+chips+(__tr.engine==='oss'?'<span style="font-size:10px;color:var(--mt);align-self:center">language is detected automatically</span>':'')+'</div>'
     +'<div id="tr-status" style="font-size:12px;margin-bottom:6px"></div>'
@@ -17534,7 +17541,7 @@ function openTranscriber(startNow){
     +'<button class="btn" style="flex:1" onclick="trShareText()"><i class="ti ti-share"></i> Share</button>'
     +'</div>'
     +'<div id="tr-audiorow" style="display:'+(__tr.lastAudio?'flex':'none')+';gap:7px;margin-top:7px"><button class="btn" style="flex:1" onclick="trDownloadAudio()"><i class="ti ti-file-music"></i> Audio (.webm)</button><button class="btn" style="flex:1" onclick="trShareAudio()"><i class="ti ti-share"></i> Share audio</button><button class="btn" style="flex:1" onclick="trCropAudio()"><i class="ti ti-scissors"></i> Crop</button></div>'
-    +'<div style="font-size:10px;color:var(--mt);margin-top:7px;line-height:1.5">Keep this page open with the screen on (I request a screen wake-lock for you). It transcribes the language you pick — Malayalam and English both work when the device supports them. Long recordings auto-split and auto-save; use .txt to export. It writes the language you speak — Malayalam stays Malayalam, English stays English (no translation). Audio is kept in memory for the latest session only: press Pause, then download or share it. With your Reedbi account, the text also backs up to the cloud automatically. A 12-hour video is roughly 100,000–130,000 spoken words (~1 MB of text). Long recordings are stored in a large on-device database (IndexedDB, hundreds of MB–gigabytes) and mirrored to your account — so your text is safe after a refresh, unlike the old 5 MB limit that could drop very long recordings. (No system on earth stores "a trillion words" for one file — but you will never hit a limit for real recordings.)</div>'
+    +'<div style="font-size:10px;color:var(--mt);margin-top:7px;line-height:1.5">Keep this page open with the screen on (I request a screen wake-lock for you). It transcribes the language you pick — Malayalam and English both work when the device supports them. Long recordings auto-split and auto-save; use .txt to export. It writes the language you speak — Malayalam stays Malayalam, English stays English (no translation). For the most reliable live text on Android phones, the Online engine now lets speech recognition use the microphone exclusively — so if you also want the .webm audio file, tap “Also save audio” (on some phones that can interrupt the live text; turn it off if text stops). Audio, when on, is kept for the latest session only: press Pause, then download or share it. With your Reedbi account, the text also backs up to the cloud automatically. A 12-hour video is roughly 100,000–130,000 spoken words (~1 MB of text). Long recordings are stored in a large on-device database (IndexedDB, hundreds of MB–gigabytes) and mirrored to your account — so your text is safe after a refresh, unlike the old 5 MB limit that could drop very long recordings. (No system on earth stores "a trillion words" for one file — but you will never hit a limit for real recordings.)</div>'
     +(sess?('<div style="margin-top:9px;font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em">Saved recordings</div><div style="max-height:150px;overflow-y:auto">'+sess+'</div>'):'')
     +'</div></div>';
   document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
@@ -17834,6 +17841,7 @@ function trPermCheck(){
     }).catch(function(){});
   }catch(e){}
 }
+function rbTrAudioToggle(){var cur=!!LS.get('rb_tr_audio',false);LS.set('rb_tr_audio',!cur);if(!cur){toast('Audio saving ON. Note: on some Android phones this can stop the live text — if text stops appearing, turn it off.','info');}else{toast('Audio saving off — best reliability for live text on phones.','ok');}if(__tr.on)trStop(true);try{openTranscriber();}catch(e){}}
 function rbTrEngine(m){
   if(__tr.engine===m)return;
   __tr.engine=m;LS.set('rb_tr_engine',m);
@@ -18114,13 +18122,10 @@ function trAIExport(sid){
     +'<button class="btn" style="flex:1;min-width:130px" onclick="trShareText(\''+escJS(sid)+'\')"><i class="ti ti-share"></i> Share transcript</button>'
     +'</div>'
     +'<div style="font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Open a model</div>'
-    +'<div style="display:flex;flex-direction:column;gap:7px">'
-    +'<button class="btn" onclick="rbOpen(\'https://chatgpt.com/\')">ChatGPT ↗</button>'
-    +'<button class="btn" onclick="rbOpen(\'https://gemini.google.com/app\')">Gemini ↗</button>'
-    +'<button class="btn" onclick="rbOpen(\'https://claude.ai/new\')">Claude ↗</button>'
-    +'<button class="btn" onclick="rbOpen(\'https://chat.z.ai/\')">GLM (Z.ai) ↗</button>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">'
+    +trAIModels().map(function(m){return '<button class="btn" onclick="trHandoffAI(\''+m.id+'\',\''+escJS(sid)+'\')"><i class="ti ti-external-link"></i> '+esc(m.name)+'</button>';}).join('')
     +'</div>'
-    +'<div style="font-size:10.5px;color:var(--mt);margin-top:10px">Tip: paste right after opening the model. The copied text already includes the instruction to correct, summarise and quiz you.</div>'
+    +'<div style="font-size:10.5px;color:var(--mt);margin-top:10px">One tap copies your transcript (with the correct-summarise-quiz instruction) AND opens the model. Where the model allows it, your text is pre-filled — otherwise long-press the input and paste. ChatGPT, Claude, Grok and Perplexity accept pre-fill; Gemini and GLM open ready for a paste.</div>'
     +'</div></div>';
   document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
   __tr.aiPrompt=prompt;
