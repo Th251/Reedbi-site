@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v326</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v328</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v326 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v328 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v326 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v328 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17304,7 +17304,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'Live word-streaming (words appear instantly as you speak, not only when you pause) + lightning-fast throttled storage + cached correction-regex',ok:(typeof trPartWrite==='function')&&(typeof trCorrBuild==='function')&&(typeof trRenderLive==='function')},
+    {n:'Live word-streaming + Android-safe per-phrase mode + auto-fallback to open-source engine when the browser has no voice API (e.g. in-app WebView) + lightning-fast storage',ok:(typeof trPartWrite==='function')&&(typeof trCorrBuild==='function')&&(typeof trRenderLive==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
@@ -17316,7 +17316,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v326';var all=(pass===checks.length);
+  var ver='v328';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17347,7 +17347,7 @@ function trNewSession(name){var id='tr'+Date.now();var s={id:id,name:name||('Rec
 function trStart(sid){
   if(!requireAuth('use the transcriber'))return;
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){__tr.errMsg='Voice recognition is not supported in this browser — please use Chrome.';trRenderStatus();toast(__tr.errMsg,'err');return;}
+  if(!SR&&__tr.engine!=='oss'){if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){__tr.engine='oss';toast('This browser has no built-in voice engine — switched to the open-source engine (downloads once, then transcribes).','info');}else{__tr.errMsg='Voice input needs a microphone. Open reedbi.com in Chrome and allow the mic.';trRenderStatus();toast(__tr.errMsg,'err');return;}}
   if(sid&&trGet(sid))__tr.sid=sid;
   if(!__tr.sid||!trGet(__tr.sid))__tr.sid=trNewSession().id;
   __tr.errMsg='';__tr.errCount=0;__tr.heard=false;__tr.typed=false;__tr.on=true;__tr.restarts=0;__tr.detected='';__tr.wordCount=trWordCountOf(__tr.sid);__tr.lastActivity=Date.now();__tr.startedAt=Date.now();__tr.recordAudio=!!LS.get('rb_tr_audio',false);
@@ -17404,7 +17404,7 @@ function trLoop(){
   if(__tr.rec)return;
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
   var r=new SR();__tr.rec=r;
-  r.continuous=true;r.interimResults=true;if(__tr.lang)r.lang=__tr.lang;
+  var _andr=/Android/i.test((navigator.userAgent||''));r.continuous=_andr?false:true;r.interimResults=true;if(__tr.lang)r.lang=__tr.lang;
   r.onresult=function(ev){__tr.lastActivity=Date.now();try{__trDiag.raw++;var _dl=document.getElementById('trdiag-body');if(_dl)_dl.innerHTML=trDiagRender();var fin='',inter='';for(var i=ev.resultIndex;i<ev.results.length;i++){var t=(ev.results[i][0]&&ev.results[i][0].transcript)||'';if(ev.results[i].isFinal)fin+=t+' ';else inter+=t;}if(fin){__trDiag.final++;__tr.typed=true;__tr.errCount=0;__tr.errMsg='';var _pre=fin;var _fx=trSmartFix(trApplyCorrections(fin));if(_fx!==_pre)__tr.autoFixed=(__tr.autoFixed||0)+1;trVocabAbsorb(_fx,1);trAppend(__tr.sid,_fx);}trRenderLive(fin,inter?trSmartFix(trApplyCorrections(inter)):inter);if(fin)trRenderStatus();}catch(e){}};
   r.onstart=function(){__tr.heard=true;__tr.lastActivity=Date.now();if(!__tr.typed)trRenderStatus();};
   r.onerror=function(e){
@@ -18402,6 +18402,7 @@ function trDiagRender(){
   var rows=caps.map(function(c){return '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px"><span>'+(c[1]?'✅':'❌')+'</span><div style="flex:1"><b>'+esc(c[0])+'</b>'+(c[2]?'<div style="font-size:11px;color:'+(c[1]?'var(--mt)':'#dc2626')+'">'+esc(c[2])+'</div>':'')+'</div></div>';}).join('');
   var live='<div style="margin-top:8px;padding:8px;background:var(--card2);border-radius:8px;font-size:12px">'
     +'<div>Engine: <b>'+(__tr.engine==='oss'?'🌐 Auto-detect (open source)':'⚡ Online')+'</b> · Language: <b>'+esc(__tr.lang)+'</b></div>'
+    +'<div>Device: <b>'+(/Android/i.test(navigator.userAgent||'')?'Android':(/iPhone|iPad/i.test(navigator.userAgent||'')?'iPhone/iPad':'Desktop'))+'</b> · Listen mode: <b>'+(/Android/i.test(navigator.userAgent||'')?'per-phrase (Android-safe)':'continuous')+'</b></div>'
     +'<div>Recording: <b>'+(__tr.on?'ON':'off')+'</b> · Mic heard: <b>'+(__tr.heard?'yes':'no')+'</b> · Text produced: <b>'+(__tr.typed?'yes':'no')+'</b></div>'
     +'<div>Raw results seen: <b>'+__trDiag.raw+'</b> · Final phrases: <b>'+__trDiag.final+'</b> · Restarts: <b>'+((__tr.restarts||0)+(__tr.forcedRestarts||0))+'</b></div>'
     +(__tr.errMsg?'<div style="color:#dc2626">Last error: '+esc(__tr.errMsg)+'</div>':'')
