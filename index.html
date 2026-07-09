@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v321</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v324</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4344,7 +4344,7 @@ function trScheduleSessFlush(){if(TRS.flushT)return;TRS.flushT=setTimeout(trFlus
 function trFlushSessNow(){if(TRS.flushT){clearTimeout(TRS.flushT);TRS.flushT=null;}if(!TRS.dirty)return;TRS.dirty=false;try{var j=JSON.stringify(TRS.cache||[]);IDB.mem['rb_tr_sessions']=j;IDB.put('rb_tr_sessions',j);LS.set('rb_tr_sessions',TRS.cache||[]);}catch(e){}}
 function trPartWrite(sid,n,val){var k=trPartKey(sid,n);IDB.mem[k]=val;TRP.pending[k]=1;if(!TRP.flushT)TRP.flushT=setTimeout(trFlushPartsNow,1200);}
 function trFlushPartsNow(){if(TRP.flushT){clearTimeout(TRP.flushT);TRP.flushT=null;}var ks=Object.keys(TRP.pending);TRP.pending={};ks.forEach(function(k){try{IDB.put(k,IDB.mem[k]);}catch(e){}});}
-function trFlushAllNow(){try{trFlushPartsNow();}catch(e){}try{trFlushSessNow();}catch(e){}}
+function trFlushAllNow(){try{trFlushPartsNow();}catch(e){}try{trFlushSessNow();}catch(e){}try{trFlushVocab();}catch(e){}try{trFlushCorr();}catch(e){}}
 try{window.addEventListener('pagehide',trFlushAllNow);document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')trFlushAllNow();});}catch(e){}
 try{IDB.get('rb_tr_sessions',function(v){if(v&&!IDB.mem.hasOwnProperty('__sessions_seeded')){IDB.mem['__sessions_seeded']=1;/* mem now holds sessions for trSessions() */}});}catch(e){}
 try{setTimeout(function(){try{trMigrateLegacy();}catch(e){}},1200);}catch(e){}
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v321 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v324 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -11826,7 +11826,9 @@ setInterval(rbUpdateNavBadge,1500);
 setTimeout(rbUpdateNavBadge,1000);
 // default: show the clean Home landing immediately on load
 try{document.body.classList.add('rb-home');}catch(e){}
-setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}try{rbOpenFromHash();}catch(e){}try{rbShowVersion();}catch(e){}try{rbInstallPWA();}catch(e){}try{rbInjectSEO();}catch(e){}try{rbFileWarn();}catch(e){}try{IDB.get('rb_tr_sessions',function(v){if(v){IDB.mem['rb_tr_sessions']=v;TRS.cache=null;var ss=[];try{ss=JSON.parse(v)||[];}catch(e){}if(ss[0]){var ks=[];for(var i=0;i<(ss[0].parts||1);i++)ks.push('rb_trp_'+ss[0].id+'_'+i);IDB.preload(ks);}}});}catch(e){}},400);
+setTimeout(function(){try{document.body.classList.add('rb-home');rbSetActiveTab('home');if(typeof goHome==='function')goHome();}catch(e){}try{rbOpenFromHash();}catch(e){}try{rbShowVersion();}catch(e){}try{rbInstallPWA();}catch(e){}try{rbInjectSEO();}catch(e){}try{rbFileWarn();}catch(e){}try{IDB.get('rb_tr_corrections',function(v){if(v){IDB.mem['rb_tr_corrections']=v;TRC.cache=null;}});}catch(e){}
+try{IDB.get('rb_tr_vocab',function(v){if(v){IDB.mem['rb_tr_vocab']=v;TRV.cache=null;}});}catch(e){}
+try{IDB.get('rb_tr_sessions',function(v){if(v){IDB.mem['rb_tr_sessions']=v;TRS.cache=null;var ss=[];try{ss=JSON.parse(v)||[];}catch(e){}if(ss[0]){var ks=[];for(var i=0;i<(ss[0].parts||1);i++)ks.push('rb_trp_'+ss[0].id+'_'+i);IDB.preload(ks);}}});}catch(e){}},400);
 
 /* ===== v135: confetti, daily spin wheel, shopper tiers, achievements =====
    Healthy delight: a once-a-day spin, celebratory confetti, and a level that
@@ -17173,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v321 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v324 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17302,11 +17304,11 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'Fast live transcription — throttled disk writes + small parts keep long YouTube recordings from slowing down',ok:(typeof trPartWrite==='function')&&(typeof trFlushAllNow==='function')},
+    {n:'Lightning-fast live transcription — throttled disk writes, small parts, and one cached correction-regex keep speed constant no matter how many words are learned',ok:(typeof trPartWrite==='function')&&(typeof trCorrBuild==='function')&&(typeof trFlushAllNow==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
-    {n:'Correction memory + lifetime vocabulary — a word confirmed once auto-corrects wrong variants forever; one-tap AI handoff to ChatGPT/Claude/Grok/Gemini/GLM/Perplexity',ok:(typeof trLearnCorrection==='function')&&(typeof trSmartFix==='function')&&(typeof trHandoffAI==='function')},
+    {n:'Correction memory + lifetime vocabulary (durable in IndexedDB) + backup/restore learned words to a file so they are never lost; one-tap AI handoff to ChatGPT/Claude/Grok/Gemini/GLM/Perplexity',ok:(typeof trLearnCorrection==='function')&&(typeof trSmartFix==='function')&&(typeof trExportBrain==='function')&&(typeof trHandoffAI==='function')},
     {n:'Live transcription diagnostics — word counter + plain-language “why nothing appears” explainer',ok:(typeof trWhyBlank==='function')},
     {n:'Clear View + Post/List entry points for products and jobs (agent or manual)',ok:(typeof openListChooser==='function')&&(typeof openPostJobChooser==='function')}
   ];
@@ -17314,7 +17316,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v321';var all=(pass===checks.length);
+  var ver='v324';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17331,7 +17333,8 @@ function openSystemCheck(){
 /* ===== v299: OVERNIGHT TRANSCRIBER — single tap record, live transcript (any language), auto-save, interview from recording ===== */
 var __tr={on:false,rec:null,sid:null,lang:(LS.get('rb_tr_lang','')||rbTrDefaultLang()),wl:null,restarts:0,engine:(LS.get('rb_tr_engine','ws')||'ws')};
 var TR_PART_LIMIT=24000;
-function trMigrateLegacy(){try{if(LS.get('rb_tr_migrated',0))return;trSessions().forEach(function(s){for(var i=0;i<(s.parts||1);i++){var k=trPartKey(s.id,i);var lv=LS.get(k,null);if(lv!=null&&lv!==''){IDB.put(k,lv);}}});LS.set('rb_tr_migrated',1);}catch(e){}}
+function trMigrateLegacy(){try{if(!IDB.mem.hasOwnProperty('rb_tr_corrections')){var _mc=LS.get('rb_tr_corrections',null);if(_mc){var _j=JSON.stringify(_mc);IDB.mem['rb_tr_corrections']=_j;IDB.put('rb_tr_corrections',_j);}}if(!IDB.mem.hasOwnProperty('rb_tr_vocab')){var _mv=LS.get('rb_tr_vocab',null);if(_mv){var _jv=JSON.stringify(_mv);IDB.mem['rb_tr_vocab']=_jv;IDB.put('rb_tr_vocab',_jv);}}}catch(e){}
+  try{if(LS.get('rb_tr_migrated',0))return;trSessions().forEach(function(s){for(var i=0;i<(s.parts||1);i++){var k=trPartKey(s.id,i);var lv=LS.get(k,null);if(lv!=null&&lv!==''){IDB.put(k,lv);}}});LS.set('rb_tr_migrated',1);}catch(e){}}
 function trSessions(){if(TRS.cache)return TRS.cache;var v=null;if(IDB.mem.hasOwnProperty('rb_tr_sessions')){try{v=JSON.parse(IDB.mem['rb_tr_sessions']);}catch(e){}}if(!v)v=LS.get('rb_tr_sessions',[])||[];TRS.cache=Array.isArray(v)?v:[];return TRS.cache;}
 function trSaveSessions(s){TRS.cache=Array.isArray(s)?s:[];TRS.dirty=true;trScheduleSessFlush();}
 function trGet(sid){return trSessions().find(function(x){return x.id===sid;});}
@@ -18044,24 +18047,39 @@ function trWhyBlank(){
 function trWordCountOf(sid){try{var t=trFullText(sid);return t.trim()?t.trim().split(/\s+/).length:0;}catch(e){return 0;}}
 
 /* ===== v310: correction memory (learns fixes), AI export, full copy/share ===== */
-function trCorrections(){return LS.get('rb_tr_corrections',{})||{};}
-function trSaveCorrections(m){LS.set('rb_tr_corrections',m);try{if(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest)FB.db.collection('trcorrections').doc(CU.uid).set({map:m,up:Date.now()},{merge:true}).catch(function(){});}catch(e){}}
+var TRC={cache:null,dirty:false,t:null};
+function trCorrections(){if(TRC.cache)return TRC.cache;var v=null;if(IDB.mem.hasOwnProperty('rb_tr_corrections')){try{v=JSON.parse(IDB.mem['rb_tr_corrections']);}catch(e){}}if(!v)v=LS.get('rb_tr_corrections',{})||{};TRC.cache=v;return TRC.cache;}
+function trSaveCorrections(m){TRC.cache=m||{};TRC.dirty=true;try{TRCX.dirty=true;}catch(e){}if(!TRC.t)TRC.t=setTimeout(trFlushCorr,2000);}
+function trFlushCorr(){if(TRC.t){clearTimeout(TRC.t);TRC.t=null;}if(!TRC.dirty)return;TRC.dirty=false;try{var _j=JSON.stringify(TRC.cache||{});IDB.mem['rb_tr_corrections']=_j;IDB.put('rb_tr_corrections',_j);}catch(e){}try{LS.set('rb_tr_corrections',TRC.cache||{});}catch(e){}try{if(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest)FB.db.collection('trcorrections').doc(CU.uid).set({map:TRC.cache,up:Date.now()},{merge:true}).catch(function(){});}catch(e){}}
 function trApplyCorrections(text){
-  var m=trCorrections();var keys=Object.keys(m);if(!keys.length||!text)return text;
+  if(!text)return text;
+  trCorrBuild();
+  if(!TRCX.re)return text;
+  TRCX.re.lastIndex=0;
+  return text.replace(TRCX.re,function(full,pre,mid){
+    var key=mid.toLowerCase().replace(/\s+/g,' ');
+    var rep=TRCX.lut[key];
+    if(rep==null)return full;
+    if(mid.charAt(0)===mid.charAt(0).toUpperCase()&&/[a-z]/i.test(mid.charAt(0)))rep=rep.charAt(0).toUpperCase()+rep.slice(1);
+    return pre+rep;
+  });
+}
+var TRCX={dirty:true,re:undefined,lut:null,n:-1};
+function trCorrBuild(){
+  var m=trCorrections();var keys=Object.keys(m);
+  if(!TRCX.dirty&&TRCX.re!==undefined&&TRCX.n===keys.length)return;
+  TRCX.dirty=false;TRCX.n=keys.length;
+  if(!keys.length){TRCX.re=null;TRCX.lut={};return;}
   keys.sort(function(a,b){return b.length-a.length;});
+  var lut={},alts=[];
   keys.forEach(function(wrong){
     var right=m[wrong];if(!wrong||right==null)return;
-    try{
-      var esc=wrong.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-      // allow flexible whitespace inside multi-word wrong forms, case-insensitive, multi-script safe
-      esc=esc.replace(/\\?\s+/g,'\\s+');
-      var re=new RegExp('(^|[^\\p{L}\\p{M}\\p{N}])('+esc+')(?=$|[^\\p{L}\\p{M}\\p{N}])','giu');
-      text=text.replace(re,function(_,pre){return pre+right;});
-    }catch(e){
-      try{text=text.split(wrong).join(right);}catch(e2){}
-    }
+    lut[wrong.toLowerCase().replace(/\s+/g,' ')]=right;
+    var esc=wrong.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\\?\s+/g,'\\s+');
+    alts.push(esc);
   });
-  return text;
+  TRCX.lut=lut;
+  try{TRCX.re=new RegExp('(^|[^\\p{L}\\p{M}\\p{N}])('+alts.join('|')+')(?=$|[^\\p{L}\\p{M}\\p{N}])','giu');}catch(e){TRCX.re=null;}
 }
 function trLearnCorrection(wrong,right){
   wrong=(wrong||'').trim();right=(right||'').trim();
@@ -18104,7 +18122,9 @@ function openCorrections(){
     +'<div class="mbd" style="overflow-y:auto">'
     +'<div style="font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:10px">Teach the transcriber a fix once. Every place that wrong word appears — in this recording and all your saved ones — is corrected, and future recordings apply it automatically. Works for Malayalam, English and Hindi words, and for slang. Lifetime memory: a word you confirm once (by editing or adding a fix) — or that appears twice — becomes trusted, and close wrong variants auto-correct to it forever.</div>'
     +'<div style="display:flex;gap:7px;margin-bottom:6px"><input id="trcorr-wrong" placeholder="Wrong word (as written)" style="flex:1;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2)"><input id="trcorr-right" placeholder="Correct word" style="flex:1;padding:10px;border:1px solid var(--b2);border-radius:10px;background:var(--card2)"></div>'
-    +'<button class="btn btnok" style="width:100%;margin-bottom:12px" onclick="trAddCorrection()"><i class="ti ti-check"></i> Learn & fix everywhere</button>'
+    +'<button class="btn btnok" style="width:100%;margin-bottom:8px" onclick="trAddCorrection()"><i class="ti ti-check"></i> Learn & fix everywhere</button>'
+    +'<div style="display:flex;gap:7px;margin-bottom:12px"><button class="btn" style="flex:1" onclick="trExportBrain()"><i class="ti ti-download"></i> Back up learned words</button><button class="btn" style="flex:1" onclick="trTriggerImport()"><i class="ti ti-upload"></i> Restore</button></div>'
+    +'<input type="file" id="trbrain-file" accept="application/json,.json" style="display:none" onchange="trImportBrainFile(this)">'
     +'<div style="font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Learned corrections</div>'
     +rows
     +'</div></div>';
@@ -18154,18 +18174,16 @@ function trPullCorrections(){
     if(!(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest))return;
     if(__tr.corrPulled&&Date.now()-__tr.corrPulled<60000)return;__tr.corrPulled=Date.now();
     FB.db.collection('trcorrections').doc(CU.uid).get().then(function(d){
-      var data=d&&d.data&&d.data();if(data&&data.map){var local=trCorrections();var merged=Object.assign({},data.map,local);LS.set('rb_tr_corrections',merged);}
+      var data=d&&d.data&&d.data();if(data&&data.map){var local=trCorrections();var merged=Object.assign({},data.map,local);TRC.cache=merged;try{TRCX.dirty=true;}catch(e){}LS.set('rb_tr_corrections',merged);}
     }).catch(function(){});
   }catch(e){}
 }
 
 /* ===== v311: LIFETIME VOCABULARY — a word confirmed once is trusted forever; wrong variants auto-correct toward it ===== */
-function trVocab(){return LS.get('rb_tr_vocab',{})||{};}
-function trSaveVocab(v){
-  LS.set('rb_tr_vocab',v);__tr.vB=null;
-  try{clearTimeout(__tr.vocabT);}catch(e){}
-  __tr.vocabT=setTimeout(function(){try{if(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest)FB.db.collection('trvocab').doc(CU.uid).set({map:trVocab(),up:Date.now()},{merge:true}).catch(function(){});}catch(e){}},(window.__TR_CLOUD_MS||8000));
-}
+var TRV={cache:null,dirty:false,t:null};
+function trVocab(){if(TRV.cache)return TRV.cache;var v=null;if(IDB.mem.hasOwnProperty('rb_tr_vocab')){try{v=JSON.parse(IDB.mem['rb_tr_vocab']);}catch(e){}}if(!v)v=LS.get('rb_tr_vocab',{})||{};TRV.cache=v;return TRV.cache;}
+function trSaveVocab(v){TRV.cache=v||{};__tr.vB=null;TRV.dirty=true;if(!TRV.t)TRV.t=setTimeout(trFlushVocab,2000);}
+function trFlushVocab(){if(TRV.t){clearTimeout(TRV.t);TRV.t=null;}if(!TRV.dirty)return;TRV.dirty=false;try{var _j=JSON.stringify(TRV.cache||{});IDB.mem['rb_tr_vocab']=_j;IDB.put('rb_tr_vocab',_j);}catch(e){}try{LS.set('rb_tr_vocab',TRV.cache||{});}catch(e){}try{if(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest)FB.db.collection('trvocab').doc(CU.uid).set({map:TRV.cache,up:Date.now()},{merge:true}).catch(function(){});}catch(e){}}
 function trNormWord(w){return String(w||'').replace(/^[^\p{L}\p{M}\p{N}]+|[^\p{L}\p{M}\p{N}]+$/gu,'').toLowerCase();}
 function trVocabAbsorb(text,weight){
   var v=trVocab();var ch=false;
@@ -18242,7 +18260,7 @@ function trPullVocab(){
       var data=d&&d.data&&d.data();if(!(data&&data.map))return;
       var local=trVocab();var ch=false;
       Object.keys(data.map).forEach(function(w){var n=Math.max(local[w]||0,data.map[w]||0);if(local[w]!==n){local[w]=n;ch=true;}});
-      if(ch){LS.set('rb_tr_vocab',local);__tr.vB=null;}
+      if(ch){TRV.cache=local;LS.set('rb_tr_vocab',local);__tr.vB=null;}
     }).catch(function(){});
   }catch(e){}
 }
@@ -18504,4 +18522,35 @@ function trIntvReactSmart(answer,sid,question,idx){
                    :'Try grounding your answer in the specific points the recording made.';
   }catch(e){return trIntvReact(answer,['Saved.','Noted.','Got it.'],idx);}
 }
+
+/* ===== v323: backup & restore the learned "brain" (corrections + vocabulary) so words are never lost ===== */
+function trExportBrain(){
+  try{
+    var data={app:'reedbi',type:'learned-brain',v:1,exported:new Date().toISOString(),corrections:trCorrections(),vocab:trVocab()};
+    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download='reedbi-learned-words-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();setTimeout(function(){try{document.body.removeChild(a);URL.revokeObjectURL(url);}catch(e){}},1500);
+    var nc=Object.keys(trCorrections()).length,nv=Object.keys(trVocab()).length;
+    toast('Backed up '+nc+' corrections + '+nv+' learned words to a file ✓','ok');
+  }catch(e){toast('Could not export','err');}
+}
+function trImportBrainFile(input){
+  var f=input&&input.files&&input.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var data=JSON.parse(rd.result);
+      if(!data||(!data.corrections&&!data.vocab)){toast('That file has no learned words','info');return;}
+      var addedC=0,addedV=0;
+      if(data.corrections){var m=trCorrections();Object.keys(data.corrections).forEach(function(k){if(m[k]!==data.corrections[k]){m[k]=data.corrections[k];addedC++;}});TRC.cache=m;TRC.dirty=true;try{TRCX.dirty=true;}catch(e){}trFlushCorr();}
+      if(data.vocab){var v=trVocab();Object.keys(data.vocab).forEach(function(k){var n=Math.max(v[k]||0,data.vocab[k]||0);if(v[k]!==n){v[k]=n;addedV++;}});TRV.cache=v;__tr.vB=null;TRV.dirty=true;trFlushVocab();}
+      toast('Restored '+addedC+' corrections + '+addedV+' learned words ✓','ok');
+      try{openCorrections();}catch(e){}
+    }catch(e){toast('That file could not be read','err');}
+    try{input.value='';}catch(e){}
+  };
+  rd.readAsText(f);
+}
+function trTriggerImport(){var el=document.getElementById('trbrain-file');if(el)el.click();}
 </script></body></html>
