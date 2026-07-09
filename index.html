@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v324</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v325</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -4347,7 +4347,7 @@ function trFlushPartsNow(){if(TRP.flushT){clearTimeout(TRP.flushT);TRP.flushT=nu
 function trFlushAllNow(){try{trFlushPartsNow();}catch(e){}try{trFlushSessNow();}catch(e){}try{trFlushVocab();}catch(e){}try{trFlushCorr();}catch(e){}}
 try{window.addEventListener('pagehide',trFlushAllNow);document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')trFlushAllNow();});}catch(e){}
 try{IDB.get('rb_tr_sessions',function(v){if(v&&!IDB.mem.hasOwnProperty('__sessions_seeded')){IDB.mem['__sessions_seeded']=1;/* mem now holds sessions for trSessions() */}});}catch(e){}
-try{setTimeout(function(){try{trMigrateLegacy();}catch(e){}},1200);}catch(e){}
+try{setTimeout(function(){try{trMigrateLegacy();}catch(e){}try{trSeedCommonFixes();}catch(e){}},1300);}catch(e){}
 
 
 /* BROADCASTCHANNEL */
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v324 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v325 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v324 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v325 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17308,7 +17308,7 @@ function rbSysChecks(){
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
-    {n:'Correction memory + lifetime vocabulary (durable in IndexedDB) + backup/restore learned words to a file so they are never lost; one-tap AI handoff to ChatGPT/Claude/Grok/Gemini/GLM/Perplexity',ok:(typeof trLearnCorrection==='function')&&(typeof trSmartFix==='function')&&(typeof trExportBrain==='function')&&(typeof trHandoffAI==='function')},
+    {n:'Correction memory + lifetime vocabulary (durable) + built-in common-mistake dictionary (out-of-the-box auto-fix) + backup/restore; one-tap AI handoff to 6 models',ok:(typeof trLearnCorrection==='function')&&(typeof trCommonFixes==='function')&&(typeof trExportBrain==='function')&&(typeof trHandoffAI==='function')},
     {n:'Live transcription diagnostics — word counter + plain-language “why nothing appears” explainer',ok:(typeof trWhyBlank==='function')},
     {n:'Clear View + Post/List entry points for products and jobs (agent or manual)',ok:(typeof openListChooser==='function')&&(typeof openPostJobChooser==='function')}
   ];
@@ -17316,7 +17316,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v324';var all=(pass===checks.length);
+  var ver='v325';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -18125,6 +18125,7 @@ function openCorrections(){
     +'<button class="btn btnok" style="width:100%;margin-bottom:8px" onclick="trAddCorrection()"><i class="ti ti-check"></i> Learn & fix everywhere</button>'
     +'<div style="display:flex;gap:7px;margin-bottom:12px"><button class="btn" style="flex:1" onclick="trExportBrain()"><i class="ti ti-download"></i> Back up learned words</button><button class="btn" style="flex:1" onclick="trTriggerImport()"><i class="ti ti-upload"></i> Restore</button></div>'
     +'<input type="file" id="trbrain-file" accept="application/json,.json" style="display:none" onchange="trImportBrainFile(this)">'
+    +'<div style="font-size:11px;color:var(--mt);margin-bottom:6px">Common English mistakes (teh→the, recieve→receive, gonna→going to…) are auto-fixed for you. <a href="#" onclick="trLoadCommon();return false;" style="color:var(--ac)">Re-add common set</a></div>'
     +'<div style="font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Learned corrections</div>'
     +rows
     +'</div></div>';
@@ -18553,4 +18554,9 @@ function trImportBrainFile(input){
   rd.readAsText(f);
 }
 function trTriggerImport(){var el=document.getElementById('trbrain-file');if(el)el.click();}
+
+/* ===== v325: built-in common-mistake dictionary (safe, out-of-the-box auto-fix) ===== */
+function trCommonFixes(){return {"teh": "the", "adn": "and", "taht": "that", "thsi": "this", "wtih": "with", "waht": "what", "wich": "which", "recieve": "receive", "recieved": "received", "beleive": "believe", "beleived": "believed", "seperate": "separate", "seperated": "separated", "definately": "definitely", "occured": "occurred", "occuring": "occurring", "untill": "until", "thier": "their", "wierd": "weird", "acheive": "achieve", "acheived": "achieved", "greatful": "grateful", "tommorow": "tomorrow", "tommorrow": "tomorrow", "goverment": "government", "enviroment": "environment", "neccessary": "necessary", "accross": "across", "alwasy": "always", "becuase": "because", "becasue": "because", "differnt": "different", "frist": "first", "improtant": "important", "importnat": "important", "knowlege": "knowledge", "managment": "management", "probaly": "probably", "probally": "probably", "realy": "really", "remeber": "remember", "succesful": "successful", "successfull": "successful", "wanna": "want to", "gonna": "going to", "gotta": "got to", "kinda": "kind of", "betweeen": "between", "langauge": "language", "peices": "pieces", "beggining": "beginning", "basicly": "basically", "completly": "completely", "experiance": "experience", "yavascript": "javascript"};}
+function trSeedCommonFixes(){try{if(LS.get("rb_tr_seeded",0))return;var m=trCorrections();var common=trCommonFixes();var added=0;Object.keys(common).forEach(function(k){if(m[k]===undefined){m[k]=common[k];added++;}});if(added){TRC.cache=m;TRC.dirty=true;try{TRCX.dirty=true;}catch(e){}trFlushCorr();}LS.set("rb_tr_seeded",1);}catch(e){}}
+function trLoadCommon(){try{var m=trCorrections();var common=trCommonFixes();var n=0;Object.keys(common).forEach(function(k){if(m[k]!==common[k]){m[k]=common[k];n++;}});TRC.cache=m;TRC.dirty=true;try{TRCX.dirty=true;}catch(e){}trFlushCorr();toast("Added "+n+" common auto-fixes","ok");try{openCorrections();}catch(e){}}catch(e){}}
 </script></body></html>
