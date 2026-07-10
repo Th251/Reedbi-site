@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v328</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v330</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v328 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v330 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v328 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v330 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17304,7 +17304,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'Live word-streaming + Android-safe per-phrase mode + auto-fallback to open-source engine when the browser has no voice API (e.g. in-app WebView) + lightning-fast storage',ok:(typeof trPartWrite==='function')&&(typeof trCorrBuild==='function')&&(typeof trRenderLive==='function')},
+    {n:'CV / Job interview practice (behavioral + CV-grounded questions, agent judges answers, AI handoff) + Malayalam-safe capture/highlighting/interviews + live streaming + open-source fallback',ok:(typeof trCVInterviewStart==='function')&&(typeof trCVQuestions==='function')&&(typeof trRenderLive==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
@@ -17316,7 +17316,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v328';var all=(pass===checks.length);
+  var ver='v330';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17423,7 +17423,7 @@ function trLoop(){
 function trStop(silent){__tr.on=false;try{trFlushAllNow();}catch(e){}__tr.q=[];__tr.qBusy=false;trStopWatchdog();try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trStopAudioRec();var _sf=trGet(__tr.sid);if(_sf){trCloudSaveMeta(_sf);trCloudSavePart(_sf.id,(_sf.parts||1)-1);}trReleaseWake();if(!silent)toast('Paused — text saved. Audio for this session is ready below.','ok');trRenderStatus();}
 function trWakeLock(){try{if(navigator.wakeLock&&navigator.wakeLock.request){navigator.wakeLock.request('screen').then(function(w){__tr.wl=w;}).catch(function(){});}}catch(e){}}
 function trReleaseWake(){try{if(__tr.wl&&__tr.wl.release)__tr.wl.release();}catch(e){}__tr.wl=null;}
-function trSetLang(l){__tr.lang=l;LS.set('rb_tr_lang',l);if(__tr.on){try{if(__tr.rec)__tr.rec.stop();}catch(e){}}trRenderStatus();}
+function trSetLang(l){__tr.lang=l;LS.set('rb_tr_lang',l);try{var _ios=/iPhone|iPad|iPod/i.test(navigator.userAgent||'');if(_ios&&/^(ml|hi|ta|te|kn|bn|ar)/.test(l)&&__tr.engine!=='oss'){toast('On iPhone, '+(l==='ml-IN'?'Malayalam':'this language')+' is captured far better by the open-source engine. Tap the 🌐 Auto-detect chip.','info');}}catch(e){}if(__tr.on){try{if(__tr.rec)__tr.rec.stop();}catch(e){}}trRenderStatus();}
 function trRenderLive(fin,inter){var box=document.getElementById('tr-live');if(!box)return;var cm=document.getElementById('tr-committed'),il=document.getElementById('tr-interim-live');if(!cm||!il){box.innerHTML='<span id="tr-committed"></span><span id="tr-interim-live" style="color:var(--mt);opacity:.6"></span>';cm=document.getElementById('tr-committed');il=document.getElementById('tr-interim-live');try{cm.textContent=trFullText(__tr.sid).slice(-6000);}catch(e){}}if(fin){cm.textContent=(cm.textContent+fin).slice(-6000);il.textContent='';box.scrollTop=box.scrollHeight;}if(typeof inter==='string'){il.textContent=inter?((cm.textContent&&!/\s$/.test(cm.textContent))?(' '+inter):inter):'';box.scrollTop=box.scrollHeight;}var it=document.getElementById('tr-interim');if(it)it.textContent=inter?'\u2026 '+inter:'';}
 function trRenderStatus(){var st=document.getElementById('tr-status');
   if(st){
@@ -17474,15 +17474,21 @@ function trInterviewStart(sid){
   var s=trGet(sid);if(!s){toast('Record something first, then I can interview you on it','info');try{openTranscriber();}catch(e){}return;}
   if(trFullText(sid).trim().length<40){toast('The recording is still too short for questions — let it listen a bit more','info');return;}
   var sI=trGet(sid);if(sI&&sI.cloud&&!(LS.get(trPartKey(sid,0),'')||'')){trEnsureParts(sid,function(){trInterviewStart(sid);});return;}
-  __trIntvSid=sid;
+  __trIntvSid=sid;__trIntvCV=false;
   if(__jarvis&&__jarvis.on){trIntvBegin();}else{openJarvis('trintv');}
 }
 function trIntvBegin(){
   var sid=__trIntvSid;var s=trGet(sid);if(!s)return;
   var text=trFullText(sid);var asked={};(s.interview||[]).forEach(function(x){asked[x.q]=1;});
-  var qs=trGenSmartQuestions(text,asked,trIntvBatchSize(0));
-  __jarvis.flow={type:'trintv',sid:sid,qs:qs,idx:0,batch:0,asked:asked};
-  var m='I read your saved recording "'+s.name+'". I will ask you '+qs.length+' questions about it — answer by voice or type. Everything is saved automatically. Question one: '+qs[0];
+  var qs,m;
+  if(__trIntvCV){
+    qs=trCVQuestions(text);
+    m='CV & job interview practice. I will ask you '+qs.length+' interview questions'+((text&&text.trim().length>60)?' — some based on what you recorded':'')+'. Answer by voice or type; I will give feedback and save everything. For a full-strength AI interviewer afterwards, use \'Send to AI\'. Question one: '+qs[0];
+  }else{
+    qs=trGenSmartQuestions(text,asked,trIntvBatchSize(0));
+    m='I read your saved recording "'+s.name+'". I will ask you '+qs.length+' questions about it — answer by voice or type. Everything is saved automatically. Question one: '+qs[0];
+  }
+  __jarvis.flow={type:'trintv',sid:sid,qs:qs,idx:0,batch:0,asked:asked,cv:!!__trIntvCV};
   jarvisLog('ai',m);jarvisSpeak(m,function(){if(__jarvis.on)jarvisListen();});
 }
 function trIntvSaveAnswer(sid,q,a){var s=trGet(sid);if(!s)return;s.interview=s.interview||[];s.interview.push({q:q,a:a,ts:Date.now()});trUpdate(s);}
@@ -17548,6 +17554,7 @@ function openTranscriber(startNow){
     +'<button class="btn" style="flex:1" onclick="rbCopyAll()"><i class="ti ti-copy"></i> Copy all</button>'
     +'<button class="btn" style="flex:1" onclick="trDownload()"><i class="ti ti-download"></i> .txt</button>'
     +'<button class="btn" style="flex:1" onclick="trInterviewStart()"><i class="ti ti-messages"></i> Interview me</button>'
+    +'<button class="btn" style="flex:1" onclick="trCVInterviewStart()"><i class="ti ti-briefcase"></i> CV / Job interview</button>'
     +'<button class="btn" style="flex:1" onclick="trAIExport()"><i class="ti ti-robot"></i> Send to AI</button>'
     +'<button class="btn" style="flex:1" onclick="openCorrections()"><i class="ti ti-brain"></i> Fix words'+((typeof trMistakeCount==='function'&&trMistakeCount())?(' <span style="background:#16a34a;color:#fff;border-radius:8px;padding:0 5px;font-size:10px">'+trMistakeCount()+'</span>'):'')+'</button>'
     +'<button class="btn" style="flex:1" onclick="openReviewMistakes()"><i class="ti ti-highlight"></i> Review 🟡</button>'
@@ -18273,7 +18280,7 @@ function trAnalyze(text){
   var sents=text.replace(/\s+/g,' ').split(/(?<=[.!?\u0964])\s+|\n+/).map(function(s){return s.trim();}).filter(function(s){return s.split(/\s+/).length>=4;});
   // term frequency (content words), multi-script
   var freq={},order=[];
-  text.toLowerCase().replace(/[^\p{L}\p{N} ]+/gu,' ').split(/\s+/).forEach(function(w){
+  text.toLowerCase().replace(/[^\p{L}\p{M}\p{N} ]+/gu,' ').split(/\s+/).forEach(function(w){
     if(w.length>3&&!TR_STOPW[w]){if(freq[w]===undefined)order.push(w);freq[w]=(freq[w]||0)+1;}
   });
   var terms=order.sort(function(a,b){return freq[b]-freq[a];});
@@ -18335,7 +18342,7 @@ function trSuspectWords(text){
   var b=(typeof trBuckets==='function'&&vk.length)?trBuckets():null;
   var out={};
   String(text||'').split(/\s+/).forEach(function(tok){
-    var core=tok.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,'');
+    var core=tok.replace(/^[^\p{L}\p{M}\p{N}]+|[^\p{L}\p{M}\p{N}]+$/gu,'');
     if(core.length<4)return;var key=core.toLowerCase();
     if(m[key]!=null){out[core]='mapped';return;}          // known wrong word
     if((v[key]||0)>=2)return;                              // trusted -> fine
@@ -18496,8 +18503,8 @@ function trIntvReactSmart(answer,sid,question,idx){
     var ansLow=(' '+String(answer||'').toLowerCase()+' ');
     // expected focus = terms quoted in the current question (v313 questions quote real sentences)
     var focus=[];var qm=(question||'').match(/"([^"]+)"/);
-    if(qm){qm[1].toLowerCase().replace(/[^\p{L}\p{N} ]+/gu,' ').split(/\s+/).forEach(function(w){if(w.length>3&&!TR_STOPW[w])focus.push(w);});}
-    var ansTerms=[];ansLow.replace(/[^\p{L}\p{N} ]+/gu,' ').split(/\s+/).forEach(function(w){if(w.length>3&&!TR_STOPW[w])ansTerms.push(w);});
+    if(qm){qm[1].toLowerCase().replace(/[^\p{L}\p{M}\p{N} ]+/gu,' ').split(/\s+/).forEach(function(w){if(w.length>3&&!TR_STOPW[w])focus.push(w);});}
+    var ansTerms=[];ansLow.replace(/[^\p{L}\p{M}\p{N} ]+/gu,' ').split(/\s+/).forEach(function(w){if(w.length>3&&!TR_STOPW[w])ansTerms.push(w);});
     var hitFocus=focus.filter(function(w){return ansLow.indexOf(' '+w)>=0||ansLow.indexOf(w)>=0;});
     var hitTop=topTerms.filter(function(t){return ansLow.indexOf(t)>=0;});
     // a key term from the source the answer did NOT cover (for a nudge)
@@ -18560,4 +18567,40 @@ function trTriggerImport(){var el=document.getElementById('trbrain-file');if(el)
 function trCommonFixes(){return {"teh": "the", "adn": "and", "taht": "that", "thsi": "this", "wtih": "with", "waht": "what", "wich": "which", "recieve": "receive", "recieved": "received", "beleive": "believe", "beleived": "believed", "seperate": "separate", "seperated": "separated", "definately": "definitely", "occured": "occurred", "occuring": "occurring", "untill": "until", "thier": "their", "wierd": "weird", "acheive": "achieve", "acheived": "achieved", "greatful": "grateful", "tommorow": "tomorrow", "tommorrow": "tomorrow", "goverment": "government", "enviroment": "environment", "neccessary": "necessary", "accross": "across", "alwasy": "always", "becuase": "because", "becasue": "because", "differnt": "different", "frist": "first", "improtant": "important", "importnat": "important", "knowlege": "knowledge", "managment": "management", "probaly": "probably", "probally": "probably", "realy": "really", "remeber": "remember", "succesful": "successful", "successfull": "successful", "wanna": "want to", "gonna": "going to", "gotta": "got to", "kinda": "kind of", "betweeen": "between", "langauge": "language", "peices": "pieces", "beggining": "beginning", "basicly": "basically", "completly": "completely", "experiance": "experience", "yavascript": "javascript"};}
 function trSeedCommonFixes(){try{if(LS.get("rb_tr_seeded",0))return;var m=trCorrections();var common=trCommonFixes();var added=0;Object.keys(common).forEach(function(k){if(m[k]===undefined){m[k]=common[k];added++;}});if(added){TRC.cache=m;TRC.dirty=true;try{TRCX.dirty=true;}catch(e){}trFlushCorr();}LS.set("rb_tr_seeded",1);}catch(e){}}
 function trLoadCommon(){try{var m=trCorrections();var common=trCommonFixes();var n=0;Object.keys(common).forEach(function(k){if(m[k]!==common[k]){m[k]=common[k];n++;}});TRC.cache=m;TRC.dirty=true;try{TRCX.dirty=true;}catch(e){}trFlushCorr();toast("Added "+n+" common auto-fixes","ok");try{openCorrections();}catch(e){}}catch(e){}}
+
+/* ===== v330: CV / Job interview mode — real interview practice from captured words + AI handoff ===== */
+var __trIntvCV=false;
+function trCVQuestions(cvText){
+  var base=[
+    'Tell me about yourself and your background.',
+    'Why are you interested in this role?',
+    'What are your greatest strengths, and can you give an example of using one?',
+    'What is a weakness you are actively working to improve, and how?',
+    'Describe a challenging problem you solved — the situation, what you did, and the result.',
+    'Tell me about a time you worked in a team and what your specific role was.',
+    'Describe a time you failed or made a mistake. What did you learn from it?',
+    'Tell me about a time you showed leadership or took initiative.',
+    'How do you handle pressure and competing deadlines? Give an example.',
+    'Describe a disagreement or conflict at work and how you resolved it.',
+    'What professional achievement are you most proud of, and why?',
+    'Where do you see yourself in five years?',
+    'Why should we hire you over other strong candidates?',
+    'Tell me about a time you had to learn something new quickly.',
+    'What questions do you have for us about the role or the team?'
+  ];
+  var derived=[];
+  try{ if(cvText&&cvText.trim().length>60){ derived=(trGenSmartQuestions(cvText,{},6)||[]).slice(0,6); } }catch(e){}
+  var out=[base[0]];var bi=1,di=0;
+  while(bi<base.length||di<derived.length){
+    if(di<derived.length)out.push(derived[di++]);
+    if(bi<base.length)out.push(base[bi++]);
+  }
+  return out;
+}
+function trCVInterviewStart(sid){
+  sid=sid||__tr.sid||((trSessions()[0]||{}).id);
+  if(!sid){sid=trNewSession('CV interview').id;__tr.sid=sid;}
+  __trIntvSid=sid;__trIntvCV=true;
+  if(__jarvis&&__jarvis.on){trIntvBegin();}else{openJarvis('trintv');}
+}
 </script></body></html>
