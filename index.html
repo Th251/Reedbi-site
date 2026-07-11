@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v330</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v334</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v330 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v334 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -16374,11 +16374,11 @@ function jarvisFlowStep(text){
         var qs2=trGenSmartQuestions(txt2,f.asked,sz);
         if(!qs2.length)qs2=trGenSmartQuestions(txt2,{},sz);
         f.batch++;f.qs=qs2;f.idx=0;f.awaitMore=false;
-        var mmT='Great — '+qs2.length+' more, all different. '+qs2[0];
+        var mmT='Okay — '+qs2.length+' more, all different. '+qs2[0];
         jarvisLog('ai',mmT);jarvisSpeak(mmT,function(){if(__jarvis.on)jarvisListen();});return;
       }
       __jarvis.flow=null;
-      var finT='Excellent work! All your answers are saved with the recording. Open the Transcriber to copy or print the full interview.';
+      var finT='That completes the interview. All your answers are saved with the recording. For a full evaluation of your answers, tap Send to AI. Open the Transcriber to copy or print the interview.';
       jarvisLog('ai',finT);jarvisSpeak(finT,function(){if(__jarvis.on)jarvisListen();});return;
     }
     var qNow=f.qs[f.idx];
@@ -16386,12 +16386,12 @@ function jarvisFlowStep(text){
     var ackT=['Saved.','Noted and saved.','Good — saved.','Got it.','Saved that answer.'];
     if(f.idx+1<f.qs.length){
       f.idx++;
-      var m2T=trIntvReactSmart(text,f.sid,qNow,f.idx)+' Next: '+f.qs[f.idx];
+      var m2T=trIntvReactSmart(text,f.sid,qNow,f.idx,f.cv)+' '+f.qs[f.idx];
       jarvisLog('ai',m2T);jarvisSpeak(m2T,function(){if(__jarvis.on)jarvisListen();});
     }else{
       f.awaitMore=true;
       var nsz=trIntvBatchSize(f.batch+1);
-      var m3T=trIntvReactSmart(text,f.sid,qNow,f.idx)+' That is '+f.qs.length+' questions answered and saved. Want '+(nsz===20?'twenty':'seven')+' more? Say yes for more, or no to finish.';
+      var m3T=trIntvReactSmart(text,f.sid,qNow,f.idx,f.cv)+' That is '+f.qs.length+' questions answered and saved. Want '+(nsz===20?'twenty':'seven')+' more? Say yes for more, or no to finish.';
       jarvisLog('ai',m3T);jarvisSpeak(m3T,function(){if(__jarvis.on)jarvisListen();});
     }
     return;
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v330 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v334 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17235,7 +17235,11 @@ function rbRenderQuickAccess(){
     var ex=document.getElementById('rb-quick');if(ex)ex.remove();
     var q=document.createElement('div');q.id='rb-quick';q.className='rb-quick';
     function tile(ic,label,sub,fn){return '<div class="rbq-tile" onclick="'+fn+'"><div class="rbq-ic">'+ic+'</div><b>'+label+'</b><span>'+sub+'</span></div>';}
-    q.innerHTML='<div class="rbq-h">View</div>'
+    q.innerHTML='<div class="rbq-h">Ask the agent</div>'
+      +'<div class="rbq-row">'
+      +'<div class="rbq-tile" style="grid-column:1/-1;background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(37,99,235,.10))" onclick="openAgentAsk()"><div class="rbq-ic">🧭</div><b>What should I do?</b><span>Pull a suggestion — the agent recommends your next step</span></div>'
+      +'</div>'
+      +'<div class="rbq-h">View</div>'
       +'<div class="rbq-row">'
       +tile('🛍️','View products','Browse & buy','openProductSearch()')
       +tile('💼','View jobs','Find & apply','openJobSearch()')
@@ -17304,7 +17308,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'CV / Job interview practice (behavioral + CV-grounded questions, agent judges answers, AI handoff) + Malayalam-safe capture/highlighting/interviews + live streaming + open-source fallback',ok:(typeof trCVInterviewStart==='function')&&(typeof trCVQuestions==='function')&&(typeof trRenderLive==='function')},
+    {n:'Real Google Gemma 4 on-device (transformers.js + WebGPU) with Thinking Mode + agent skills loaded from a URL + ask-the-agent mode + CV/Job interview + Malayalam-safe capture',ok:(typeof rbLLMLoadSkill==='function')&&(typeof rbLLMSplitThinking==='function')&&(typeof openAgentAsk==='function')&&(typeof openAIInterviewer==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
@@ -17316,7 +17320,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v330';var all=(pass===checks.length);
+  var ver='v334';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17423,7 +17427,7 @@ function trLoop(){
 function trStop(silent){__tr.on=false;try{trFlushAllNow();}catch(e){}__tr.q=[];__tr.qBusy=false;trStopWatchdog();try{if(__tr.rec)__tr.rec.stop();}catch(e){}__tr.rec=null;trStopAudioRec();var _sf=trGet(__tr.sid);if(_sf){trCloudSaveMeta(_sf);trCloudSavePart(_sf.id,(_sf.parts||1)-1);}trReleaseWake();if(!silent)toast('Paused — text saved. Audio for this session is ready below.','ok');trRenderStatus();}
 function trWakeLock(){try{if(navigator.wakeLock&&navigator.wakeLock.request){navigator.wakeLock.request('screen').then(function(w){__tr.wl=w;}).catch(function(){});}}catch(e){}}
 function trReleaseWake(){try{if(__tr.wl&&__tr.wl.release)__tr.wl.release();}catch(e){}__tr.wl=null;}
-function trSetLang(l){__tr.lang=l;LS.set('rb_tr_lang',l);try{var _ios=/iPhone|iPad|iPod/i.test(navigator.userAgent||'');if(_ios&&/^(ml|hi|ta|te|kn|bn|ar)/.test(l)&&__tr.engine!=='oss'){toast('On iPhone, '+(l==='ml-IN'?'Malayalam':'this language')+' is captured far better by the open-source engine. Tap the 🌐 Auto-detect chip.','info');}}catch(e){}if(__tr.on){try{if(__tr.rec)__tr.rec.stop();}catch(e){}}trRenderStatus();}
+function trSetLang(l){__tr.lang=l;LS.set('rb_tr_lang',l);try{if(/^(ml|ta|te|kn)/.test(l)&&__tr.engine!=='oss'){toast((l==='ml-IN'?'Malayalam':'This language')+' is captured much more reliably by the open-source engine than the browser. Tap the 🌐 Auto-detect chip for best results.','info');}}catch(e){}if(__tr.on){try{if(__tr.rec)__tr.rec.stop();}catch(e){}}trRenderStatus();}
 function trRenderLive(fin,inter){var box=document.getElementById('tr-live');if(!box)return;var cm=document.getElementById('tr-committed'),il=document.getElementById('tr-interim-live');if(!cm||!il){box.innerHTML='<span id="tr-committed"></span><span id="tr-interim-live" style="color:var(--mt);opacity:.6"></span>';cm=document.getElementById('tr-committed');il=document.getElementById('tr-interim-live');try{cm.textContent=trFullText(__tr.sid).slice(-6000);}catch(e){}}if(fin){cm.textContent=(cm.textContent+fin).slice(-6000);il.textContent='';box.scrollTop=box.scrollHeight;}if(typeof inter==='string'){il.textContent=inter?((cm.textContent&&!/\s$/.test(cm.textContent))?(' '+inter):inter):'';box.scrollTop=box.scrollHeight;}var it=document.getElementById('tr-interim');if(it)it.textContent=inter?'\u2026 '+inter:'';}
 function trRenderStatus(){var st=document.getElementById('tr-status');
   if(st){
@@ -17555,6 +17559,7 @@ function openTranscriber(startNow){
     +'<button class="btn" style="flex:1" onclick="trDownload()"><i class="ti ti-download"></i> .txt</button>'
     +'<button class="btn" style="flex:1" onclick="trInterviewStart()"><i class="ti ti-messages"></i> Interview me</button>'
     +'<button class="btn" style="flex:1" onclick="trCVInterviewStart()"><i class="ti ti-briefcase"></i> CV / Job interview</button>'
+    +'<button class="btn" style="flex:1" onclick="openAIInterviewer()"><i class="ti ti-cpu"></i> On-device Gemma 4</button>'
     +'<button class="btn" style="flex:1" onclick="trAIExport()"><i class="ti ti-robot"></i> Send to AI</button>'
     +'<button class="btn" style="flex:1" onclick="openCorrections()"><i class="ti ti-brain"></i> Fix words'+((typeof trMistakeCount==='function'&&trMistakeCount())?(' <span style="background:#16a34a;color:#fff;border-radius:8px;padding:0 5px;font-size:10px">'+trMistakeCount()+'</span>'):'')+'</button>'
     +'<button class="btn" style="flex:1" onclick="openReviewMistakes()"><i class="ti ti-highlight"></i> Review 🟡</button>'
@@ -18495,44 +18500,45 @@ function trRenderHint(){
 }
 
 /* ===== v320: intelligent interview reactions grounded in the complete transcript ===== */
-function trIntvReactSmart(answer,sid,question,idx){
+function trIntvReactSmart(answer,sid,question,idx,cvMode){
   try{
-    var src=trFullText(sid);if(!src)return trIntvReact(answer,['Saved.','Noted.','Got it.'],idx);
-    var an=trAnalyze(src);
-    var topTerms=an.terms.slice(0,20);
     var ansLow=(' '+String(answer||'').toLowerCase()+' ');
-    // expected focus = terms quoted in the current question (v313 questions quote real sentences)
+    var ansTerms=[];ansLow.replace(/[^\p{L}\p{M}\p{N} ]+/gu,' ').split(/\s+/).forEach(function(w){if(w.length>3&&!TR_STOPW[w])ansTerms.push(w);});
+    var wordCount=String(answer||'').trim().split(/\s+/).filter(Boolean).length;
+    // Honest: the app cannot verify whether an answer is correct without a full AI, so it never falsely praises.
+    if(wordCount<8){
+      var sm=['That answer is quite short. Add a concrete example — the situation, what you did, and what happened.','Too brief to be convincing. Expand with specifics: your exact role, the actions, the outcome.','Give more detail — a real example makes this land. What did you actually do, step by step?'];
+      return sm[idx%sm.length];
+    }
+    if(cvMode){
+      var hasResult=/result|led to|increased|reduced|improved|achieved|grew|saved|delivered|percent|%|\d/.test(ansLow);
+      var hasAction=/i\s+(did|led|built|created|made|managed|handled|solved|designed|organi|implemented|decided|worked|ran|drove)/.test(ansLow);
+      var tips=[];
+      if(!hasAction)tips.push('say clearly what YOU personally did, not just the team');
+      if(!hasResult)tips.push('end with the measurable result or outcome');
+      if(wordCount>150)tips.push('tighten it to a focused 60–90 seconds');
+      if(tips.length){return 'Saved. To make this stronger, '+tips.slice(0,2).join(', and ')+'. Next question:';}
+      var okm=['Saved. Clear structure — situation, action and result. For a full judgement of the content, use “Send to AI”. Next:','Saved. You named your role and an outcome — good shape. Next:','Saved. Well structured. Next:'];
+      return okm[idx%okm.length];
+    }
+    var src=trFullText(sid);if(!src)return 'Saved. Add a specific detail to make it fuller.';
+    var an=trAnalyze(src);var topTerms=an.terms.slice(0,20);
     var focus=[];var qm=(question||'').match(/"([^"]+)"/);
     if(qm){qm[1].toLowerCase().replace(/[^\p{L}\p{M}\p{N} ]+/gu,' ').split(/\s+/).forEach(function(w){if(w.length>3&&!TR_STOPW[w])focus.push(w);});}
-    var ansTerms=[];ansLow.replace(/[^\p{L}\p{M}\p{N} ]+/gu,' ').split(/\s+/).forEach(function(w){if(w.length>3&&!TR_STOPW[w])ansTerms.push(w);});
-    var hitFocus=focus.filter(function(w){return ansLow.indexOf(' '+w)>=0||ansLow.indexOf(w)>=0;});
+    var hitFocus=focus.filter(function(w){return ansLow.indexOf(w)>=0;});
     var hitTop=topTerms.filter(function(t){return ansLow.indexOf(t)>=0;});
-    // a key term from the source the answer did NOT cover (for a nudge)
     var missed=topTerms.filter(function(t){return ansLow.indexOf(t)<0;});
     var missTerm=missed.length?missed[idx%missed.length]:'';
-    var strong=hitTop.slice(0,2);
-    // very short answer
-    if(ansTerms.length<3){
-      return missTerm?('That’s a brief answer — the recording went deeper on “'+missTerm+'”. Try adding a detail about that.'):'That’s brief — try expanding with a specific detail from the recording.';
+    if(hitFocus.length>=1&&hitTop.length>=2){
+      return 'Saved. That addresses the key points'+(missTerm?(' — you could also mention “'+missTerm+'”'):'')+'.';
     }
-    // strong, on-topic answer
-    if(hitFocus.length>=1||hitTop.length>=2){
-      var base=strong.length>=2?('Strong answer — you connected “'+strong[0]+'” and “'+strong[1]+'”, which the recording emphasised.')
-             :(strong.length===1?('Good — you correctly focused on “'+strong[0]+'”.'):'Good, on-topic answer.');
-      if(missTerm&&(idx%2===0))base+=' You could also tie in “'+missTerm+'”.';
-      return base;
+    if(hitTop.length>=1){
+      return 'Saved. Partly on point'+(missTerm?(', but the recording also stressed “'+missTerm+'” — worth adding'):'')+'.';
     }
-    // partially relevant
-    if(hitTop.length===1){
-      return 'Reasonable — though the recording tied this to “'+(missTerm||topTerms[0])+'” as well; revisit that part.';
-    }
-    // off-topic / not grounded
-    return missTerm?('The recording actually focused on “'+(topTerms[0]||missTerm)+'” and “'+missTerm+'” here — revisit that section and it’ll click.')
-                   :'Try grounding your answer in the specific points the recording made.';
-  }catch(e){return trIntvReact(answer,['Saved.','Noted.','Got it.'],idx);}
+    return missTerm?('Saved — but this seems off from what the recording covered (“'+(topTerms[0]||missTerm)+'”). Re-answer with that in mind if you like.')
+                   :'Saved. Try to ground your answer in the specific points from the recording.';
+  }catch(e){return 'Saved.';}
 }
-
-/* ===== v323: backup & restore the learned "brain" (corrections + vocabulary) so words are never lost ===== */
 function trExportBrain(){
   try{
     var data={app:'reedbi',type:'learned-brain',v:1,exported:new Date().toISOString(),corrections:trCorrections(),vocab:trVocab()};
@@ -18603,4 +18609,149 @@ function trCVInterviewStart(sid){
   __trIntvSid=sid;__trIntvCV=true;
   if(__jarvis&&__jarvis.on){trIntvBegin();}else{openJarvis('trintv');}
 }
+
+/* ===== v334: real Google Gemma 4 on-device via transformers.js (WebGPU) — Thinking Mode + agent skills from a URL ===== */
+var rbLLM={gen:null,loading:false,ready:false,progress:'',model:'onnx-community/gemma-4-E2B-it-ONNX',modelName:'Gemma 4 E2B',hist:null,thinking:true,skill:null,skillName:''};
+function rbLLMSupported(){try{return !!(navigator.gpu&&navigator.gpu.requestAdapter);}catch(e){return false;}}
+function openAIInterviewer(sid){
+  sid=sid||__tr.sid||((trSessions()[0]||{}).id);
+  var ex=document.getElementById('llmiv-ovl');if(ex)ex.remove();
+  var supported=rbLLMSupported();
+  var isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+  var html='<div class="ovl" id="llmiv-ovl"><div class="sheet" style="max-width:580px">'
+   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0"><i class="ti ti-cpu"></i> Gemma 4 — on-device AI</h3><button class="btn" onclick="closeOvl(\'llmiv-ovl\')">✕</button></div>'
+   +'<div style="font-size:12.5px;color:var(--mt);line-height:1.6;margin-bottom:12px">Runs <b>Google Gemma 4</b> (open source, Apache-2.0) <b>fully on your device</b> via WebGPU — private, offline, free, no API key. It reads your captured words and interviews you, and can show its <b>step-by-step reasoning</b>.</div>';
+  if(!supported){
+    html+='<div style="background:rgba(234,179,8,.14);color:#a16207;padding:11px;border-radius:10px;font-size:12.5px;line-height:1.55;margin-bottom:12px">'
+      +(isMobile?'This browser can’t run Gemma 4 on-device (needs WebGPU). On Android, the latest <b>Chrome</b> may work on a powerful phone; <b>iPhone Safari</b> doesn’t support it yet. Google’s separate <b>AI Edge Gallery</b> app runs Gemma 4 natively on phones.':'This browser doesn’t support WebGPU. Use the latest <b>Chrome</b> or <b>Edge</b> on desktop.')
+      +'<br><br>The free full-strength option that works everywhere is <b>Send to AI → Gemini</b>.</div>'
+      +'<button class="btn btnok" style="width:100%" onclick="closeOvl(\'llmiv-ovl\');trAIExport(\''+escJS(sid)+'\')"><i class="ti ti-robot"></i> Use Send to AI (Gemini, free) instead</button>'
+      +'</div></div>';
+    document.body.insertAdjacentHTML('beforeend',html);return;
+  }
+  html+='<div style="display:flex;gap:8px;margin-bottom:10px">'
+    +'<label style="flex:1;font-size:12px;display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--b);border-radius:9px;padding:8px"><input type="checkbox" id="llm-think" '+(rbLLM.thinking?'checked':'')+' onchange="rbLLM.thinking=this.checked"> 🧠 Thinking Mode (show reasoning)</label>'
+    +'<select id="llm-model" class="card-field" style="flex:0 0 auto" onchange="rbLLM.model=this.value.split(\'|\')[0];rbLLM.modelName=this.value.split(\'|\')[1];"><option value="onnx-community/gemma-4-E2B-it-ONNX|Gemma 4 E2B">Gemma 4 E2B (~0.5–1.3GB)</option><option value="onnx-community/gemma-4-E4B-it-ONNX|Gemma 4 E4B">Gemma 4 E4B (~1.5–2.5GB)</option></select>'
+    +'</div>'
+   +'<div style="display:flex;gap:7px;margin-bottom:10px"><input id="llm-skill-url" class="card-field" placeholder="Load an agent skill from a URL (optional)…" style="flex:1"><button class="btn" onclick="rbLLMLoadSkill()">Load skill</button></div>'
+   +'<div id="llm-skill-status" style="font-size:11px;color:var(--mt);margin-bottom:8px"></div>'
+   +'<div style="background:rgba(37,99,235,.10);color:var(--tx);padding:11px;border-radius:10px;font-size:12px;line-height:1.55;margin-bottom:12px">First run downloads the model once (~0.5–1.3&nbsp;GB for E2B), then it’s cached and works offline. A desktop PC or a powerful Android phone is recommended.</div>'
+   +'<div id="llm-status" style="font-size:12px;color:var(--mt);margin-bottom:10px"></div>'
+   +'<div id="llm-chat" style="max-height:40vh;overflow-y:auto;background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:10px;font-size:13px;line-height:1.55;margin-bottom:10px;display:none"></div>'
+   +'<div id="llm-answer-row" style="display:none;gap:7px;margin-bottom:10px"><input id="llm-answer" class="card-field" placeholder="Type your answer…" style="flex:1"><button class="btn btnok" onclick="rbLLMAnswer()">Send</button></div>'
+   +'<button class="btn btnok" id="llm-load-btn" style="width:100%" onclick="rbLLMStartInterview(\''+escJS(sid)+'\')"><i class="ti ti-download"></i> Load Gemma 4 & start interview</button>'
+   +'<div style="font-size:10.5px;color:var(--mt2);margin-top:8px;text-align:center">Experimental in-browser model. If it can’t load on your device, use Send to AI → Gemini (free).</div>'
+   +'</div></div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function rbLLMSetStatus(t){var el=document.getElementById('llm-status');if(el)el.innerHTML=t;}
+function rbLLMAddMsg(who,text,thinking){var box=document.getElementById('llm-chat');if(!box)return;box.style.display='block';var color=who==='ai'?'var(--ac)':'var(--tx)';var name=who==='ai'?'Gemma 4':'You';var th=(thinking&&rbLLM.thinking)?'<div style="font-size:11px;color:var(--mt2);background:rgba(124,58,237,.08);border-left:2px solid var(--ac);padding:6px 8px;border-radius:6px;margin:4px 0;white-space:pre-wrap">🧠 '+esc(thinking)+'</div>':'';box.insertAdjacentHTML('beforeend','<div style="margin-bottom:8px"><span style="color:'+color+';font-weight:700">'+name+':</span> '+th+esc(text)+'</div>');box.scrollTop=box.scrollHeight;}
+async function rbLLMLoadSkill(){
+  var el=document.getElementById('llm-skill-url');if(!el)return;var url=(el.value||'').trim();if(!url)return;
+  var st=document.getElementById('llm-skill-status');if(st)st.textContent='Loading skill…';
+  try{
+    var r=await fetch(url);var ct=(r.headers.get('content-type')||'');var body;
+    if(/json/.test(ct)){var j=await r.json();rbLLM.skill=j.instructions||j.systemPrompt||j.prompt||JSON.stringify(j);rbLLM.skillName=j.name||'skill';}
+    else{rbLLM.skill=await r.text();rbLLM.skillName='skill';}
+    rbLLM.skill=String(rbLLM.skill).slice(0,4000);
+    if(st)st.innerHTML='✓ Loaded skill “'+esc(rbLLM.skillName)+'” — it will guide Gemma 4.';
+  }catch(e){if(st)st.innerHTML='<span style="color:#b91c1c">Could not load that skill URL (check the link / CORS).</span>';}
+}
+async function rbLLMLoad(){
+  if(rbLLM.ready)return true;
+  if(rbLLM.loading)return false;
+  rbLLM.loading=true;
+  try{
+    rbLLMSetStatus('Loading transformers.js…');
+    var tf=await import('https://esm.run/@huggingface/transformers');
+    rbLLM.gen=await tf.pipeline('text-generation',rbLLM.model,{dtype:'q4f16',device:'webgpu',progress_callback:function(p){var pct=(p&&p.progress)?(' '+Math.round(p.progress)+'%'):'';rbLLM.progress=((p&&p.status)||'')+pct;rbLLMSetStatus('Downloading '+esc(rbLLM.modelName)+'… '+esc(rbLLM.progress));}});
+    rbLLM.ready=true;rbLLM.loading=false;rbLLMSetStatus('✓ '+esc(rbLLM.modelName)+' ready — running fully on your device.');
+    return true;
+  }catch(e){
+    rbLLM.loading=false;
+    rbLLMSetStatus('<span style="color:#b91c1c">Could not load Gemma 4 on this device (needs WebGPU + memory). Use Send to AI → Gemini (free).</span>');
+    return false;
+  }
+}
+async function rbLLMStartInterview(sid){
+  var btn=document.getElementById('llm-load-btn');if(btn){btn.disabled=true;btn.style.opacity='.6';}
+  var ok=await rbLLMLoad();
+  if(!ok){if(btn){btn.disabled=false;btn.style.opacity='1';}return;}
+  if(btn)btn.style.display='none';
+  var text=(typeof trFullText==='function'&&sid)?trFullText(sid):'';
+  var ctx=text&&text.trim().length>40?('The candidate\'s recorded material (CV / notes / transcript):\n\n'+text.slice(0,3500)+'\n\n'):'';
+  var think=rbLLM.thinking?'First reason step by step inside <thinking></thinking> tags, then give your reply after them. ':'';
+  var skill=rbLLM.skill?('\n\nActive agent skill ("'+rbLLM.skillName+'"): '+rbLLM.skill+'\n'):'';
+  rbLLM.hist=[{role:'system',content:'You are a professional, honest job interviewer. '+ctx+skill+think+'Ask ONE interview question at a time. After each answer give brief HONEST feedback (clearly say if it is weak, wrong, or too short — never just praise), then ask the next question. Keep it concise. Begin now with your first question.'}];
+  var row=document.getElementById('llm-answer-row');if(row)row.style.display='flex';
+  await rbLLMTurn();
+  var inp=document.getElementById('llm-answer');if(inp)inp.focus();
+}
+function rbLLMSplitThinking(txt){
+  var think='';var m=String(txt||'').match(/<think(?:ing)?>([\s\S]*?)<\/think(?:ing)?>/i);
+  if(m){think=m[1].trim();txt=txt.replace(m[0],'').trim();}
+  return {think:think,text:txt||'(no response)'};
+}
+async function rbLLMTurn(){
+  try{
+    rbLLMSetStatus('Gemma 4 is thinking…');
+    var out=await rbLLM.gen(rbLLM.hist,{max_new_tokens:rbLLM.thinking?420:240,do_sample:true,temperature:0.7});
+    var full=out&&out[0]&&out[0].generated_text;
+    var reply='';
+    if(Array.isArray(full)){reply=(full[full.length-1]&&full[full.length-1].content)||'';}
+    else{reply=String(full||'');}
+    rbLLM.hist.push({role:'assistant',content:reply});
+    var sp=rbLLMSplitThinking(reply);
+    rbLLMAddMsg('ai',sp.text,sp.think);rbLLMSetStatus('');
+    try{if(window.speechSynthesis){var u=new SpeechSynthesisUtterance(sp.text);speechSynthesis.speak(u);}}catch(e){}
+  }catch(e){rbLLMSetStatus('<span style="color:#b91c1c">Generation error. Try again or use Send to AI.</span>');}
+}
+async function rbLLMAnswer(){
+  var inp=document.getElementById('llm-answer');if(!inp)return;var a=(inp.value||'').trim();if(!a)return;
+  inp.value='';rbLLMAddMsg('you',a);rbLLM.hist.push({role:'user',content:a});
+  await rbLLMTurn();
+}
+/* ===== v333: "ask the agent" — the agent proposes next actions, you pull one ===== */
+function rbAgentSuggestions(){
+  var out=[];var today=(typeof dayKey==='function')?dayKey(Date.now()):'';
+  try{
+    var sess=(typeof trSessions==='function')?trSessions():[];
+    var withText=sess.filter(function(s){return (s.chars||0)>20;});
+    var latest=withText[0];
+    if(latest){
+      var susCount=0;try{susCount=Object.keys(trSuspectWords(trFullText(latest.id))||{}).length;}catch(e){}
+      if(susCount>0)out.push({icon:'🟡',label:'Review '+susCount+' possible mistake'+(susCount>1?'s':'')+' in “'+(latest.name||'your recording')+'”',why:'Fix each once and it’s corrected forever.',act:function(){closeOvl('agentask-ovl');try{openReviewMistakes(latest.id);}catch(e){}}});
+      out.push({icon:'🎯',label:'Practice a CV / job interview on your notes',why:'The agent asks questions from what you recorded and gives honest feedback.',act:function(){closeOvl('agentask-ovl');try{trCVInterviewStart(latest.id);}catch(e){}}});
+      out.push({icon:'🤖',label:'Send “'+(latest.name||'your recording')+'” to an AI',why:'One tap to ChatGPT, Gemini, Claude, Grok or GLM.',act:function(){closeOvl('agentask-ovl');try{trAIExport(latest.id);}catch(e){}}});
+    }
+  }catch(e){}
+  try{
+    var habits=LS.get('rb_habits',[])||[];
+    var left=habits.filter(function(h){var d=h.done||[];return d.indexOf(today)<0;});
+    if(habits.length&&left.length)out.push({icon:'✅',label:'Complete '+left.length+' habit'+(left.length>1?'s':'')+' for today',why:'Keep your streak alive.',act:function(){closeOvl('agentask-ovl');try{openHabits();}catch(e){}}});
+  }catch(e){}
+  try{
+    var prods=(LS.get('rb_products',[])||[]).filter(function(p){return CU&&p.sellerUid===CU.uid;});
+    var low=prods.filter(function(p){return (p.qty||0)>0&&(p.qty||0)<=3;});
+    if(low.length)out.push({icon:'📦',label:low.length+' product'+(low.length>1?'s':'')+' low on stock',why:'Restock “'+(low[0].title||'')+'” before it sells out.',act:function(){closeOvl('agentask-ovl');try{openMainStore();}catch(e){}}});
+    if(!prods.length)out.push({icon:'🏷️',label:'List your first product to sell',why:'Add something by voice or a quick form.',act:function(){closeOvl('agentask-ovl');try{openListChooser();}catch(e){}}});
+  }catch(e){}
+  out.push({icon:'🎙️',label:'Start a new transcription',why:'Tap and it writes instantly as you speak, until you stop.',act:function(){closeOvl('agentask-ovl');try{openTranscriber(true);}catch(e){}}});
+  out.push({icon:'💬',label:'Or just tell me — I’ll do it',why:'Prefer to give a command? Open the voice assistant.',act:function(){closeOvl('agentask-ovl');try{openJarvis();}catch(e){}}});
+  return out;
+}
+function openAgentAsk(){
+  var ex=document.getElementById('agentask-ovl');if(ex)ex.remove();
+  if(typeof requireAuth==='function'&&!requireAuth('ask the agent'))return;
+  var sug=rbAgentSuggestions();window.__agentSug=sug;
+  var html='<div class="ovl" id="agentask-ovl"><div class="sheet" style="max-width:520px">'
+   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="margin:0">🧭 What should I do?</h3><button class="btn" onclick="closeOvl(\'agentask-ovl\')">✕</button></div>'
+   +'<div style="font-size:12.5px;color:var(--mt);margin-bottom:12px">Rather than telling the agent what to do, <b>pull a suggestion</b>. The agent looked at your day and recommends these next steps.</div>';
+  sug.forEach(function(s,i){
+    html+='<button class="btn" style="width:100%;text-align:left;margin-bottom:8px;padding:12px;display:block" onclick="rbAgentDo('+i+')"><div style="font-weight:700;font-size:13.5px">'+s.icon+' '+esc(s.label)+'</div><div style="font-size:11.5px;color:var(--mt);margin-top:3px">'+esc(s.why)+'</div></button>';
+  });
+  html+='</div></div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function rbAgentDo(i){var s=(window.__agentSug||[])[i];if(s&&s.act)s.act();}
 </script></body></html>
