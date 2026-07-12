@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v341</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v342</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v341 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v342 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v341 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v342 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17309,7 +17309,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'ONE interview that ALWAYS responds instantly — built-in interviewer (offline, rates answers vs your captured text & rejects wrong/empty ones) with Ollama/in-page Gemma 4 as the smart upgrade; CV mode inline; Reedbi voice assistant + Gemma 4 shop assistant for products',ok:(typeof rbInterviewStart==='function')&&(typeof rbBIEval==='function')&&(typeof rbBIStart==='function')&&(typeof openAIInterviewer==='function')},
+    {n:'Faster, more accurate Malayalam/Indic capture — open-source Whisper upgraded to the multilingual base model with an explicit language hint (Malayalam stops being guessed) + ONE instant interview + Ollama/Gemma 4 + shop assistant',ok:(typeof rbInterviewStart==='function')&&(typeof rbBIEval==='function')&&(typeof rbOSSQueue==='function')&&(typeof openShopAssistant==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
@@ -17321,7 +17321,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v341';var all=(pass===checks.length);
+  var ver='v342';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17880,7 +17880,8 @@ function rbOSSPump(){
   __tr.qBusy=true;var b=__tr.q.shift();
   rbOSSLoad(function(ok){
     if(!ok||!window.rbWhisper||!window.rbWhisper.ready){__tr.qBusy=false;return;}
-    window.rbWhisper.transcribe(b).then(function(r){
+    var _wl=(__tr.lang&&!/^en/i.test(__tr.lang))?__tr.lang:'';   // force Malayalam/Indic if the user picked it; else auto-detect
+    window.rbWhisper.transcribe(b,{language:_wl}).then(function(r){
       if(r&&r.text){__tr.typed=true;__tr.errMsg='';if(r.language)__tr.detected=r.language;
         var _ct=trSmartFix(trApplyCorrections(r.text+' '));trVocabAbsorb(_ct,1);trAppend(__tr.sid,_ct);trRenderLive(_ct,'');}
       trRenderStatus();
