@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v337</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v338</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v337 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v338 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v337 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v338 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17309,7 +17309,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'Gemma 4 top-model choice (E2B/E4B) remembered & used everywhere — conversational interviews + human-like shopping/product-support assistant + Thinking Mode + agent skills from a URL, with honest 12B/27B guidance and Gemini/voice fallback',ok:(typeof rbLLMSetModel==='function')&&(typeof rbLLMModelPickerHTML==='function')&&(typeof openShopAssistant==='function')&&(typeof trChooseInterview==='function')},
+    {n:'Connect to local Ollama on your PC (big Gemma 4 12B/27B) used everywhere + in-page Gemma 4 (E2B/E4B) — ONE professional conversational interview + human-like shopping/support assistant + Thinking Mode + agent skills from a URL, Gemini/voice fallback',ok:(typeof rbOllamaConnect==='function')&&(typeof rbOllamaChat==='function')&&(typeof rbLLMEngineHTML==='function')&&(typeof openShopAssistant==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
@@ -17321,7 +17321,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v337';var all=(pass===checks.length);
+  var ver='v338';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17558,8 +17558,8 @@ function openTranscriber(startNow){
     +'<div style="display:flex;gap:7px;margin-top:7px;flex-wrap:wrap">'
     +'<button class="btn" style="flex:1" onclick="rbCopyAll()"><i class="ti ti-copy"></i> Copy all</button>'
     +'<button class="btn" style="flex:1" onclick="trDownload()"><i class="ti ti-download"></i> .txt</button>'
-    +'<button class="btn" style="flex:1" onclick="trChooseInterview(null,false)"><i class="ti ti-messages"></i> Interview me</button>'
-    +'<button class="btn" style="flex:1" onclick="trChooseInterview(null,true)"><i class="ti ti-briefcase"></i> CV / Job interview</button>'
+    +'<button class="btn" style="flex:1" onclick="openAIInterviewer(null,false)"><i class="ti ti-messages"></i> Interview me</button>'
+    +'<button class="btn" style="flex:1" onclick="openAIInterviewer(null,true)"><i class="ti ti-briefcase"></i> CV / Job interview</button>'
     +'<button class="btn" style="flex:1" onclick="openAIInterviewer()"><i class="ti ti-cpu"></i> On-device Gemma 4</button>'
     +'<button class="btn" style="flex:1" onclick="trAIExport()"><i class="ti ti-robot"></i> Send to AI</button>'
     +'<button class="btn" style="flex:1" onclick="openCorrections()"><i class="ti ti-brain"></i> Fix words'+((typeof trMistakeCount==='function'&&trMistakeCount())?(' <span style="background:#16a34a;color:#fff;border-radius:8px;padding:0 5px;font-size:10px">'+trMistakeCount()+'</span>'):'')+'</button>'
@@ -18612,7 +18612,7 @@ function trCVInterviewStart(sid){
 }
 
 /* ===== v334: real Google Gemma 4 on-device via transformers.js (WebGPU) — Thinking Mode + agent skills from a URL ===== */
-var rbLLM={gen:null,loading:false,ready:false,progress:'',model:'onnx-community/gemma-4-E2B-it-ONNX',modelName:'Gemma 4 E2B',hist:null,thinking:true,skill:null,skillName:'',cvMode:false};
+var rbLLM={gen:null,loading:false,ready:false,progress:'',model:'onnx-community/gemma-4-E2B-it-ONNX',modelName:'Gemma 4 E2B',hist:null,thinking:true,skill:null,skillName:'',cvMode:false,backend:'webgpu',ollamaUrl:'http://localhost:11434',ollamaModel:''};
 try{var _sm=LS.get('rb_llm_model','');if(_sm==='E4B'){rbLLM.model='onnx-community/gemma-4-E4B-it-ONNX';rbLLM.modelName='Gemma 4 E4B';}}catch(e){}
 function rbLLMSetModel(key){ // key: 'E2B' | 'E4B' — the best model, remembered and used everywhere
   if(key==='E4B'){rbLLM.model='onnx-community/gemma-4-E4B-it-ONNX';rbLLM.modelName='Gemma 4 E4B';}
@@ -18621,6 +18621,7 @@ function rbLLMSetModel(key){ // key: 'E2B' | 'E4B' — the best model, remembere
   try{LS.set('rb_llm_model',key);}catch(e){}
 }
 function rbLLMModelPickerHTML(){
+  if(rbLLM.backend==='ollama')return '';
   var e4=rbLLM.modelName==='Gemma 4 E4B';
   return '<div style="margin-bottom:10px"><div style="font-size:11.5px;color:var(--mt);margin-bottom:5px">AI model (used everywhere — interviews & shopping):</div>'
     +'<select class="card-field" style="width:100%" onchange="rbLLMSetModel(this.value)">'
@@ -18630,21 +18631,18 @@ function rbLLMModelPickerHTML(){
     +'<div style="font-size:10.5px;color:var(--mt2);margin-top:4px">Gemma 4 12B/27B are more powerful but too large for a browser tab — run those on a PC with Ollama/LM&nbsp;Studio, or use <b>Send to AI → Gemini</b>.</div></div>';
 }
 function rbLLMSupported(){try{return !!(navigator.gpu&&navigator.gpu.requestAdapter);}catch(e){return false;}}
-function openAIInterviewer(sid){
+function openAIInterviewer(sid,cvMode){
   sid=sid||__tr.sid||((trSessions()[0]||{}).id);
+  if(typeof cvMode!=='undefined')rbLLM.cvMode=!!cvMode;
   var ex=document.getElementById('llmiv-ovl');if(ex)ex.remove();
   var supported=rbLLMSupported();
   var isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
   var html='<div class="ovl" id="llmiv-ovl"><div class="sheet" style="max-width:580px">'
    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0"><i class="ti ti-cpu"></i> Gemma 4 — on-device AI</h3><button class="btn" onclick="closeOvl(\'llmiv-ovl\')">✕</button></div>'
    +'<div style="font-size:12.5px;color:var(--mt);line-height:1.6;margin-bottom:12px">Runs <b>Google Gemma 4</b> (open source, Apache-2.0) <b>fully on your device</b> via WebGPU — private, offline, free, no API key. It reads your captured words and interviews you, and can show its <b>step-by-step reasoning</b>.</div>';
+  html+=rbLLMEngineHTML();
   if(!supported){
-    html+='<div style="background:rgba(234,179,8,.14);color:#a16207;padding:11px;border-radius:10px;font-size:12.5px;line-height:1.55;margin-bottom:12px">'
-      +(isMobile?'This browser can’t run Gemma 4 on-device (needs WebGPU). On Android, the latest <b>Chrome</b> may work on a powerful phone; <b>iPhone Safari</b> doesn’t support it yet. Google’s separate <b>AI Edge Gallery</b> app runs Gemma 4 natively on phones.':'This browser doesn’t support WebGPU. Use the latest <b>Chrome</b> or <b>Edge</b> on desktop.')
-      +'<br><br>The free full-strength option that works everywhere is <b>Send to AI → Gemini</b>.</div>'
-      +'<button class="btn btnok" style="width:100%" onclick="closeOvl(\'llmiv-ovl\');trAIExport(\''+escJS(sid)+'\')"><i class="ti ti-robot"></i> Use Send to AI (Gemini, free) instead</button>'
-      +'</div></div>';
-    document.body.insertAdjacentHTML('beforeend',html);return;
+    html+='<div style="background:rgba(234,179,8,.14);color:#a16207;padding:10px;border-radius:10px;font-size:12px;line-height:1.5;margin-bottom:10px">Can’t run Gemma 4 <i>in the page</i> here (needs WebGPU). Switch on <b>Ollama</b> above to use your PC’s models, or use <b>Gemini</b> (free, any device):<br><button class="btn btnok" style="width:100%;margin-top:8px" onclick="closeOvl(\'llmiv-ovl\');trAIExport(\''+escJS(sid)+'\')"><i class="ti ti-robot"></i> Use Gemini (free) instead</button></div>';
   }
   html+='<div style="display:flex;gap:8px;margin-bottom:10px">'
     +'<label style="flex:1;font-size:12px;display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--b);border-radius:9px;padding:8px"><input type="checkbox" id="llm-think" '+(rbLLM.thinking?'checked':'')+' onchange="rbLLM.thinking=this.checked"> 🧠 Thinking Mode (show reasoning)</label>'
@@ -18674,9 +18672,43 @@ async function rbLLMLoadSkill(){
     if(st)st.innerHTML='✓ Loaded skill “'+esc(rbLLM.skillName)+'” — it will guide Gemma 4.';
   }catch(e){if(st)st.innerHTML='<span style="color:#b91c1c">Could not load that skill URL (check the link / CORS).</span>';}
 }
+/* v338: connect to a local Ollama server on the user's PC (runs big Gemma 4 12B/27B) */
+try{var _ou=LS.get('rb_ollama_url','');if(_ou)rbLLM.ollamaUrl=_ou;var _om=LS.get('rb_ollama_model','');if(_om)rbLLM.ollamaModel=_om;}catch(e){}
+function rbLLMEngineHTML(){
+  var on=rbLLM.backend==='ollama';
+  return '<div style="border:1px solid var(--b);border-radius:10px;padding:10px;margin-bottom:10px;background:var(--card2)">'
+    +'<label style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600"><input type="checkbox" id="use-ollama" '+(on?'checked':'')+' onchange="rbToggleOllama(this.checked)"> 🖥️ Use Ollama on my PC <span style="font-weight:400;color:var(--mt)">(for big models — Gemma 4 12B / 27B)</span></label>'
+    +'<div id="ollama-box" style="margin-top:9px;'+(on?'':'display:none')+'">'
+      +'<div style="display:flex;gap:7px;margin-bottom:7px"><input id="ollama-url" class="card-field" value="'+esc(rbLLM.ollamaUrl)+'" placeholder="http://localhost:11434" style="flex:1"><button class="btn" onclick="rbOllamaConnect()">Connect</button></div>'
+      +'<select id="ollama-model" class="card-field" style="width:100%;margin-bottom:6px" onchange="rbLLM.ollamaModel=this.value;try{LS.set(\'rb_ollama_model\',this.value);}catch(e){}"><option value="">Connect to see your installed models…</option></select>'
+      +'<div id="ollama-status" style="font-size:11px;color:var(--mt);margin-bottom:6px"></div>'
+      +'<div style="font-size:10.5px;color:var(--mt2);line-height:1.5">Start Ollama so the browser is allowed to reach it: run <code>OLLAMA_ORIGINS=* ollama serve</code> (Windows: set the env var, then <code>ollama serve</code>), pull a model with e.g. <code>ollama pull gemma3:12b</code>, and open this app on the same PC. If Connect fails, it’s usually that origins aren’t allowed or the app isn’t on the same machine.</div>'
+    +'</div></div>';
+}
+function rbToggleOllama(on){rbLLM.backend=on?'ollama':'webgpu';var b=document.getElementById('ollama-box');if(b)b.style.display=on?'block':'none';}
+async function rbOllamaConnect(){
+  var u=(document.getElementById('ollama-url')||{}).value||rbLLM.ollamaUrl;u=u.replace(/\/$/,'');rbLLM.ollamaUrl=u;try{LS.set('rb_ollama_url',u);}catch(e){}
+  var st=document.getElementById('ollama-status');if(st)st.textContent='Connecting to Ollama…';
+  try{
+    var r=await fetch(u+'/api/tags');if(!r.ok)throw new Error('HTTP '+r.status);
+    var j=await r.json();var models=(j&&j.models||[]).map(function(m){return m.name||m.model;}).filter(Boolean);
+    var sel=document.getElementById('ollama-model');
+    if(sel){sel.innerHTML=models.length?models.map(function(m){return '<option value="'+esc(m)+'"'+(m===rbLLM.ollamaModel?' selected':'')+'>'+esc(m)+'</option>';}).join(''):'<option value="">No models found — run: ollama pull gemma3:12b</option>';}
+    if(models.length){if(!rbLLM.ollamaModel||models.indexOf(rbLLM.ollamaModel)<0){rbLLM.ollamaModel=models[0];try{LS.set('rb_ollama_model',models[0]);}catch(e){}}if(st)st.innerHTML='✓ Connected — '+models.length+' model'+(models.length>1?'s':'')+' available. Using <b>'+esc(rbLLM.ollamaModel)+'</b>.';}
+    else if(st)st.textContent='Connected, but no models installed. Try: ollama pull gemma3:12b';
+    return models;
+  }catch(e){if(st)st.innerHTML='<span style="color:#b91c1c">Could not reach Ollama at '+esc(u)+'. Make sure it’s running with OLLAMA_ORIGINS=* and the app is on the same PC.</span>';return [];}
+}
+async function rbOllamaChat(messages){
+  var r=await fetch(rbLLM.ollamaUrl.replace(/\/$/,'')+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:rbLLM.ollamaModel,messages:messages,stream:false})});
+  if(!r.ok)throw new Error('Ollama HTTP '+r.status);
+  var j=await r.json();return (j&&j.message&&j.message.content)||'';
+}
 async function rbLLMLoad(){
+  if(rbLLM.backend==='ollama'){var ms=await rbOllamaConnect();if(!ms.length){rbLLMSetStatus('<span style="color:#b91c1c">Ollama not reachable — check it’s running with OLLAMA_ORIGINS=* on this PC.</span>');return false;}if(!rbLLM.ollamaModel)rbLLM.ollamaModel=ms[0];rbLLM.ready=true;rbLLMSetStatus('✓ Using Ollama model '+esc(rbLLM.ollamaModel)+' on your PC.');return true;}
   if(rbLLM.ready)return true;
   if(rbLLM.loading)return false;
+  if(!rbLLMSupported()){rbLLMSetStatus('<span style="color:#b91c1c">This browser can’t run Gemma 4 in-page (no WebGPU). Turn on “Use Ollama on my PC” above, or use Gemini.</span>');return false;}
   rbLLM.loading=true;
   try{
     rbLLMSetStatus('Loading transformers.js…');
@@ -18712,12 +18744,17 @@ function rbLLMSplitThinking(txt){
 }
 async function rbLLMTurn(){
   try{
-    rbLLMSetStatus('Gemma 4 is thinking…');
-    var out=await rbLLM.gen(rbLLM.hist,{max_new_tokens:rbLLM.thinking?420:240,do_sample:true,temperature:0.7});
-    var full=out&&out[0]&&out[0].generated_text;
     var reply='';
-    if(Array.isArray(full)){reply=(full[full.length-1]&&full[full.length-1].content)||'';}
-    else{reply=String(full||'');}
+    if(rbLLM.backend==='ollama'){
+      rbLLMSetStatus('Ollama ('+esc(rbLLM.ollamaModel)+') is thinking…');
+      reply=await rbOllamaChat(rbLLM.hist);
+    }else{
+      rbLLMSetStatus('Gemma 4 is thinking…');
+      var out=await rbLLM.gen(rbLLM.hist,{max_new_tokens:rbLLM.thinking?420:240,do_sample:true,temperature:0.7});
+      var full=out&&out[0]&&out[0].generated_text;
+      if(Array.isArray(full)){reply=(full[full.length-1]&&full[full.length-1].content)||'';}
+      else{reply=String(full||'');}
+    }
     rbLLM.hist.push({role:'assistant',content:reply});
     var sp=rbLLMSplitThinking(reply);
     rbLLMAddMsg('ai',sp.text,sp.think);rbLLMSetStatus('');
@@ -18739,7 +18776,7 @@ function rbAgentSuggestions(){
     if(latest){
       var susCount=0;try{susCount=Object.keys(trSuspectWords(trFullText(latest.id))||{}).length;}catch(e){}
       if(susCount>0)out.push({icon:'🟡',label:'Review '+susCount+' possible mistake'+(susCount>1?'s':'')+' in “'+(latest.name||'your recording')+'”',why:'Fix each once and it’s corrected forever.',act:function(){closeOvl('agentask-ovl');try{openReviewMistakes(latest.id);}catch(e){}}});
-      out.push({icon:'🎯',label:'Practice a CV / job interview on your notes',why:'The agent asks questions from what you recorded and gives honest feedback.',act:function(){closeOvl('agentask-ovl');try{trChooseInterview(latest.id,true);}catch(e){}}});
+      out.push({icon:'🎯',label:'Practice a CV / job interview on your notes',why:'The agent asks questions from what you recorded and gives honest feedback.',act:function(){closeOvl('agentask-ovl');try{openAIInterviewer(latest.id,true);}catch(e){}}});
       out.push({icon:'🤖',label:'Send “'+(latest.name||'your recording')+'” to an AI',why:'One tap to ChatGPT, Gemini, Claude, Grok or GLM.',act:function(){closeOvl('agentask-ovl');try{trAIExport(latest.id);}catch(e){}}});
     }
   }catch(e){}
@@ -18811,16 +18848,11 @@ function openShopAssistant(){
   var html='<div class="ovl" id="llmiv-ovl"><div class="sheet" style="max-width:580px">'
    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0">🛍️ Shopping assistant — Gemma 4</h3><button class="btn" onclick="closeOvl(\'llmiv-ovl\')">✕</button></div>'
    +'<div style="font-size:12.5px;color:var(--mt);line-height:1.6;margin-bottom:12px">A friendly assistant powered by <b>Google Gemma 4</b>, running <b>on your device</b>. It knows your marketplace products and helps customers find items, ask questions, and get delivery & support — talking like a real person.</div>';
+  html+=rbLLMEngineHTML();
   if(!supported){
-    html+='<div style="background:rgba(234,179,8,.14);color:#a16207;padding:11px;border-radius:10px;font-size:12.5px;line-height:1.55;margin-bottom:12px">'
-      +(isMobile?'This phone can’t run Gemma 4 in-browser (needs WebGPU).':'This browser doesn’t support WebGPU — use desktop Chrome/Edge.')
-      +' You can still browse products, or chat with the voice assistant.</div>'
-      +'<button class="btn btnok" style="width:100%;margin-bottom:8px" onclick="closeOvl(\'llmiv-ovl\');try{openProductSearch();}catch(e){}"><i class="ti ti-search"></i> Browse products</button>'
-      +'<button class="btn" style="width:100%" onclick="closeOvl(\'llmiv-ovl\');try{openJarvis(\'Help me shop\');}catch(e){}"><i class="ti ti-microphone"></i> Talk to the voice assistant</button>'
-      +'</div></div>';
-    document.body.insertAdjacentHTML('beforeend',html);return;
+    html+='<div style="background:rgba(234,179,8,.14);color:#a16207;padding:10px;border-radius:10px;font-size:12px;line-height:1.5;margin-bottom:10px">Can’t run Gemma 4 <i>in the page</i> here (needs WebGPU) — switch on <b>Ollama</b> above to use your PC, or:<br><button class="btn btnok" style="width:100%;margin-top:8px;margin-bottom:6px" onclick="closeOvl(\'llmiv-ovl\');try{openProductSearch();}catch(e){}"><i class="ti ti-search"></i> Browse products</button><button class="btn" style="width:100%" onclick="closeOvl(\'llmiv-ovl\');try{openJarvis(\'Help me shop\');}catch(e){}"><i class="ti ti-microphone"></i> Talk to the voice assistant</button></div>';
   }
-  html+='<div style="background:rgba(37,99,235,.10);color:var(--tx);padding:11px;border-radius:10px;font-size:12px;line-height:1.55;margin-bottom:12px">First run downloads Gemma 4 once (~0.5–1.3&nbsp;GB), then it’s cached and works offline.</div>'
+  html+=(supported?'<div style="background:rgba(37,99,235,.10);color:var(--tx);padding:11px;border-radius:10px;font-size:12px;line-height:1.55;margin-bottom:12px">First run downloads Gemma 4 once (~0.5–1.3&nbsp;GB), then it’s cached and works offline.</div>':'')
    +rbLLMModelPickerHTML()
    +'<div id="llm-status" style="font-size:12px;color:var(--mt);margin-bottom:10px"></div>'
    +'<div id="llm-chat" style="max-height:42vh;overflow-y:auto;background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:10px;font-size:13px;line-height:1.55;margin-bottom:10px;display:none"></div>'
