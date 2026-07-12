@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v344</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v345</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v344 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v345 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v344 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v345 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17309,7 +17309,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'Whisper engine now BUILT-IN (no separate file to upload) so Malayalam capture + replay auto-correct work out of the box; shop assistant ALWAYS responds (built-in from your real products, Gemma 4/Ollama as upgrade); plus ONE instant interview',ok:(typeof rbWhisperInitInline==='function')&&(typeof rbShopStart==='function')&&(typeof rbShopReply==='function')&&(typeof trReplayTranscribe==='function')},
+    {n:'Mixed-language capture (default ON) — writes English, Malayalam, Hindi & Arabic TOGETHER without stalling; turn off to force one language for sharpest single-language accuracy; built-in Whisper + replay auto-correct + always-on shop assistant + one instant interview',ok:(typeof trIsMulti==='function')&&(typeof trWhisperHint==='function')&&(typeof rbWhisperInitInline==='function')&&(typeof rbShopStart==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
@@ -17321,7 +17321,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v344';var all=(pass===checks.length);
+  var ver='v345';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17545,7 +17545,8 @@ function openTranscriber(startNow){
     +'<button class="cat-chip" onclick="openTrDiag()"><i class="ti ti-stethoscope"></i> Why no text?</button>'
     +'<button class="cat-chip'+(LS.get('rb_tr_audio',false)?' on':'')+'" onclick="rbTrAudioToggle()"><i class="ti ti-microphone-2"></i> '+(LS.get('rb_tr_audio',false)?'Saving audio too':'Also save audio')+'</button>'
     +'</div>'
-    +'<div id="tr-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;'+(__tr.engine==='oss'?'opacity:.45;pointer-events:none':'')+'">'+chips+(__tr.engine==='oss'?'<span style="font-size:10px;color:var(--mt);align-self:center">language is detected automatically</span>':'')+'</div>'
+    +(__tr.engine==='oss'?('<label style="display:flex;align-items:center;gap:7px;font-size:11.5px;margin-bottom:8px;cursor:pointer;background:var(--card2);border:1px solid var(--b);border-radius:9px;padding:8px"><input type="checkbox" '+(trIsMulti()?'checked':'')+' onchange="trSetMulti(this.checked)"> 🌐 Capture mixed languages together — English, Malayalam, Hindi &amp; Arabic (recommended). Turn off to force one language.</label>'):'')
+    +'<div id="tr-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;'+((__tr.engine==='oss'&&trIsMulti())?'opacity:.45;pointer-events:none':'')+'">'+chips+((__tr.engine==='oss'&&trIsMulti())?'<span style="font-size:10px;color:var(--mt);align-self:center">any language is captured automatically</span>':'')+'</div>'
     +'<div id="tr-status" style="font-size:12px;margin-bottom:6px"></div>'
     +'<div id="tr-live" style="flex:1;overflow-y:auto;background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:11px;font-size:13px;line-height:1.6;white-space:pre-wrap"><span id="tr-committed">'+esc(trFullText(__tr.sid).slice(-4000))+'</span><span id="tr-interim-live" style="color:var(--mt);opacity:.6"></span></div>'
     +'<div id="tr-interim" style="font-size:12px;color:var(--mt);font-style:italic;min-height:16px;margin-top:4px"></div>'
@@ -17875,13 +17876,16 @@ function rbTrEngine(m){
   __tr.errMsg='';__tr.detected='';
   try{openTranscriber();}catch(e){}
 }
+function trIsMulti(){if(typeof __tr.multiLang==='undefined')__tr.multiLang=(LS.get('rb_tr_multi','1')!=='0');return !!__tr.multiLang;}
+function trSetMulti(on){__tr.multiLang=!!on;LS.set('rb_tr_multi',on?'1':'0');try{openTranscriber();}catch(e){}toast(on?'Capturing ALL languages together (English, Malayalam, Hindi, Arabic)':'Forcing '+((rbVoiceLangName&&rbVoiceLangName(__tr.lang))||'the selected language')+' only — sharpest for one language','ok');}
+function trWhisperHint(){ if(trIsMulti())return ''; return (__tr.lang&&!/^(en|auto|multi)/i.test(__tr.lang))?__tr.lang:''; }
 function rbOSSQueue(blob){__tr.q=__tr.q||[];__tr.q.push(blob);rbOSSPump();}
 function rbOSSPump(){
   if(__tr.qBusy||!__tr.q||!__tr.q.length)return;
   __tr.qBusy=true;var b=__tr.q.shift();
   rbOSSLoad(function(ok){
     if(!ok||!window.rbWhisper||!window.rbWhisper.ready){__tr.qBusy=false;return;}
-    var _wl=(__tr.lang&&!/^en/i.test(__tr.lang))?__tr.lang:'';   // force Malayalam/Indic if the user picked it; else auto-detect
+    var _wl=trWhisperHint();   // mixed mode => auto-detect ANY language; single mode => force the picked language
     window.rbWhisper.transcribe(b,{language:_wl}).then(function(r){
       if(r&&r.text){__tr.typed=true;__tr.errMsg='';if(r.language)__tr.detected=r.language;
         var _ct=trSmartFix(trApplyCorrections(r.text+' '));trVocabAbsorb(_ct,1);trAppend(__tr.sid,_ct);trRenderLive(_ct,'');}
@@ -18972,7 +18976,7 @@ async function trReplayTranscribe(sid){
   toast('Replaying the saved audio through the accurate engine to catch every word…','info');
   rbOSSLoad(function(ok){
     if(!ok||!window.rbWhisper||!window.rbWhisper.ready){if(btn){btn.disabled=false;btn.style.opacity='1';btn.innerHTML='<i class="ti ti-refresh"></i> Replay → recover words';}toast('The accurate voice model is not ready yet — open 🌐 Auto-detect once to load it','err');return;}
-    var _wl=(__tr.lang&&!/^en/i.test(__tr.lang))?__tr.lang:'';
+    var _wl=trWhisperHint();
     window.rbWhisper.transcribe(a.blob,{language:_wl}).then(function(r){
       var text=((r&&r.text)||'').trim();
       if(btn){btn.disabled=false;btn.style.opacity='1';btn.innerHTML='<i class="ti ti-refresh"></i> Replay → recover words';}
