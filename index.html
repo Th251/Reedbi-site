@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v343</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v344</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v343 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v344 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v343 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v344 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17309,7 +17309,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'Auto-correct by REPLAY — saves your audio while listening, then re-runs it through accurate whisper-base (with Malayalam language) to recover missed words and auto-correct; Play + Replace/Add-on; plus ONE instant interview + Ollama/Gemma 4 + shop assistant',ok:(typeof trReplayTranscribe==='function')&&(typeof trReplaceAll==='function')&&(typeof trPlaySaved==='function')&&(typeof rbOSSQueue==='function')},
+    {n:'Whisper engine now BUILT-IN (no separate file to upload) so Malayalam capture + replay auto-correct work out of the box; shop assistant ALWAYS responds (built-in from your real products, Gemma 4/Ollama as upgrade); plus ONE instant interview',ok:(typeof rbWhisperInitInline==='function')&&(typeof rbShopStart==='function')&&(typeof rbShopReply==='function')&&(typeof trReplayTranscribe==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
@@ -17321,7 +17321,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v343';var all=(pass===checks.length);
+  var ver='v344';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17891,24 +17891,34 @@ function rbOSSPump(){
 }
 function rbOSSMissing(){
   __tr.ossFail=true;
-  __tr.errMsg='The auto-detect engine is not installed on your site yet. Upload the provided whisper-engine.js next to index.html (2-minute step in the transcription guide), or switch back to ⚡ Online.';
+  __tr.errMsg='The voice model could not load — this needs Chrome/Edge and an internet connection for the one-time download. You can switch back to ⚡ Online, or try again.';
   trRenderStatus();
+}
+/* v344: Whisper engine is now BUILT IN — no separate whisper-engine.js upload needed. Loads whisper-base (multilingual) on first use, then cached/offline. */
+async function rbWhisperInitInline(){
+  try{
+    var TF=await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
+    try{TF.env.allowLocalModels=false;}catch(e){}
+    var MODEL='Xenova/whisper-base';
+    var asr=await TF.pipeline('automatic-speech-recognition',MODEL,{progress_callback:function(p){try{if(p&&p.status==='progress'&&typeof p.progress==='number'){__tr.warmPct=Math.round(p.progress);trRenderStatus();}}catch(e){}}});
+    var LANG={ml:'malayalam',hi:'hindi',ta:'tamil',te:'telugu',kn:'kannada',ar:'arabic',en:'english',ur:'urdu',bn:'bengali',mr:'marathi',gu:'gujarati',pa:'punjabi'};
+    function toWL(code){if(!code||code==='auto')return null;var b=String(code).toLowerCase().split('-')[0];return LANG[b]||null;}
+    function langOf(t){if(/[\u0D00-\u0D7F]/.test(t))return 'Malayalam';if(/[\u0900-\u097F]/.test(t))return 'Hindi';if(/[\u0600-\u06FF]/.test(t))return 'Arabic';if(/[\u0B80-\u0BFF]/.test(t))return 'Tamil';if(/[\u0C00-\u0C7F]/.test(t))return 'Telugu';if(/[\u0C80-\u0CFF]/.test(t))return 'Kannada';return 'English';}
+    async function toPCM16k(blob){var ab=await blob.arrayBuffer();var AC=window.AudioContext||window.webkitAudioContext;var ctx=new AC();var buf=await ctx.decodeAudioData(ab);var off=new OfflineAudioContext(1,Math.max(1,Math.ceil(buf.duration*16000)),16000);var src=off.createBufferSource();src.buffer=buf;src.connect(off.destination);src.start();var out=await off.startRendering();try{ctx.close();}catch(e){}return out.getChannelData(0);}
+    window.rbWhisper={ready:true,model:MODEL,transcribe:async function(blob,opts){opts=opts||{};var pcm=await toPCM16k(blob);var cfg={chunk_length_s:30,return_timestamps:false,task:'transcribe'};var lang=opts.language;if(lang){var nm=toWL(lang);if(nm)lang=nm;cfg.language=String(lang).toLowerCase();}try{var r=await asr(pcm,cfg);var text=((r&&r.text)||'').trim();return {text:text,language:text?langOf(text):''};}catch(e){var r2=await asr(pcm,{chunk_length_s:30,return_timestamps:false});var t2=((r2&&r2.text)||'').trim();return {text:t2,language:t2?langOf(t2):''};}}};
+    return true;
+  }catch(e){window.rbWhisper={ready:false,error:String(e&&e.message||e)};return false;}
 }
 function rbOSSLoad(cb){
   if(window.rbWhisper&&window.rbWhisper.ready){cb(true);return;}
-  if(window.rbWhisper&&!window.rbWhisper.ready){rbOSSMissing();cb(false);return;}
   if(__tr.ossFail){cb(false);return;}
   __tr.osscbs=__tr.osscbs||[];__tr.osscbs.push(cb);
   if(__tr.ossInj)return;
   __tr.ossInj=true;__tr.warm=true;trRenderStatus();
-  window.rbOSSReady=function(){
-    var ok=!!(window.rbWhisper&&window.rbWhisper.ready);
+  rbWhisperInitInline().then(function(ok){
     if(!ok)rbOSSMissing();
     (__tr.osscbs||[]).splice(0).forEach(function(f){try{f(ok);}catch(e){}});
-  };
-  var s=document.createElement('script');s.src='whisper-engine.js';s.setAttribute('data-rboss','1');
-  s.onerror=function(){rbOSSMissing();(__tr.osscbs||[]).splice(0).forEach(function(f){try{f(false);}catch(e){}});};
-  document.head.appendChild(s);
+  }).catch(function(){rbOSSMissing();(__tr.osscbs||[]).splice(0).forEach(function(f){try{f(false);}catch(e){}});});
 }
 
 /* ===== v305: Admin "Bulk Ops" — agent-driven bulk listing, barcode scan-to-list, vendor/delivery queue (real software) ===== */
@@ -18612,7 +18622,7 @@ function trCVInterviewStart(sid){
 }
 
 /* ===== v334: real Google Gemma 4 on-device via transformers.js (WebGPU) — Thinking Mode + agent skills from a URL ===== */
-var rbLLM={gen:null,loading:false,ready:false,progress:'',model:'onnx-community/gemma-4-E2B-it-ONNX',modelName:'Gemma 4 E2B',hist:null,thinking:true,skill:null,skillName:'',cvMode:false,backend:'webgpu',ollamaUrl:'http://localhost:11434',ollamaModel:'',builtin:false};
+var rbLLM={gen:null,loading:false,ready:false,progress:'',model:'onnx-community/gemma-4-E2B-it-ONNX',modelName:'Gemma 4 E2B',hist:null,thinking:true,skill:null,skillName:'',cvMode:false,backend:'webgpu',ollamaUrl:'http://localhost:11434',ollamaModel:'',builtin:false,shopBuiltin:false};
 try{var _sm=LS.get('rb_llm_model','');if(_sm==='E4B'){rbLLM.model='onnx-community/gemma-4-E4B-it-ONNX';rbLLM.modelName='Gemma 4 E4B';}}catch(e){}
 function rbLLMSetModel(key){ // key: 'E2B' | 'E4B' — the best model, remembered and used everywhere
   if(key==='E4B'){rbLLM.model='onnx-community/gemma-4-E4B-it-ONNX';rbLLM.modelName='Gemma 4 E4B';}
@@ -18766,6 +18776,7 @@ async function rbLLMTurn(){
 }
 async function rbLLMAnswer(){
   if(rbLLM.builtin){return rbBIAnswer();}
+  if(rbLLM.shopBuiltin){return rbShopBuiltinAnswer();}
   var inp=document.getElementById('llm-answer');if(!inp)return;var a=(inp.value||'').trim();if(!a)return;
   inp.value='';rbLLMAddMsg('you',a);rbLLM.hist.push({role:'user',content:a});
   await rbLLMTurn();
@@ -18861,12 +18872,13 @@ function openShopAssistant(){
    +'<div id="llm-status" style="font-size:12px;color:var(--mt);margin-bottom:10px"></div>'
    +'<div id="llm-chat" style="max-height:42vh;overflow-y:auto;background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:10px;font-size:13px;line-height:1.55;margin-bottom:10px;display:none"></div>'
    +'<div id="llm-answer-row" style="display:none;gap:7px;margin-bottom:10px"><input id="llm-answer" class="card-field" placeholder="Ask about a product, delivery, or support…" style="flex:1"><button class="btn btnok" onclick="rbLLMAnswer()">Send</button></div>'
-   +'<button class="btn btnok" id="llm-load-btn" style="width:100%" onclick="rbLLMStartAssistant()"><i class="ti ti-download"></i> Start the Gemma 4 assistant</button>'
+   +'<button class="btn btnok" id="llm-load-btn" style="width:100%" onclick="rbShopStart()"><i class="ti ti-player-play"></i> Start shopping assistant</button>'
    +'<div style="font-size:10.5px;color:var(--mt2);margin-top:8px;text-align:center">Experimental in-browser model. On phones, browse products or use the voice assistant instead.</div>'
    +'</div></div>';
   document.body.insertAdjacentHTML('beforeend',html);
 }
 async function rbLLMStartAssistant(){
+  rbLLM.shopBuiltin=false;
   var btn=document.getElementById('llm-load-btn');if(btn){btn.disabled=true;btn.style.opacity='.6';}
   rbLLM.thinking=false; // assistant should reply directly, not show reasoning
   var ok=await rbLLMLoad();
@@ -18992,5 +19004,39 @@ function trReplayApply(sid,mode){
   try{var box=document.getElementById('tr-committed');if(box)box.textContent=(typeof trFullText==='function')?trFullText(sid):text;}catch(e){}
   try{openTranscriber();}catch(e){}
   toast(mode==='replace'?'Transcript replaced with the recovered version ✓':'Recovered words added ✓','ok');
+}
+
+/* ===== v344: built-in shop assistant — always responds instantly, answers from your real product list ===== */
+function rbShopStart(){
+  if(rbLLM.backend==='ollama'){rbOllamaConnect().then(function(ms){if(ms&&ms.length){rbLLM.builtin=false;rbLLM.shopBuiltin=false;return rbLLMStartAssistant();}rbLLMSetStatus('Ollama not reachable — using the built-in assistant, which works right now.');rbShopBuiltinStart();});return;}
+  if(rbLLM.ready){rbLLM.builtin=false;rbLLM.shopBuiltin=false;return rbLLMStartAssistant();}
+  rbShopBuiltinStart();
+}
+function rbShopBuiltinStart(){
+  rbLLM.shopBuiltin=true;rbLLM.builtin=false;
+  var box=document.getElementById('llm-chat');if(box){box.style.display='block';box.innerHTML='';}
+  var row=document.getElementById('llm-answer-row');if(row)row.style.display='flex';
+  var lb=document.getElementById('llm-load-btn');if(lb)lb.style.display='none';
+  rbLLMSetStatus('Built-in shopping assistant — instant. Toggle “Use Ollama on my PC” or load Gemma 4 above for a smarter, human-like chat.');
+  var prods=(LS.get('rb_products',[])||[]);
+  var greet=prods.length?('Hi! I can help you shop. We have '+prods.length+' item'+(prods.length>1?'s':'')+' — like '+prods.slice(0,3).map(function(p){return p.title;}).join(', ')+'. What are you looking for?'):'Hi! No products are listed in this store yet. Tell me what you need and I’ll help as soon as items are added.';
+  rbLLMAddMsg('ai',greet);
+  var inp=document.getElementById('llm-answer');if(inp){inp.placeholder='Ask about a product, price, stock, delivery…';inp.focus();}
+}
+function rbShopReply(q){
+  var prods=(LS.get('rb_products',[])||[]);
+  if(!prods.length)return 'There are no products listed yet, so I can’t show any. Once items are added I can help you find them.';
+  var ql=(' '+String(q).toLowerCase()+' ');
+  var qw=(ql.match(/[\p{L}\p{N}]{3,}/gu)||[]);
+  var hits=prods.filter(function(p){var t=(p.title||'').toLowerCase();return qw.some(function(w){return t.indexOf(w)>=0;});});
+  if(hits.length)return hits.slice(0,4).map(function(p){return p.title+' — '+(p.price||'?')+' '+(p.currency||'')+((p.qty||0)>0?(', in stock ('+p.qty+' left)'):', currently OUT OF STOCK');}).join('. ')+'. Want to add any to your cart?';
+  if(/\b(deliver|delivery|ship|shipping|arrive|when)\b/.test(ql))return 'Delivery depends on the seller and your address — add an item to your cart and the delivery options show at checkout.';
+  if(/\b(cheap|cheapest|low price|budget|under|below|affordable)\b/.test(ql)){var sorted=prods.slice().sort(function(a,b){return (a.price||0)-(b.price||0);});return 'The most affordable are: '+sorted.slice(0,3).map(function(p){return p.title+' ('+(p.price||'?')+' '+(p.currency||'')+')';}).join(', ')+'.';}
+  if(/\b(show me|list|browse|catalog|everything|all products|what do you|what products|which products)\b/.test(ql))return 'Here’s what we have: '+prods.slice(0,6).map(function(p){return p.title+' ('+(p.price||'?')+' '+(p.currency||'')+')';}).join(', ')+((prods.length>6)?', and more.':'.');
+  return 'I couldn’t find that in our store. We do have: '+prods.slice(0,5).map(function(p){return p.title;}).join(', ')+'. Which of these can I help with?';
+}
+function rbShopBuiltinAnswer(){
+  var inp=document.getElementById('llm-answer');if(!inp)return;var q=(inp.value||'').trim();if(!q)return;inp.value='';
+  rbLLMAddMsg('you',q);rbLLMAddMsg('ai',rbShopReply(q));
 }
 </script></body></html>
