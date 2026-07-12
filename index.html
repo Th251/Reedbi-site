@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v340</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v341</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v340 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v341 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v340 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v341 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17309,7 +17309,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'ONE professional AI interview from your captured text (Gemma 4 via Ollama/in-page/Gemini; CV mode is an inline toggle) that checks answers vs your material & does not accept wrong ones; plus the Reedbi voice assistant + Gemma 4 shop assistant for products everywhere',ok:(typeof openAIInterviewer==='function')&&(typeof rbOllamaChat==='function')&&(typeof openShopAssistant==='function')&&(typeof openJarvis==='function')},
+    {n:'ONE interview that ALWAYS responds instantly — built-in interviewer (offline, rates answers vs your captured text & rejects wrong/empty ones) with Ollama/in-page Gemma 4 as the smart upgrade; CV mode inline; Reedbi voice assistant + Gemma 4 shop assistant for products',ok:(typeof rbInterviewStart==='function')&&(typeof rbBIEval==='function')&&(typeof rbBIStart==='function')&&(typeof openAIInterviewer==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
@@ -17321,7 +17321,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v340';var all=(pass===checks.length);
+  var ver='v341';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -18610,7 +18610,7 @@ function trCVInterviewStart(sid){
 }
 
 /* ===== v334: real Google Gemma 4 on-device via transformers.js (WebGPU) — Thinking Mode + agent skills from a URL ===== */
-var rbLLM={gen:null,loading:false,ready:false,progress:'',model:'onnx-community/gemma-4-E2B-it-ONNX',modelName:'Gemma 4 E2B',hist:null,thinking:true,skill:null,skillName:'',cvMode:false,backend:'webgpu',ollamaUrl:'http://localhost:11434',ollamaModel:''};
+var rbLLM={gen:null,loading:false,ready:false,progress:'',model:'onnx-community/gemma-4-E2B-it-ONNX',modelName:'Gemma 4 E2B',hist:null,thinking:true,skill:null,skillName:'',cvMode:false,backend:'webgpu',ollamaUrl:'http://localhost:11434',ollamaModel:'',builtin:false};
 try{var _sm=LS.get('rb_llm_model','');if(_sm==='E4B'){rbLLM.model='onnx-community/gemma-4-E4B-it-ONNX';rbLLM.modelName='Gemma 4 E4B';}}catch(e){}
 function rbLLMSetModel(key){ // key: 'E2B' | 'E4B' — the best model, remembered and used everywhere
   if(key==='E4B'){rbLLM.model='onnx-community/gemma-4-E4B-it-ONNX';rbLLM.modelName='Gemma 4 E4B';}
@@ -18653,7 +18653,8 @@ function openAIInterviewer(sid,cvMode){
    +'<div id="llm-status" style="font-size:12px;color:var(--mt);margin-bottom:10px"></div>'
    +'<div id="llm-chat" style="max-height:40vh;overflow-y:auto;background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:10px;font-size:13px;line-height:1.55;margin-bottom:10px;display:none"></div>'
    +'<div id="llm-answer-row" style="display:none;gap:7px;margin-bottom:10px"><input id="llm-answer" class="card-field" placeholder="Type your answer…" style="flex:1"><button class="btn btnok" onclick="rbLLMAnswer()">Send</button></div>'
-   +'<button class="btn btnok" id="llm-load-btn" style="width:100%" onclick="rbLLMStartInterview(\''+escJS(sid)+'\')"><i class="ti ti-download"></i> Load Gemma 4 & start interview</button>'
+   +'<button class="btn btnok" id="llm-load-btn" style="width:100%;margin-bottom:8px" onclick="rbInterviewStart(\''+escJS(sid)+'\')"><i class="ti ti-player-play"></i> Start interview</button>'
+   +'<button class="btn" id="llm-load-btn2" style="width:100%" onclick="rbLLMStartInterview(\''+escJS(sid)+'\')"><i class="ti ti-download"></i> Load Gemma 4 in-browser (~1GB, PC)</button>'
    +'<div style="font-size:10.5px;color:var(--mt2);margin-top:8px;text-align:center">Experimental in-browser model. If it can’t load on your device, use Send to AI → Gemini (free).</div>'
    +'</div></div>';
   document.body.insertAdjacentHTML('beforeend',html);
@@ -18722,6 +18723,7 @@ async function rbLLMLoad(){
   }
 }
 async function rbLLMStartInterview(sid){
+  rbLLM.builtin=false;
   var btn=document.getElementById('llm-load-btn');if(btn){btn.disabled=true;btn.style.opacity='.6';}
   var ok=await rbLLMLoad();
   if(!ok){if(btn){btn.disabled=false;btn.style.opacity='1';}return;}
@@ -18761,6 +18763,7 @@ async function rbLLMTurn(){
   }catch(e){rbLLMSetStatus('<span style="color:#b91c1c">Generation error. Try again or use Send to AI.</span>');}
 }
 async function rbLLMAnswer(){
+  if(rbLLM.builtin){return rbBIAnswer();}
   var inp=document.getElementById('llm-answer');if(!inp)return;var a=(inp.value||'').trim();if(!a)return;
   inp.value='';rbLLMAddMsg('you',a);rbLLM.hist.push({role:'user',content:a});
   await rbLLMTurn();
@@ -18875,5 +18878,62 @@ async function rbLLMStartAssistant(){
   var row=document.getElementById('llm-answer-row');if(row)row.style.display='flex';
   await rbLLMTurn();
   var inp=document.getElementById('llm-answer');if(inp)inp.focus();
+}
+
+/* ===== v341: built-in interviewer — always responds instantly (no download), thinks about answers vs captured text ===== */
+var rbBI={q:[],i:0,sid:null,text:'',cv:false};
+function rbBIStart(sid){
+  sid=sid||__tr.sid||((trSessions()[0]||{}).id);rbBI.sid=sid;rbBI.i=0;
+  rbBI.cv=(document.getElementById('llm-cv')&&document.getElementById('llm-cv').checked)||false;
+  rbBI.text=(typeof trFullText==='function'&&sid)?(trFullText(sid)||''):'';
+  var qs=[];
+  try{qs=rbBI.cv?trCVQuestions(rbBI.text):trGenSmartQuestions(rbBI.text,{},8);}catch(e){qs=[];}
+  if(!qs||!qs.length)qs=['To start, tell me about yourself and what you have been working on.','What was the most challenging part, and how did you handle it?','What specific result or outcome did you achieve? Give numbers if you can.','What would you do differently next time?'];
+  rbBI.q=qs;
+  rbLLM.builtin=true;
+  var box=document.getElementById('llm-chat');if(box){box.style.display='block';box.innerHTML='';}
+  var row=document.getElementById('llm-answer-row');if(row)row.style.display='flex';
+  var lb=document.getElementById('llm-load-btn');if(lb)lb.style.display='none';
+  var lb2=document.getElementById('llm-load-btn2');if(lb2)lb2.style.display='none';
+  rbLLMSetStatus('Built-in interviewer — instant, works offline. Toggle “Use Ollama on my PC” above (or load Gemma 4) for a smarter AI interviewer.');
+  rbLLMAddMsg('ai',rbBI.q[0]);
+  var inp=document.getElementById('llm-answer');if(inp){inp.placeholder='Type your answer…';inp.focus();}
+}
+function rbBIEval(answer,text){
+  var aw=(String(answer).toLowerCase().match(/[\p{L}\p{N}]+/gu)||[]);var words=aw.length;
+  var stop=' the a an and or of to in on for with is are was were be been being i my me we our us you your it its this that these those as at by from have has had do does did will would can could should about so but not no yes just get got make made really very more most much many how what when where who why which their they them he she his her ';
+  var tw=(String(text).toLowerCase().match(/[\p{L}\p{N}]{4,}/gu)||[]);var freq={};
+  tw.forEach(function(w){if(stop.indexOf(' '+w+' ')<0)freq[w]=(freq[w]||0)+1;});
+  var keys=Object.keys(freq).sort(function(a,b){return freq[b]-freq[a];}).slice(0,30);
+  var overlap=0,seen={};aw.forEach(function(w){if(keys.indexOf(w)>=0&&!seen[w]){seen[w]=1;overlap++;}});
+  var hasNum=/\d/.test(answer);var rating,note;
+  var lc=(' '+String(answer).toLowerCase()+' ');
+  var dunno=/\b(i (do not|don't|dont) know|no idea|not sure|dunno|skip|pass)\b/.test(lc);
+  if(dunno){rating='Incorrect';note='saying you do not know does not answer it — attempt a specific response, even a partial one.';}
+  else if(words<4){rating='Weak';note='too short. Give a concrete example with specifics.';}
+  else if(keys.length&&overlap===0){rating='Partial';note='this does not clearly connect to what you recorded — tie it to a real detail from your notes.';}
+  else if(overlap>=2&&(hasNum||words>=20)){rating='Strong';note='specific and grounded in your material — good answer.';}
+  else{rating='Partial';note='on the right track, but add a concrete result, number, or example to make it strong.';}
+  return '['+rating+'] '+note;
+}
+function rbBIAnswer(){
+  var inp=document.getElementById('llm-answer');if(!inp)return;var a=(inp.value||'').trim();if(!a)return;inp.value='';
+  rbLLMAddMsg('you',a);
+  var fb=rbBIEval(a,rbBI.text);
+  rbBI.i++;
+  if(rbBI.i<rbBI.q.length)rbLLMAddMsg('ai',fb+'  —  Next: '+rbBI.q[rbBI.i]);
+  else{rbLLMAddMsg('ai',fb+'  —  That is the end of the interview. Review the ratings above; anything marked [Weak], [Partial] or [Incorrect] is where to improve.');var row=document.getElementById('llm-answer-row');if(row)row.style.display='none';rbLLMSetStatus('Interview complete.');}
+  try{if(window.speechSynthesis){var u=new SpeechSynthesisUtterance(fb);speechSynthesis.speak(u);}}catch(e){}
+}
+async function rbInterviewStart(sid){
+  var cv=document.getElementById('llm-cv');if(cv)rbLLM.cvMode=cv.checked;
+  if(rbLLM.backend==='ollama'){
+    var ms=await rbOllamaConnect();
+    if(ms&&ms.length){rbLLM.builtin=false;return rbLLMStartInterview(sid);}
+    rbLLMSetStatus('Ollama not reachable (run it with OLLAMA_ORIGINS=* on this PC). Starting the built-in interviewer instead — it works right now.');
+    return rbBIStart(sid);
+  }
+  if(rbLLM.ready){rbLLM.builtin=false;return rbLLMStartInterview(sid);}
+  return rbBIStart(sid); // instant, always works
 }
 </script></body></html>
