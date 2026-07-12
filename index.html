@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v338</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v339</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v338 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v339 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v338 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v339 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17309,7 +17309,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'Connect to local Ollama on your PC (big Gemma 4 12B/27B) used everywhere + in-page Gemma 4 (E2B/E4B) — ONE professional conversational interview + human-like shopping/support assistant + Thinking Mode + agent skills from a URL, Gemini/voice fallback',ok:(typeof rbOllamaConnect==='function')&&(typeof rbOllamaChat==='function')&&(typeof rbLLMEngineHTML==='function')&&(typeof openShopAssistant==='function')},
+    {n:'Professional AI that does NOT accept wrong answers — interviewer checks answers vs your recorded material & rates them [Strong/Partial/Weak/Incorrect]; shop assistant only sells real listed products & corrects wrong names. Runs on Ollama (PC big models), in-page Gemma 4, or Gemini',ok:(typeof rbOllamaConnect==='function')&&(typeof rbOllamaChat==='function')&&(typeof rbLLMEngineHTML==='function')&&(typeof openShopAssistant==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
@@ -17321,7 +17321,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v338';var all=(pass===checks.length);
+  var ver='v339';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -18732,7 +18732,7 @@ async function rbLLMStartInterview(sid){
   var ctx=text&&text.trim().length>40?('The candidate\'s recorded material (CV / notes / transcript, may be long):\n\n'+text.slice(0,12000)+'\n\n'):'';
   var think=rbLLM.thinking?'First reason step by step inside <thinking></thinking> tags, then give your reply after them. ':'';
   var skill=rbLLM.skill?('\n\nActive agent skill ("'+rbLLM.skillName+'"): '+rbLLM.skill+'\n'):'';
-  rbLLM.hist=[{role:'system',content:'You are a professional, honest job interviewer. '+role+ctx+skill+think+'Ask ONE interview question at a time. After each answer give brief HONEST feedback (clearly say if it is weak, wrong, or too short — never just praise), then ask the next question. Keep it concise. Begin now with your first question.'}];
+  rbLLM.hist=[{role:'system',content:'You are a strict, professional job interviewer conducting a serious interview. '+role+ctx+skill+think+'Rules you MUST follow: (1) Ask ONE clear question at a time. (2) CHECK every answer against the recorded material above. If the person states a wrong name, a wrong fact, a date or detail that contradicts or is not supported by their material, or an answer that is factually incorrect, you MUST point it out directly and professionally and never accept a wrong or made-up answer as correct. (3) NEVER say great or excellent or praise an answer that is weak, vague, off-topic, or wrong; give credit only for genuinely strong, specific, correct answers. (4) After each answer, give one line of honest feedback that starts with a rating in brackets, one of [Strong], [Partial], [Weak], or [Incorrect], then a short reason, then ask the next question or a probing follow-up. (5) Be concise, fair and professional. Begin now with your first question.'}];
   var row=document.getElementById('llm-answer-row');if(row)row.style.display='flex';
   await rbLLMTurn();
   var inp=document.getElementById('llm-answer');if(inp)inp.focus();
@@ -18870,9 +18870,9 @@ async function rbLLMStartAssistant(){
   if(btn)btn.style.display='none';
   var prods=rbShopProductsCtx();
   var name=(typeof CU!=='undefined'&&CU&&CU.name)?CU.name:'there';
-  rbLLM.hist=[{role:'system',content:'You are a warm, professional human shopping assistant for the Reedbi marketplace. '
-    +(prods?('Products currently available: '+prods+'. '):'There are no products listed yet. ')
-    +'Help the customer find products, answer questions about items, pricing, delivery and support, and help sellers list products. Be concise, friendly and human. Never invent products that are not in the list; if something is not available or out of stock, say so honestly and suggest an alternative from the list. Greet the customer warmly and ask how you can help today.'}];
+  rbLLM.hist=[{role:'system',content:'You are a warm but professional human shopping assistant for the Reedbi marketplace. '
+    +(prods?('The ONLY products that exist in this store are: '+prods+'. '):'There are no products listed in this store yet. ')
+    +'Strict rules: (1) ONLY discuss products from that exact list and never invent, assume, or agree to a product that is not on it. (2) If a customer names a product, brand or item that is NOT on the list, do not pretend it exists; politely tell them it is not available here and, if there is a similar real product on the list, suggest that instead. (3) Be accurate about price and stock and if something is out of stock say so clearly. (4) Do not make up prices, delivery dates, or specs you were not given. (5) Be concise, friendly, human and helpful for finding items, pricing, delivery and support. Greet the customer warmly and ask how you can help today.'}];
   var row=document.getElementById('llm-answer-row');if(row)row.style.display='flex';
   await rbLLMTurn();
   var inp=document.getElementById('llm-answer');if(inp)inp.focus();
