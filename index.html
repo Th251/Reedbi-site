@@ -1407,7 +1407,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v342</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v343</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -6186,7 +6186,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v342 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v343 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17175,7 +17175,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v342 loaded \u2014 you are on the latest version';
+    b.innerHTML='\u2713 Reedbi v343 loaded \u2014 you are on the latest version';
     b.onclick=function(){try{b.remove();}catch(e){}try{openSystemCheck();}catch(e){}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17309,7 +17309,7 @@ function rbSysChecks(){
     {n:'Conversational voice notes — talk naturally, auto-saves every sentence, read back, undo, attach to habits',ok:(typeof jarvisNoteStart==='function')&&(typeof openNotesList==='function')},
     {n:'Cloud-backed transcripts — capacity grows with your account (gigabytes per person), synced across devices',ok:(typeof trCloudSaveMeta==='function')&&(typeof trCloudPull==='function')},
     {n:'Admin Bulk Ops — barcode scan-to-list, bulk product listing, vendor fulfilment queue',ok:(typeof admBulkCreate==='function')&&(typeof admScanStart==='function')},
-    {n:'Faster, more accurate Malayalam/Indic capture — open-source Whisper upgraded to the multilingual base model with an explicit language hint (Malayalam stops being guessed) + ONE instant interview + Ollama/Gemma 4 + shop assistant',ok:(typeof rbInterviewStart==='function')&&(typeof rbBIEval==='function')&&(typeof rbOSSQueue==='function')&&(typeof openShopAssistant==='function')},
+    {n:'Auto-correct by REPLAY — saves your audio while listening, then re-runs it through accurate whisper-base (with Malayalam language) to recover missed words and auto-correct; Play + Replace/Add-on; plus ONE instant interview + Ollama/Gemma 4 + shop assistant',ok:(typeof trReplayTranscribe==='function')&&(typeof trReplaceAll==='function')&&(typeof trPlaySaved==='function')&&(typeof rbOSSQueue==='function')},
     {n:'Durable large-recording storage (IndexedDB) — hours of transcript survive refresh & sync to your account',ok:(typeof IDB==='object')&&(typeof trPartRead==='function')},
     {n:'On-device transcription diagnostic — shows live why text is or isn\'t appearing (mic, language, engine)',ok:(typeof openTrDiag==='function')&&(typeof trDiagRender==='function')},
     {n:'Intelligent agent interview — asks from the whole transcript AND judges your answers against what the recording said; yellow mistake review with learned-fix count',ok:(typeof trGenSmartQuestions==='function')&&(typeof trIntvReactSmart==='function')&&(typeof openReviewMistakes==='function')},
@@ -17321,7 +17321,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v342';var all=(pass===checks.length);
+  var ver='v343';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17565,7 +17565,8 @@ function openTranscriber(startNow){
     +'<button class="btn" style="flex:1" onclick="assignTranscriptToHabit()"><i class="ti ti-target-arrow"></i> To habit</button>'
     +'<button class="btn" style="flex:1" onclick="trShareText()"><i class="ti ti-share"></i> Share</button>'
     +'</div>'
-    +'<div id="tr-audiorow" style="display:'+(__tr.lastAudio?'flex':'none')+';gap:7px;margin-top:7px"><button class="btn" style="flex:1" onclick="trDownloadAudio()"><i class="ti ti-file-music"></i> Audio (.webm)</button><button class="btn" style="flex:1" onclick="trShareAudio()"><i class="ti ti-share"></i> Share audio</button><button class="btn" style="flex:1" onclick="trCropAudio()"><i class="ti ti-scissors"></i> Crop</button></div>'
+    +'<div id="tr-audiorow" style="display:'+(__tr.lastAudio?'flex':'none')+';gap:7px;margin-top:7px"><button class="btn" style="flex:1" onclick="trDownloadAudio()"><i class="ti ti-file-music"></i> Audio (.webm)</button><button class="btn" style="flex:1" onclick="trShareAudio()"><i class="ti ti-share"></i> Share audio</button><button class="btn" style="flex:1" onclick="trPlaySaved()"><i class="ti ti-player-play"></i> Play</button><button class="btn" style="flex:1" onclick="trCropAudio()"><i class="ti ti-scissors"></i> Crop</button></div>'
+    +(__tr.lastAudio?'<button class="btn btnok" id="tr-replay-btn" style="width:100%;margin-top:7px" onclick="trReplayTranscribe()"><i class="ti ti-refresh"></i> Replay → recover missed words (accurate Malayalam)</button>':'')
     +'<div style="font-size:10px;color:var(--mt);margin-top:7px;line-height:1.5">Keep this page open with the screen on (I request a screen wake-lock for you). It transcribes the language you pick — Malayalam and English both work when the device supports them. Long recordings auto-split and auto-save; use .txt to export. It writes the language you speak — Malayalam stays Malayalam, English stays English (no translation). For the most reliable live text on Android phones, the Online engine now lets speech recognition use the microphone exclusively — so if you also want the .webm audio file, tap “Also save audio” (on some phones that can interrupt the live text; turn it off if text stops). Audio, when on, is kept for the latest session only: press Pause, then download or share it. With your Reedbi account, the text also backs up to the cloud automatically. A 12-hour video is roughly 100,000–130,000 spoken words (~1 MB of text). Long recordings are stored in a large on-device database (IndexedDB, hundreds of MB–gigabytes) and mirrored to your account — so your text is safe after a refresh, unlike the old 5 MB limit that could drop very long recordings. (No system on earth stores "a trillion words" for one file — but you will never hit a limit for real recordings.)</div>'
     +(sess?('<div style="margin-top:9px;font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em">Saved recordings</div><div style="max-height:150px;overflow-y:auto">'+sess+'</div>'):'')
     +'</div></div>';
@@ -18936,5 +18937,60 @@ async function rbInterviewStart(sid){
   }
   if(rbLLM.ready){rbLLM.builtin=false;return rbLLMStartInterview(sid);}
   return rbBIStart(sid); // instant, always works
+}
+
+/* ===== v343: auto-correct by REPLAY — re-run the saved audio through accurate Whisper to recover missed words ===== */
+function trReplaceAll(sid,text){
+  var s=trGet(sid);if(!s)return;
+  var old=(s.parts||1);
+  for(var i=0;i<old;i++){try{IDB.mem[trPartKey(sid,i)]='';TRP.pending[trPartKey(sid,i)]=1;}catch(e){}}
+  s.parts=1;trPartWrite(sid,0,String(text||''));
+  s.chars=String(text||'').length;s.up=Date.now();trUpdate(s);
+  try{trFlushAllNow();}catch(e){}
+}
+function trPlaySaved(){
+  var a=__tr.lastAudio;if(!a||!a.blob){toast('No saved audio yet — press Pause first','info');return;}
+  try{if(__tr._au){try{__tr._au.pause();}catch(e){}}var au=new Audio(URL.createObjectURL(a.blob));__tr._au=au;au.play();toast('▶ Playing your saved recording…','ok');}
+  catch(e){toast('Could not play the audio here','err');}
+}
+async function trReplayTranscribe(sid){
+  var a=__tr.lastAudio;if(!a||!a.blob){toast('No saved audio to replay — press Pause first, then Replay','info');return;}
+  sid=sid||a.sid||__tr.sid;
+  var btn=document.getElementById('tr-replay-btn');if(btn){btn.disabled=true;btn.style.opacity='.6';btn.innerHTML='<i class="ti ti-loader"></i> Re-listening…';}
+  toast('Replaying the saved audio through the accurate engine to catch every word…','info');
+  rbOSSLoad(function(ok){
+    if(!ok||!window.rbWhisper||!window.rbWhisper.ready){if(btn){btn.disabled=false;btn.style.opacity='1';btn.innerHTML='<i class="ti ti-refresh"></i> Replay → recover words';}toast('The accurate voice model is not ready yet — open 🌐 Auto-detect once to load it','err');return;}
+    var _wl=(__tr.lang&&!/^en/i.test(__tr.lang))?__tr.lang:'';
+    window.rbWhisper.transcribe(a.blob,{language:_wl}).then(function(r){
+      var text=((r&&r.text)||'').trim();
+      if(btn){btn.disabled=false;btn.style.opacity='1';btn.innerHTML='<i class="ti ti-refresh"></i> Replay → recover words';}
+      if(!text){toast('Could not recover speech from the audio — try recording a bit closer to the mic','info');return;}
+      var fixed=(typeof trSmartFix==='function')?trSmartFix((typeof trApplyCorrections==='function')?trApplyCorrections(text):text):text;
+      try{trVocabAbsorb(fixed,1);}catch(e){}
+      trReplayShow(sid,fixed);
+    }).catch(function(){if(btn){btn.disabled=false;btn.style.opacity='1';btn.innerHTML='<i class="ti ti-refresh"></i> Replay → recover words';}toast('Re-transcription failed — try again','err');});
+  });
+}
+function trReplayShow(sid,text){
+  var ex=document.getElementById('replay-ovl');if(ex)ex.remove();
+  var s=trGet(sid);var liveLen=((typeof trFullText==='function'?trFullText(sid):'')||'').length;var newLen=text.length;
+  var html='<div class="ovl" id="replay-ovl"><div class="sheet" style="max-width:580px">'
+   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3 style="margin:0">🔁 Recovered from replay</h3><button class="btn" onclick="closeOvl(\'replay-ovl\')">✕</button></div>'
+   +'<div style="font-size:12.5px;color:var(--mt);line-height:1.55;margin-bottom:10px">The accurate engine re-listened to your saved audio and captured this (auto-corrected from your learned words). It found <b>'+newLen.toLocaleString()+'</b> characters vs <b>'+liveLen.toLocaleString()+'</b> in the live capture. Replace your transcript with this fuller version, or add it on.</div>'
+   +'<textarea id="replay-text" class="card-field" style="width:100%;min-height:170px;font-size:14px">'+esc(text)+'</textarea>'
+   +'<div style="display:flex;gap:7px;margin-top:10px">'
+   +'<button class="btn btnok" style="flex:1" onclick="trReplayApply(\''+escJS(sid)+'\',\'replace\')"><i class="ti ti-check"></i> Replace transcript</button>'
+   +'<button class="btn" style="flex:1" onclick="trReplayApply(\''+escJS(sid)+'\',\'append\')"><i class="ti ti-plus"></i> Add on</button>'
+   +'</div></div></div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function trReplayApply(sid,mode){
+  var ta=document.getElementById('replay-text');var text=ta?ta.value:'';
+  if(mode==='replace')trReplaceAll(sid,text);
+  else if(typeof trAppend==='function')trAppend(sid,(text?(' '+text):''));
+  closeOvl('replay-ovl');
+  try{var box=document.getElementById('tr-committed');if(box)box.textContent=(typeof trFullText==='function')?trFullText(sid):text;}catch(e){}
+  try{openTranscriber();}catch(e){}
+  toast(mode==='replace'?'Transcript replaced with the recovered version ✓':'Recovered words added ✓','ok');
 }
 </script></body></html>
