@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.gstatic.com https://pay.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://esm.sh https://esm.run; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' data: blob:; connect-src 'self' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://esm.sh https://esm.run https://huggingface.co https://*.huggingface.co https://*.hf.co https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://firebaseinstallations.googleapis.com https://www.googleapis.com https://pay.google.com https://generativelanguage.googleapis.com https://api.openai.com https://api.anthropic.com https://api.x.ai; worker-src 'self' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; child-src 'self' blob: data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; frame-src 'self' https://pay.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.gstatic.com https://pay.google.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://esm.sh https://esm.run; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' data: blob:; connect-src 'self' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://esm.sh https://esm.run https://huggingface.co https://*.huggingface.co https://*.hf.co https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://firebaseinstallations.googleapis.com https://www.googleapis.com https://pay.google.com https://generativelanguage.googleapis.com https://api.openai.com https://api.anthropic.com https://api.x.ai; worker-src 'self' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; child-src 'self' blob: data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; frame-src 'self' https://pay.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#7c3aed">
@@ -1409,7 +1409,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v503</span></span>
+      <span class="logo" onclick="openMainStore()" style="cursor:pointer" title="Reedbi Ecommerce — all stores">⬡ Reedbi <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v506</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -1959,7 +1959,7 @@ input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(1
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <!-- SheetJS (xlsx) — powers Excel bulk product import/export (openBulkExcel). Loads window.XLSX. -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script>var RB_VERSION="v503";
+<script>var RB_VERSION="v506";
 /* ===== v295: installable app (PWA) — manifest, icons, offline worker registration ===== */
 var RB_ICON192='data:image/png;base64,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';
 var RB_ICON512='data:image/png;base64,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';
@@ -6156,7 +6156,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v503 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v506 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -17012,7 +17012,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v503 loaded \u2014 tap here if something is not working (Update)';
+    b.innerHTML='\u2713 Reedbi v506 loaded \u2014 tap here if something is not working (Update)';
     b.onclick=function(){try{rbForceUpdate();}catch(e){try{b.remove();openSystemCheck();}catch(x){}}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -17032,16 +17032,20 @@ function rbShowVersion(){
         var __gpu=false;try{__gpu=!!(navigator.gpu);}catch(e){}
         e2.innerHTML='⚠ The downloadable text reader cannot start on this page.<br><span style="font-weight:600;opacity:.95">'+esc(msg)+'</span>'
           +'<div style="margin-top:7px;font-weight:600;opacity:.95">'
-          +(__gpu?'Reading can still work here: the AI vision reader needs no worker and runs on WebGPU, which this device has. It is a large one-time download.'
-                 :'This device also reports no WebGPU, so the worker-free reader cannot run either. Opening the live site is the reliable route.')
+          +(__gpu?'Reading can still work here two ways: the AI vision reader needs no worker and runs on WebGPU, which this device has — but it is a large one-time download. Your own cloud key needs no worker, no WebGPU and no download at all.'
+                 :'This device also reports no WebGPU, so the worker-free model cannot run either. Your own cloud key still works here — it needs no worker and no download.')
           +'</div>'
           +'<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">'
           +(__gpu?'<button id="rb-env-vis" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:800">Use the reader that works here</button>':'')
+          // v504: the route with nothing left to fail - no worker, no WebGPU, no download at all
+          +'<button id="rb-env-cloud" style="background:#0a7ea4;color:#fff;border:none;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:800">Read with my own AI key (no download)</button>'
           +'<a href="https://www.reedbi.com" target="_blank" rel="noopener" style="background:#ffd23f;color:#3a2a00;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:800;text-decoration:none">Open www.reedbi.com</a>'
           +'<button id="rb-env-x" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:8px;padding:7px 11px;font-size:12px">Dismiss</button>'
           +'</div>';
         document.body.appendChild(e2);
         var x=e2.querySelector('#rb-env-x');if(x)x.onclick=function(){try{e2.remove();}catch(e){}};
+        var cb2=e2.querySelector('#rb-env-cloud');
+        if(cb2)cb2.onclick=function(){try{openCloudAISettings();}catch(e){try{toast('Open AI & Backup and set up "Use a big AI model as backup".','info');}catch(x){}}};
         var vb=e2.querySelector('#rb-env-vis');
         if(vb)vb.onclick=function(){
           vb.disabled=true;vb.textContent='Downloading the reader…';
@@ -17117,6 +17121,8 @@ function rbRenderQuickAccess(){
       +tile('🧠','AI &amp; Backup','Install Gemma 4 · save','openAIModels()')
       +tile('🖥️','Learn my PC screen','No phone — read &amp; listen','openPCScreenLearn()')
       +tile('⚡','Live everything','See+hear+talk+save at once','rbLiveAll()')
+      +tile('🎬','Record screen','Screen + voice → notes','openScreenRecorder()')
+      +tile('🏘️','Property','Full-screen map · buy, rent, off-plan','openPropertyMap()')
       +tile('💬','Shop assistant','Ask Gemma 4','openShopAssistant()')
       +tile('💼','View jobs','Find & apply','openJobSearch()')
       +tile('✅','Habits','Daily goals','openHabits()')
@@ -17126,6 +17132,7 @@ function rbRenderQuickAccess(){
       +'<div class="rbq-row">'
       +tile('🛒','List a product','Sell an item','openListChooser()')
       +tile('📢','Post a job','Hire someone','openPostJobChooser()')
+      +tile('🏡','List property','Sale · rent · parking','openPropertyAdd(\'sale\')')
       +tile('📷','Bulk / scan','Many at once','openBulkListChooser()')
       +tile('🎙️','Transcribe','Record & type','openTranscriber(true)')
       +'</div>';
@@ -17196,6 +17203,14 @@ function rbSysChecks(){
     {n:'Reading now works where no Web Worker can exist (v503) - the previous two versions correctly identified why the downloadable reader cannot start on a page with an opaque origin, such as a sandboxed frame or a file preview, and then stopped at the explanation. Explaining is not reading. There was already a reader here that needs no worker at all: the vision model, which reads a whole screenshot on WebGPU. It was opt-in and buried in the AI panel, so it never ran. It now starts automatically in exactly the case where a worker is impossible, and is presented as the reader so everything that asks for one simply works',ok:(typeof rbNoWorkerMode==='function')},
     {n:'The model runtime is pinned to spawn no workers (v503) - ONNX Runtime documents that no worker thread is spawned when numThreads is 1, and that execution stays on the main thread when proxy is false. Both are now set, for the vision reader and for the voice model, whenever workers are unavailable - otherwise the model would fail for the same reason the reader did. Ordinary browsers are left on the default multi-threaded settings so nothing gets slower for them',ok:(typeof rbPinNoWorkerORT==='function')},
     {n:'The opening warning stopped being wrong (v503) - it announced that screen reading will not work in this copy, which is no longer true. It now says the downloadable reader cannot start on this page, states whether the worker-free route is available on this device, and carries a button that loads it there and then. It only says reading cannot work when WebGPU is missing too, which is the case where that is actually true',ok:true},
+    {n:'The vision reader now says WHY each model failed, and checks whether it exists first (v504) - it reported one sentence, no browser build could be loaded from the model hub, after discarding the real reason from every candidate - the same mistake the text reader made before v500. A name that does not exist and a model that exists but will not run are different problems with different fixes, and that message could not tell them apart. Each candidate is now checked against the hub first, which answers in a few kilobytes, so a wrong name is reported as no such model on the hub instead of being blamed on the browser or the network, and every candidate outcome is kept and listed',ok:true},
+    {n:'The route with nothing left to fail is now used first (v504) - where no worker can exist, a cloud key needs no worker, no WebGPU and no download whatsoever: the screen image is sent and the text comes back. If one is already set up it is now used as the reader immediately, before attempting a download of over a gigabyte, and the opening banner offers it as a second button. When everything else fails the message names it as the remaining route rather than leaving no way forward',ok:(typeof rbCloudReady==='function')&&(typeof rbCloudReadCanvas==='function')},
+    {n:'Record this screen with its sound, and get notes back (v505) - records the screen and the audio together, including when the screen being recorded is the one this app is running on. Two things make that work rather than turn into endless nested copies: the panel collapses to a small bar while recording, and no preview of the capture is drawn on the page - the frames go straight to the reader. The screen sound and your microphone are mixed into one track so both reach the recording and the notes. While it runs it reads the screen and listens, and at the end it writes notes cut into sections wherever the subject changes, each with its own heading and topic, saved with the video',ok:(typeof openScreenRecorder==='function')&&(typeof rbRecStart==='function')},
+    {n:'Property - find and list on a real map (v505) - seven kinds in one place: for sale, for rent, off-plan, buyers wanted, tenants wanted, parking and commercial, each with its own Add. Search by area or words, filter by kind, and an IN VIEW panel counts what is inside the current map view. The map is OpenStreetMap through Leaflet, which needs no key and so cannot stop working when one expires, while every pin and listing also opens in Google Maps for directions and street view. A location can be set by pasting a Google Maps link, typing a pair of coordinates, or tapping the spot on the map',ok:(typeof openPropertyFinder==='function')&&(typeof rbPropParseLatLng==='function')},
+    {n:'Instagram and YouTube, handled honestly (v505) - neither allows its listings to be read from a page like this without a developer key, so nothing pretends otherwise: a listing carries its own Instagram and YouTube links which open the exact post or tour, and two buttons build the right search on each for the area and kinds currently being looked at',ok:(typeof rbPropSocial==='function')},
+    {n:'The property map now gets the whole screen (v506) - a map squeezed into a 300 pixel box inside a dialog is the wrong shape for looking for somewhere to live. It is now the entire screen with everything floating over it: the IN VIEW counts in the corner, a search bar and a green Add low down where a thumb reaches, a listings sheet that slides up, a bottom bar for Home, Buy, Rent, Sell and Builders, and a menu. Buy shows for sale and off-plan, Rent shows rentals and tenants, Builders shows off-plan, commercial and parking, and Sell opens the listing form straight away',ok:(typeof openPropertyMap==='function')},
+    {n:'Pins gather into counted circles when zoomed out (v506) - a hundred pins on one town is unreadable, so pins inside the same small square of the map are drawn as a single circle carrying the count, which splits apart as you zoom in and disappears entirely past close zoom where every pin stands alone. Tapping a circle zooms into it. The grouping is written into the app rather than fetched from a plugin service: one more download is one more thing that can fail, and this app has lost enough days to downloads that never arrived',ok:(typeof rbPMapCluster==='function')},
+    {n:'Three map styles, none needing a key (v506) - the button under the close button switches between Map, Terrain and Satellite. The first two are OpenStreetMap and OpenTopoMap and the third is Esri world imagery, so there is aerial view without a billing account, and nothing here stops working because a key expired or a quota ran out',ok:(typeof rbPMapTiles==='function')},
     {n:'Live delivery tracking + drone option',ok:fn('liveTrackOrder')&&fn('toggleMyDrone')},
     {n:'Cross-platform sync — orders, products & jobs reflect live on web, Android and iOS',ok:(typeof fbListenMarketData==='function')&&(typeof scanIncomingOrders==='function')},
     {n:'Overnight transcriber — records & auto-types (English, Malayalam and more), interviews you from the recording',ok:(typeof openTranscriber==='function')&&(typeof trInterviewStart==='function')},
@@ -17214,7 +17229,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v503';var all=(pass===checks.length);
+  var ver='v506';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -17606,6 +17621,1133 @@ function trMaybeAutoListen(){
     }).catch(function(){});
   }catch(e){}
 }
+
+/* ===================================================================================================
+   v505: RECORD THIS SCREEN WITH ITS SOUND - AND TURN IT INTO NOTES
+   Records the screen and the audio together, including when the screen being recorded is the very one
+   this app is running on. Two things make that work rather than turn into a hall of mirrors:
+   the panel collapses to a small bar while recording so it is not itself filling the recording, and no
+   live preview of the capture is drawn - the frames go straight to the reader.
+   While it records it reads the screen and listens to the sound, and at the end it writes notes: the
+   material is cut into sections wherever the subject changes, each one given a heading and a topic.
+   =================================================================================================== */
+var __rec={on:false,stream:null,mic:null,merged:null,rec:null,chunks:[],video:null,
+           frameT:null,audioRec:null,audioT:null,sections:[],cur:null,startedAt:0,
+           blob:null,lastShotAt:0,busy:false,hidden:false,sid:null,err:''};
+
+function rbRecSupported(){
+  try{return !!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia&&typeof MediaRecorder!=='undefined');}catch(e){return false;}
+}
+/* ---------- notes: sections, headings, topics ---------- */
+var REC_STOP={'the':1,'and':1,'for':1,'that':1,'this':1,'with':1,'you':1,'your':1,'are':1,'was':1,'were':1,'have':1,'has':1,'had':1,'not':1,'but':1,'they':1,'them':1,'then':1,'than':1,'from':1,'into':1,'about':1,'will':1,'would':1,'could':1,'should':1,'there':1,'their':1,'what':1,'when':1,'where':1,'which':1,'while':1,'been':1,'being':1,'because':1,'very':1,'just':1,'like':1,'also':1,'more':1,'some':1,'such':1,'only':1,'over':1,'after':1,'before':1,'these':1,'those':1,'here':1,'going':1,'okay':1,'yeah':1,'know':1,'want':1,'need':1,'make':1,'made':1,'many':1,'much':1,'other':1,'people':1,'thing':1,'things':1,'time':1,'really':1,'right':1,'well':1,'said':1,'says':1,'can':1,'its':1,'all':1,'out':1,'new':1,'now':1,'get':1,'got':1,'one':1,'two':1,'see':1,'use':1,'how':1,'why':1,'who':1,'any':1};
+/* words that carry the subject - keeps letters of every script, so Malayalam and Arabic count too */
+function rbRecWords(t,max){
+  var f={},out=[];
+  try{
+    String(t||'').toLowerCase().split(/[^\p{L}\p{M}\p{N}]+/u).forEach(function(w){
+      if(!w||w.length<4||REC_STOP[w])return;
+      f[w]=(f[w]||0)+1;
+    });
+  }catch(e){
+    String(t||'').toLowerCase().split(/[^a-z0-9ഀ-ൿ؀-ۿ]+/).forEach(function(w){
+      if(!w||w.length<4||REC_STOP[w])return;f[w]=(f[w]||0)+1;
+    });
+  }
+  out=Object.keys(f).sort(function(a,b){return f[b]-f[a];});
+  return out.slice(0,max||8);
+}
+/* how much two stretches of material have in common, 0..1 - this is what decides a new section */
+function rbRecOverlap(a,b){
+  var A=rbRecWords(a,12),B=rbRecWords(b,12);
+  if(!A.length||!B.length)return 0;
+  var set={},n=0;A.forEach(function(w){set[w]=1;});
+  B.forEach(function(w){if(set[w])n++;});
+  return n/Math.max(A.length,B.length);
+}
+function rbRecNewSection(){
+  rbRecCloseSection();
+  __rec.cur={at:Date.now(),screen:[],voice:[],heading:'',topic:''};
+  __rec.sections.push(__rec.cur);
+}
+function rbRecCloseSection(){
+  var s=__rec.cur;if(!s)return;
+  var all=(s.screen.join('\n')+'\n'+s.voice.join(' ')).trim();
+  if(!all){ // nothing was captured in it - drop it rather than leave an empty heading
+    var i=__rec.sections.indexOf(s);if(i>-1)__rec.sections.splice(i,1);
+    __rec.cur=null;return;
+  }
+  var words=rbRecWords(all,6);
+  s.topic=words.slice(0,3).join(', ');
+  s.heading=rbRecHeading(s,words);
+  __rec.cur=null;
+}
+/* a heading, in order of preference: a real line off the screen that reads like a title, else the
+   subject words, else the time it started */
+function rbRecHeading(s,words){
+  try{
+    var cand=null;
+    for(var i=0;i<s.screen.length&&i<40;i++){
+      var ln=String(s.screen[i]||'').trim();
+      if(ln.length<4||ln.length>64)continue;
+      if(/^[\s\d\W]+$/.test(ln))continue;          // numbers and symbols only
+      var w=ln.split(/\s+/).length;
+      if(w<1||w>9)continue;
+      if(words.length&&!words.some(function(x){return ln.toLowerCase().indexOf(x)>-1;}))continue;
+      cand=ln;break;
+    }
+    if(cand)return cand.replace(/\s+/g,' ');
+    if(words.length){
+      return words.slice(0,3).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' · ');
+    }
+  }catch(e){}
+  return new Date(s.at).toLocaleTimeString();
+}
+function rbRecAbsorbScreen(text){
+  if(!__rec.on||!text)return;
+  var lines=String(text).split(/\n+/).map(function(l){return l.trim();}).filter(function(l){return l.length>1;});
+  if(!lines.length)return;
+  if(!__rec.cur)rbRecNewSection();
+  var fresh=lines.join('\n');
+  // A clear change of subject starts a new section, so the notes follow what was actually happening.
+  // The test counts the screen AND the voice: a stretch can be mostly spoken with little on screen, and
+  // judging it on screen words alone kept sections from ever closing. The bar is 25 words, low enough that
+  // real changes of subject actually split and high enough that a few stray lines do not.
+  var sofar=(__rec.cur.screen.join('\n')+' '+__rec.cur.voice.join(' ')).trim();
+  if(sofar.split(/\s+/).filter(Boolean).length>25 && rbRecOverlap(sofar,fresh)<0.2){ rbRecNewSection(); }
+  var seen={};__rec.cur.screen.forEach(function(l){seen[l.toLowerCase()]=1;});
+  lines.forEach(function(l){var k=l.toLowerCase();if(!seen[k]){seen[k]=1;__rec.cur.screen.push(l);}});
+  rbRecStatus();
+}
+function rbRecAbsorbVoice(text){
+  if(!__rec.on||!text)return;
+  if(!__rec.cur)rbRecNewSection();
+  __rec.cur.voice.push(String(text).trim());
+  rbRecStatus();
+}
+/* ---------- capture ---------- */
+function rbRecStart(){
+  if(__rec.on)return;
+  if(!rbRecSupported()){toast('This browser cannot record the screen. Use Chrome or Edge on a computer.','err');return;}
+  var wantMic=!!(document.getElementById('rec-mic')||{}).checked;
+  // selfBrowserSurface:'exclude' keeps THIS tab out of the picker, so choosing "Entire screen" records
+  // what is actually being worked on. systemAudio:'include' asks for the sound the computer is playing.
+  var opts={video:{frameRate:{ideal:8,max:15}},audio:true};
+  try{opts.selfBrowserSurface='exclude';opts.systemAudio='include';opts.surfaceSwitching='include';}catch(e){}
+  rbRecStatus('Choose what to record. Tick "Share tab audio" or "Share system audio" so the sound is captured too.');
+  navigator.mediaDevices.getDisplayMedia(opts).then(function(stream){
+    __rec.stream=stream;
+    var vt=null;try{vt=stream.getVideoTracks()[0];}catch(e){}
+    if(!vt){rbRecStatus('No screen was shared.');return;}
+    var v=document.createElement('video');v.srcObject=stream;v.muted=true;v.playsInline=true;
+    // deliberately NOT added to the page: drawing the capture back onto the screen being captured is what
+    // produces the endless nested copies when recording the same screen this app is running on
+    try{v.play();}catch(e){}
+    __rec.video=v;
+    vt.addEventListener('ended',function(){if(__rec.on)rbRecStop();});
+    if(wantMic&&navigator.mediaDevices.getUserMedia){
+      navigator.mediaDevices.getUserMedia({audio:true}).then(function(mic){__rec.mic=mic;rbRecBegin();})
+        .catch(function(){__rec.mic=null;toast('Microphone was not allowed — recording the screen sound only.','info');rbRecBegin();});
+    }else rbRecBegin();
+  }).catch(function(e){
+    var n=(e&&e.name)||'';
+    rbRecStatus(/NotAllowed|Permission/i.test(n)?'Screen recording was not allowed. Press Record and choose a screen, window or tab.':'Could not start: '+((e&&e.message)||n||'unknown'));
+  });
+}
+/* mix the screen sound and the microphone into ONE track, so both end up in the recording and in the notes */
+function rbRecMixAudio(){
+  try{
+    var tracks=[];
+    try{(__rec.stream.getAudioTracks()||[]).forEach(function(t){tracks.push(t);});}catch(e){}
+    try{if(__rec.mic)(__rec.mic.getAudioTracks()||[]).forEach(function(t){tracks.push(t);});}catch(e){}
+    if(!tracks.length)return null;
+    if(tracks.length===1)return new MediaStream([tracks[0]]);
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return new MediaStream([tracks[0]]);
+    var ctx=new AC();__rec.actx=ctx;
+    var dest=ctx.createMediaStreamDestination();
+    tracks.forEach(function(t){
+      try{ctx.createMediaStreamSource(new MediaStream([t])).connect(dest);}catch(e){}
+    });
+    return dest.stream;
+  }catch(e){return null;}
+}
+function rbRecBegin(){
+  __rec.on=true;__rec.sections=[];__rec.cur=null;__rec.chunks=[];__rec.blob=null;__rec.err='';
+  __rec.startedAt=Date.now();__rec.sid='rec'+Date.now().toString(36);
+  var audio=rbRecMixAudio();
+  var mixed=[];
+  try{(__rec.stream.getVideoTracks()||[]).forEach(function(t){mixed.push(t);});}catch(e){}
+  if(audio)try{(audio.getAudioTracks()||[]).forEach(function(t){mixed.push(t);});}catch(e){}
+  try{__rec.merged=new MediaStream(mixed);}catch(e){__rec.merged=__rec.stream;}
+  // the video file
+  try{
+    var mr=null,types=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+    for(var i=0;i<types.length&&!mr;i++){
+      try{if(!MediaRecorder.isTypeSupported||MediaRecorder.isTypeSupported(types[i]))mr=new MediaRecorder(__rec.merged,{mimeType:types[i]});}catch(e){}
+    }
+    if(!mr)mr=new MediaRecorder(__rec.merged);
+    __rec.rec=mr;
+    mr.ondataavailable=function(ev){if(ev&&ev.data&&ev.data.size)__rec.chunks.push(ev.data);};
+    mr.onstop=function(){try{__rec.blob=new Blob(__rec.chunks,{type:(__rec.chunks[0]&&__rec.chunks[0].type)||'video/webm'});}catch(e){}rbRecStatus();};
+    mr.start(4000);
+  }catch(e){__rec.err='the video file could not be recorded ('+((e&&e.message)||'recorder error')+') — notes are still being made.';}
+  // read the screen on a timer, and listen in parallel
+  __rec.frameT=setInterval(rbRecTick,6000);
+  setTimeout(rbRecTick,900);
+  if(audio)rbRecVoiceChain(audio);
+  rbRecPanelCompact(true);
+  rbRecStatus();
+  toast('Recording. The panel is collapsed so it does not fill your own recording.','ok');
+}
+/* one frame -> the reader -> the notes */
+function rbRecTick(){
+  try{
+    if(!__rec.on||__rec.busy)return;
+    var v=__rec.video;if(!v||!v.videoWidth)return;
+    __rec.busy=true;
+    var MW=1400,sc=Math.min(1,MW/v.videoWidth);
+    var cv=document.createElement('canvas');
+    cv.width=Math.max(1,Math.round(v.videoWidth*sc));cv.height=Math.max(1,Math.round(v.videoHeight*sc));
+    cv.getContext('2d').drawImage(v,0,0,cv.width,cv.height);
+    __rec.lastShotAt=Date.now();
+    var run=(typeof rbReadAutoZoom==='function')?rbReadAutoZoom(cv):Promise.resolve('');
+    Promise.resolve(run).then(function(t){
+      var txt=String(t||'');
+      try{if(typeof rbStripReedbiUI==='function')txt=rbStripReedbiUI(txt);}catch(e){}
+      rbRecAbsorbScreen(txt);
+    }).catch(function(){}).then(function(){__rec.busy=false;});
+  }catch(e){__rec.busy=false;}
+}
+/* short, complete recordings so every window can be decoded on its own - the same pattern the
+   transcriber uses, because a mid-stream chunk carries no file header and cannot be decoded */
+function rbRecVoiceChain(audioStream){
+  try{
+    if(!__rec.on)return;
+    if(typeof MediaRecorder==='undefined')return;
+    var mr;try{mr=new MediaRecorder(audioStream,{mimeType:'audio/webm'});}catch(e){try{mr=new MediaRecorder(audioStream);}catch(e2){return;}}
+    __rec.audioRec=mr;var parts=[];
+    mr.ondataavailable=function(ev){if(ev&&ev.data&&ev.data.size)parts.push(ev.data);};
+    mr.onstop=function(){
+      try{
+        if(!parts.length)return;
+        var blob=new Blob(parts,{type:(parts[0]&&parts[0].type)||'audio/webm'});
+        if(blob.size<1200)return;
+        var lang=(typeof trWhisperHint==='function')?trWhisperHint():null;
+        if(typeof rbTranscribeQ!=='function')return;
+        rbTranscribeQ(blob,{language:lang}).then(function(r){
+          var t=((r&&r.text)||'').trim();
+          if(!t||/^(you|thanks for watching|\.)$/i.test(t))return;
+          try{if(typeof trApplyCorrections==='function')t=trApplyCorrections(t);}catch(e){}
+          rbRecAbsorbVoice(t);
+        }).catch(function(){});
+      }catch(e){}
+    };
+    try{mr.start();}catch(e){return;}
+    __rec.audioT=setTimeout(function(){
+      __rec.audioT=null;
+      try{if(__rec.on)rbRecVoiceChain(audioStream);}catch(e){}    // next window starts before this one finishes
+      try{if(mr.state!=='inactive')mr.stop();}catch(e){}
+    },5000);
+  }catch(e){}
+}
+function rbRecStop(){
+  if(!__rec.on)return;
+  __rec.on=false;
+  try{if(__rec.frameT)clearInterval(__rec.frameT);}catch(e){}__rec.frameT=null;
+  try{if(__rec.audioT)clearTimeout(__rec.audioT);}catch(e){}__rec.audioT=null;
+  try{if(__rec.audioRec&&__rec.audioRec.state!=='inactive')__rec.audioRec.stop();}catch(e){}__rec.audioRec=null;
+  try{if(__rec.rec&&__rec.rec.state!=='inactive')__rec.rec.stop();}catch(e){}
+  rbRecCloseSection();
+  try{(__rec.stream?__rec.stream.getTracks():[]).forEach(function(t){t.stop();});}catch(e){}
+  try{(__rec.mic?__rec.mic.getTracks():[]).forEach(function(t){t.stop();});}catch(e){}
+  try{if(__rec.actx&&__rec.actx.close)__rec.actx.close();}catch(e){}
+  __rec.actx=null;__rec.stream=null;__rec.mic=null;__rec.video=null;
+  rbRecPanelCompact(false);
+  // the video blob arrives a moment after stop() - save once it is there
+  setTimeout(function(){rbRecSave();},700);
+  rbRecStatus();
+}
+/* ---------- saving ---------- */
+function rbRecNotes(){return LS.get('rb_recnotes',[])||[];}
+function rbRecSaveNotes(a){LS.set('rb_recnotes',a);}
+function rbRecSave(){
+  try{
+    var secs=__rec.sections.filter(function(s){return (s.screen.length||s.voice.length);});
+    if(!secs.length){toast('Nothing was captured — no notes saved.','info');rbRecRender();return;}
+    var allText=secs.map(function(s){return s.screen.join('\n')+'\n'+s.voice.join(' ');}).join('\n');
+    var topics=rbRecWords(allText,6);
+    var note={
+      id:__rec.sid||('rec'+Date.now().toString(36)),
+      title:(secs[0].heading||'Screen recording')+' — '+new Date(__rec.startedAt).toLocaleString(),
+      topic:topics.slice(0,4).join(', '),
+      at:__rec.startedAt,
+      secs:Math.max(1,Math.round((Date.now()-__rec.startedAt)/1000)),
+      sections:secs.map(function(s){return {at:s.at,heading:s.heading,topic:s.topic,screen:s.screen,voice:s.voice};}),
+      words:allText.split(/\s+/).filter(Boolean).length,
+      hasVideo:false
+    };
+    var all=rbRecNotes();all.unshift(note);
+    if(all.length>60)all.length=60;
+    rbRecSaveNotes(all);
+    // the video goes to the large store, not into the small one with the text
+    if(__rec.blob&&__rec.blob.size){
+      note.hasVideo=true;rbRecSaveNotes(all);
+      try{
+        var fr=new FileReader();
+        fr.onload=function(){try{IDB.put('rb_recvid_'+note.id,String(fr.result||''));}catch(e){}};
+        fr.readAsDataURL(__rec.blob);
+      }catch(e){}
+    }
+    try{if(typeof rbMemAdd==='function')rbMemAdd(allText.slice(0,4000),'screen-recording');}catch(e){}
+    toast('Notes saved: '+secs.length+' section'+(secs.length>1?'s':'')+', '+note.words.toLocaleString()+' words.','ok');
+    rbRecRender();
+  }catch(e){toast('Could not save the notes: '+((e&&e.message)||'error'),'err');}
+}
+function rbRecNoteText(n){
+  var out=[];
+  out.push(n.title);
+  if(n.topic)out.push('Topics: '+n.topic);
+  out.push('');
+  (n.sections||[]).forEach(function(s,i){
+    out.push((i+1)+'. '+(s.heading||'Section '+(i+1)));
+    if(s.topic)out.push('   Topic: '+s.topic);
+    if(s.screen&&s.screen.length){out.push('   On screen:');s.screen.forEach(function(l){out.push('     '+l);});}
+    if(s.voice&&s.voice.length){out.push('   Said:');out.push('     '+s.voice.join(' '));}
+    out.push('');
+  });
+  return out.join('\n');
+}
+function rbRecCopy(id){
+  var n=rbRecNotes().filter(function(x){return x.id===id;})[0];if(!n)return;
+  var t=rbRecNoteText(n);
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast('Notes copied','ok');});return;}}catch(e){}
+  try{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Notes copied','ok');}catch(e){}
+}
+function rbRecDownload(id){
+  var n=rbRecNotes().filter(function(x){return x.id===id;})[0];if(!n)return;
+  try{
+    var b=new Blob([rbRecNoteText(n)],{type:'text/plain'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(b);
+    a.download=(n.title||'screen-notes').replace(/[^\w\- ]+/g,'').slice(0,60)+'.txt';
+    document.body.appendChild(a);a.click();a.remove();
+  }catch(e){toast('Download failed','err');}
+}
+function rbRecVideo(id){
+  try{
+    IDB.get('rb_recvid_'+id,function(v){
+      if(!v){toast('No video was saved for this recording.','info');return;}
+      var a=document.createElement('a');a.href=v;a.download='screen-recording-'+id+'.webm';
+      document.body.appendChild(a);a.click();a.remove();
+    });
+  }catch(e){toast('Could not fetch the video','err');}
+}
+function rbRecDelete(id){
+  var all=rbRecNotes().filter(function(x){return x.id!==id;});
+  rbRecSaveNotes(all);try{IDB.put('rb_recvid_'+id,'');}catch(e){}
+  rbRecRender();toast('Deleted','ok');
+}
+/* ---------- panel ---------- */
+function rbRecStatus(msg){
+  try{
+    var el=document.getElementById('rec-status');
+    if(el&&msg)el.textContent=msg;
+    var live=document.getElementById('rec-live');
+    if(live){
+      if(__rec.on){
+        var secs=Math.round((Date.now()-__rec.startedAt)/1000);
+        var sc=0,vc=0;
+        __rec.sections.forEach(function(s){sc+=s.screen.length;vc+=s.voice.length;});
+        live.innerHTML='<b style="color:#dc2626">● Recording</b> · '+Math.floor(secs/60)+'m '+(secs%60)+'s · '
+          +__rec.sections.length+' section'+(__rec.sections.length===1?'':'s')+' · '+sc+' screen lines · '+vc+' voice parts'
+          +(__rec.err?('<br><span style="color:#d97706">'+esc(__rec.err)+'</span>'):'');
+      }else live.innerHTML='';
+    }
+    var cm=document.getElementById('rec-mini-t');
+    if(cm&&__rec.on){var s2=Math.round((Date.now()-__rec.startedAt)/1000);cm.textContent=Math.floor(s2/60)+':'+String(s2%60).padStart(2,'0');}
+    var b=document.getElementById('rec-toggle');
+    if(b)b.innerHTML=__rec.on?'<i class="ti ti-player-stop"></i> Stop &amp; make notes':'<i class="ti ti-video"></i> Record this screen';
+  }catch(e){}
+}
+/* while recording, the panel shrinks to a small bar - so the recording shows the work, not this app */
+function rbRecPanelCompact(on){
+  try{
+    __rec.hidden=!!on;
+    var ov=document.getElementById('screenrec-ovl');
+    if(on){
+      if(ov)ov.style.display='none';
+      if(!document.getElementById('rec-mini')){
+        var m=document.createElement('div');m.id='rec-mini';
+        m.style.cssText='position:fixed;right:12px;bottom:12px;z-index:100001;background:#111;color:#fff;border-radius:999px;padding:8px 13px;display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:800;font-family:var(--fn);box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer';
+        m.innerHTML='<span style="width:9px;height:9px;border-radius:50%;background:#dc2626;display:inline-block"></span><span id="rec-mini-t">0:00</span><button id="rec-mini-x" style="background:#dc2626;color:#fff;border:none;border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:800">Stop</button>';
+        document.body.appendChild(m);
+        m.querySelector('#rec-mini-x').onclick=function(ev){ev.stopPropagation();rbRecStop();};
+        m.onclick=function(){rbRecPanelCompact(false);};
+      }
+      if(!__rec.miniT)__rec.miniT=setInterval(rbRecStatus,1000);
+    }else{
+      try{if(__rec.miniT){clearInterval(__rec.miniT);__rec.miniT=null;}}catch(e){}
+      var mm=document.getElementById('rec-mini');if(mm&&!__rec.on)mm.remove();
+      if(ov)ov.style.display='';
+      if(__rec.on&&mm)mm.remove();
+      if(__rec.on&&!__rec.miniT)__rec.miniT=setInterval(rbRecStatus,1000);
+    }
+  }catch(e){}
+}
+function rbRecRender(){
+  try{
+    var box=document.getElementById('rec-list');if(!box)return;
+    var all=rbRecNotes();
+    if(!all.length){box.innerHTML='<div style="font-size:12px;color:var(--mt);padding:8px 2px">No recordings yet. Press Record, choose a screen or window, and talk over it — the notes write themselves.</div>';return;}
+    box.innerHTML=all.map(function(n){
+      return '<div style="border:1px solid var(--b);border-radius:11px;padding:10px;margin-bottom:8px;background:var(--card2)">'
+        +'<div style="font-weight:800;font-size:12.5px">'+esc(n.title)+'</div>'
+        +'<div style="font-size:10.5px;color:var(--mt);margin-top:2px">'+(n.sections||[]).length+' sections · '+(n.words||0).toLocaleString()+' words · '+Math.round((n.secs||0)/60)+' min'+(n.topic?(' · '+esc(n.topic)):'')+'</div>'
+        +'<div style="margin-top:7px;max-height:120px;overflow-y:auto;font-size:11.5px;line-height:1.55">'
+        +(n.sections||[]).map(function(s,i){return '<div style="margin-bottom:5px"><b>'+(i+1)+'. '+esc(s.heading||'')+'</b>'+(s.topic?(' <span style="color:var(--mt)">('+esc(s.topic)+')</span>'):'')+'</div>';}).join('')
+        +'</div>'
+        +'<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">'
+        +'<button class="btn" style="padding:5px 9px;font-size:11px" onclick="rbRecOpenNote(\''+escJS(n.id)+'\')"><i class="ti ti-eye"></i> Read</button>'
+        +'<button class="btn" style="padding:5px 9px;font-size:11px" onclick="rbRecCopy(\''+escJS(n.id)+'\')"><i class="ti ti-copy"></i> Copy</button>'
+        +'<button class="btn" style="padding:5px 9px;font-size:11px" onclick="rbRecDownload(\''+escJS(n.id)+'\')"><i class="ti ti-download"></i> .txt</button>'
+        +(n.hasVideo?'<button class="btn" style="padding:5px 9px;font-size:11px" onclick="rbRecVideo(\''+escJS(n.id)+'\')"><i class="ti ti-video"></i> Video</button>':'')
+        +'<button class="btn" style="padding:5px 9px;font-size:11px;color:#dc2626" onclick="rbRecDelete(\''+escJS(n.id)+'\')"><i class="ti ti-trash"></i></button>'
+        +'</div></div>';
+    }).join('');
+  }catch(e){}
+}
+function rbRecOpenNote(id){
+  var n=rbRecNotes().filter(function(x){return x.id===id;})[0];if(!n)return;
+  var ex=document.getElementById('recnote-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='recnote-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:600px;max-height:88vh;display:flex;flex-direction:column">'
+    +'<div class="mhd"><h3>'+esc(n.title)+'</h3><button class="modal-x" onclick="closeOvl(\'recnote-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="overflow-y:auto;font-size:13px;line-height:1.65">'
+    +(n.topic?('<div style="font-size:11.5px;color:var(--mt);margin-bottom:9px">Topics: '+esc(n.topic)+'</div>'):'')
+    +(n.sections||[]).map(function(s,i){
+      return '<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--b)">'
+        +'<div style="font-weight:800;font-size:14px">'+(i+1)+'. '+esc(s.heading||'')+'</div>'
+        +(s.topic?('<div style="font-size:11px;color:var(--mt);margin:2px 0 6px">Topic: '+esc(s.topic)+'</div>'):'')
+        +(s.screen&&s.screen.length?('<div style="font-size:11px;font-weight:800;color:var(--mt);margin-top:6px">ON SCREEN</div><div style="white-space:pre-wrap">'+esc(s.screen.join('\n'))+'</div>'):'')
+        +(s.voice&&s.voice.length?('<div style="font-size:11px;font-weight:800;color:var(--mt);margin-top:8px">SAID</div><div>'+esc(s.voice.join(' '))+'</div>'):'')
+        +'</div>';
+    }).join('')
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
+function openScreenRecorder(){
+  if(typeof requireAuth==='function'&&!requireAuth('record the screen'))return;
+  var ex=document.getElementById('screenrec-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='screenrec-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:560px;max-height:90vh;display:flex;flex-direction:column">'
+    +'<div class="mhd"><h3>🎬 Record this screen + voice → notes</h3><button class="modal-x" onclick="closeOvl(\'screenrec-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="overflow-y:auto">'
+    +'<div style="font-size:12px;line-height:1.6;color:var(--mt);margin-bottom:10px">Records the screen and its sound together — including this very computer and this very screen. While it runs it reads what is on screen and listens to what is said, then writes notes split into sections, each with its own heading and topic.</div>'
+    +'<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;background:var(--card2);border:1px solid var(--b);border-radius:10px;padding:9px;margin-bottom:8px;cursor:pointer"><input type="checkbox" id="rec-mic" checked> 🎤 Also record my microphone (mixed with the screen sound)</label>'
+    +'<div id="rec-status" style="font-size:12px;margin-bottom:6px"></div>'
+    +'<div id="rec-live" style="font-size:12px;margin-bottom:8px"></div>'
+    +'<button id="rec-toggle" class="btn btnok" style="width:100%" onclick="__rec.on?rbRecStop():rbRecStart()"><i class="ti ti-video"></i> Record this screen</button>'
+    +'<div style="font-size:11px;color:var(--mt);margin-top:8px;line-height:1.55">When the browser asks, pick <b>Entire screen</b> or the <b>window</b> you want, and tick <b>Share system audio</b> / <b>Share tab audio</b> — that tick is what sends the sound. This panel collapses to a small bar while recording, so the recording shows your work rather than this app. No preview of the capture is drawn here, which is what stops the endless nested copies when you record the same screen this app is on.</div>'
+    +'<div style="margin-top:12px;font-weight:800;font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em">Saved recordings &amp; notes</div>'
+    +'<div id="rec-list" style="margin-top:7px"></div>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+  rbRecRender();rbRecStatus();
+}
+
+
+/* ===================================================================================================
+   v505: PROPERTY — find and list on a real map, with Instagram and YouTube alongside
+   Seven kinds in one place: for sale, for rent, off-plan, buyers wanted, tenants wanted, parking and
+   commercial. The map is a genuine interactive one (OpenStreetMap through Leaflet) which needs no key
+   and therefore cannot stop working because a key expired - and every pin also opens in Google Maps,
+   which is where directions and street view actually live.
+   Instagram and YouTube are handled honestly: neither allows reading their listings from a page like
+   this without a developer key, so a listing CARRIES its own Instagram and YouTube links, and the
+   finder builds the right search on each for an area and kind. Those open where the content is.
+   =================================================================================================== */
+var PROP_KINDS=[
+  {k:'sale',    n:'For sale',   ic:'🏡', c:'#16a34a'},
+  {k:'rent',    n:'For rent',   ic:'🔑', c:'#ea8c00'},
+  {k:'offplan', n:'Off-plan',   ic:'🏗️', c:'#b08900'},
+  {k:'buyer',   n:'Buyer',      ic:'👤', c:'#2a7fd4'},
+  {k:'tenant',  n:'Tenant',     ic:'🛋️', c:'#7c3aed'},
+  {k:'parking', n:'Parking',    ic:'🅿️', c:'#64748b'},
+  {k:'comm',    n:'Commercial', ic:'🏢', c:'#0e7490'}
+];
+function rbPropKind(k){for(var i=0;i<PROP_KINDS.length;i++)if(PROP_KINDS[i].k===k)return PROP_KINDS[i];return PROP_KINDS[0];}
+var __prop={map:null,layer:null,markers:[],filter:{},q:'',kinds:{},pickMode:false,pick:null,ready:false};
+
+function getProps(){return LS.get('rb_props',[])||[];}
+function savePropsLocal(a){LS.set('rb_props',a);}
+function savePropsAll(a){
+  savePropsLocal(a);
+  try{
+    if(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest){
+      a.forEach(function(x){if(x&&x.id&&x.by===CU.uid)FB.db.collection('props').doc(x.id).set(x,{merge:true}).catch(function(){});});
+    }
+  }catch(e){}
+}
+function rbPropPull(){
+  try{
+    if(!(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&CU&&!CU.guest))return;
+    var now=Date.now();if(__prop.pulledAt&&now-__prop.pulledAt<45000)return;__prop.pulledAt=now;
+    FB.db.collection('props').limit(400).get().then(function(snap){
+      var have={};getProps().forEach(function(x){have[x.id]=1;});
+      var all=getProps(),n=0;
+      snap.forEach(function(d){var m=d.data();if(m&&m.id&&!have[m.id]){all.push(m);n++;}});
+      if(n){savePropsLocal(all);rbPropRender();}
+    }).catch(function(){});
+  }catch(e){}
+}
+/* ---------- a Google Maps link is the easiest way most people have a location to hand ---------- */
+function rbPropParseLatLng(s){
+  s=String(s||'').trim();
+  if(!s)return null;
+  var m;
+  // plain "11.05, 76.07"
+  m=s.match(/^\s*(-?\d{1,3}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/);
+  if(m)return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  // google maps link: @lat,lng  |  !3dlat!4dlng  |  ?q=lat,lng  |  /place/.../@lat,lng
+  m=s.match(/@(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)/);            if(m)return {lat:+m[1],lng:+m[2]};
+  m=s.match(/!3d(-?\d{1,3}\.\d+)!4d(-?\d{1,3}\.\d+)/);        if(m)return {lat:+m[1],lng:+m[2]};
+  m=s.match(/[?&](?:q|query|ll|daddr)=(-?\d{1,3}\.\d+),\s*(-?\d{1,3}\.\d+)/); if(m)return {lat:+m[1],lng:+m[2]};
+  return null;
+}
+function rbPropGMaps(p){
+  if(p&&typeof p.lat==='number'&&typeof p.lng==='number')
+    return 'https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng;
+  return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((p&&p.place)||'');
+}
+function rbPropDirections(p){
+  if(p&&typeof p.lat==='number'&&typeof p.lng==='number')
+    return 'https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lng;
+  return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent((p&&p.place)||'');
+}
+/* Instagram and YouTube cannot be read from a page like this without a developer key, so these build
+   the search that actually finds the posts, and the listing's own links open the exact post */
+function rbPropIGSearch(q){return 'https://www.instagram.com/explore/tags/'+encodeURIComponent(String(q||'property').replace(/[^A-Za-z0-9]/g,''))+'/';}
+function rbPropYTSearch(q){return 'https://www.youtube.com/results?search_query='+encodeURIComponent(q||'property tour');}
+
+/* ---------- the map (Leaflet + OpenStreetMap: no key, so nothing to expire) ---------- */
+function rbPropMapLoad(cb){
+  if(window.L&&window.L.map){cb(true);return;}
+  if(window.__lflState==='loading'){(window.__lflCbs=window.__lflCbs||[]).push(cb);return;}
+  window.__lflState='loading';window.__lflCbs=[cb];
+  var fin=function(ok){window.__lflState=ok?'ready':'failed';(window.__lflCbs||[]).splice(0).forEach(function(f){try{f(ok);}catch(e){}});};
+  try{
+    var css=document.createElement('link');css.rel='stylesheet';
+    css.href='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(css);
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
+    s.onload=function(){fin(!!(window.L&&window.L.map));};
+    s.onerror=function(){window.__lflErr='the map library could not be fetched';fin(false);};
+    document.head.appendChild(s);
+  }catch(e){window.__lflErr=(e&&e.message)||'map load error';fin(false);}
+}
+function rbPropMapInit(){
+  var el=document.getElementById('prop-map');if(!el)return;
+  rbPropMapLoad(function(ok){
+    if(!ok){el.innerHTML='<div style="padding:16px;font-size:12px;color:var(--mt);line-height:1.6">The map could not load'+(window.__lflErr?(': '+esc(window.__lflErr)):'')+'. The list below still works, and every listing opens in Google Maps.</div>';return;}
+    try{
+      if(__prop.map){try{__prop.map.remove();}catch(e){}__prop.map=null;}
+      var start=rbPropCentre();
+      var map=L.map(el,{zoomControl:true}).setView([start.lat,start.lng],start.z);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        maxZoom:19, attribution:'&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      __prop.map=map;__prop.layer=L.layerGroup().addTo(map);
+      map.on('moveend',function(){rbPropCountInView();});
+      map.on('click',function(ev){
+        if(!__prop.pickMode)return;
+        __prop.pick={lat:+ev.latlng.lat.toFixed(6),lng:+ev.latlng.lng.toFixed(6)};
+        rbPropPickShow();
+      });
+      __prop.ready=true;
+      rbPropDrawPins();
+    }catch(e){el.innerHTML='<div style="padding:16px;font-size:12px;color:var(--mt)">The map could not start: '+esc((e&&e.message)||'error')+'</div>';}
+  });
+}
+function rbPropCentre(){
+  var saved=LS.get('rb_prop_centre',null);
+  if(saved&&typeof saved.lat==='number')return saved;
+  var ps=rbPropVisible();
+  for(var i=0;i<ps.length;i++)if(typeof ps[i].lat==='number')return {lat:ps[i].lat,lng:ps[i].lng,z:11};
+  return {lat:11.0510,lng:76.0711,z:9};        // Malappuram / Kerala, matching the listings seen so far
+}
+function rbPropDrawPins(){
+  try{
+    if(!__prop.map||!__prop.layer)return;
+    __prop.layer.clearLayers();__prop.markers=[];
+    rbPropVisible().forEach(function(p){
+      if(typeof p.lat!=='number'||typeof p.lng!=='number')return;
+      var K=rbPropKind(p.kind);
+      var ic=L.divIcon({className:'',html:'<div style="background:'+K.c+';color:#fff;border:2px solid #fff;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:800;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.3)">'+esc(p.price?rbPropPrice(p):K.n)+'</div>',iconSize:null});
+      var m=L.marker([p.lat,p.lng],{icon:ic}).addTo(__prop.layer);
+      m.bindPopup('<div style="font-size:12.5px;min-width:170px"><b>'+esc(p.title||K.n)+'</b><br>'
+        +(p.price?('<span style="color:'+K.c+';font-weight:800">'+esc(rbPropPrice(p))+'</span><br>'):'')
+        +(p.place?(esc(p.place)+'<br>'):'')
+        +'<a href="'+rbPropGMaps(p)+'" target="_blank" rel="noopener">Google Maps</a> · '
+        +'<a href="'+rbPropDirections(p)+'" target="_blank" rel="noopener">Directions</a>'
+        +(p.ig?(' · <a href="'+esc(p.ig)+'" target="_blank" rel="noopener">Instagram</a>'):'')
+        +(p.yt?(' · <a href="'+esc(p.yt)+'" target="_blank" rel="noopener">YouTube</a>'):'')
+        +'</div>');
+      __prop.markers.push({m:m,p:p});
+    });
+    rbPropCountInView();
+  }catch(e){}
+}
+function rbPropPrice(p){
+  if(!p||!p.price)return '';
+  var n=Number(p.price);
+  var cur=p.currency||'AED';
+  if(!isFinite(n))return String(p.price);
+  // trim only the zeros AFTER a decimal point - the old rule stripped ".00" and left "2.50M", while a
+  // blanket zero-strip would have turned a flat 20 into 2
+  var trim=function(s){return String(s).replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,'');};
+  if(cur==='INR'){
+    if(n>=10000000)return '₹'+trim((n/10000000).toFixed(2))+'Cr';
+    if(n>=100000)return '₹'+trim((n/100000).toFixed(2))+'L';
+    return '₹'+n.toLocaleString();
+  }
+  if(n>=1000000)return cur+' '+trim((n/1000000).toFixed(2))+'M';
+  if(n>=1000)return cur+' '+(n/1000).toFixed(0)+'k';
+  return cur+' '+n.toLocaleString();
+}
+/* which listings pass the current search and kind filters */
+function rbPropVisible(){
+  var q=String(__prop.q||'').toLowerCase().trim();
+  var anyKind=PROP_KINDS.some(function(K){return __prop.kinds[K.k];});
+  return getProps().filter(function(p){
+    if(!p)return false;
+    if(anyKind&&!__prop.kinds[p.kind])return false;
+    if(__prop.minP&&Number(p.price||0)<__prop.minP)return false;
+    if(__prop.maxP&&Number(p.price||0)>__prop.maxP)return false;
+    if(!q)return true;
+    var hay=((p.title||'')+' '+(p.place||'')+' '+(p.desc||'')+' '+(p.kind||'')+' '+(p.beds||'')+' '+(p.type||'')).toLowerCase();
+    return q.split(/\s+/).every(function(w){return hay.indexOf(w)>-1;});
+  });
+}
+/* the IN VIEW panel: how many of each kind are inside the map's current view */
+function rbPropCountInView(){
+  try{
+    var el=document.getElementById('prop-inview');if(!el)return;
+    var b=null;try{b=__prop.map&&__prop.map.getBounds();}catch(e){}
+    var counts={};PROP_KINDS.forEach(function(K){counts[K.k]=0;});
+    rbPropVisible().forEach(function(p){
+      if(typeof p.lat!=='number')return;
+      if(b&&!b.contains([p.lat,p.lng]))return;
+      counts[p.kind]=(counts[p.kind]||0)+1;
+    });
+    el.innerHTML='<div style="font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--mt);margin-bottom:4px">IN VIEW</div>'
+      +PROP_KINDS.map(function(K){
+        var n=counts[K.k]||0;
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;font-weight:700;padding:1px 0;opacity:'+(n?1:.45)+'">'
+          +'<span style="color:'+K.c+'">'+K.ic+' '+esc(K.n)+'</span><span style="color:'+K.c+'">'+n+'</span></div>';
+      }).join('');
+    try{var c=__prop.map&&__prop.map.getCenter();if(c)LS.set('rb_prop_centre',{lat:c.lat,lng:c.lng,z:__prop.map.getZoom()});}catch(e){}
+  }catch(e){}
+}
+function rbPropSearch(v){__prop.q=v;rbPropDrawPins();rbPropRender();}
+function rbPropToggleKind(k){
+  __prop.kinds[k]=!__prop.kinds[k];
+  try{document.querySelectorAll('#prop-kinds button[data-k]').forEach(function(b){b.classList.toggle('on',!!__prop.kinds[b.getAttribute('data-k')]);});}catch(e){}
+  rbPropDrawPins();rbPropRender();
+}
+/* ---------- add a listing ---------- */
+function rbPropPickShow(){
+  try{
+    var el=document.getElementById('pf-latlng');
+    if(el&&__prop.pick)el.value=__prop.pick.lat+', '+__prop.pick.lng;
+    var s=document.getElementById('pf-pickmsg');
+    if(s)s.textContent=__prop.pick?('Location set: '+__prop.pick.lat+', '+__prop.pick.lng):'';
+  }catch(e){}
+}
+function rbPropPickOnMap(){
+  __prop.pickMode=true;
+  closeOvl('propadd-ovl');
+  toast('Tap the spot on the map. The form reopens with that location.','info');
+  var once=setInterval(function(){
+    if(__prop.pick){clearInterval(once);__prop.pickMode=false;openPropertyAdd(__prop.pendingKind,__prop.pick);}
+  },400);
+  setTimeout(function(){try{clearInterval(once);}catch(e){}__prop.pickMode=false;},60000);
+}
+function openPropertyAdd(kind,pre){
+  if(typeof requireAuth==='function'&&!requireAuth('list a property'))return;
+  kind=kind||'sale';__prop.pendingKind=kind;
+  var ex=document.getElementById('propadd-ovl');if(ex)ex.remove();
+  var K=rbPropKind(kind);
+  var ov=document.createElement('div');ov.className='overlay';ov.id='propadd-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:520px;max-height:90vh;display:flex;flex-direction:column">'
+    +'<div class="mhd"><h3>'+K.ic+' List — '+esc(K.n)+'</h3><button class="modal-x" onclick="closeOvl(\'propadd-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="overflow-y:auto">'
+    +'<div id="prop-kindpick" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'
+    +PROP_KINDS.map(function(x){return '<button class="cat-chip'+(x.k===kind?' on':'')+'" onclick="openPropertyAdd(\''+x.k+'\')">'+x.ic+' '+esc(x.n)+'</button>';}).join('')
+    +'</div>'
+    +'<input id="pf-title" placeholder="Title — e.g. 3BHK villa near Valanchery" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box;margin-bottom:7px">'
+    +'<div style="display:flex;gap:7px;margin-bottom:7px">'
+    +'<select id="pf-cur" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box;max-width:96px"><option>AED</option><option selected>INR</option><option>USD</option><option>GBP</option><option>EUR</option></select>'
+    +'<input id="pf-price" type="number" placeholder="Price / rent" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box">'
+    +'</div>'
+    +'<div style="display:flex;gap:7px;margin-bottom:7px">'
+    +'<input id="pf-beds" placeholder="Beds" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box"><input id="pf-baths" placeholder="Baths" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box"><input id="pf-area" placeholder="Area (sqft)" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box">'
+    +'</div>'
+    +'<input id="pf-place" placeholder="Area / town — e.g. Valanchery, Malappuram" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box;margin-bottom:7px">'
+    +'<div style="font-size:11px;color:var(--mt);margin-bottom:4px">Location — paste a Google Maps link (or “lat, lng”), or pick it on the map</div>'
+    +'<input id="pf-latlng" placeholder="https://maps.google.com/... or 11.0510, 76.0711" value="'+((pre&&pre.lat)?(pre.lat+', '+pre.lng):'')+'" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box;margin-bottom:5px">'
+    +'<button class="btn" style="width:100%;margin-bottom:4px" onclick="rbPropPickOnMap()"><i class="ti ti-map-pin"></i> Pick the spot on the map</button>'
+    +'<div id="pf-pickmsg" style="font-size:11px;color:#16a34a;margin-bottom:7px"></div>'
+    +'<textarea id="pf-desc" rows="3" placeholder="Details — condition, facing, floor, what is included…" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box;margin-bottom:7px"></textarea>'
+    +'<input id="pf-ig" placeholder="Instagram post or reel link (optional)" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box;margin-bottom:7px">'
+    +'<input id="pf-yt" placeholder="YouTube video tour link (optional)" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box;margin-bottom:7px">'
+    +'<input id="pf-contact" placeholder="Phone or WhatsApp to contact you" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box;margin-bottom:10px">'
+    +'<button class="btn btnok" style="width:100%" onclick="rbPropAddSave(\''+kind+'\')"><i class="ti ti-check"></i> Publish listing</button>'
+    +'<div style="font-size:10.5px;color:var(--mt);margin-top:8px;line-height:1.5">It appears on the map straight away for you, and syncs to your account so it reaches the app on your other devices. Only a listing you created can be edited or removed by you.</div>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+  if(pre)rbPropPickShow();
+}
+function rbPropAddSave(kind){
+  try{
+    var g=function(id){var e=document.getElementById(id);return e?String(e.value||'').trim():'';};
+    var title=g('pf-title');
+    if(!title){toast('Give it a title so people can find it','info');return;}
+    var ll=rbPropParseLatLng(g('pf-latlng'));
+    var p={
+      id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+      kind:kind||'sale',title:title,
+      price:Number(g('pf-price'))||0,currency:g('pf-cur')||'INR',
+      beds:g('pf-beds'),baths:g('pf-baths'),area:g('pf-area'),
+      place:g('pf-place'),desc:g('pf-desc'),
+      ig:g('pf-ig'),yt:g('pf-yt'),contact:g('pf-contact'),
+      at:Date.now()
+    };
+    if(ll){p.lat=ll.lat;p.lng=ll.lng;}
+    try{p.by=(CU&&CU.uid)||'';p.byName=(CU&&(CU.name||CU.email))||'';}catch(e){}
+    var all=getProps();all.unshift(p);savePropsAll(all);
+    __prop.pick=null;
+    closeOvl('propadd-ovl');
+    toast(ll?'Listed, and pinned on the map.':'Listed. Add a location later so it appears on the map.','ok');
+    rbPropDrawPins();rbPropRender();
+    if(ll&&__prop.map){try{__prop.map.setView([ll.lat,ll.lng],14);}catch(e){}}
+  }catch(e){toast('Could not save: '+((e&&e.message)||'error'),'err');}
+}
+function rbPropDelete(id){
+  var all=getProps(),p=all.filter(function(x){return x.id===id;})[0];
+  if(!p)return;
+  var mine=false;try{mine=(CU&&CU.uid&&p.by===CU.uid);}catch(e){}
+  if(!mine){toast('You can only remove a listing you created.','info');return;}
+  savePropsAll(all.filter(function(x){return x.id!==id;}));
+  try{if(FB&&FB.ready&&FB.db&&!FB_CLOUD_DISABLED)FB.db.collection('props').doc(id).delete().catch(function(){});}catch(e){}
+  rbPropDrawPins();rbPropRender();toast('Removed','ok');
+}
+/* ---------- the list under the map ---------- */
+function rbPropRender(){
+  try{
+    var box=document.getElementById('prop-list');if(!box)return;
+    var ps=rbPropVisible();
+    var cnt=document.getElementById('prop-count');
+    if(cnt)cnt.textContent=ps.length+' listing'+(ps.length===1?'':'s')+(__prop.q?(' for “'+__prop.q+'”'):'');
+    if(!ps.length){
+      box.innerHTML='<div style="font-size:12px;color:var(--mt);padding:10px 2px;line-height:1.6">Nothing matches yet. Use <b>Add</b> to list a property, a buyer, a tenant, parking or commercial space — or search Instagram and YouTube above for what is being posted in your area.</div>';
+      return;
+    }
+    box.innerHTML=ps.slice(0,60).map(function(p){
+      var K=rbPropKind(p.kind);
+      var mine=false;try{mine=(CU&&CU.uid&&p.by===CU.uid);}catch(e){}
+      return '<div style="border:1px solid var(--b);border-left:4px solid '+K.c+';border-radius:11px;padding:10px;margin-bottom:8px;background:var(--card2)">'
+        +'<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">'
+        +'<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:13px">'+esc(p.title||'')+'</div>'
+        +'<div style="font-size:10.5px;color:var(--mt);margin-top:2px">'+K.ic+' '+esc(K.n)
+        +(p.place?(' · '+esc(p.place)):'')
+        +(p.beds?(' · '+esc(p.beds)+' bed'):'')+(p.baths?(' · '+esc(p.baths)+' bath'):'')+(p.area?(' · '+esc(p.area)+' sqft'):'')
+        +'</div></div>'
+        +(p.price?('<div style="font-weight:800;font-size:13px;color:'+K.c+';white-space:nowrap">'+esc(rbPropPrice(p))+'</div>'):'')
+        +'</div>'
+        +(p.desc?('<div style="font-size:11.5px;line-height:1.5;margin-top:6px">'+esc(p.desc)+'</div>'):'')
+        +'<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">'
+        +((typeof p.lat==='number')?('<button class="btn" style="padding:5px 9px;font-size:11px" onclick="rbPropFocus(\''+escJS(p.id)+'\')"><i class="ti ti-map-pin"></i> On map</button>'):'')
+        +'<a class="btn" style="padding:5px 9px;font-size:11px;text-decoration:none" href="'+rbPropGMaps(p)+'" target="_blank" rel="noopener"><i class="ti ti-brand-google"></i> Google Maps</a>'
+        +'<a class="btn" style="padding:5px 9px;font-size:11px;text-decoration:none" href="'+rbPropDirections(p)+'" target="_blank" rel="noopener"><i class="ti ti-navigation"></i> Directions</a>'
+        +(p.ig?('<a class="btn" style="padding:5px 9px;font-size:11px;text-decoration:none" href="'+esc(p.ig)+'" target="_blank" rel="noopener"><i class="ti ti-brand-instagram"></i> Instagram</a>'):'')
+        +(p.yt?('<a class="btn" style="padding:5px 9px;font-size:11px;text-decoration:none" href="'+esc(p.yt)+'" target="_blank" rel="noopener"><i class="ti ti-brand-youtube"></i> YouTube</a>'):'')
+        +(p.contact?('<a class="btn" style="padding:5px 9px;font-size:11px;text-decoration:none" href="https://wa.me/'+encodeURIComponent(String(p.contact).replace(/[^0-9]/g,''))+'" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i> Contact</a>'):'')
+        +(mine?('<button class="btn" style="padding:5px 9px;font-size:11px;color:#dc2626" onclick="rbPropDelete(\''+escJS(p.id)+'\')"><i class="ti ti-trash"></i></button>'):'')
+        +'</div></div>';
+    }).join('');
+  }catch(e){}
+}
+function rbPropFocus(id){
+  var p=getProps().filter(function(x){return x.id===id;})[0];
+  if(!p||typeof p.lat!=='number'||!__prop.map)return;
+  try{
+    __prop.map.setView([p.lat,p.lng],15);
+    var hit=__prop.markers.filter(function(m){return m.p.id===id;})[0];
+    if(hit&&hit.m.openPopup)hit.m.openPopup();
+    var el=document.getElementById('prop-map');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(e){}
+}
+function rbPropSocial(which){
+  var q=(__prop.q||'')+' '+((document.getElementById('prop-q')||{}).value||'');
+  q=q.trim()||'property for sale';
+  var kinds=PROP_KINDS.filter(function(K){return __prop.kinds[K.k];}).map(function(K){return K.n;}).join(' ');
+  var full=(q+' '+kinds+' property').replace(/\s+/g,' ').trim();
+  var url=which==='ig'?rbPropIGSearch(full.split(/\s+/).slice(0,3).join('')):rbPropYTSearch(full+' tour');
+  try{window.open(url,'_blank','noopener');}catch(e){}
+}
+function openPropertyFinder(){
+  var ex=document.getElementById('prop-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='prop-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:640px;max-height:92vh;display:flex;flex-direction:column">'
+    +'<div class="mhd"><h3>🏘️ Property — find &amp; list</h3><button class="modal-x" onclick="closeOvl(\'prop-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div style="padding:0 16px"><button class="btn btnok" style="width:100%" onclick="closeOvl(\'prop-ovl\');setTimeout(openPropertyMap,180)"><i class="ti ti-map-2"></i> Open the full-screen map</button></div>'
+    +'<div class="mbd" style="overflow-y:auto;padding-top:9px">'
+    +'<input id="prop-q" placeholder="Search — area, town, 3BHK, villa, shop, parking…" oninput="rbPropSearch(this.value)" style="width:100%;background:var(--card);border:1px solid var(--b);border-radius:9px;padding:9px;color:var(--tx);font-size:13px;font-family:var(--fn);box-sizing:border-box;margin-bottom:7px">'
+    +'<div id="prop-kinds" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'
+    +PROP_KINDS.map(function(K){return '<button class="cat-chip" data-k="'+K.k+'" onclick="rbPropToggleKind(\''+K.k+'\')">'+K.ic+' '+esc(K.n)+'</button>';}).join('')
+    +'</div>'
+    +'<div style="position:relative;margin-bottom:9px">'
+    +'<div id="prop-map" style="height:300px;border-radius:12px;overflow:hidden;border:1px solid var(--b);background:var(--card2)"></div>'
+    +'<div id="prop-inview" style="position:absolute;top:9px;right:9px;z-index:500;background:rgba(255,255,255,.93);backdrop-filter:blur(6px);border-radius:11px;padding:8px 11px;box-shadow:0 2px 10px rgba(0,0,0,.18);min-width:128px"></div>'
+    +'</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px">'
+    +'<button class="btn" style="flex:1;min-width:120px" onclick="openPropertyAdd(\'sale\')"><i class="ti ti-plus"></i> Add a listing</button>'
+    +'<button class="btn" style="flex:1;min-width:110px" onclick="rbPropSocial(\'ig\')"><i class="ti ti-brand-instagram"></i> On Instagram</button>'
+    +'<button class="btn" style="flex:1;min-width:110px" onclick="rbPropSocial(\'yt\')"><i class="ti ti-brand-youtube"></i> On YouTube</button>'
+    +'</div>'
+    +'<div id="prop-count" style="font-size:11px;font-weight:800;color:var(--mt);margin-bottom:6px"></div>'
+    +'<div id="prop-list"></div>'
+    +'<div style="font-size:10.5px;color:var(--mt);margin-top:10px;line-height:1.55">The map is OpenStreetMap, which needs no key and so cannot stop working when one expires; every pin and listing also opens in Google Maps for directions and street view. Instagram and YouTube do not allow their listings to be read from a page like this without a developer key, so a listing carries its own links and the two buttons above open the right search on each.</div>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+  rbPropRender();
+  setTimeout(rbPropMapInit,120);
+  rbPropPull();
+}
+
+
+/* ===================================================================================================
+   v506: THE PROPERTY MAP, FULL SCREEN — the map gets the room it needs
+   The finder put the map in a 300px box inside a dialog, which is the wrong shape for looking for a
+   place to live. This is the whole screen: the map underneath, controls floating on top, an IN VIEW
+   count in the corner, a bottom bar for Buy / Rent / Sell / Builders, and a sheet of listings that
+   slides up over it.
+   Pins gather into counted circles when zoomed out and separate as you zoom in. That clustering is
+   written here rather than pulled from a plugin CDN: one more download is one more thing that can fail,
+   and this app has lost enough days to downloads that did not arrive.
+   =================================================================================================== */
+var __pmap={map:null,layer:null,tiles:null,tileKey:'standard',sheet:'peek',nav:'buy',markers:[]};
+
+var PMAP_TILES={
+  standard:{n:'Map',   url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            att:'&copy; OpenStreetMap contributors',max:19},
+  terrain: {n:'Terrain',url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+            att:'&copy; OpenStreetMap contributors, SRTM | &copy; OpenTopoMap',max:17},
+  satellite:{n:'Satellite',url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            att:'Imagery &copy; Esri, Maxar, Earthstar Geographics',max:19}
+};
+/* which kinds each bottom-bar entry shows */
+var PMAP_NAV={
+  home:    [],
+  buy:     ['sale','offplan'],
+  rent:    ['rent','tenant'],
+  sell:    null,                       // opens the add form instead of filtering
+  builders:['offplan','comm','parking']
+};
+function rbPMapKindsFor(nav){
+  var k=PMAP_NAV[nav];
+  var out={};
+  if(!k||!k.length)return out;
+  k.forEach(function(x){out[x]=true;});
+  return out;
+}
+function openPropertyMap(nav){
+  var ex=document.getElementById('pmap-ovl');if(ex)ex.remove();
+  __pmap.nav=nav||'buy';
+  __prop.kinds=rbPMapKindsFor(__pmap.nav);
+  var ov=document.createElement('div');ov.id='pmap-ovl';
+  ov.style.cssText='position:fixed;inset:0;z-index:99000;background:var(--bg);font-family:var(--fn)';
+  ov.innerHTML=
+     '<div id="pmap-canvas" style="position:absolute;inset:0"></div>'
+    // top-left: close, then the layer switcher
+    +'<button id="pmap-close" style="position:absolute;top:12px;left:12px;z-index:5;width:42px;height:42px;border-radius:50%;border:none;background:#fff;color:#111;box-shadow:0 2px 10px rgba(0,0,0,.22);font-size:18px;cursor:pointer">✕</button>'
+    +'<button id="pmap-layers" style="position:absolute;top:62px;left:12px;z-index:5;width:42px;height:42px;border-radius:50%;border:none;background:#fff;color:#111;box-shadow:0 2px 10px rgba(0,0,0,.22);font-size:17px;cursor:pointer" title="Map style">◰</button>'
+    +'<div id="pmap-layerlist" style="position:absolute;top:62px;left:60px;z-index:6;display:none;background:#fff;border-radius:11px;box-shadow:0 4px 16px rgba(0,0,0,.25);overflow:hidden"></div>'
+    // top-right: menu
+    +'<button id="pmap-menu" style="position:absolute;top:12px;right:12px;z-index:5;width:42px;height:42px;border-radius:50%;border:none;background:#fff;color:#111;box-shadow:0 2px 10px rgba(0,0,0,.22);font-size:17px;cursor:pointer">☰</button>'
+    // IN VIEW, under the menu, as on a property map
+    +'<div id="pmap-inview" style="position:absolute;top:62px;right:12px;z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-radius:13px;padding:9px 12px;box-shadow:0 3px 14px rgba(0,0,0,.2);min-width:150px"></div>'
+    // search, floating low so it does not cover the map
+    +'<div style="position:absolute;left:12px;right:12px;bottom:142px;z-index:5;display:flex;gap:7px">'
+      +'<input id="pmap-q" placeholder="Search area, town, 3BHK, shop…" style="flex:1;border:none;border-radius:999px;padding:12px 16px;font-size:13.5px;font-family:var(--fn);box-shadow:0 3px 14px rgba(0,0,0,.2);background:#fff;color:#111;box-sizing:border-box">'
+      +'<button id="pmap-add" style="border:none;border-radius:999px;padding:0 17px;background:#16a34a;color:#fff;font-weight:800;font-size:13px;box-shadow:0 3px 14px rgba(0,0,0,.2);cursor:pointer;white-space:nowrap">+ Add</button>'
+    +'</div>'
+    // the listings sheet
+    +'<div id="pmap-sheet" style="position:absolute;left:0;right:0;bottom:66px;z-index:6;background:var(--card);border-radius:18px 18px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.18);max-height:62vh;display:flex;flex-direction:column;transform:translateY(calc(100% - 46px));transition:transform .26s ease">'
+      +'<div id="pmap-grab" style="padding:9px 14px;cursor:pointer;flex-shrink:0;border-bottom:1px solid var(--b)">'
+        +'<div style="width:38px;height:4px;border-radius:2px;background:var(--b2);margin:0 auto 7px"></div>'
+        +'<div id="pmap-count" style="font-size:12.5px;font-weight:800;text-align:center"></div>'
+      +'</div>'
+      +'<div id="pmap-list" style="overflow-y:auto;padding:10px 12px 14px"></div>'
+    +'</div>'
+    // bottom bar
+    +'<div style="position:absolute;left:0;right:0;bottom:0;z-index:7;height:66px;background:var(--card);border-top:1px solid var(--b);display:flex;align-items:center;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom,0)">'
+      +[['home','⌂','Home'],['buy','◎','Buy'],['rent','⚿','Rent'],['sell','◈','Sell'],['builders','⚒','Builders']]
+        .map(function(x){return '<button class="pmap-nav" data-n="'+x[0]+'" style="background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--fn);font-size:11px;font-weight:700;color:var(--mt);cursor:pointer;padding:6px 10px;border-radius:11px"><span style="font-size:17px">'+x[1]+'</span>'+x[2]+'</button>';}).join('')
+    +'</div>';
+  document.body.appendChild(ov);
+
+  ov.querySelector('#pmap-close').onclick=function(){rbPMapClose();};
+  ov.querySelector('#pmap-menu').onclick=function(){rbPMapMenu();};
+  ov.querySelector('#pmap-add').onclick=function(){openPropertyAdd(__pmap.nav==='rent'?'rent':'sale');};
+  ov.querySelector('#pmap-layers').onclick=function(){rbPMapLayerMenu();};
+  ov.querySelector('#pmap-grab').onclick=function(){rbPMapSheet(__pmap.sheet==='peek'?'open':'peek');};
+  var qi=ov.querySelector('#pmap-q');
+  qi.oninput=function(){__prop.q=this.value;rbPMapDraw();rbPMapList();};
+  ov.querySelectorAll('.pmap-nav').forEach(function(b){
+    b.onclick=function(){rbPMapNav(b.getAttribute('data-n'));};
+  });
+  rbPMapNavPaint();
+  setTimeout(rbPMapInit,60);
+}
+function rbPMapClose(){
+  try{if(__pmap.map){__pmap.map.remove();}}catch(e){}
+  __pmap.map=null;__pmap.layer=null;__pmap.markers=[];
+  var ov=document.getElementById('pmap-ovl');if(ov)ov.remove();
+}
+function rbPMapInit(){
+  var el=document.getElementById('pmap-canvas');if(!el)return;
+  rbPropMapLoad(function(ok){
+    if(!ok){
+      el.innerHTML='<div style="padding:22px;font-size:13px;color:var(--mt);line-height:1.6">The map could not load'+(window.__lflErr?(': '+esc(window.__lflErr)):'')+'. The listings below still work, and each one opens in Google Maps.</div>';
+      rbPMapList();rbPMapSheet('open');return;
+    }
+    try{
+      var st=rbPropCentre();
+      var map=L.map(el,{zoomControl:false,attributionControl:true}).setView([st.lat,st.lng],st.z||9);
+      L.control.zoom({position:'bottomleft'}).addTo(map);
+      __pmap.map=map;
+      rbPMapTiles(LS.get('rb_pmap_tiles','standard')||'standard');
+      __pmap.layer=L.layerGroup().addTo(map);
+      map.on('moveend zoomend',function(){rbPMapDraw();rbPMapList();});
+      map.on('click',function(ev){
+        if(!__prop.pickMode)return;
+        __prop.pick={lat:+ev.latlng.lat.toFixed(6),lng:+ev.latlng.lng.toFixed(6)};
+        rbPropPickShow();
+      });
+      rbPMapDraw();rbPMapList();
+      setTimeout(function(){try{map.invalidateSize();}catch(e){}},220);
+    }catch(e){
+      el.innerHTML='<div style="padding:22px;font-size:13px;color:var(--mt)">The map could not start: '+esc((e&&e.message)||'error')+'</div>';
+    }
+  });
+}
+function rbPMapTiles(key){
+  try{
+    var t=PMAP_TILES[key]||PMAP_TILES.standard;
+    if(__pmap.tiles)try{__pmap.map.removeLayer(__pmap.tiles);}catch(e){}
+    __pmap.tiles=L.tileLayer(t.url,{maxZoom:t.max,attribution:t.att}).addTo(__pmap.map);
+    __pmap.tileKey=key;LS.set('rb_pmap_tiles',key);
+  }catch(e){}
+}
+function rbPMapLayerMenu(){
+  var box=document.getElementById('pmap-layerlist');if(!box)return;
+  if(box.style.display==='block'){box.style.display='none';return;}
+  box.innerHTML=Object.keys(PMAP_TILES).map(function(k){
+    var on=(__pmap.tileKey===k);
+    return '<button data-t="'+k+'" style="display:block;width:100%;text-align:left;border:none;background:'+(on?'#eef2ff':'#fff')+';color:#111;padding:10px 15px;font-size:12.5px;font-weight:'+(on?'800':'600')+';font-family:var(--fn);cursor:pointer;white-space:nowrap">'+esc(PMAP_TILES[k].n)+'</button>';
+  }).join('');
+  box.style.display='block';
+  box.querySelectorAll('button[data-t]').forEach(function(b){
+    b.onclick=function(){rbPMapTiles(b.getAttribute('data-t'));box.style.display='none';};
+  });
+}
+function rbPMapMenu(){
+  var ex=document.getElementById('pmapmenu-ovl');if(ex){ex.remove();return;}
+  var items=[
+    ['⌂','Home','closeAllAndHome'],
+    ['◎','Explore all kinds','exploreAll'],
+    ['✚','Add a listing','addOne'],
+    ['☰','My listings','mine'],
+    ['📷','On Instagram','ig'],
+    ['▶','On YouTube','yt']
+  ];
+  var m=document.createElement('div');m.id='pmapmenu-ovl';
+  m.style.cssText='position:fixed;inset:0;z-index:99500;background:rgba(0,0,0,.32)';
+  m.innerHTML='<div style="position:absolute;top:0;right:0;bottom:0;width:min(320px,86vw);background:var(--card);box-shadow:-4px 0 22px rgba(0,0,0,.25);padding:16px;overflow-y:auto">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-size:15px">Property</b><button id="pmm-x" style="background:none;border:none;font-size:19px;cursor:pointer;color:var(--tx)">✕</button></div>'
+    +items.map(function(it){return '<button class="pmm-i" data-a="'+it[2]+'" style="display:flex;align-items:center;gap:11px;width:100%;background:var(--card2);border:1px solid var(--b);border-radius:12px;padding:12px;margin-bottom:8px;font-size:13px;font-weight:700;font-family:var(--fn);color:var(--tx);cursor:pointer;text-align:left"><span style="font-size:16px">'+it[0]+'</span>'+esc(it[1])+'</button>';}).join('')
+    +'<div style="font-size:11px;color:var(--mt);line-height:1.55;margin-top:10px">Map data is OpenStreetMap, which needs no key, so it cannot stop working when one expires. Every listing also opens in Google Maps for directions and street view.</div>'
+    +'</div>';
+  document.body.appendChild(m);
+  m.onclick=function(ev){if(ev.target===m)m.remove();};
+  m.querySelector('#pmm-x').onclick=function(){m.remove();};
+  m.querySelectorAll('.pmm-i').forEach(function(b){
+    b.onclick=function(){
+      var a=b.getAttribute('data-a');m.remove();
+      if(a==='closeAllAndHome'){rbPMapClose();}
+      else if(a==='exploreAll'){rbPMapNav('home');}
+      else if(a==='addOne'){openPropertyAdd('sale');}
+      else if(a==='mine'){__prop.q='';var qi=document.getElementById('pmap-q');if(qi)qi.value='';__pmap.mineOnly=!__pmap.mineOnly;rbPMapDraw();rbPMapList();toast(__pmap.mineOnly?'Showing only your listings':'Showing all listings','info');}
+      else if(a==='ig'){rbPropSocial('ig');}
+      else if(a==='yt'){rbPropSocial('yt');}
+    };
+  });
+}
+function rbPMapNav(n){
+  if(n==='sell'){openPropertyAdd('sale');return;}
+  __pmap.nav=n;
+  __prop.kinds=rbPMapKindsFor(n);
+  rbPMapNavPaint();rbPMapDraw();rbPMapList();
+}
+function rbPMapNavPaint(){
+  try{
+    document.querySelectorAll('.pmap-nav').forEach(function(b){
+      var on=(b.getAttribute('data-n')===__pmap.nav);
+      b.style.color=on?'#4f46e5':'var(--mt)';
+      b.style.background=on?'rgba(79,70,229,.10)':'none';
+    });
+  }catch(e){}
+}
+function rbPMapSheet(state){
+  __pmap.sheet=state;
+  var s=document.getElementById('pmap-sheet');if(!s)return;
+  s.style.transform=(state==='open')?'translateY(0)':'translateY(calc(100% - 46px))';
+}
+/* which listings are in play right now */
+function rbPMapSet(){
+  var ps=rbPropVisible();
+  if(__pmap.mineOnly){
+    var uid='';try{uid=(CU&&CU.uid)||'';}catch(e){}
+    ps=ps.filter(function(p){return p.by&&p.by===uid;});
+  }
+  return ps;
+}
+/* ---- clustering, written here so there is no extra download to fail ----
+   Pins inside the same small square of the map are drawn as one counted circle. The square shrinks as
+   you zoom in, so groups break apart naturally; past zoom 14 every pin is drawn on its own. */
+function rbPMapCellSize(z){
+  if(z>=14)return 0;                       // no grouping this close in
+  if(z>=12)return 0.02;
+  if(z>=10)return 0.08;
+  if(z>=8) return 0.30;
+  if(z>=6) return 1.00;
+  return 3.00;
+}
+function rbPMapCluster(items,z){
+  var cell=rbPMapCellSize(z);
+  if(!cell)return items.map(function(p){return {single:p,lat:p.lat,lng:p.lng,n:1};});
+  var bucket={};
+  items.forEach(function(p){
+    var key=Math.floor(p.lat/cell)+'|'+Math.floor(p.lng/cell);
+    (bucket[key]=bucket[key]||[]).push(p);
+  });
+  return Object.keys(bucket).map(function(k){
+    var g=bucket[k];
+    if(g.length===1)return {single:g[0],lat:g[0].lat,lng:g[0].lng,n:1};
+    var la=0,ln=0;g.forEach(function(p){la+=p.lat;ln+=p.lng;});
+    return {group:g,lat:la/g.length,lng:ln/g.length,n:g.length};
+  });
+}
+function rbPMapDraw(){
+  try{
+    if(!__pmap.map||!__pmap.layer||!window.L)return;
+    __pmap.layer.clearLayers();__pmap.markers=[];
+    var z=__pmap.map.getZoom();
+    var withPos=rbPMapSet().filter(function(p){return typeof p.lat==='number'&&typeof p.lng==='number';});
+    rbPMapCluster(withPos,z).forEach(function(c){
+      if(c.n>1){
+        var ic=L.divIcon({className:'',iconSize:null,html:
+          '<div style="background:#4f46e5;color:#fff;border:3px solid rgba(255,255,255,.85);border-radius:50%;width:'+(c.n>50?52:c.n>9?46:40)+'px;height:'+(c.n>50?52:c.n>9?46:40)+'px;display:flex;align-items:center;justify-content:center;font-size:'+(c.n>99?12:14)+'px;font-weight:800;font-family:var(--fn);box-shadow:0 3px 10px rgba(0,0,0,.3)">'+c.n+'</div>'});
+        var m=L.marker([c.lat,c.lng],{icon:ic}).addTo(__pmap.layer);
+        m.on('click',function(){try{__pmap.map.setView([c.lat,c.lng],Math.min(17,z+3));}catch(e){}});
+        __pmap.markers.push({m:m,c:c});
+      }else{
+        var p=c.single,K=rbPropKind(p.kind);
+        var lbl=p.price?rbPropPrice(p):K.n;
+        var ic2=L.divIcon({className:'',iconSize:null,html:
+          '<div style="background:'+K.c+';color:#fff;border:2px solid #fff;border-radius:999px;padding:4px 9px;font-size:11.5px;font-weight:800;font-family:var(--fn);white-space:nowrap;box-shadow:0 2px 7px rgba(0,0,0,.3)">'+esc(lbl)+'</div>'});
+        var m2=L.marker([p.lat,p.lng],{icon:ic2}).addTo(__pmap.layer);
+        m2.bindPopup('<div style="font-size:12.5px;min-width:180px"><b>'+esc(p.title||K.n)+'</b><br>'
+          +(p.price?('<span style="color:'+K.c+';font-weight:800">'+esc(rbPropPrice(p))+'</span><br>'):'')
+          +(p.place?(esc(p.place)+'<br>'):'')
+          +'<a href="'+rbPropGMaps(p)+'" target="_blank" rel="noopener">Google Maps</a> · '
+          +'<a href="'+rbPropDirections(p)+'" target="_blank" rel="noopener">Directions</a>'
+          +(p.ig?(' · <a href="'+esc(p.ig)+'" target="_blank" rel="noopener">Instagram</a>'):'')
+          +(p.yt?(' · <a href="'+esc(p.yt)+'" target="_blank" rel="noopener">YouTube</a>'):'')
+          +'</div>');
+        __pmap.markers.push({m:m2,p:p});
+      }
+    });
+    rbPMapInView();
+  }catch(e){}
+}
+function rbPMapInView(){
+  try{
+    var el=document.getElementById('pmap-inview');if(!el)return;
+    var b=null;try{b=__pmap.map&&__pmap.map.getBounds();}catch(e){}
+    var counts={};PROP_KINDS.forEach(function(K){counts[K.k]=0;});
+    rbPMapSet().forEach(function(p){
+      if(typeof p.lat!=='number')return;
+      if(b&&!b.contains([p.lat,p.lng]))return;
+      counts[p.kind]=(counts[p.kind]||0)+1;
+    });
+    el.innerHTML='<div style="font-size:9.5px;font-weight:800;letter-spacing:.07em;color:#64748b;margin-bottom:5px">IN VIEW</div>'
+      +PROP_KINDS.map(function(K){
+        var n=counts[K.k]||0;
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:12.5px;font-weight:700;padding:1.5px 0;opacity:'+(n?1:.42)+'">'
+          +'<span style="color:'+K.c+'">◉ '+esc(K.n)+'</span><span style="color:'+K.c+'">'+n+'</span></div>';
+      }).join('');
+    try{var c=__pmap.map&&__pmap.map.getCenter();if(c)LS.set('rb_prop_centre',{lat:c.lat,lng:c.lng,z:__pmap.map.getZoom()});}catch(e){}
+  }catch(e){}
+}
+function rbPMapList(){
+  try{
+    var box=document.getElementById('pmap-list'),cnt=document.getElementById('pmap-count');
+    if(!box)return;
+    var b=null;try{b=__pmap.map&&__pmap.map.getBounds();}catch(e){}
+    var all=rbPMapSet();
+    var inView=all.filter(function(p){
+      if(typeof p.lat!=='number')return true;        // no location yet - keep it listed
+      return !b||b.contains([p.lat,p.lng]);
+    });
+    if(cnt)cnt.textContent=inView.length?(inView.length+' listing'+(inView.length===1?'':'s')+' here — tap to '+(__pmap.sheet==='open'?'close':'see them')):'No listings in this view — zoom out, or tap + Add';
+    box.innerHTML=inView.length?inView.slice(0,60).map(function(p){
+      var K=rbPropKind(p.kind);
+      var mine=false;try{mine=(CU&&CU.uid&&p.by===CU.uid);}catch(e){}
+      return '<div style="border:1px solid var(--b);border-left:4px solid '+K.c+';border-radius:12px;padding:10px;margin-bottom:8px;background:var(--card2)">'
+        +'<div style="display:flex;justify-content:space-between;gap:9px;align-items:flex-start">'
+        +'<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:13px">'+esc(p.title||'')+'</div>'
+        +'<div style="font-size:10.5px;color:var(--mt);margin-top:2px">'+K.ic+' '+esc(K.n)
+        +(p.place?(' · '+esc(p.place)):'')
+        +(p.beds?(' · '+esc(p.beds)+' bed'):'')+(p.area?(' · '+esc(p.area)+' sqft'):'')+'</div></div>'
+        +(p.price?('<div style="font-weight:800;font-size:13px;color:'+K.c+';white-space:nowrap">'+esc(rbPropPrice(p))+'</div>'):'')
+        +'</div>'
+        +'<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">'
+        +((typeof p.lat==='number')?('<button class="btn" style="padding:5px 9px;font-size:11px" onclick="rbPMapFocus(\''+escJS(p.id)+'\')"><i class="ti ti-map-pin"></i> Show</button>'):'')
+        +'<a class="btn" style="padding:5px 9px;font-size:11px;text-decoration:none" href="'+rbPropGMaps(p)+'" target="_blank" rel="noopener">Google Maps</a>'
+        +'<a class="btn" style="padding:5px 9px;font-size:11px;text-decoration:none" href="'+rbPropDirections(p)+'" target="_blank" rel="noopener">Directions</a>'
+        +(p.ig?('<a class="btn" style="padding:5px 9px;font-size:11px;text-decoration:none" href="'+esc(p.ig)+'" target="_blank" rel="noopener"><i class="ti ti-brand-instagram"></i></a>'):'')
+        +(p.yt?('<a class="btn" style="padding:5px 9px;font-size:11px;text-decoration:none" href="'+esc(p.yt)+'" target="_blank" rel="noopener"><i class="ti ti-brand-youtube"></i></a>'):'')
+        +(p.contact?('<a class="btn" style="padding:5px 9px;font-size:11px;text-decoration:none" href="https://wa.me/'+encodeURIComponent(String(p.contact).replace(/[^0-9]/g,''))+'" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i></a>'):'')
+        +(mine?('<button class="btn" style="padding:5px 9px;font-size:11px;color:#dc2626" onclick="rbPropDelete(\''+escJS(p.id)+'\');rbPMapDraw();rbPMapList()"><i class="ti ti-trash"></i></button>'):'')
+        +'</div></div>';
+    }).join(''):'<div style="font-size:12px;color:var(--mt);line-height:1.6;padding:6px 2px">Nothing here yet. Tap <b>+ Add</b> to list a property, a buyer, a tenant, parking or commercial space — or use the menu to see what is posted on Instagram and YouTube for this area.</div>';
+  }catch(e){}
+}
+function rbPMapFocus(id){
+  var p=getProps().filter(function(x){return x.id===id;})[0];
+  if(!p||typeof p.lat!=='number'||!__pmap.map)return;
+  try{
+    rbPMapSheet('peek');
+    __pmap.map.setView([p.lat,p.lng],16);
+    setTimeout(function(){
+      var hit=__pmap.markers.filter(function(m){return m.p&&m.p.id===id;})[0];
+      if(hit&&hit.m.openPopup)hit.m.openPopup();
+    },340);
+  }catch(e){}
+}
+
 /* ===== v299: site-level structured data for search engines & AI agents ===== */
 function rbInjectSEO(){try{
   var prods=[];try{prods=getProducts().filter(function(p){return productInMarketplace(p);}).slice(0,10);}catch(e){}
@@ -19613,6 +20755,19 @@ function rbOCRLoad(cb){
       // cannot be read. Start the worker-free vision reader instead of declaring failure.
       var why=rbWorkerBlocked()||('a Web Worker will not run here: '+(__st.why||'unknown'));
       var gpu=false;try{gpu=!!(navigator.gpu);}catch(e){}
+      // v504: if a cloud key is already configured, that reader needs NO worker, NO WebGPU and NO download -
+      // it sends the screenshot and gets the text back. In a page where workers are impossible it is the one
+      // route with nothing left to fail, so it is used before the large model download is attempted.
+      var cloudOK=false;try{cloudOK=!!(typeof rbCloudReady==='function'&&rbCloudReady());}catch(e){}
+      if(cloudOK){
+        window.rbOCR={ready:true,native:false,noworker:true,cloud:true,source:'your cloud AI (no worker, no download)',
+          recognize:function(src){return rbCloudReadCanvas(src).then(function(t){return String(t||'');});}};
+        window.__ocrErr='';
+        try{window.__engPct=window.__engPct||{};window.__engPct.ocr=100;}catch(e){}
+        try{rbReaderBadge('ready (your cloud AI)','ok');}catch(e){}
+        try{rbDTStatus('This page cannot run a Web Worker, so your cloud AI is reading the screen image directly \u2014 no download needed.');}catch(e){}
+        done(true);return;
+      }
       if(gpu&&!(window.rbVisionOCR&&window.rbVisionOCR.ready)&&window.__vocrState!=='failed'){
         window.__ocrErr=why+' Switching to the reader that needs no worker (AI vision, on WebGPU) \u2014 this is a one-time download.';
         try{rbReaderBadge('no worker here \u2014 using AI vision','load');}catch(e){}
@@ -19628,7 +20783,9 @@ function rbOCRLoad(cb){
             done(true);
           }else{
             window.__ocrErr=why+' The worker-free AI vision reader also could not load'
-              +((window.__vocrErr)?(': '+window.__vocrErr):'')+'.';
+              +((window.__vocrErr)?(': '+window.__vocrErr):'')
+              +'. The remaining route that needs no worker, no WebGPU and no download is your own cloud key'
+              +' \u2014 open AI & Backup and set up "Use a big AI model as backup"; it reads the screen image directly.';
             done(false);
           }
         });
@@ -22913,16 +24070,44 @@ function rbVisionOCRLoad(cb){
   var wd=setTimeout(function(){if(window.__vocrState==='loading'){window.__vocrErr='timed out (large one-time download)';done(false);}},600000);
   import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.6').then(function(TF){
     try{rbPinNoWorkerORT(TF);}catch(e){}   // v503: no worker threads where workers are unavailable
-    // candidate browser builds, newest first; the first that loads wins
-    var ids=['onnx-community/LightOnOCR-2-1B-ONNX','onnx-community/LightOnOCR-1B-1025-ONNX','onnx-community/LightOnOCR-1B-ONNX'];
-    var idx=0;
+    /* ===== v504: ASK THE HUB WHETHER EACH MODEL EXISTS, AND KEEP EVERY REASON =====
+       This reported one sentence - "no browser build could be loaded from the model hub" - after discarding
+       the real reason from each candidate, which is the same mistake the text reader made before v500. A
+       missing model and a model that exists but will not run are different problems with different fixes, and
+       the message could not tell them apart.
+       Each candidate is now checked against the hub first, which answers in a few kilobytes: a 404 means that
+       name is simply wrong and is reported as such, rather than being blamed on the browser or the network.
+       Every candidate's outcome is kept, so the final message lists exactly what happened to each one. */
+    var ids=['onnx-community/LightOnOCR-1B-ONNX','onnx-community/LightOnOCR-1B-1025-ONNX','onnx-community/LightOnOCR-2-1B-ONNX','onnx-community/Florence-2-base-ft','Xenova/trocr-base-printed'];
+    var idx=0,vnotes=[];
+    function vnote(m){vnotes.push(m);window.__vocrErr=vnotes.join(' | ');}
+    /* a few-kilobyte question: does this name exist on the hub at all? */
+    function hubHas(id){
+      try{
+        if(typeof fetch!=='function')return Promise.resolve(null);   // unknown - just try loading it
+        return fetch('https://huggingface.co/api/models/'+id,{method:'GET'})
+          .then(function(r){return r.status===404?false:(r.ok?true:null);})
+          .catch(function(){return null;});
+      }catch(e){return Promise.resolve(null);}
+    }
     function tryNext(){
-      if(idx>=ids.length){clearTimeout(wd);window.__vocrErr='no browser build of the AI vision reader could be loaded from the model hub';try{rbEngineUnavailable('vision',window.__vocrErr);}catch(e){}done(false);return;}
+      if(idx>=ids.length){
+        clearTimeout(wd);
+        vnote('every candidate exhausted');
+        try{rbEngineUnavailable('vision',window.__vocrErr);}catch(e){}
+        done(false);return;
+      }
       var id=ids[idx++];
+      Promise.resolve(hubHas(id)).then(function(exists){
+        if(exists===false){vnote(id+': no such model on the hub');tryNext();return;}
+        loadId(id);
+      });
+    }
+    function loadId(id){
       TF.pipeline('image-to-text',id,{device:'webgpu',dtype:'q4f16',progress_callback:function(m){
         try{if(m&&typeof m.progress==='number'){var p=Math.round(m.progress);window.__engPct=window.__engPct||{};window.__engPct.vocr=p;rbAIRow&&rbAIRow('vocr','Installing '+p+'%','load');}}catch(e){}
       }}).then(function(gen){
-        clearTimeout(wd);window.__vocrErr='';window.__vocrModel=id;
+        clearTimeout(wd);vnotes.length=0;window.__vocrErr='';window.__vocrModel=id;
         window.rbVisionOCR={ready:true,model:id,read:function(src){
           return gen(src,{max_new_tokens:1024}).then(function(out){
             var t='';
@@ -22934,7 +24119,7 @@ function rbVisionOCRLoad(cb){
           });
         }};
         done(true);
-      }).catch(function(err){ window.__vocrErr=(err&&err.message)||('could not load '+id); tryNext(); });
+      }).catch(function(err){ vnote(id+': '+((err&&(err.message||err.name))||'could not load')); tryNext(); });
     }
     tryNext();
   }).catch(function(err){clearTimeout(wd);window.__vocrErr='the AI library could not be fetched: '+((err&&err.message)||'blocked');done(false);});
