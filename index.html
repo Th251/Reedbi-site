@@ -256,6 +256,34 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
 /* v538: the find box, the tabs and the index are how you get anywhere on this screen, so they
    hold still at the top while the list scrolls under them. The modal body is what scrolls, and
    --sf is its background, so the bar is opaque against it. */
+/* v542: the screen shown instead of a product form when there is no approved shop */
+.lp-msg{margin:11px 0 0;font-size:12.5px;line-height:1.55;color:var(--g)}
+.lp-msg.bad{color:#b45309}
+.lp-msg:empty{display:none;margin:0}
+.sn-draft{display:flex;gap:8px;align-items:flex-start;border:1px solid rgba(22,163,74,.4);
+  background:rgba(22,163,74,.07);border-radius:11px;padding:10px 11px;margin:12px 0 0;
+  font-size:12px;line-height:1.6;color:var(--tx)}
+.sn-draft svg{flex:none;margin-top:2px;color:#16a34a}
+.sn-p{font-size:13px;line-height:1.65;color:var(--tx);margin:0 0 13px}
+.sn-note{font-size:11.5px;line-height:1.6;color:var(--mt);margin:12px 0 0}
+.sn-go{width:100%;padding:11px;border:none;border-radius:11px;background:var(--g);color:#fff;
+  font:700 13px/1 var(--fn);cursor:pointer}
+.sn-list{display:flex;flex-direction:column;gap:7px;margin:0 0 4px}
+.sn-row{display:flex;align-items:center;gap:9px;border:.5px solid var(--b);border-radius:11px;
+  padding:10px 11px}
+.sn-row b{flex:1;min-width:0;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sn-row span{font-size:11px;color:var(--mt);white-space:nowrap}
+.sn-ask{border:1px solid var(--g);background:none;color:var(--g);border-radius:8px;
+  padding:5px 11px;font:700 11.5px/1 var(--fn);cursor:pointer;white-space:nowrap}
+/* v541: the button that turns a guess into a measurement, and the line that reports back */
+.rbn-geo{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--g);
+  background:var(--g);color:#fff;border-radius:999px;padding:8px 14px;margin:0 0 10px;
+  font:700 12.5px/1 var(--fn);cursor:pointer}
+.rbn-geo:disabled,.rbn-geo.busy{opacity:.65;cursor:default}
+.rbn-geo svg{flex:none}
+.rbn-geomsg{display:block;font-size:11.5px;margin-top:4px;color:var(--g);line-height:1.5}
+.rbn-geomsg.bad{color:#b45309}
+.rbn-geomsg:empty{display:none;margin:0}
 .rbn-stick{position:sticky;top:0;z-index:6;background:var(--sf);
   padding:1px 0 2px;margin:0 0 2px;box-shadow:0 6px 10px -10px rgba(0,0,0,.45)}
 /* the panel scrolls inside its own padding, so a sticky bar pinned at top:0 sits BELOW that
@@ -1050,6 +1078,17 @@ summary{list-style:none}summary::-webkit-details-marker{display:none}
 .col-track{background:var(--card2);border-radius:9px;padding:9px 11px;font-size:11px;margin-top:7px}
 .col-track b{color:var(--tx)}
 /* yellow AI care */
+/* v542: the two round buttons on the right sat permanently over the cards behind them - in the
+   screenshots they covered "Goals, streaks & reminders", the "Habit coaching" chip and "Bulk /
+   scan - Many at once". They are still always reachable; they just get out of the way while you
+   are reading. Scrolling down slides them off; stopping, or scrolling up, brings them back. */
+.rb-fabs-away #ragent-fab,.rb-fabs-away .care-fab{
+  transform:translateX(130%);opacity:0;pointer-events:none}
+#ragent-fab,.care-fab{transition:transform .22s cubic-bezier(.4,0,.2,1),opacity .18s}
+@media(prefers-reduced-motion:reduce){
+  #ragent-fab,.care-fab{transition:none}
+  .rb-fabs-away #ragent-fab,.rb-fabs-away .care-fab{opacity:0}
+}
 .care-fab{position:fixed;right:16px;bottom:152px;z-index:7200;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#ffd23f,#ffb800);color:#3a2a00;border:none;cursor:pointer;box-shadow:0 8px 22px rgba(255,184,0,.5);display:flex;align-items:center;justify-content:center;font-size:24px}
 #fab{display:none!important}
 body.rb-home #cv-view{display:none!important}
@@ -1677,7 +1716,7 @@ html.no-ti .ti-x{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http:/
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" title="Reedbi Ecommerce — all stores" style="cursor:pointer;display:inline-flex;align-items:center;gap:7px"><svg viewBox="0 0 48 48" width="22" height="22"><defs><linearGradient id="lgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><path fill="url(#lgb)" d="M21.2 2.7a5.6 5.6 0 0 1 5.6 0l14.6 8.4a5.6 5.6 0 0 1 2.8 4.9v16.8a5.6 5.6 0 0 1-2.8 4.9l-14.6 8.4a5.6 5.6 0 0 1-5.6 0L6.6 37.7a5.6 5.6 0 0 1-2.8-4.9V16a5.6 5.6 0 0 1 2.8-4.9z"/><path fill="#fff" d="M24 14.6a1.5 1.5 0 0 1 1 .4l8.6 7.4a1 1 0 0 1-.7 1.8h-1.6v8.4a1.5 1.5 0 0 1-1.5 1.5h-4v-6.2a1.8 1.8 0 0 0-3.6 0v6.2h-4a1.5 1.5 0 0 1-1.5-1.5v-8.4h-1.6a1 1 0 0 1-.7-1.8l8.6-7.4a1.5 1.5 0 0 1 1-.4z"/></svg><span>Reed<span style="color:#6d28d9">bi</span></span> <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v540</span></span>
+      <span class="logo" onclick="openMainStore()" title="Reedbi Ecommerce — all stores" style="cursor:pointer;display:inline-flex;align-items:center;gap:7px"><svg viewBox="0 0 48 48" width="22" height="22"><defs><linearGradient id="lgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><path fill="url(#lgb)" d="M21.2 2.7a5.6 5.6 0 0 1 5.6 0l14.6 8.4a5.6 5.6 0 0 1 2.8 4.9v16.8a5.6 5.6 0 0 1-2.8 4.9l-14.6 8.4a5.6 5.6 0 0 1-5.6 0L6.6 37.7a5.6 5.6 0 0 1-2.8-4.9V16a5.6 5.6 0 0 1 2.8-4.9z"/><path fill="#fff" d="M24 14.6a1.5 1.5 0 0 1 1 .4l8.6 7.4a1 1 0 0 1-.7 1.8h-1.6v8.4a1.5 1.5 0 0 1-1.5 1.5h-4v-6.2a1.8 1.8 0 0 0-3.6 0v6.2h-4a1.5 1.5 0 0 1-1.5-1.5v-8.4h-1.6a1 1 0 0 1-.7-1.8l8.6-7.4a1.5 1.5 0 0 1 1-.4z"/></svg><span>Reed<span style="color:#6d28d9">bi</span></span> <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v544</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -2036,22 +2075,6 @@ html.no-ti .ti-x{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http:/
   <div class="mbd" id="activity-body"></div>
 </div></div>
 <!-- CHECKOUT (online payment) -->
-<div class="overlay" id="checkout-ovl"><div class="modal" style="max-width:360px">
-  <div class="mhd"><h3><i class="ti ti-credit-card" style="font-size:13px"></i> Secure Checkout</h3><button class="ib" onclick="closeOvl('checkout-ovl')"><i class="ti ti-x"></i></button></div>
-  <div class="mbd">
-    <div id="co-summary" style="background:var(--card2);border-radius:9px;padding:11px;margin-bottom:12px;font-size:13px"></div>
-    <button class="gpay-btn" onclick="payByGooglePay()"><i class="ti ti-brand-google"></i> Pay with Google Pay</button>
-    <div class="co-or"><span>or pay by card</span></div>
-    <div class="fg"><label>Card number</label><input type="text" id="co-card" placeholder="1234 5678 9012 3456" inputmode="numeric"></div>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <div class="fg" style="flex:1"><label>Expiry</label><input type="text" id="co-exp" placeholder="MM/YY"></div>
-      <div class="fg" style="flex:1"><label>CVV</label><input type="text" id="co-cvv" placeholder="123" inputmode="numeric"></div>
-    </div>
-    <button class="btn btnok" style="width:100%;margin-top:12px" onclick="payByCard()"><i class="ti ti-lock"></i> Pay Securely</button>
-    <div style="font-size:9px;color:var(--mt2);text-align:center;margin-top:8px"><i class="ti ti-shield-lock"></i> Encrypted &amp; secure checkout</div>
-  </div>
-</div></div>
-<!-- ORDER QR -->
 <div class="overlay" id="qr-ovl"><div class="modal" style="max-width:320px">
   <div class="mhd"><h3><i class="ti ti-qrcode" style="font-size:13px"></i> Order Tracking QR</h3><button class="ib" onclick="closeOvl('qr-ovl')"><i class="ti ti-x"></i></button></div>
   <div class="mbd" id="qr-body"></div>
@@ -2236,7 +2259,7 @@ html.no-ti .ti-x{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http:/
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <!-- SheetJS (xlsx) — powers Excel bulk product import/export (openBulkExcel). Loads window.XLSX. -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script>var RB_VERSION="v540";
+<script>var RB_VERSION="v544";
 /* ===== v295: installable app (PWA) — manifest, icons, offline worker registration ===== */
 var RB_ICON192='data:image/png;base64,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';
 var RB_ICON512='data:image/png;base64,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';
@@ -4881,6 +4904,11 @@ function rbItemState(kind,id){
 function rbItemVisible(kind,item,where){
   try{
     if(!item)return false;
+    /* v542: a product from a shop the admin has not approved is its owner's business and an
+       admin's, and nobody else's. The Firestore rule enforces the same thing, so on anybody
+       else's phone it never arrives in the first place - this is the belt to that brace, and it
+       is what keeps an unapproved shop off Near you and out of the browse lists. */
+    if(kind==='product'&&!rbProductVisible(item))return false;
     var st=rbItemState(kind,item.id);
     if(!st)return true;
     if(st==='hidden')return where!=='home';         // still reachable by its own link
@@ -5137,12 +5165,78 @@ function rbAcEverything(){
 }
 /* v536: the store pages people have made. Holding one takes it and everything on it out of sight
    without deleting anybody's work, which is the thing to reach for before deleting is. */
+/* v542: the admin's own view of what is waiting. Approval is the thing that makes a shop's stock
+   visible at all now, so an admin needs to see at a glance how much is sitting behind an
+   unapproved shop - otherwise a shop goes quiet and nobody knows why. */
+function rbAcShopsWaiting(){
+  try{
+    var out=[];
+    getPages().forEach(function(pg){
+      if(!pg||pg.isStore)return;
+      if(rbPageApproved(pg.name))return;
+      var key=rbPageKey(pg.name);
+      var n=(LS.get('rb_products',[])||[]).filter(function(p){
+        return p&&rbPageKey(p.pageName||'')===key;}).length;
+      var asked=(LS.get('rb_licreqs',[])||[]).some(function(r){
+        return r&&r.pageName===pg.name&&r.status==='pending';});
+      out.push({name:pg.name,items:n,asked:asked,
+                suspended:!!(pg.suspendedUntil&&Date.now()<pg.suspendedUntil),
+                expired:!!(pg.licensed&&pg.licExpiry&&Date.now()>pg.licExpiry)});
+    });
+    return out.sort(function(x,y){return y.items-x.items;});
+  }catch(e){return [];}
+}
+function rbAcWaitingBlock(){
+  var w=rbAcShopsWaiting();
+  if(!w.length)return '';
+  var stock=w.reduce(function(s,x){return s+x.items;},0);
+  return '<div style="border:1px solid rgba(217,119,6,.45);border-left:3px solid #d97706;'
+    +'background:rgba(217,119,6,.07);border-radius:11px;padding:12px 13px;margin:0 0 13px">'
+    +'<b style="font-size:13px">'+w.length+' shop'+(w.length===1?'':'s')+' not approved'
+    +(stock?(', holding '+stock+' item'+(stock===1?'':'s')):'')+'</b>'
+    +'<div style="font-size:12px;color:var(--mt);margin:6px 0 10px;line-height:1.6">'
+    +'Nothing can be listed under an unapproved shop, and anything already listed under one is '
+    +'visible to its own seller and to you, and to nobody else. Approving a shop puts its stock '
+    +'in front of buyers straight away.</div>'
+    + w.map(function(x){
+        return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0;'
+          +'border-top:.5px solid var(--b)">'
+          +'<span style="flex:1;min-width:0"><b style="font-size:12.5px;display:block;'
+          +'white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(x.name)+'</b>'
+          +'<small style="color:var(--mt);font-size:11px">'
+          +(x.items?(x.items+' item'+(x.items===1?'':'s')+' waiting'):'nothing listed yet')
+          +(x.suspended?' \u00b7 suspended by you':x.expired?' \u00b7 approval expired'
+            :x.asked?' \u00b7 has asked':' \u00b7 has not asked')
+          +'</small></span>'
+          +'<button class="btn" style="padding:5px 11px;font-size:11.5px;border:1px solid var(--g);'
+          +'background:var(--g);color:#fff;border-radius:8px;white-space:nowrap" '
+          +'onclick="rbAcApproveShop(\''+escJS(x.name)+'\')">Approve</button></div>';
+      }).join('')
+    +'</div>';
+}
+function rbAcApproveShop(name){
+  try{
+    var pgs=getPages();
+    var pg=pgs.filter(function(x){return x&&x.name===name;})[0];
+    if(!pg){toast('That shop is no longer here.','err');return;}
+    pg.licensed=true;
+    pg.licExpiry=Date.now()+12*30*86400000;
+    pg.suspendedUntil=0;
+    savePages(pgs);
+    rbShopSyncStock(pg.name);
+    try{rbModLog('approve',{page:pg.name});}catch(e){}
+    toast('\u201c'+name+'\u201d can now list, and its stock is visible to buyers','ok');
+    rbAcRender();
+  }catch(e){toast('That could not be changed just now.','err');}
+}
 function rbAcPages(){
   var list=[];try{list=getPages();}catch(e){}
   if(!list.length)return '<div style="font-size:12.5px;color:var(--mt)">Nobody has made a store page yet.</div>';
   return '<div style="font-size:12px;color:var(--mt);margin-bottom:11px;line-height:1.6">'
-    +'<b>Hold</b> takes a page and everything on it out of sight without deleting it. '
+    +'<b>Approve</b> is what lets a shop list anything at all, and what makes its stock visible '
+    +'to buyers. <b>Hold</b> takes a page and everything on it out of sight without deleting it. '
     +'<b>Hide</b> keeps it reachable by its own link but off the home screen.</div>'
+    + rbAcWaitingBlock()
     +list.map(function(pg){
       var id=String(pg.name||pg.id||'');
       var st=rbItemState('page',id);
@@ -5215,7 +5309,70 @@ function rbAcMoney(){
         +'style="width:78px;padding:7px 9px;border:1px solid var(--b);border-radius:9px;'
         +'background:var(--card2);color:var(--tx);font-family:var(--fn);font-size:13px">'
         +'<span style="color:var(--mt)">%</span></div>';
-    }).join('');
+    }).join('')
+    + rbAcCurBlock();
+}
+/* v541: a price in the wrong country's money. The posting form used to arrive with INR already
+   chosen, so listings pinned in Dubai were written up in rupees. New ones follow the country now;
+   the ones already posted are listed here, because changing somebody's price is theirs to approve
+   and not something to do quietly behind them. */
+function rbAcCurBlock(){
+  var odd=rbCurFixList();
+  var home=rbHomeCur();
+  if(!odd.length)
+    return '<div style="margin-top:16px;font-size:12px;color:var(--mt);line-height:1.6">'
+      +'Every listing\u2019s price is in the money of the country its pin sits in.</div>';
+  return '<div style="margin-top:18px;border:1px solid rgba(217,119,6,.45);border-left:3px solid #d97706;'
+    +'background:rgba(217,119,6,.07);border-radius:11px;padding:12px 13px">'
+    +'<b style="font-size:13px">'+odd.length+' listing'+(odd.length===1?'':'s')
+    +' priced in another country\u2019s money</b>'
+    +'<div style="font-size:12px;color:var(--mt);margin:6px 0 10px;line-height:1.6">'
+    +'The form used to open with INR already chosen, so these were written up in rupees even though '
+    +'the pin is somewhere else. A new listing now follows the country it is pinned in. '
+    +'<b>Changing this relabels the price, it does not convert it</b> \u2014 4,000 stays 4,000.</div>'
+    + odd.map(function(p){
+        var want=rbCurExpected(p);
+        return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0;'
+          +'border-top:.5px solid var(--b)">'
+          +'<span style="flex:1;min-width:0"><b style="font-size:12.5px;display:block;'
+          +'white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(p.title||'Listing')+'</b>'
+          +'<small style="color:var(--mt);font-size:11px">'+esc(p.place||'')
+          +' \u00b7 now '+esc(String(p.currency))+'</small></span>'
+          +'<button class="btn" style="padding:5px 11px;font-size:11.5px;border:1px solid var(--g);'
+          +'color:var(--g);border-radius:8px;white-space:nowrap" '
+          +'onclick="rbAcFixCur(\''+escJS(String(p.id))+'\',\''+escJS(want)+'\')">'
+          +'Make it '+esc(want)+'</button></div>';
+      }).join('')
+    + (odd.length>1
+       ? ('<button class="btn" style="margin-top:10px;width:100%;padding:8px;font-size:12px;'
+          +'border:1px solid var(--g);background:var(--g);color:#fff;border-radius:9px" '
+          +'onclick="rbAcFixCurAll()">Relabel all '+odd.length+' to match their pin</button>')
+       : '')
+    +'</div>';
+}
+function rbAcFixCur(id,to){
+  rbCurFixOne(id,to,function(ok,msg){
+    toast(ok?('Now priced in '+to+(msg?(' \u2014 '+msg):'')):msg, ok?'ok':'err');
+    rbAcRender();
+  });
+}
+function rbAcFixCurAll(){
+  var odd=rbCurFixList();
+  if(!odd.length)return;
+  if(!confirm('Relabel '+odd.length+' listing'+(odd.length===1?'':'s')+' to the money of the country '
+    +'each one is pinned in?\n\nThe price NUMBER does not change \u2014 4,000 rupees becomes '
+    +'4,000 dirhams, not the converted amount.'))return;
+  var left=odd.length,failed=0;
+  odd.forEach(function(p){
+    rbCurFixOne(p.id,rbCurExpected(p),function(ok){
+      if(!ok)failed++;
+      if(--left===0){
+        toast(failed?((odd.length-failed)+' changed, '+failed+' refused by the server')
+                    :(odd.length+' listings relabelled'), failed?'err':'ok');
+        rbAcRender();
+      }
+    });
+  });
 }
 function rbAcSaveNotice(){
   var v=(document.getElementById('ac-notice')||{}).value||'';
@@ -5316,14 +5473,28 @@ function fbListenMarketData(){
   if(!FB.ready||FB_CLOUD_DISABLED||!FB.db)return;
   try{
     if(!FB_LISTENERS['products']){
-      FB_LISTENERS['products']=FB.db.collection('products').onSnapshot(function(snap){
+      /* v542: the rule now says an unapproved shop's stock is readable only by its seller, its
+         page owner, or an admin. A query over the whole collection cannot satisfy that, so it
+         asks in two parts: everything from approved shops, and separately this person's own -
+         which is how they still see their stock while it waits for approval. An admin, whose
+         token says so, may ask for the collection. */
+      var __me=(CU&&CU.uid)||'';
+      var __take=function(snap){
         var local=getProducts();var map={};local.forEach(function(p){map[p.id]=p;});
         snap.forEach(function(doc){var d=doc.data();d.id=d.id||doc.id;map[d.id]=Object.assign(map[d.id]||{},d);});
-        var merged=Object.keys(map).map(function(k){return map[k];});
-        LS.set('rb_products',merged);
+        LS.set('rb_products',Object.keys(map).map(function(k){return map[k];}));
         try{if(document.getElementById('seller-ovl').classList.contains('open'))showMyProducts(sellerTab);}catch(eR){}
-        if(document.getElementById('seller-ovl').classList.contains('open'))showMyProducts(sellerTab);
-      },function(err){if(fbIsPermErr(err))fbStopListener('products','perm');});
+      };
+      var __err=function(err){if(fbIsPermErr(err))fbStopListener('products','perm');};
+      if(rbHasAdminClaim()){
+        FB_LISTENERS['products']=FB.db.collection('products').onSnapshot(__take,__err);
+      }else{
+        FB_LISTENERS['products']=FB.db.collection('products')
+          .where('shopOk','==',true).onSnapshot(__take,__err);
+        if(__me)FB_LISTENERS['products_mine']=FB.db.collection('products')
+          .where('sellerUid','==',__me).onSnapshot(__take,function(err){
+            if(fbIsPermErr(err))fbStopListener('products_mine','perm');});
+      }
     }
     if(!FB_LISTENERS['orders']){
       FB_LISTENERS['orders']=FB.db.collection('orders').onSnapshot(function(snap){
@@ -5796,7 +5967,23 @@ function orderStatusIndex(id){for(var i=0;i<ORDER_STATUS.length;i++){if(ORDER_ST
 var CURRENCIES=['USD $','EUR €','GBP £','AED د.إ','INR ₹','SAR ﷼','PKR ₨','PHP ₱','SGD S$','CAD C$','AUD A$','JPY ¥','CNY ¥','BRL R$','NGN ₦','ZAR R','MYR RM','IDR Rp','THB ฿','TRY ₺','RUB ₽','KRW ₩','HKD HK$','CHF Fr','SEK kr','MXN $','EGP £','BDT ৳','LKR Rs','KWD د.ك','QAR ﷼','OMR ﷼','BHD .د.ب'];
 /* ===== Products store ===== */
 function getProducts(){return LS.get('rb_products',[])||[];}
-function saveProducts(p){LS.set('rb_products',p);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{p.forEach(function(x){if(x&&x.id)FB.db.collection('products').doc(x.id).set(x,{merge:true}).catch(function(err){try{if(!window.__bigWarned&&/exceeds|too large|INVALID_ARGUMENT|longer than/i.test(String(err&&err.message||err))){window.__bigWarned=true;toast('⚠ “'+(x.title||'A product')+'” could not sync to cloud — its photo is too large. Edit/Add stock → re-save to compress it.','err');}}catch(e2){}});});}catch(e){}}}
+/* v542: every product write passes through here, so this is where the two fields the Firestore
+   rule reads are kept true: pageKey (the lowercase key the page is stored under - the rule compares
+   them, and the display name never matched) and shopOk (is that page approved RIGHT NOW). The rule
+   recomputes shopOk from the page document and refuses the write if it disagrees, so writing it
+   here is a convenience for reading, never a claim the server takes on trust. Only this person's
+   own products are stamped; somebody else's are passed through untouched. */
+function rbStampShop(list){
+  var me=(CU&&CU.uid)||'';
+  if(!me||!Array.isArray(list))return list;
+  list.forEach(function(x){
+    if(!x||x.sellerUid!==me)return;
+    x.pageKey=rbPageKey(x.pageName||'');
+    x.shopOk=rbShopOk(x);
+  });
+  return list;
+}
+function saveProducts(p){p=rbStampShop(p);LS.set('rb_products',p);if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{p.forEach(function(x){if(x&&x.id)FB.db.collection('products').doc(x.id).set(x,{merge:true}).catch(function(err){try{if(!window.__bigWarned&&/exceeds|too large|INVALID_ARGUMENT|longer than/i.test(String(err&&err.message||err))){window.__bigWarned=true;toast('⚠ “'+(x.title||'A product')+'” could not sync to cloud — its photo is too large. Edit/Add stock → re-save to compress it.','err');}}catch(e2){}});});}catch(e){}}}
 function getMyProducts(){
   var uid=CU?CU.uid:'';
   return getProducts().filter(function(x){
@@ -5825,6 +6012,49 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
    HTTP header, and GitHub Pages does not let you set headers. So the page checks for itself.
    An attacker who frames Reedbi invisibly over their own page can have somebody click "remove
    this listing" or "approve" while they believe they are clicking something else. */
+/* v542: keep the floating buttons out of the way of what is being read. They are fixed to the
+   right edge and the content scrolls underneath them, so on a phone they permanently cover a
+   strip of every card they sit over - in the screenshots, "Goals, streaks & reminders", the
+   "Habit coaching" chip and "Bulk / scan - Many at once". Hiding them while the finger moves
+   down and bringing them back the moment it stops, or moves up, takes neither button away.
+
+   The home screen does NOT scroll the document - it scrolls inside its own box - so this has to
+   watch inner scrollers as well, and remember each one's position separately to know which way
+   it went. Watching only the window finds nothing at all on the screen that matters. */
+(function(){
+  var away=false,timer=0;
+  var tops=new WeakMap();
+  var winTop=0;
+  function show(){ if(!away)return; away=false;
+    try{document.documentElement.classList.remove('rb-fabs-away');}catch(e){} }
+  function hide(){ if(away)return; away=true;
+    try{document.documentElement.classList.add('rb-fabs-away');}catch(e){} }
+  function settle(ms){ clearTimeout(timer); timer=setTimeout(show,ms||650); }
+  function moved(down,y){
+    if(down&&y>120)hide(); else if(!down)show();
+    settle();
+  }
+  try{
+    window.addEventListener('scroll',function(){
+      var y=window.pageYOffset||document.documentElement.scrollTop||0;
+      if(Math.abs(y-winTop)<6){settle();return;}
+      moved(y>winTop,y); winTop=y;
+    },{passive:true});
+    /* capture, because a scroll event does not bubble - this is how an inner scroller is seen */
+    document.addEventListener('scroll',function(e){
+      var t=e.target;
+      if(!t||t===document||t.nodeType!==1)return;
+      if(t.scrollHeight<=t.clientHeight+40)return;
+      var prev=tops.has(t)?tops.get(t):0;
+      var y=t.scrollTop;
+      if(Math.abs(y-prev)<6){settle();return;}
+      moved(y>prev,y); tops.set(t,y);
+    },true);
+    /* a finger lifted means reading is about to start */
+    window.addEventListener('touchend',function(){settle(450);},{passive:true});
+  }catch(e){}
+})();
+
 var RB_FRAME_GUARD=false;
 (function(){
   try{
@@ -5941,6 +6171,129 @@ function pageLicenseValid(pageName){
   if(pg.suspendedUntil&&Date.now()<pg.suspendedUntil)return false; // admin 1-week revoke
   if(pg.licExpiry&&Date.now()>pg.licExpiry)return false;
   return true;
+}
+/* ============================================================
+   WHO MAY LIST A PRODUCT  (v542)
+   Listing something for sale used to need nothing but an account: the form offered "My own name"
+   and saved a product with no page attached at all. Those never reached the public marketplace,
+   because productInMarketplace() asks for an approved page - so people were filling in a long form
+   for a listing nobody would ever see, and the shop had no gate on it.
+   A product may now only be listed under a page the Reedbi admin has approved. The checks below
+   are what the screens read; they are NOT the boundary. The boundary is in firestore.rules, which
+   asks the database for the page document and refuses a product whose page is not approved.
+============================================================ */
+function rbApprovedPagesForMe(){
+  if(!CU||CU.guest)return [];
+  return getPages().filter(function(pg){
+    if(!pg||pg.isStore)return false;
+    var r=pageRole(pg.name);
+    if(r!=='owner'&&r!=='admin'&&r!=='editor')return false;
+    return pageLicenseValid(pg.name);
+  });
+}
+/* every page this person could sell under once it is approved, approved or not */
+function rbMyShopPages(){
+  if(!CU||CU.guest)return [];
+  return getPages().filter(function(pg){
+    if(!pg||pg.isStore)return false;
+    var r=pageRole(pg.name);
+    return r==='owner'||r==='admin'||r==='editor';
+  });
+}
+/* {ok, why, pages} - why is written to be shown to the person, not logged */
+function rbCanSellProducts(){
+  if(!CU||CU.guest)
+    return {ok:false,why:'signin',pages:[],
+      msg:'Sign in first. Listing something for sale is tied to a shop, and a shop belongs to an account.'};
+  var approved=rbApprovedPagesForMe();
+  if(approved.length)return {ok:true,why:'',pages:approved,msg:''};
+  var mine=rbMyShopPages();
+  if(!mine.length)
+    return {ok:false,why:'nopage',pages:[],
+      msg:'Products are sold by a shop, not by a person. Create your shop page first, then ask the Reedbi admin to approve it \u2014 once it is approved you can list as much as you like.'};
+  var held=mine.filter(function(p){return p.suspendedUntil&&Date.now()<p.suspendedUntil;});
+  if(held.length)
+    return {ok:false,why:'suspended',pages:mine,
+      msg:'\u201c'+held[0].name+'\u201d is on hold, so it cannot list anything at the moment. The Reedbi admin can lift it.'};
+  var expired=mine.filter(function(p){return p.licensed&&p.licExpiry&&Date.now()>p.licExpiry;});
+  if(expired.length)
+    return {ok:false,why:'expired',pages:mine,
+      msg:'Approval for \u201c'+expired[0].name+'\u201d has run out. Ask the Reedbi admin to renew it.'};
+  var pending=rbPageApprovalPending(mine);
+  return {ok:false,why:pending?'pending':'unapproved',pages:mine,
+    msg:pending
+      ? ('\u201c'+pending+'\u201d is waiting for the Reedbi admin to approve it. Nothing more to do \u2014 you will be able to list as soon as it is approved.')
+      : ('\u201c'+mine[0].name+'\u201d has not been approved to sell yet. Ask the Reedbi admin to approve it, and then you can list products under it.')};
+}
+function rbPageApprovalPending(mine){
+  try{
+    var reqs=getLicenseRequests();
+    for(var i=0;i<mine.length;i++){
+      var hit=reqs.filter(function(r){return r.pageName===mine[i].name&&r.status==='pending';})[0];
+      if(hit)return mine[i].name;
+    }
+  }catch(e){}
+  return '';
+}
+/* ============================================================
+   WHO MAY SELL  (v542)
+   Anybody signed in could post a product. It then sat out of the marketplace, because that asks
+   for an approved page - but it was created, stored, and shown to everyone on Near you. So the
+   approval gate decided where a product APPEARED, not whether it could exist. It is now the thing
+   that decides whether it can be posted at all, and who may see it.
+
+   Approval belongs to the Reedbi admin and nobody else. A shop owner can ask; only an admin grants.
+   ============================================================ */
+/* the key a page is stored under. Pages are saved at name.toLowerCase(); a product carries the
+   display name. The Firestore rule compares them, so the lowercase form is written down too. */
+function rbPageKey(name){return String(name==null?'':name).trim().toLowerCase();}
+/* is this page approved to sell, right now? Expiry and an admin suspension both count. */
+function rbPageApproved(name){
+  try{return !!(name&&pageLicenseValid(String(name)));}catch(e){return false;}
+}
+/* the pages this person may sell under: owned or administered, AND approved */
+function rbMyApprovedPages(){
+  try{
+    return getPages().filter(function(pg){
+      if(!pg||pg.isStore)return false;
+      var r=pageRole(pg.name);
+      if(r!=='owner'&&r!=='admin'&&r!=='editor')return false;
+      return rbPageApproved(pg.name);
+    });
+  }catch(e){return [];}
+}
+/* pages they hold that are NOT approved yet - so the app can say what is actually missing */
+function rbMyPendingPages(){
+  try{
+    return getPages().filter(function(pg){
+      if(!pg||pg.isStore)return false;
+      var r=pageRole(pg.name);
+      if(r!=='owner'&&r!=='admin'&&r!=='editor')return false;
+      return !rbPageApproved(pg.name);
+    });
+  }catch(e){return [];}
+}
+/* may this person post a product at all, and if not, exactly why not */
+function rbCanSellProducts(){
+  if(!CU||CU.guest)return {ok:false,why:'signin',pages:[],pending:[]};
+  var okPages=rbMyApprovedPages();
+  if(okPages.length)return {ok:true,why:'',pages:okPages,pending:rbMyPendingPages()};
+  var pending=rbMyPendingPages();
+  return {ok:false,why:pending.length?'waiting':'nopage',pages:[],pending:pending};
+}
+/* The flag the database checks. It is written by the app but VERIFIED by the rule against the page
+   document, so setting it by hand gains nothing - the write is refused unless it tells the truth. */
+function rbShopOk(p){
+  return !!(p&&p.pageName&&rbPageApproved(p.pageName));
+}
+/* may THIS person see this product? An unapproved shop's stock is its owner's business and an
+   admin's, and nobody else's - which is what the rules enforce as well. */
+function rbProductVisible(p){
+  if(!p)return false;
+  if(rbShopOk(p))return true;
+  if(rbAmAdmin&&rbAmAdmin())return true;
+  var me=(CU&&CU.uid)||'';
+  return !!(me&&(p.sellerUid===me||p.by===me||p.ownerUid===me));
 }
 function productInMarketplace(p){
   // ReadBi e-commerce approval is PER PAGE only: a product appears in the
@@ -6098,12 +6451,47 @@ function approveLicenseRequest(reqId,months){
     // approve the PAGE as the ReadBi seller
     var pgs=getPages();var pg=pgs.find(function(x){return x.name===r.pageName;});
     if(pg){pg.licensed=true;pg.licExpiry=Date.now()+(months||12)*30*86400000;savePages(pgs);
-      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(pg.name.toLowerCase()).set(rbPageWire(pg),{merge:true}).catch(function(){});}catch(e){}}}
+      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(pg.name.toLowerCase()).set(rbPageWire(pg),{merge:true}).catch(function(){});}catch(e){}}
+      rbShopSyncStock(pg.name);}
     return;
   }
   // grant license with expiry
   setUserLicensed(r.uid,true,r.name);
   var lic=LS.get('rb_licenses',{})||{};if(lic[r.uid]){lic[r.uid].expiry=Date.now()+(months||12)*30*86400000;LS.set('rb_licenses',lic);}
+}
+/* v542: approving a shop has to reach the stock already sitting under it. Each product carries
+   shopOk, and the rule refuses a product whose flag disagrees with the page - so when the admin
+   approves or suspends a shop, that shop's products are rewritten with the new answer. Without
+   this, approval would change nothing for anything already listed. */
+function rbShopSyncStock(pageName){
+  try{
+    var key=rbPageKey(pageName);
+    var now=rbPageApproved(pageName);
+    var all=LS.get('rb_products',[])||[];
+    var touched=0;
+    all.forEach(function(p){
+      if(!p||rbPageKey(p.pageName||'')!==key)return;
+      if(p.shopOk===now&&p.pageKey===key)return;
+      p.shopOk=now;p.pageKey=key;touched++;
+      if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&!fbIsOff('products')){
+        try{FB.db.collection('products').doc(String(p.id))
+          .set({shopOk:now,pageKey:key},{merge:true}).catch(function(){});}catch(e){}
+      }
+    });
+    if(touched){
+      LS.set('rb_products',all);
+      try{rbModLog('shop',{page:pageName,approved:now,stock:touched});}catch(e){}
+      try{toast(touched+' item'+(touched===1?'':'s')+' in '+pageName+(now?' are now visible to buyers':' are no longer shown to buyers'),'ok');}catch(e){}
+    }
+    /* v544: anything written while the shop was waiting goes up now, rather than sitting in a
+       drafts list the person has to remember to come back to. */
+    if(now){
+      try{
+        var mine=rbDrafts();
+        if(mine.length&&rbCanSellProducts().ok)rbDraftPostAll();
+      }catch(e){}
+    }
+  }catch(e){}
 }
 function rejectLicenseRequest(reqId){
   var reqs=getLicenseRequests();var r=reqs.find(function(x){return x.id===reqId;});if(!r)return;
@@ -6426,6 +6814,31 @@ function sharePost(id){navigator.clipboard.writeText(location.href.split('?')[0]
 
 
 function updateSuggests(title,body){var found=extractAT(title,body).filter(function(t){return addedSuggestTags.indexOf(t)<0;});var row=document.getElementById('sgrow');if(!found.length&&!addedSuggestTags.length){row.innerHTML='';row.className='sgrow';return;}row.className='sgrow has';var h='<span style="font-size:9px;color:var(--mt2);flex-shrink:0">Auto:</span>';addedSuggestTags.forEach(function(t){h+='<button class="stag added" onclick="remSuggest(\''+escJS(t)+'\')">#'+esc(t)+' x</button>';});found.forEach(function(t){h+='<button class="stag" onclick="addSuggest(\''+escJS(t)+'\')">#'+esc(t)+' +</button>';});row.innerHTML=h;}
+/* v544: the composer's two inputs called onBI (body) and onTI (title). Neither existed, so the
+   box grew no taller as you typed and the suggested tags never updated from what you wrote -
+   while updateSuggests and renderComposerState, which do both jobs, were sitting right here. */
+function rbComposeVals(){
+  var t=document.getElementById('ctitle'),b=document.getElementById('cbody');
+  return [t?t.value:'', b?b.value:''];
+}
+function onBI(el){
+  /* grow with the text, the way a message box should, and stop at a sensible height */
+  try{ if(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,160)+'px'; } }catch(e){}
+  /* updateSuggests reads the title AND the body - passing one would suggest from half of it */
+  try{var v=rbComposeVals();updateSuggests(v[0],v[1]);}catch(e){}
+  try{renderComposerState();}catch(e){}
+}
+function onTI(){
+  try{var v=rbComposeVals();updateSuggests(v[0],v[1]);}catch(e){}
+  try{renderComposerState();}catch(e){}
+}
+/* v544: pay-ovl is never opened by anything - it is left over from a payment screen that no
+   longer exists - but its button still called a function that was not there. Reedbi does not
+   take payment at all, so if it is ever reached it says so rather than doing nothing. */
+function confirmPay(){
+  closeOvl('pay-ovl');
+  toast('Reedbi does not take payment. Nothing has been charged.','info');
+}
 function addSuggest(tag){if(addedSuggestTags.indexOf(tag)<0)addedSuggestTags.push(tag);updateSuggests(document.getElementById('ctitle').value,document.getElementById('cbody').value);}
 function remSuggest(tag){addedSuggestTags=addedSuggestTags.filter(function(t){return t!==tag;});updateSuggests(document.getElementById('ctitle').value,document.getElementById('cbody').value);}
 function sendPost(){
@@ -6469,6 +6882,85 @@ function openApply(tagId,postId,company){
   curApplyPid={tagId:tagId,postId:postId,company:company||''};selCVId=null;
   document.getElementById('ano').value='';document.getElementById('al').value='';document.getElementById('cv-fname').textContent='';
   renderCVList();document.getElementById('ap-ovl').classList.add('open');
+}
+/* v544: the Submit button on the job application called submitApply(), which did not exist. The
+   form filled in, the CV attached, Submit pressed - and nothing happened at all. The record shape
+   is the one the three other application paths already write, including employerUid, which is what
+   the Firestore rule reads to decide who may see it. */
+function submitApply(){
+  if(!requireAuth('apply'))return;
+  if(!curApplyPid||!curApplyPid.postId){toast('Open the job again and press Apply','err');return;}
+  var g=function(id){var e=document.getElementById(id);return e?String(e.value||'').trim():'';};
+  var name=g('an')||((CU&&CU.name)||'');
+  var email=g('ae')||((CU&&CU.email)||'');
+  var phone=g('aph');
+  var loc=g('al');
+  var note=g('ano');
+  var skills=g('askills');
+  if(!name){toast('Put your name on it so the employer knows who applied','err');return;}
+  if(!email&&!phone){toast('Leave an email or a phone number, or they cannot reply','err');return;}
+  var apps=getAllApps();
+  var dup=apps.filter(function(x){
+    return x&&x.uid===CU.uid&&String(x.postId)===String(curApplyPid.postId);})[0];
+  if(dup){toast('You have already applied for this one','info');closeOvl('ap-ovl');return;}
+  /* who posted it - the rule lets exactly that person read the application */
+  var post=null,tag=null;
+  try{
+    (jarvisAllJobPosts()||[]).forEach(function(x){
+      if(x&&x.post&&String(x.post.id)===String(curApplyPid.postId)){post=x.post;tag=x.tag;}
+    });
+  }catch(e){}
+  var cv=null;
+  try{var cvs=getCVs(CU.uid)||[];
+      cv=selCVId?cvs.filter(function(c){return c.id===selCVId;})[0]:cvs[cvs.length-1];}catch(e){}
+  var co=curApplyPid.company||(post&&(post.company||post.co||post.author||post.by))||'';
+  var rec={
+    id:'app'+Date.now()+'_'+Math.floor(Math.random()*9999),
+    name:name,email:email,phone:phone,loc:loc,note:note,skills:skills,
+    cvText:(cv&&cv.text)||'',cvId:(cv&&cv.id)||null,cvName:(cv&&cv.name)||'',cvOwnerUid:CU.uid,
+    company:co,companyLower:String(co||'').toLowerCase(),
+    employerUid:(post&&post.uid)||'',
+    tagId:curApplyPid.tagId||(tag&&tag.id)||'jobs',
+    postId:curApplyPid.postId,
+    postTitle:(post&&post.title)||'',postBody:(post&&post.body)||'',
+    ts:Date.now(),uid:CU.uid,status:'received',statusTs:Date.now()
+  };
+  try{var kw=aiKeywordsFrom((rec.postBody||'')+' '+(rec.postTitle||''));
+      var sc=(kw&&kw.length)?atsScore(rec,kw.join(',')):null;
+      rec.atsPct=sc?sc.pct:0;rec.atsMatched=sc?sc.matched:[];}catch(e){rec.atsPct=0;rec.atsMatched=[];}
+  apps.push(rec);
+  saveAllApps(apps);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
+    try{FB.db.collection('applications').doc(rec.id).set(rec,{merge:true}).catch(function(){});}catch(e){}
+  }
+  closeOvl('ap-ovl');
+  toast('Applied'+(co?(' to '+co):'')+(cv?' with your CV':'')+'. You can follow it in My applications.','ok');
+  try{if(typeof showMyApps==='function')showMyApps();}catch(e){}
+}
+
+/* v544: "Confirm Order" on the single-product buy screen called placeOrder(), which did not
+   exist either. Rather than write a second ordering path beside the cart one that already works,
+   this puts the item in the basket with what was filled in and hands over to that checkout -
+   one order path, already tested, instead of two that can disagree. */
+function placeOrder(){
+  if(!requireAuth('order'))return;
+  /* buyProduct() puts the item in curBuyProduct - that is what this screen is showing */
+  var p=(typeof curBuyProduct!=='undefined'&&curBuyProduct)||null;
+  if(p&&p.id)p=getProducts().filter(function(x){return x&&x.id===p.id;})[0]||p;
+  if(!p||!p.id){toast('Open the item again and press Buy','err');return;}
+  var g=function(id){var e=document.getElementById(id);return e?String(e.value||'').trim():'';};
+  var qty=Math.max(1,Math.round(parseFloat(g('buy-qty'))||1));
+  var addr=g('buy-addr'), phone=g('buy-phone');
+  if(!addr){toast('Where should it go? Add a delivery address.','err');return;}
+  if(phone.replace(/[^0-9]/g,'').length<7){toast('Leave a number they can reach you on','err');return;}
+  try{
+    addToCart(p.id,qty);
+    /* carry what was typed here into the checkout so it is not asked for twice */
+    LS.set('rb_buy_prefill',{addr:addr,phone:phone,map:g('buy-map'),sched:g('buy-sched'),at:Date.now()});
+    closeOvl('buy-ovl');
+    if(typeof checkoutCart==='function'){checkoutCart();}
+    else{toast('Added to your basket \u2014 open the basket to finish','ok');}
+  }catch(e){toast('That could not be added just now.','err');}
 }
 function renderCVList(){
   var uid=CU?CU.uid:'guest';var cvs=getCVs(uid);var info=cvStorInfo(uid);
@@ -6836,6 +7328,34 @@ function viewReqDoc(appId,drId){
    BOOST + PAYMENT
 ============================================================ */
 function openBoost(tagId,postId){if(!requireAuth('boost'))return;curBoostTagId=tagId;curBoostPostId=postId;selBoostPlan=null;renderBoostPlans();document.getElementById('boost-ovl').classList.add('open');}
+/* v544: "Pay and Boost" called proceedToPay(), which did not exist. Reedbi does not take money -
+   it says so on the commission screen - so a button that claimed to charge a card and silently
+   did nothing was the worst of both. A boost is now what every other privilege here is: something
+   the admin grants. The request is recorded with the plan asked for, and the person is told
+   plainly that no payment was taken and who decides. */
+function proceedToPay(){
+  if(!requireAuth('boost a post'))return;
+  if(!selBoostPlan){toast('Choose how long you want it boosted','info');return;}
+  var plan=BOOST_PLANS.filter(function(p){return p.id===selBoostPlan;})[0];
+  if(!plan){toast('Choose how long you want it boosted','info');return;}
+  var reqs=[];try{reqs=LS.get('rb_boostreqs',[])||[];}catch(e){}
+  var already=reqs.filter(function(r){
+    return r&&r.uid===CU.uid&&String(r.postId)===String(curBoostPostId)&&r.status==='pending';})[0];
+  if(already){toast('You already have a boost request waiting on this post','info');
+    closeOvl('boost-ovl');return;}
+  reqs.push({id:'bst'+Date.now(),uid:CU.uid,name:(CU&&CU.name)||'',
+    tagId:curBoostTagId,postId:curBoostPostId,
+    plan:plan.id,planName:plan.name,days:plan.days,listed:plan.price,
+    status:'pending',ts:Date.now()});
+  try{LS.set('rb_boostreqs',reqs);}catch(e){}
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
+    try{FB.db.collection('config').doc('boostreqs').set({list:reqs},{merge:true})
+      .catch(function(){});}catch(e){}
+  }
+  closeOvl('boost-ovl');
+  toast('Asked for '+plan.name+'. Nothing has been charged \u2014 Reedbi does not take payment. '
+    +'The Reedbi admin decides and will set it live.','ok');
+}
 function renderBoostPlans(){
   var t=tags.find(function(x){return x.id===curBoostTagId;}),p=t&&t.posts.find(function(x){return x.id==curBoostPostId;});
   document.getElementById('boost-plans').innerHTML='<div style="background:var(--card);border-radius:8px;padding:8px 10px;margin-bottom:11px;font-size:11px;color:var(--mt2)">Boosting: <strong style="color:var(--tx)">'+esc((p?(p.title||p.body||''):'').substring(0,42))+'</strong></div>'
@@ -7048,7 +7568,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v540 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v544 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -7593,21 +8113,236 @@ function fbDiag(){
    MARKETPLACE — product listing, photos, orders, shipping status
    ============================================================ */
 var listPhotos=[]; // base64 photos for the product being listed
+/* v542: what to say when somebody tries to list a product without an approved shop. Three
+   different situations, three different things to do - "not allowed" on its own is useless. */
+/* ============================================================
+   PUBLISH LISTING  (v544)
+   The button at the bottom of the product form called submitProduct(). No such function existed
+   anywhere in the app - so somebody could fill in the whole form, press Publish Listing, and have
+   absolutely nothing happen: no listing, no error, no explanation. Six places open that form.
+   This is that function. It also handles the case the approval gate creates: if the shop is not
+   approved yet, the work is KEPT as a draft rather than thrown away, and goes up by itself the
+   moment the shop is let through.
+   ============================================================ */
+function lpVal(id){var e=document.getElementById(id);return e?String(e.value==null?'':e.value).trim():'';}
+function lpNum(id){var n=parseFloat(lpVal(id).replace(/[^0-9.\-]/g,''));return isFinite(n)?n:0;}
+function lpChecked(id){var e=document.getElementById(id);return !!(e&&e.checked);}
+
+/* read the form into a product, with no decisions hidden inside it */
+function lpCollect(){
+  var cur=lpVal('lp-cur');
+  if(cur&&cur.indexOf(' ')>0)cur=cur.split(' ')[0];      /* the list is "AED د.إ" */
+  return {
+    title:lpVal('lp-title'),
+    desc:lpVal('lp-desc'),
+    category:lpVal('lp-category')||'Other',
+    brand:lpVal('lp-brand'),
+    price:lpVal('lp-price'),
+    cost:lpVal('lp-cost'),
+    offer:lpVal('lp-offer'),
+    currency:cur||rbHomeCur(),
+    qty:Math.max(1,Math.round(lpNum('lp-qty'))||1),
+    location:lpVal('lp-location'),
+    addr:lpVal('lp-addr'),
+    phone:lpVal('lp-phone'),
+    map:lpVal('lp-map'),
+    barcode:lpVal('lp-barcode'),
+    upi:lpVal('lp-upi'),
+    expiry:lpVal('lp-expiry'),
+    payOpts:lpVal('lp-pay')||'both',
+    byWeight:lpChecked('lp-byweight'),
+    weightUnit:lpVal('lp-weightunit')||'kg',
+    sizes:lpVal('lp-sizes').split(',').map(function(s){return s.trim();}).filter(Boolean),
+    colors:lpVal('lp-colors').split(',').map(function(s){return s.trim();}).filter(Boolean),
+    pageName:lpVal('lp-as'),
+    photos:(typeof listPhotos!=='undefined'&&Array.isArray(listPhotos))?listPhotos.slice(0,10):[]
+  };
+}
+/* what is wrong with it, in the order a person would fix it */
+function lpProblems(d){
+  var out=[];
+  if(!d.title)out.push(['lp-title','Give it a name buyers would search for.']);
+  else if(d.title.length>300)out.push(['lp-title','That name is too long \u2014 keep it under 300 characters.']);
+  var n=parseFloat(String(d.price).replace(/[^0-9.]/g,''));
+  if(!d.price)out.push(['lp-price','Put a price on it.']);
+  else if(!isFinite(n)||n<=0)out.push(['lp-price','That price is not a number.']);
+  if(d.desc.length>8000)out.push(['lp-desc','That description is too long.']);
+  if(d.phone&&d.phone.replace(/[^0-9]/g,'').length<7)
+    out.push(['lp-phone','That phone number looks too short to call.']);
+  return out;
+}
+function lpSay(msg,bad){
+  var el=document.getElementById('lp-msg');
+  if(!el){
+    var host=document.getElementById('list-prod-ovl');
+    if(host&&host.querySelector('.mbd')){
+      el=document.createElement('div');el.id='lp-msg';el.className='lp-msg';
+      host.querySelector('.mbd').appendChild(el);
+    }
+  }
+  if(el){el.textContent=msg||'';el.className='lp-msg'+(bad?' bad':'');}
+}
+function submitProduct(){
+  if(!requireAuth('list a product'))return;
+  var may=rbCanSellProducts();
+  var d=lpCollect();
+  var probs=lpProblems(d);
+  if(probs.length){
+    lpSay(probs[0][1],true);
+    var f=document.getElementById(probs[0][0]);
+    if(f){try{f.focus();f.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}}
+    return;
+  }
+  /* no approved shop: keep the work rather than lose it */
+  if(!may.ok){
+    var kept=rbDraftSave(d);
+    closeOvl('list-prod-ovl');
+    rbShopNeeded(may);
+    toast(kept
+      ? 'Saved as a draft \u2014 it goes up by itself once your shop is approved'
+      : 'Your shop needs approval before anything can be listed','info');
+    return;
+  }
+  var pageName=d.pageName||may.pages[0].name;
+  if(!rbPageApproved(pageName))pageName=may.pages[0].name;
+  var made=rbProductFromForm(d,pageName);
+  var all=getProducts();
+  all.unshift(made);
+  saveProducts(all);                       /* stamps pageKey + shopOk on the way out */
+  closeOvl('list-prod-ovl');
+  try{if(typeof showMyProducts==='function')showMyProducts('live');}catch(e){}
+  toast('\u201c'+made.title+'\u201d is listed under '+pageName,'ok');
+}
+/* one shape, used by the form and by anything that posts a kept draft */
+function rbProductFromForm(d,pageName){
+  var prodNo='';try{prodNo=fmtProdNo(nextProdNoSeq());}catch(e){prodNo='P'+Date.now();}
+  return {
+    id:'prd'+Date.now()+'_'+Math.floor(Math.random()*9999),
+    prodNo:prodNo,
+    sellerUid:(CU&&CU.uid)||'',sellerName:(CU&&CU.name)||'',
+    pageName:pageName,pageKey:rbPageKey(pageName),
+    title:d.title,desc:d.desc,category:d.category,brand:d.brand,
+    price:String(d.price),cost:d.cost,offer:d.offer,currency:d.currency,
+    qty:d.qty,sold:0,
+    location:d.location,addr:d.addr,phone:d.phone,map:d.map,
+    barcode:d.barcode,upi:d.upi,expiry:d.expiry,
+    payOpts:d.payOpts,byWeight:d.byWeight,weightUnit:d.weightUnit,
+    sizes:d.sizes,colors:d.colors,photos:d.photos,
+    ts:Date.now(),interest:0,interestLog:[],batches:[]
+  };
+}
+
+/* ---- drafts: work kept while a shop waits for approval ---- */
+function rbDrafts(){try{return LS.get('rb_prod_drafts',[])||[];}catch(e){return [];}}
+function rbDraftSave(d){
+  try{
+    var list=rbDrafts();
+    list.unshift({id:'dft'+Date.now()+'_'+Math.floor(Math.random()*999),at:Date.now(),data:d});
+    LS.set('rb_prod_drafts',list.slice(0,60));
+    return true;
+  }catch(e){return false;}
+}
+function rbDraftDrop(id){
+  try{LS.set('rb_prod_drafts',rbDrafts().filter(function(x){return x.id!==id;}));}catch(e){}
+}
+/* post everything kept, once there is a shop to post it under */
+function rbDraftPostAll(){
+  var may=rbCanSellProducts();
+  if(!may.ok){rbShopNeeded(may);return;}
+  var list=rbDrafts();
+  if(!list.length){toast('There are no drafts waiting','info');return;}
+  var page=may.pages[0].name;
+  var all=getProducts();
+  list.forEach(function(x){
+    var name=(x.data&&x.data.pageName&&rbPageApproved(x.data.pageName))?x.data.pageName:page;
+    all.unshift(rbProductFromForm(x.data||{},name));
+  });
+  saveProducts(all);
+  LS.set('rb_prod_drafts',[]);
+  toast(list.length+' draft'+(list.length===1?'':'s')+' listed under '+page,'ok');
+  try{if(typeof showMyProducts==='function')showMyProducts('live');}catch(e){}
+}
+function rbShopNeeded(may){
+  may=may||rbCanSellProducts();
+  var ex=document.getElementById('shopneed-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='shopneed-ovl';
+  var body='';
+  if(may.why==='signin'){
+    body='<p class="sn-p">Listing something for sale needs an account, so buyers can reach you '
+      +'and so the listing can be taken down by you later.</p>'
+      +'<button class="sn-go" onclick="closeOvl(\'shopneed-ovl\');openAuth()">Sign in</button>';
+  }else if(may.why==='waiting'){
+    var names=may.pending.map(function(p){return p.name;});
+    body='<p class="sn-p">Your shop is waiting for the Reedbi admin to approve it. '
+      +'Until then nothing can be listed under it.</p>'
+      +'<div class="sn-list">'+may.pending.map(function(p){
+          var asked=(LS.get('rb_licreqs',[])||[]).some(function(r){
+            return r&&r.pageName===p.name&&r.status==='pending';});
+          return '<div class="sn-row"><b>'+esc(p.name)+'</b>'
+            +'<span>'+(asked?'Asked \u2014 waiting':'Not asked yet')+'</span>'
+            +(asked?'':'<button class="sn-ask" onclick="rbShopAsk(\''+escJS(p.name)+'\')">Ask now</button>')
+            +'</div>';
+        }).join('')+'</div>'
+      + rbShopDraftNote()
+      +'<p class="sn-note">Only the Reedbi admin can approve a shop. Nothing you do on this phone '
+      +'changes that, and the database refuses a listing from an unapproved shop even if the form '
+      +'is reached another way.</p>';
+  }else{
+    body='<p class="sn-p">Things for sale are listed by a shop, not by a person. Make your shop '
+      +'page first, then ask the Reedbi admin to approve it \u2014 approval is what puts your stock '
+      +'in front of buyers.</p>'
+      +'<button class="sn-go" onclick="closeOvl(\'shopneed-ovl\');openCreatePageFlow()">'
+      +'Make my shop page</button>'
+      + rbShopDraftNote()
+      +'<p class="sn-note">Every account gets one page. Once it is approved you can list, edit and '
+      +'remove your own stock at any time.</p>';
+  }
+  ov.innerHTML='<div class="modal" style="max-width:440px">'
+    +'<div class="mhd"><b>'+(may.why==='waiting'?'Waiting for approval':'A shop is needed first')+'</b>'
+    +'<button class="modal-x" onclick="closeOvl(\'shopneed-ovl\')">'+rbUiSVG('x',18)+'</button></div>'
+    +'<div class="mbd">'+body+'</div></div>';
+  document.body.appendChild(ov);
+  requestAnimationFrame(function(){ov.classList.add('open');});
+}
+/* v544: what happened to the work. Being told "not allowed" after filling in a form is the
+   thing that makes people give up; being told it was kept, and will go up by itself, is not. */
+function rbShopDraftNote(){
+  var n=rbDrafts().length;
+  if(!n)return '';
+  return '<div class="sn-draft">'+rbUiSVG('check',15)
+    +'<span><b>'+n+' draft'+(n===1?'':'s')+' kept.</b> Nothing you wrote was lost. '
+    +(n===1?'It goes':'They go')+' up by '+(n===1?'itself':'themselves')
+    +' the moment your shop is approved.</span></div>';
+}
+function rbShopAsk(name){
+  try{
+    requestPageApproval(name);
+    rbShopNeeded();      /* redraw so the row now reads "Asked - waiting" */
+  }catch(e){toast('That request could not be sent just now.','err');}
+}
 function openListProduct(){
   if(!requireAuth('list a product'))return;
+  /* v542: the gate. Posting a product needs a shop the Reedbi admin has approved - not an
+     account, not a page you made yourself. Saying so before the form opens is the whole point;
+     filling in a long form and finding out afterwards is the thing this replaces. */
+  var may=rbCanSellProducts();
+  if(!may.ok){rbShopNeeded(may);return;}
   listPhotos=[];
   ['lp-title','lp-desc','lp-price','lp-qty','lp-addr','lp-phone','lp-map','lp-cost','lp-offer','lp-expiry','lp-category','lp-location','lp-brand','lp-sizes','lp-colors','lp-barcode','lp-upi'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   var cs=document.getElementById('lp-cur');if(cs&&!cs.options.length){CURRENCIES.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;cs.appendChild(o);});}
   // sell-as: my name or any page I own/admin
+  /* v542: only approved shops. "My own name" used to be an option, which meant a product with
+     no shop behind it and no approval anybody had given - exactly what this now prevents. */
   var sa=document.getElementById('lp-as');
-  if(sa){sa.innerHTML='<option value="">My own name ('+esc(CU?CU.name:'')+')</option>';
-    getPages().forEach(function(pg){
-      if(pg.isStore)return;
-      var r=pageRole(pg.name);
-      if(r==='owner'||r==='admin'||r==='editor'){
-        var o=document.createElement('option');o.value=pg.name;o.textContent='Page: '+pg.name+(pg.licensed?' ✓ ReadBi approved':' (Tag Talk only)');sa.appendChild(o);
-      }
-    });}
+  if(sa){
+    sa.innerHTML='';
+    may.pages.forEach(function(pg){
+      var o=document.createElement('option');
+      o.value=pg.name;o.textContent=pg.name+' \u2713 approved';
+      sa.appendChild(o);
+    });
+    if(may.pages.length===1)sa.disabled=true;else sa.disabled=false;
+  }
   renderListPhotos();
   document.getElementById('list-prod-ovl').classList.add('open');
 }
@@ -9964,13 +10699,13 @@ function adminDecidePageReq(id,allow){
 
 function adminSuspendPage(name){
   var pgs=getPages();var pg=pgs.find(function(x){return x.name===name;});if(!pg)return;
-  pg.suspendedUntil=Date.now()+7*86400000;savePages(pgs);
+  pg.suspendedUntil=Date.now()+7*86400000;savePages(pgs);rbShopSyncStock(pg.name);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(name.toLowerCase()).set(rbPageWire(pg),{merge:true}).catch(function(){});}catch(e){}}
   adminTab('content');toast('“'+name+'” revoked for 1 week — its products are hidden from ReadBi until then','info');
 }
 function adminUnsuspendPage(name){
   var pgs=getPages();var pg=pgs.find(function(x){return x.name===name;});if(!pg)return;
-  pg.suspendedUntil=0;savePages(pgs);
+  pg.suspendedUntil=0;savePages(pgs);rbShopSyncStock(pg.name);
   adminTab('content');toast('Suspension lifted for “'+name+'”','ok');
 }
 function adminDeletePage(name){
@@ -9978,7 +10713,7 @@ function adminDeletePage(name){
   // tombstone (deleted:true) instead of removal — syncs to the server and to EVERY device,
   // so no other device can re-upload the page back
   var pgs=getAllPagesRaw();var pg=pgs.find(function(x){return x.name===name;});
-  if(pg){pg.deleted=true;pg.licensed=false;}
+  if(pg){pg.deleted=true;pg.licensed=false;try{rbShopSyncStock(pg.name);}catch(e){}}
   savePages(pgs);
   var prods=getProducts();prods.forEach(function(p){if(p.pageName===name){p.pageName='';}});saveProducts(prods);
   if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){try{FB.db.collection('pages').doc(name.toLowerCase()).delete().catch(function(){});}catch(e){}}
@@ -17995,9 +18730,17 @@ function jarvisCompleteAllHabits(){
 /* ===== v284: list a product by VOICE/agent (easy, conversational) ===== */
 function rbCreateProductVoice(d){
   if(!CU)return null;
+  /* v542: the voice path reaches the same collection, so it meets the same gate. Without this,
+     "list a product" spoken aloud walked straight past the approval check. */
+  var may=rbCanSellProducts();
+  if(!may.ok){try{rbShopNeeded(may);}catch(e){}
+    try{toast('Your shop needs the admin\u2019s approval before anything can be listed','err');}catch(e){}
+    return null;}
   var addrs=[];try{addrs=getAddresses();}catch(e){}var a=(addrs&&addrs.length)?addrs[0]:{};
   var page=null;try{page=myOwnedPage();}catch(e){}
-  var pageName=(page&&pageLicenseValid(page.name))?page.name:'';
+  /* v542: the gate above guarantees at least one approved shop, so there is one to name here.
+     It used to fall back to '' - a product with no shop behind it. */
+  var pageName=may.pages[0].name;
   var prodNo='';try{prodNo=fmtProdNo(nextProdNoSeq());}catch(e){prodNo='P'+Date.now();}
   var prod={id:'prd'+Date.now(),prodNo:prodNo,sellerUid:CU.uid,sellerName:CU.name,pageName:pageName,title:d.title,desc:d.desc||'',price:String(d.price),currency:d.currency||'AED',qty:d.qty||1,sold:0,category:d.category||'Other',location:(CU.location||''),photos:[],addr:(a.addr||''),phone:(a.phone||a.whatsapp||''),map:'',ts:Date.now(),interest:0,interestLog:[],batches:[],voiceDraft:true};
   var prods=getProducts();prods.unshift(prod);saveProducts(prods);
@@ -18017,7 +18760,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v540 loaded \u2014 tap here if something is not working (Update)';
+    b.innerHTML='\u2713 Reedbi v544 loaded \u2014 tap here if something is not working (Update)';
     b.onclick=function(){try{rbForceUpdate();}catch(e){try{b.remove();openSystemCheck();}catch(x){}}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -18234,6 +18977,20 @@ function rbSysChecks(){
     {n:'Caught before shipping: scoping the counts made listings look as if they had vanished (v518.1) - counting only what the map was showing meant that zooming into a town dropped the per-kind figures, which is the exact opposite of the earlier requirement that everything be visible WITHOUT zooming out. The regression tests caught it. Each kind now shows both numbers, as 1 / 2 - what is here and what exists altogether - so a figure can match the location without anything ever appearing to disappear',ok:true},
     {n:'When nothing is showing, it now says what is hiding it (v518.1) - listings are hiding is almost never the listings. It is a filter chip still pressed, a word left in the search box, or My listings still on from a previous look. The app knew which one and never said. The empty list now names every restriction in force, says how many listings exist altogether, and clears the lot in one tap. A Show all button sits beside Add on the map for the same reason, and when listings exist but none has a location it says that instead of looking empty',ok:(typeof rbPropActiveFilters==='function')&&(typeof rbPropClearAllFilters==='function')},
     {n:'The running build is now stated where the problem is being looked at (v518.2) - a phone can be on an older copy than the one just sent, in which case none of the fixes described exist on it and every other answer is beside the point. The version is shown beside Property in the map menu, and the visibility check names it and says what to do if it is older than expected',ok:true},
+    {n:'And the admin can see what is waiting, and let it through in one press (v542) — making approval the thing that decides visibility means a shop can go quiet with nobody knowing why. The Pages tab now leads with how many shops are not approved and how many items are sitting behind them, each with an Approve button. Pressing it approves the shop, rewrites the flag on every item already listed under it, and puts the lot in front of buyers at once — tried on twenty-six items: invisible to a buyer, all twenty-six visible to their own seller, and all twenty-six live after one press',ok:fn("rbAcShopsWaiting")&&fn("rbAcApproveShop")&&fn("rbAcWaitingBlock")&&String(rbAcPages).indexOf('rbAcWaitingBlock()')>0&&String(rbAcApproveShop).indexOf('rbShopSyncStock')>0},
+    {n:'Ten buttons did nothing at all (v544) — the worst thing in the app, and nothing on screen said so. “Publish Listing” called a function that was never written. You could fill in the whole product form, press it, and get no listing, no error, no explanation — and six places open that form. The same was true of “Confirm Order”, the job “Submit”, “Submit Rating”, “Pay and Boost”, the composer’s two typing handlers and all three parts of the search inside a topic. Found by walking every inline handler in the page and checking the function exists; that walk is now a test that fails the build',ok:['submitProduct','placeOrder','submitApply','submitRating','proceedToPay','doIS','toggleIS','clearIS','onBI','onTI','confirmPay'].every(function(f){return typeof window[f]==='function';})},
+    {n:'Nothing you write is thrown away while a shop waits (v544) — the approval gate was the right rule and a miserable experience: fill in a form, press Publish, told you are not allowed. The listing is kept as a draft instead, the screen says plainly that nothing was lost, and the moment an admin approves the shop every draft goes up by itself. Tried end to end: one draft kept, nothing listed, approved, one listing live carrying exactly what was typed',ok:fn("rbDraftSave")&&fn("rbDraftPostAll")&&fn("rbShopDraftNote")&&String(submitProduct).indexOf('rbDraftSave')>0&&String(rbShopSyncStock).indexOf('rbDraftPostAll')>0},
+    {n:'And the form now tells you what is wrong, in the order you would fix it (v544) — no name, no price, a price that is not a number, a phone number too short to call. It says one thing at a time and puts the cursor in the field it is talking about, rather than refusing the whole form with nothing pointed at',ok:fn("lpProblems")&&lpProblems({title:'',price:'',desc:'',phone:''}).length>0&&lpProblems({title:'x',price:'abc',desc:'',phone:''})[0][0]==='lp-price'&&lpProblems({title:'x',price:'5',desc:'',phone:''}).length===0},
+    {n:'A card form that went nowhere has been taken out (v544) — the page carried a checkout overlay asking for a card number, expiry and CVV, with handlers that did not exist and nothing anywhere that opened it. Unreachable, but a payment-card form sitting in a shipped page with no processor behind it is not something to leave lying there. It is gone, and the one remaining payment button says plainly that Reedbi takes no payment rather than pretending to charge',ok:!document.getElementById('co-cvv')&&!document.getElementById('co-card')&&!document.getElementById('checkout-ovl')&&/Reedbi does not take payment/.test(String(confirmPay))&&/Nothing has been charged/.test(String(proceedToPay))},
+    {n:'A job is not looked for the way a flat is (v543) — nobody rents a place in the next emirate, but plenty of people would take the work there. Property and things for sale are held to the area you are in; jobs are not narrowed at all. “Only Discovery garden” now drops a villa 130 km away and a bike in Sharjah, and leaves every job on the screen. A job also says where it actually is — “in Sharjah, UAE”, or “anywhere” — because a post carries a region, usually no finer than a country, and “in your area” was a claim the data did not support',ok:(function(){var s=String(rbNearbyItems);return s.indexOf('RB_NEAR_KM')>0&&/Jobs are not narrowed to your area at all/.test(String(rbNearbyRender))&&String(rbNearbyRow).indexOf('r.wide')>0;})()},
+    {n:'And “only this area” meant it for property too (v543) — the pill named an area and then listed property from anywhere, because that branch never looked at the toggle. A property carries real coordinates, so the test is a radius — twelve kilometres, wide enough for a city and the next neighbourhood — with the area name accepted as well for a pin just outside it',ok:typeof RB_NEAR_KM==='number'&&RB_NEAR_KM>0&&String(rbNearbyItems).indexOf('byName&&!byKm')>0},
+    {n:'Only an approved shop may list anything (v542) — anybody with an account could post a product. It stayed out of the marketplace, because that asks for an approved page, so the approval decided where a product APPEARED and not whether it could exist: it was created, stored, and shown to everyone on Near you. Posting now needs a shop the Reedbi admin has approved. The form does not open without one — it says which of the three things is missing instead: sign in, make the page, or wait for the admin, with a button to ask. The voice path and bulk scan reach the same collection, so they meet the same gate; both used to walk straight past it and one of them filed the product under no shop at all',ok:fn("rbCanSellProducts")&&fn("rbShopNeeded")&&fn("rbPageApproved")&&String(openListProduct).indexOf('rbShopNeeded')>0&&String(rbCreateProductVoice).indexOf('rbCanSellProducts')>0&&String(admBulkCreate).indexOf('rbCanSellProducts')>0},
+    {n:'And an unapproved shop’s stock is nobody else’s business (v542) — it is visible to the person selling it and to an admin, and to no one else, so a shop waiting for approval is not being browsed in the meantime. Each product carries whether its shop is approved, and the rule recomputes that from the page document and refuses the write if the flag disagrees — so setting it by hand gains nothing. Approving or suspending a shop rewrites the flag on the stock already sitting under it, which approval used to leave untouched',ok:fn("rbProductVisible")&&fn("rbStampShop")&&fn("rbShopSyncStock")&&rbProductVisible({sellerUid:'nobody',pageName:'no such shop'})===false&&rbPropRulesText().indexOf('shopOk')>0},
+    {n:'A page owner could not edit a product on their own page (v542) — a page is stored under its name in lower case; a product carries the name as typed. The rule compared the two, so “Green Grocer” was looked up as a document called “Green Grocer”, which does not exist, and the check quietly failed for everyone. Both sides are lowered now, and the lowercase key is written onto the product as well',ok:fn("rbPageKey")&&rbPageKey(' Green Grocer ')==='green grocer'&&rbPropRulesText().indexOf('name.lower()')>0},
+    {n:'The two round buttons stopped sitting on the words (v542) — the mic and the headset are fixed to the right edge while the cards scroll underneath, so they permanently covered a strip of whatever was behind them: “Goals, streaks & reminders”, the “Habit coaching” chip, “Bulk / scan — Many at once”. They slide away while you scroll down and come back the moment you stop or scroll up. Neither button is taken away. The home screen does not scroll the page — it scrolls inside its own box — so watching the window alone found nothing, which is how the first attempt at this did nothing at all',ok:document.documentElement.classList!==undefined&&/rb-fabs-away/.test(document.documentElement.innerHTML.slice(0,200000))},
+    {n:'“Turn on location” had nothing to press (v541) — with location off, Near you measured from the last place you looked at and still wrote “347 m away” on every row. Three listings in one building all said it, and away means away from you. It was 347 m from Discovery garden. Two changes: a row measured from anywhere other than you now NAMES what it is measured from — “345 m from Discovery garden” — and the line telling you to turn location on is now a button that asks for it. The old helper only ever took a position already granted and never prompted, which is why the advice had nothing behind it',ok:fn("rbGeoAskNow")&&fn("rbNearbyUseMyLocation")&&fn("rbNearFromSuffix")&&rbNearKmLabel(0.345)==='345 m away'&&rbNearKmLabel(0.345,true)==='345 m'&&String(rbNearbyRender).indexOf('not from you')>0},
+    {n:'A flat in Dubai was priced in rupees (v541) — the posting form opened with INR already selected, so unless you noticed the box, your listing was written up as ₹4,000. The price formatter falls back to AED when the field is missing, so two listings in the same building showed two different currencies. The picker now opens on the currency of the country you are in, and a listing saved without touching it follows the country rather than defaulting to rupees',ok:fn("rbHomeCur")&&fn("rbCurOptions")&&rbCurOptions().indexOf('selected')>0&&String(rbPropAddSave||'').indexOf("||'INR'")<0&&rbCurOptions().indexOf('<option value="'+rbHomeCur()+'" selected>')===0},
+    {n:'And the ones already posted are listed, not quietly rewritten (v541) — fixing the form does nothing for listings that are already up. The Commission tab names every listing whose price is in a different country’s money from its own map pin, with one button each and one for all of them. It says plainly that this RELABELS and does not convert: 4,000 rupees becomes 4,000 dirhams, not the exchanged amount. A listing pinned in Kochi and priced in rupees is not listed, because nothing is wrong with it',ok:fn("rbCurExpected")&&fn("rbCurOdd")&&fn("rbCurFixOne")&&rbCurExpected({lat:25.0475,lng:55.1196})==='AED'&&rbCurExpected({lat:9.93,lng:76.27})==='INR'&&rbCurExpected({lat:-30,lng:-140})===''&&rbCurOdd({lat:9.93,lng:76.27,currency:'INR'})===false&&rbCurOdd({lat:25.0475,lng:55.1196,currency:'INR'})===true},
     {n:'And on the Google pages too — the worse half of the same bug (v540) — v539 fixed the app. The pages the site builds for Google are made by a different piece of code, and it had the same hole in a nastier place. Every page carries a block of structured data for search engines, written with JSON.stringify — which does not escape a less-than sign, because JSON has no opinion about HTML. The browser reading the page does. A listing titled with a closing script tag therefore ENDED the structured-data block, and the rest of the title became live markup on a page served from reedbi.com and handed to Google. Running the real page builder against one hostile listing: ten of the fifteen pages it wrote ran the attacker’s code. Those characters are now written as \\u003C, which is still valid JSON and still reads back as a less-than sign, so what Google sees is unchanged — all fifteen pages are clean and the structured data still parses',ok:(function(){try{var g=atob(RB_BUILD_MJS_B64.replace(/\s/g,''));return g.indexOf('jsonForScript')>0&&g.indexOf('u003C')>0&&g.indexOf('<script type="application/ld+json">${JSON.stringify(ld)}')<0;}catch(e){return false;}})()},
     {n:'A quote in a listing title could run code in your browser (v539) — the worst thing found in this pass, and it had been there all along. Every button Reedbi draws carries its data in an attribute: onclick="open(&#39;...&#39;)". The helper that filled those in escaped a quote the JavaScript way, with a backslash. HTML is read FIRST and knows nothing about backslashes, so a listing titled  red" onmouseover="...  closed the attribute and added a real event handler to the page — running in the browser of everyone who scrolled past, with their session. Anyone with an account could post one. Quotes and ampersands are now HTML entities, which cannot close anything, at all 165 places that build a button',ok:(function(){var h='x" onmouseover="BAD" a="';var d=document.createElement('div');d.innerHTML='<i onclick="f(\''+escJS(h)+'\')"></i>';return d.firstChild.attributes.length===1&&!d.firstChild.hasAttribute('onmouseover');})()},
     {n:'A CV could take over the account of whoever opened it (v539) — an applicant’s file was turned into a blob and shown in a frame, taking the file’s type from the file itself. A blob keeps the origin of the page that made it, so a “CV” that was really a web page ran as Reedbi, in the employer’s session, the moment they clicked to read it. Only PDFs, pictures and plain text are rendered now; the frame is sandboxed so even those cannot run anything; and anything else is handed over as a download, which is what it was all along',ok:fn("rbViewableType")&&rbViewableType('application/pdf')===true&&rbViewableType('text/html')===false&&rbViewableType('image/svg+xml')===false&&String(openCVData).indexOf('sandbox=')>0},
@@ -18250,7 +19007,7 @@ function rbSysChecks(){
     {n:'Store pages are the owner’s to control too (v536) — sections, categories, listings, items and posts could all be held or hidden, and the pages people had built could not. Holding a page takes it and everything listed on it out of sight without deleting anybody’s work, which is the thing to reach for before deleting is',ok:fn("rbAcPages")&&!!RB_REMOVABLE.page&&String(rbNearbyItems).indexOf("rbItemVisible('page'")>0},
     {n:'Every control in one place, and it is the owner’s (v535) — sections on or off, categories shown or hidden, and hold, hide or remove on every listing, item and post. One press turns everything back on and releases the lot. It lives in a single Firestore document that every phone reads, so a switch thrown once reaches everybody instead of only the phone that threw it',ok:fn("openAdminConsole")&&fn("rbSiteSave")&&fn("rbAdminShowEverything")&&fn("rbItemVisible")&&fn("rbSectionOn")},
     {n:'And it is honest about what actually protects it (v535) — the password on this phone decides what this phone displays, and nothing more: the check runs in code anybody can read. What stops somebody rewriting your site is the Firestore rule, which asks for a real admin mark on the account. The console checks which of those you have and says so before you touch a switch — because a switch that looks thrown and was refused is worse than one that is plainly greyed out. Every change is written to a record naming the account and the time, which nobody may edit or delete, admin included',ok:fn("rbAdminClaim")&&fn("rbModLog")&&String(rbAcRender).indexOf('will work on this phone only')>0&&rbPropRulesText().indexOf('match /modlog/{id}')>0},
-    {n:'The shop stays shut until somebody decides otherwise (v535) — “show everything to everyone” was asked for, and listings, job posts and the topic list are now readable by anybody. Things for sale are not, deliberately: a product record carries the seller’s phone number and street address, and opening the collection publishes every field to anyone who asks the database — not only the ones a page prints. Somebody selling a sofa from their flat would be publishing their home address. The one line to change is in the rules with the trade written beside it',ok:/match \/products\/\{id\} \{[\s\S]{0,120}allow read:   if isSignedIn\(\);/.test(rbPropRulesText())},
+    {n:'The shop stays shut until somebody decides otherwise (v535) — “show everything to everyone” was asked for, and listings, job posts and the topic list are now readable by anybody. Things for sale are not, deliberately: a product record carries the seller’s phone number and street address, and opening the collection publishes every field to anyone who asks the database — not only the ones a page prints. Somebody selling a sofa from their flat would be publishing their home address. The one line to change is in the rules with the trade written beside it',ok:(function(){var t=rbPropRulesText();var i=t.indexOf('match /products/{id}');if(i<0)return false;var b=t.slice(i,i+1800);return /allow read:\s+if isSignedIn\(\)/.test(b)&&!/allow read:\s+if true/.test(b)&&/phone/.test(t)&&/addr/.test(t);})()},
     {n:'A button nobody could see (v535) — the pressed state of every switch in the new console was styled with a colour borrowed from somewhere else and never defined here, so it came out as white text on nothing: the Shown button was invisible, and there was no way to tell what a row was set to. Found by looking at the screen rather than at the code. Four colours were being used without ever having been defined; all four have definitions now',ok:String(rbAcItems).indexOf('var(--i)')<0},
     {n:'Copying the Firestore rules took the whole app offline (v534) — the button marked “Firestore rules → Copy” handed over a ruleset covering one collection, props. Pasting into the Firebase console REPLACES the entire file, so everything not mentioned — accounts, orders, the shop, topics, posts, settings — fell to Firestore’s deny-by-default. The app then met permission errors everywhere. It hands over the complete file now, and says plainly that pasting replaces what is there',ok:(function(){try{var t=rbPropRulesText();return t.indexOf('match /users')>0&&t.indexOf('match /tags/{tagId}')>0&&t.indexOf('match /products')>0&&t.indexOf('{document=**}')>0;}catch(e){return false;}})()},
     {n:'And one closed collection no longer takes everything down with it (v534) — the app listens to several collections at once. When the community posts listener was refused, the handler switched off the ENTIRE cloud: every listener torn down, the property map left running from whatever was last saved on the phone — fourteen hours old in the report that found this — and listings reaching nobody. A collection somebody may not read is a fact about that collection, not a reason to stop reading the ones they may. Each is switched off on its own now, and asked for only once',ok:fn("fbOff")&&fn("fbIsOff")&&String(fbListenTag).indexOf("fbIsOff('posts_')")>0&&String(fbListenTag).indexOf('fbDisableCloud')<0},
@@ -18339,7 +19096,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v540';var all=(pass===checks.length);
+  var ver='v544';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -19692,7 +20449,7 @@ function rbPropLive(){
    v534 the first of those switched the cloud off entirely - which is a map running from a saved
    copy and listings reaching nobody, from pressing a button called Copy.
    It returns the complete file now, held as base64 so the braces and quotes survive intact. */
-var RB_RULES_SRC='cnVsZXNfdmVyc2lvbiA9ICcyJzsKc2VydmljZSBjbG91ZC5maXJlc3RvcmUgewogIG1hdGNoIC9kYXRhYmFzZXMve2RhdGFiYXNl'+'fS9kb2N1bWVudHMgewoKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PQogICAgLy8gIFdITyBJUyBXSE8KICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gImFkbWluIiBpcyBhIENVU1RPTSBDTEFJTSBvbiB0'+'aGUgYWNjb3VudCwgc2V0IGZyb20gdGhlIEZpcmViYXNlIEFkbWluIFNESyBvciBhIENsb3VkCiAgICAvLyBGdW5jdGlvbiAtIG5l'+'dmVyIGZyb20gYSBicm93c2VyLiBUaGUgcGFzc3dvcmQgZ2F0ZSBpbnNpZGUgdGhlIFJlZWRiaSBhcHAgaXMgTk9UIHRoaXMuCiAg'+'ICAvLyBUaGF0IGdhdGUgZGVjaWRlcyB3aGF0IG9uZSBwaG9uZSBkaXNwbGF5cyBhbmQgbm90aGluZyBtb3JlOyBhbnlib2R5IGNh'+'biByZWFkIHRoZSBhcHAncwogICAgLy8gc291cmNlIGFuZCBmaW5kIGl0LiBUaGVzZSBydWxlcyBhcmUgdGhlIG9ubHkgdGhpbmcg'+'dGhhdCBhY3R1YWxseSBzdG9wcyBzb21lYm9keQogICAgLy8gcmV3cml0aW5nIHlvdXIgc2l0ZSwgc28gdGhlIGNsYWltIGlzIHdo'+'YXQgdGhleSBhc2sgZm9yLgogICAgZnVuY3Rpb24gaXNBZG1pbigpICAgIHsgcmV0dXJuIHJlcXVlc3QuYXV0aCAhPSBudWxsICYm'+'IHJlcXVlc3QuYXV0aC50b2tlbi5hZG1pbiA9PSB0cnVlOyB9CiAgICBmdW5jdGlvbiBpc1NpZ25lZEluKCkgeyByZXR1cm4gcmVx'+'dWVzdC5hdXRoICE9IG51bGw7IH0KICAgIGZ1bmN0aW9uIGlzT3duZXIodWlkKSB7IHJldHVybiByZXF1ZXN0LmF1dGggIT0gbnVs'+'bCAmJiByZXF1ZXN0LmF1dGgudWlkID09IHVpZDsgfQogICAgZnVuY3Rpb24gb3duc1BhZ2UobmFtZSkgewogICAgICByZXR1cm4g'+'bmFtZSBpcyBzdHJpbmcgJiYgbmFtZSAhPSAnJyAmJgogICAgICAgIGV4aXN0cygvZGF0YWJhc2VzLyQoZGF0YWJhc2UpL2RvY3Vt'+'ZW50cy9wYWdlcy8kKG5hbWUpKSAmJgogICAgICAgIGdldCgvZGF0YWJhc2VzLyQoZGF0YWJhc2UpL2RvY3VtZW50cy9wYWdlcy8k'+'KG5hbWUpKS5kYXRhLm93bmVyVWlkID09IHJlcXVlc3QuYXV0aC51aWQ7CiAgICB9CgogICAgLy8gPT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgICAvLyAgTElNSVRTCiAgICAvLyA9'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgIC8v'+'IEZpcmVzdG9yZSBjaGFyZ2VzIHRoZSBPV05FUiBvZiB0aGUgcHJvamVjdCBmb3Igc3RvcmFnZSBhbmQgZm9yIGV2ZXJ5IGJ5dGUg'+'cmVhZC4gQSB3b3JsZAogICAgLy8gcmVhZGFibGUgY29sbGVjdGlvbiB3aXRoIG5vIGNlaWxpbmcgaXMgdGhlcmVmb3JlIHNvbWVi'+'b2R5IGVsc2UncyBiaWxsLCBhbmQgYSBsaXN0aW5nCiAgICAvLyB0aXRsZSBvZiBhIG1pbGxpb24gY2hhcmFjdGVycyBhbHNvIGJy'+'ZWFrcyB0aGUgcGFnZSBidWlsZGVyLiBUaGVzZSBhcmUgZGVsaWJlcmF0ZWx5CiAgICAvLyBnZW5lcm91cyAtIHRoZXkgc3RvcCBh'+'YnVzZSwgbm90IHVzZS4KICAgIGZ1bmN0aW9uIG9rU3RyKHYsIG4pICB7IHJldHVybiAhKHYgaXMgc3RyaW5nKSB8fCB2LnNpemUo'+'KSA8PSBuOyB9CiAgICBmdW5jdGlvbiBva0xpc3QodiwgbikgeyByZXR1cm4gISh2IGlzIGxpc3QpICAgfHwgdi5zaXplKCkgPD0g'+'bjsgfQogICAgZnVuY3Rpb24gbm90VG9vQmlnKCkgIHsgcmV0dXJuIHJlcXVlc3QucmVzb3VyY2UuZGF0YS5zaXplKCkgPD0gOTA7'+'IH0KCiAgICAvLyBBIGxpc3RpbmcsIGEgcHJvZHVjdCBvciBhIHBvc3QgYXMgc29tZWJvZHkgbWF5IGFjdHVhbGx5IHdyaXRlIG9u'+'ZS4KICAgIGZ1bmN0aW9uIHRleHRPaygpIHsKICAgICAgbGV0IGQgPSByZXF1ZXN0LnJlc291cmNlLmRhdGE7CiAgICAgIHJldHVy'+'biBub3RUb29CaWcoKQogICAgICAgICYmIG9rU3RyKGQuZ2V0KCd0aXRsZScsICcnKSwgMzAwKQogICAgICAgICYmIG9rU3RyKGQu'+'Z2V0KCdkZXNjJywgICcnKSwgODAwMCkKICAgICAgICAmJiBva1N0cihkLmdldCgnYm9keScsICAnJyksIDgwMDApCiAgICAgICAg'+'JiYgb2tTdHIoZC5nZXQoJ3BsYWNlJywgJycpLCAyMDApCiAgICAgICAgJiYgb2tTdHIoZC5nZXQoJ2FkZHInLCAgJycpLCAzMDAp'+'CiAgICAgICAgJiYgb2tTdHIoZC5nZXQoJ25hbWUnLCAgJycpLCAyMDApCiAgICAgICAgJiYgb2tTdHIoZC5nZXQoJ3Bob25lJywg'+'JycpLCA0MCkKICAgICAgICAmJiBva0xpc3QoZC5nZXQoJ3Bob3RvcycsIFtdKSwgMjApCiAgICAgICAgJiYgb2tMaXN0KGQuZ2V0'+'KCd1bml0cycsICBbXSksIDIwMCk7CiAgICB9CgogICAgLy8gVGhlIGZpZWxkIHRoYXQgc2F5cyB3aG8gb3ducyBhIGRvY3VtZW50'+'IG11c3QgbmV2ZXIgY2hhbmdlIGhhbmRzIG9uIGFuIGVkaXQuIFdpdGhvdXQgdGhpcwogICAgLy8gdGhlIG93bmVyIG9mIGEgbGlz'+'dGluZyBjb3VsZCBoYW5kIGl0IHRvIHNvbWVib2R5IGVsc2UsIG9yIC0gd29yc2UsIHdpdGggYSBtZXJnZSB3cml0ZSAtCiAgICAv'+'LyBhIGZpZWxkIGNvdWxkIGJlIHF1aWV0bHkgYWRkZWQgdGhhdCBhbm90aGVyIHJ1bGUgbGF0ZXIgdHJ1c3RzLgogICAgZnVuY3Rp'+'b24ga2VlcHMoZmllbGQpIHsKICAgICAgcmV0dXJuICEoZmllbGQgaW4gcmVxdWVzdC5yZXNvdXJjZS5kYXRhKQogICAgICAgIHx8'+'IHJlcXVlc3QucmVzb3VyY2UuZGF0YVtmaWVsZF0gPT0gcmVzb3VyY2UuZGF0YVtmaWVsZF07CiAgICB9CgogICAgLy8gPT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgICAvLyAgQUND'+'T1VOVFMKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PQogICAgLy8gQSBwcm9maWxlIGlzIHJlYWRhYmxlIGJ5IGFueW9uZSBzaWduZWQgaW4gYmVjYXVzZSB0aGUgYXBwIHNo'+'b3dzIHdobyBwb3N0ZWQgd2hhdC4gSXQgaXMKICAgIC8vIHdyaXRhYmxlIG9ubHkgYnkgaXRzIG93bmVyIC0gYW5kIGBhZG1pbmAg'+'aXMgTk9UIGEgZmllbGQgaGVyZTsgaXQgaXMgYSB0b2tlbiBjbGFpbSwgc28KICAgIC8vIHdyaXRpbmcgaXQgdG8geW91ciBvd24g'+'cHJvZmlsZSBkb2N1bWVudCBncmFudHMgbm90aGluZy4KICAgIG1hdGNoIC91c2Vycy97dWlkfSB7CiAgICAgIGFsbG93IHJlYWQ6'+'ICBpZiBpc1NpZ25lZEluKCk7CiAgICAgIGFsbG93IHdyaXRlOiBpZiAoaXNPd25lcih1aWQpIHx8IGlzQWRtaW4oKSkgJiYgbm90'+'VG9vQmlnKCk7CiAgICB9CgogICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09CiAgICAvLyAgVE9QSUNTIEFORCBQT1NUUyAgKHB1YmxpYyByZWFkaW5nIC0gYSBqb2Igbm9ib2R5'+'IGNhbiBzZWUgaXMgbm90IGEgam9iIGFkdmVydCkKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgbWF0Y2ggL3RhZ3Mve3RhZ0lkfSB7CiAgICAgIGFsbG93IHJlYWQ6'+'ICAgaWYgdHJ1ZTsKICAgICAgYWxsb3cgY3JlYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgdGV4dE9rKCk7CiAgICAgIC8vIEl0cyBj'+'cmVhdG9yIG9yIGFuIGFkbWluIG1heSBjaGFuZ2UgaXQuIEFueW9uZSBlbHNlIG1heSBPTkxZIHRvdWNoIHRoZSB0aW1lc3RhbXAs'+'IHdoaWNoCiAgICAgIC8vIGlzIHdoYXQgdGhlIGFwcCBkb2VzIHdoZW4gc29tZWJvZHkgcG9zdHMgaW4gYSB0b3BpYy4gVGhhdCBz'+'dG9wcyBhbnkgc2lnbmVkLWluIGFjY291bnQKICAgICAgLy8gcmVuYW1pbmcgb3IgcmUtZGVzY3JpYmluZyBldmVyeSB0b3BpYyBv'+'biB0aGUgYm9hcmQsIHdoaWNoIHRoZSBvbGQgcnVsZSBhbGxvd2VkLgogICAgICBhbGxvdyB1cGRhdGU6IGlmIGlzU2lnbmVkSW4o'+'KSAmJiB0ZXh0T2soKSAmJiAoCiAgICAgICAgICAgICAgICAgICAgICAgcmVzb3VyY2UuZGF0YS5nZXQoJ2J5JywgJycpID09IHJl'+'cXVlc3QuYXV0aC51aWQgfHwgaXNBZG1pbigpCiAgICAgICAgICAgICAgICAgICAgICAgfHwgcmVxdWVzdC5yZXNvdXJjZS5kYXRh'+'LmRpZmYocmVzb3VyY2UuZGF0YSkuYWZmZWN0ZWRLZXlzKCkuaGFzT25seShbJ2F0J10pCiAgICAgICAgICAgICAgICAgICAgKTsK'+'ICAgICAgYWxsb3cgZGVsZXRlOiBpZiBpc0FkbWluKCk7CgogICAgICBtYXRjaCAvcG9zdHMve3Bvc3RJZH0gewogICAgICAgIGFs'+'bG93IHJlYWQ6ICAgaWYgdHJ1ZTsKICAgICAgICBhbGxvdyBjcmVhdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiByZXF1ZXN0LnJlc291'+'cmNlLmRhdGEudWlkID09IHJlcXVlc3QuYXV0aC51aWQgJiYgdGV4dE9rKCk7CiAgICAgICAgYWxsb3cgdXBkYXRlOiBpZiBpc1Np'+'Z25lZEluKCkgJiYgdGV4dE9rKCkgJiYga2VlcHMoJ3VpZCcpCiAgICAgICAgICAgICAgICAgICAgICAmJiAocmVzb3VyY2UuZGF0'+'YS51aWQgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgICAgIGFsbG93IGRlbGV0ZTogaWYgaXNTaWduZWRJ'+'bigpICYmIChyZXNvdXJjZS5kYXRhLnVpZCA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlzQWRtaW4oKSk7CgogICAgICAgIG1hdGNo'+'IC9jb21tZW50cy97Y2lkfSB7CiAgICAgICAgICAvLyBzaWduLWluIG9ubHksIGFzIGl0IHdhcy4gQSBoYXJkZW5pbmcgcGFzcyBp'+'cyBub3QgdGhlIG1vbWVudCB0byB3aWRlbiBhbnl0aGluZyAtCiAgICAgICAgICAvLyB0aGUgcG9zdCBhYm92ZSBpcyBwdWJsaWMs'+'IHRoZSBjb252ZXJzYXRpb24gdW5kZXIgaXQgc3RheXMgd2hlcmUgaXQgd2FzLgogICAgICAgICAgYWxsb3cgcmVhZDogICBpZiBp'+'c1NpZ25lZEluKCk7CiAgICAgICAgICBhbGxvdyBjcmVhdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiByZXF1ZXN0LnJlc291cmNlLmRh'+'dGEudWlkID09IHJlcXVlc3QuYXV0aC51aWQgJiYgdGV4dE9rKCk7CiAgICAgICAgICBhbGxvdyB1cGRhdGU6IGlmIGlzU2lnbmVk'+'SW4oKSAmJiBrZWVwcygndWlkJykgJiYgdGV4dE9rKCkKICAgICAgICAgICAgICAgICAgICAgICAgJiYgKHJlc291cmNlLmRhdGEu'+'dWlkID09IHJlcXVlc3QuYXV0aC51aWQgfHwgaXNBZG1pbigpKTsKICAgICAgICAgIGFsbG93IGRlbGV0ZTogaWYgaXNTaWduZWRJ'+'bigpICYmIChyZXNvdXJjZS5kYXRhLnVpZCA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlzQWRtaW4oKSk7CiAgICAgICAgfQogICAg'+'ICB9CiAgICB9CgogICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09CiAgICAvLyAgUFJPUEVSVFkgTElTVElOR1MgIChwdWJsaWMgcmVhZGluZywgZGVsaWJlcmF0ZWx5KQogICAg'+'Ly8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAg'+'ICAvLyBBIHJlbnQsIGEgcmF0ZSwgYSBwbG90IGZvciBzYWxlIGlzIHBvc3RlZCBpbiBvcmRlciB0byBiZSBzZWVuLCBzbyBhIHZp'+'c2l0b3Igd2hvIGhhcyBub3QKICAgIC8vIHNpZ25lZCB1cCBzdGlsbCBzZWVzIGV2ZXJ5IGxpc3RpbmcsIGl0cyBwcmljZSBhbmQg'+'aXRzIHBsYWNlIG9uIHRoZSBtYXAuIFdyaXRpbmcgbmVlZHMgYW4KICAgIC8vIGFjY291bnQgLSBgaXNTaWduZWRJbigpYCBpcyBz'+'YXRpc2ZpZWQgYnkgYW4gQU5PTllNT1VTIGFjY291bnQgdG9vLCB3aGljaCBpcyBob3cgdGhlIGFwcAogICAgLy8gbGV0cyBwZW9w'+'bGUgcG9zdCB3aXRob3V0IGEgc2lnbi11cCBmb3JtOiBBdXRoZW50aWNhdGlvbiAtPiBTaWduLWluIG1ldGhvZCAtPiBBbm9ueW1v'+'dXMuCiAgICBtYXRjaCAvcHJvcHMve2lkfSB7CiAgICAgIGFsbG93IHJlYWQ6ICAgaWYgdHJ1ZTsKICAgICAgYWxsb3cgY3JlYXRl'+'OiBpZiBpc1NpZ25lZEluKCkgJiYgcmVxdWVzdC5yZXNvdXJjZS5kYXRhLmJ5ID09IHJlcXVlc3QuYXV0aC51aWQgJiYgdGV4dE9r'+'KCk7CiAgICAgIGFsbG93IHVwZGF0ZTogaWYgaXNTaWduZWRJbigpICYmIHRleHRPaygpICYmIGtlZXBzKCdieScpCiAgICAgICAg'+'ICAgICAgICAgICAgJiYgKHJlc291cmNlLmRhdGEuYnkgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgICBh'+'bGxvdyBkZWxldGU6IGlmIGlzU2lnbmVkSW4oKSAmJiAocmVzb3VyY2UuZGF0YS5ieSA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlz'+'QWRtaW4oKSk7CiAgICB9CgogICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09CiAgICAvLyAgVEhJTkdTIEZPUiBTQUxFICAtIHN0aWxsIHNpZ24taW4gb25seSwgZGVsaWJlcmF0'+'ZWx5CiAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT0KICAgIC8vIEEgcHJvZHVjdCBkb2N1bWVudCBjYXJyaWVzIGBwaG9uZWAgYW5kIGBhZGRyYDogdGhlIHNlbGxlcidzIG51'+'bWJlciBhbmQgc3RyZWV0IGFkZHJlc3MsCiAgICAvLyBhbmQgYGFkZHJgIGNhbiBiZSBzb21lYm9keSdzIGhvbWUuIFJ1bGVzIGFw'+'cGx5IHRvIHRoZSBDT0xMRUNUSU9OLCBub3QgdG8gdGhlIGZpZWxkcyBhCiAgICAvLyBwYWdlIGhhcHBlbnMgdG8gcHJpbnQsIHNv'+'IG9wZW5pbmcgdGhpcyBwdWJsaXNoZXMgZXZlcnkgZmllbGQgb2YgZXZlcnkgcHJvZHVjdCB0byBhbnlvbmUKICAgIC8vIHdobyBx'+'dWVyaWVzIEZpcmVzdG9yZS4gSWYgYWxsIG9mIHlvdXIgc2VsbGVycyBhcmUgc2hvcHMgd2l0aCBhbiBhZGRyZXNzIHRoZXkgd2Fu'+'dAogICAgLy8gcHVibGlzaGVkLCBjaGFuZ2UgdGhlIG5leHQgbGluZSB0byBgaWYgdHJ1ZTtgIGtub3dpbmcgZXhhY3RseSB0aGF0'+'LiBVbnRpbCBzb21lYm9keQogICAgLy8gZGVjaWRlcyB0aGF0IGRlbGliZXJhdGVseSwgaXQgc3RheXMgc2h1dC4KICAgIG1hdGNo'+'IC9wcm9kdWN0cy97aWR9IHsKICAgICAgYWxsb3cgcmVhZDogICBpZiBpc1NpZ25lZEluKCk7CiAgICAgIGFsbG93IGNyZWF0ZTog'+'aWYgaXNTaWduZWRJbigpICYmIHJlcXVlc3QucmVzb3VyY2UuZGF0YS5zZWxsZXJVaWQgPT0gcmVxdWVzdC5hdXRoLnVpZCAmJiB0'+'ZXh0T2soKTsKICAgICAgYWxsb3cgdXBkYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgdGV4dE9rKCkgJiYga2VlcHMoJ3NlbGxlclVp'+'ZCcpICYmICgKICAgICAgICAgICAgICAgICAgICAgICByZXNvdXJjZS5kYXRhLnNlbGxlclVpZCA9PSByZXF1ZXN0LmF1dGgudWlk'+'IHx8CiAgICAgICAgICAgICAgICAgICAgICAgb3duc1BhZ2UocmVzb3VyY2UuZGF0YS5nZXQoJ3BhZ2VOYW1lJywgJycpKSB8fCBp'+'c0FkbWluKCkKICAgICAgICAgICAgICAgICAgICApOwogICAgICBhbGxvdyBkZWxldGU6IGlmIGlzU2lnbmVkSW4oKSAmJiAoCiAg'+'ICAgICAgICAgICAgICAgICAgICAgcmVzb3VyY2UuZGF0YS5zZWxsZXJVaWQgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fAogICAgICAg'+'ICAgICAgICAgICAgICAgIG93bnNQYWdlKHJlc291cmNlLmRhdGEuZ2V0KCdwYWdlTmFtZScsICcnKSkgfHwgaXNBZG1pbigpCiAg'+'ICAgICAgICAgICAgICAgICAgKTsKICAgIH0KCiAgICBtYXRjaCAvb3JkZXJzL3tpZH0gewogICAgICAvLyBBbiBvcmRlciBpcyBi'+'ZXR3ZWVuIGEgYnV5ZXIgYW5kIGEgc2VsbGVyLiBOb2JvZHkgZWxzZSBoYXMgYW55IGJ1c2luZXNzIHJlYWRpbmcgaXQuCiAgICAg'+'IGFsbG93IHJlYWQ6ICAgaWYgaXNTaWduZWRJbigpICYmICgKICAgICAgICAgICAgICAgICAgICAgICByZXNvdXJjZS5kYXRhLmdl'+'dCgnYnV5ZXJVaWQnLCcnKSAgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fAogICAgICAgICAgICAgICAgICAgICAgIHJlc291cmNlLmRh'+'dGEuZ2V0KCdzZWxsZXJVaWQnLCcnKSA9PSByZXF1ZXN0LmF1dGgudWlkIHx8CiAgICAgICAgICAgICAgICAgICAgICAgcmVzb3Vy'+'Y2UuZGF0YS5nZXQoJ2FnZW50VWlkJywnJykgID09IHJlcXVlc3QuYXV0aC51aWQgfHwKICAgICAgICAgICAgICAgICAgICAgICBv'+'d25zUGFnZShyZXNvdXJjZS5kYXRhLmdldCgncGFnZU5hbWUnLCcnKSkgfHwgaXNBZG1pbigpCiAgICAgICAgICAgICAgICAgICAg'+'KTsKICAgICAgYWxsb3cgY3JlYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgbm90VG9vQmlnKCkKICAgICAgICAgICAgICAgICAgICAm'+'JiAocmVxdWVzdC5yZXNvdXJjZS5kYXRhLmJ1eWVyVWlkID09IHJlcXVlc3QuYXV0aC51aWQKICAgICAgICAgICAgICAgICAgICAg'+'fHwgcmVxdWVzdC5yZXNvdXJjZS5kYXRhLnNlbGxlclVpZCA9PSByZXF1ZXN0LmF1dGgudWlkKTsKICAgICAgYWxsb3cgdXBkYXRl'+'OiBpZiBpc1NpZ25lZEluKCkgJiYgbm90VG9vQmlnKCkgJiYga2VlcHMoJ2J1eWVyVWlkJykgJiYga2VlcHMoJ3NlbGxlclVpZCcp'+'ICYmICgKICAgICAgICAgICAgICAgICAgICAgICByZXNvdXJjZS5kYXRhLmdldCgnYnV5ZXJVaWQnLCcnKSAgPT0gcmVxdWVzdC5h'+'dXRoLnVpZCB8fAogICAgICAgICAgICAgICAgICAgICAgIHJlc291cmNlLmRhdGEuZ2V0KCdzZWxsZXJVaWQnLCcnKSA9PSByZXF1'+'ZXN0LmF1dGgudWlkIHx8CiAgICAgICAgICAgICAgICAgICAgICAgcmVzb3VyY2UuZGF0YS5nZXQoJ2FnZW50VWlkJywnJykgID09'+'IHJlcXVlc3QuYXV0aC51aWQgfHwKICAgICAgICAgICAgICAgICAgICAgICBvd25zUGFnZShyZXNvdXJjZS5kYXRhLmdldCgncGFn'+'ZU5hbWUnLCcnKSkgfHwgaXNBZG1pbigpCiAgICAgICAgICAgICAgICAgICAgKTsKICAgICAgYWxsb3cgZGVsZXRlOiBpZiBpc0Fk'+'bWluKCk7CiAgICB9CgogICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09CiAgICAvLyAgSk9CIEFQUExJQ0FUSU9OUyBBTkQgQ1ZzICAtIHRoZSBtb3N0IHBlcnNvbmFsIHRoaW5n'+'cyBoZXJlCiAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT0KICAgIC8vIEFuIGFwcGxpY2F0aW9uIGNhcnJpZXMgYSBuYW1lLCBhbiBlbWFpbCwgYSBwaG9uZSBudW1iZXIgYW5k'+'IGEgQ1YuIFRoZSBvbGQgcnVsZSBsZXQgQU5ZCiAgICAvLyBzaWduZWQtaW4gYWNjb3VudCByZWFkIGV2ZXJ5IG9uZSBvZiB0aGVt'+'LiBOb3c6IHRoZSBhcHBsaWNhbnQsIHRoZSBlbXBsb3llciBpdCB3YXMgc2VudAogICAgLy8gdG8sIGFuZCBhbiBhZG1pbi4gVGhl'+'IGFwcCBhc2tzIGZvciB0aGVtIHdpdGggd2hlcmUoJ3VpZCcsJz09JyxtZSkgb3IKICAgIC8vIHdoZXJlKCdlbXBsb3llclVpZCcs'+'Jz09JyxtZSksIHdoaWNoIGlzIHdoYXQgbWFrZXMgdGhvc2UgcXVlcmllcyBhbGxvd2VkLgogICAgbWF0Y2ggL2FwcGxpY2F0aW9u'+'cy97aWR9IHsKICAgICAgYWxsb3cgcmVhZDogICBpZiBpc1NpZ25lZEluKCkgJiYgKAogICAgICAgICAgICAgICAgICAgICAgIHJl'+'c291cmNlLmRhdGEuZ2V0KCd1aWQnLCcnKSAgICAgICAgID09IHJlcXVlc3QuYXV0aC51aWQgfHwKICAgICAgICAgICAgICAgICAg'+'ICAgICByZXNvdXJjZS5kYXRhLmdldCgnZW1wbG95ZXJVaWQnLCcnKSA9PSByZXF1ZXN0LmF1dGgudWlkIHx8CiAgICAgICAgICAg'+'ICAgICAgICAgICAgb3duc1BhZ2UocmVzb3VyY2UuZGF0YS5nZXQoJ2NvbXBhbnlMb3dlcicsJycpKSB8fCBpc0FkbWluKCkKICAg'+'ICAgICAgICAgICAgICAgICApOwogICAgICBhbGxvdyBjcmVhdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiByZXF1ZXN0LnJlc291cmNl'+'LmRhdGEudWlkID09IHJlcXVlc3QuYXV0aC51aWQgJiYgdGV4dE9rKCk7CiAgICAgIGFsbG93IHVwZGF0ZTogaWYgaXNTaWduZWRJ'+'bigpICYmIGtlZXBzKCd1aWQnKSAmJiBub3RUb29CaWcoKSAmJiAoCiAgICAgICAgICAgICAgICAgICAgICAgcmVzb3VyY2UuZGF0'+'YS5nZXQoJ3VpZCcsJycpICAgICAgICAgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fAogICAgICAgICAgICAgICAgICAgICAgIHJlc291'+'cmNlLmRhdGEuZ2V0KCdlbXBsb3llclVpZCcsJycpID09IHJlcXVlc3QuYXV0aC51aWQgfHwKICAgICAgICAgICAgICAgICAgICAg'+'ICBvd25zUGFnZShyZXNvdXJjZS5kYXRhLmdldCgnY29tcGFueUxvd2VyJywnJykpIHx8IGlzQWRtaW4oKQogICAgICAgICAgICAg'+'ICAgICAgICk7CiAgICAgIGFsbG93IGRlbGV0ZTogaWYgaXNTaWduZWRJbigpICYmIChyZXNvdXJjZS5kYXRhLmdldCgndWlkJywn'+'JykgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgfQogICAgbWF0Y2ggL2N2cy97aWR9IHsKICAgICAgYWxs'+'b3cgcmVhZDogIGlmIGlzU2lnbmVkSW4oKSAmJiAocmVzb3VyY2UuZGF0YS51aWQgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0Fk'+'bWluKCkpOwogICAgICBhbGxvdyB3cml0ZTogaWYgaXNTaWduZWRJbigpICYmIHJlcXVlc3QucmVzb3VyY2UuZGF0YS51aWQgPT0g'+'cmVxdWVzdC5hdXRoLnVpZCAmJiBub3RUb29CaWcoKTsKICAgIH0KICAgIG1hdGNoIC9pbnRlcnZpZXdzL3tpZH0gewogICAgICBh'+'bGxvdyByZWFkOiAgIGlmIGlzU2lnbmVkSW4oKSAmJiAoCiAgICAgICAgICAgICAgICAgICAgICAgcmVzb3VyY2UuZGF0YS5nZXQo'+'J3VpZCcsJycpICAgICAgICAgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fAogICAgICAgICAgICAgICAgICAgICAgIHJlc291cmNlLmRh'+'dGEuZ2V0KCdlbXBsb3llclVpZCcsJycpID09IHJlcXVlc3QuYXV0aC51aWQgfHwgaXNBZG1pbigpCiAgICAgICAgICAgICAgICAg'+'ICAgKTsKICAgICAgYWxsb3cgY3JlYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgbm90VG9vQmlnKCk7CiAgICAgIGFsbG93IHVwZGF0'+'ZSwgZGVsZXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgKAogICAgICAgICAgICAgICAgICAgICAgIHJlc291cmNlLmRhdGEuZ2V0KCdl'+'bXBsb3llclVpZCcsJycpID09IHJlcXVlc3QuYXV0aC51aWQgfHwgaXNBZG1pbigpKTsKICAgIH0KCiAgICAvLyA9PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgIC8vICBQQUdFUyAg'+'KHNob3BzIGFuZCBjb21wYW5pZXMpCiAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT0KICAgIC8vIFRoZSBvbGQgcnVsZSB3YXMgYGFsbG93IHVwZGF0ZTogaWYgaXNTaWduZWRJ'+'bigpYC4gVGhhdCBsZXQgQU5ZIGFjY291bnQgb3ZlcndyaXRlIEFOWQogICAgLy8gcGFnZSAtIGluY2x1ZGluZyBzZXR0aW5nIG93'+'bmVyVWlkIHRvIHRoZW1zZWx2ZXMsIG9yIGxpY2Vuc2VkIHRvIHRydWUuIEEgc2hvcCBjb3VsZCBiZQogICAgLy8gdGFrZW4gb3Zl'+'ciBieSBhbnlib2R5IHdpdGggYW4gYWNjb3VudC4gT25seSB0aGUgb3duZXIsIGEgbGlzdGVkIG1lbWJlciwgb3IgYW4gYWRtaW4u'+'CiAgICBmdW5jdGlvbiBwYWdlTWVtYmVyKG5hbWUpIHsKICAgICAgcmV0dXJuIGlzU2lnbmVkSW4oKSAmJgogICAgICAgIChyZXNv'+'dXJjZS5kYXRhLmdldCgnb3duZXJVaWQnLCcnKSA9PSByZXF1ZXN0LmF1dGgudWlkCiAgICAgICAgIHx8IHJlcXVlc3QuYXV0aC51'+'aWQgaW4gcmVzb3VyY2UuZGF0YS5nZXQoJ21lbWJlclVpZHMnLCBbXSkpOwogICAgfQogICAgbWF0Y2ggL3BhZ2VzL3tuYW1lfSB7'+'CiAgICAgIGFsbG93IHJlYWQ6ICAgaWYgaXNTaWduZWRJbigpOwogICAgICBhbGxvdyBjcmVhdGU6IGlmIGlzU2lnbmVkSW4oKSAm'+'JiByZXF1ZXN0LnJlc291cmNlLmRhdGEub3duZXJVaWQgPT0gcmVxdWVzdC5hdXRoLnVpZCAmJiB0ZXh0T2soKTsKICAgICAgLy8g'+'YGxpY2Vuc2VkYCwgYGxpY0V4cGlyeWAgYW5kIGBzdXNwZW5kZWRVbnRpbGAgZGVjaWRlIHdoZXRoZXIgYSBzaG9wIGFwcGVhcnMg'+'aW4gdGhlCiAgICAgIC8vIG1hcmtldHBsYWNlLCBzbyB0aGV5IGFyZSBhbiBhZG1pbidzIHRvIHNldCwgbmV2ZXIgdGhlIHNob3An'+'cyBvd24uCiAgICAgIGFsbG93IHVwZGF0ZTogaWYgKHBhZ2VNZW1iZXIobmFtZSkgfHwgaXNBZG1pbigpKSAmJiB0ZXh0T2soKSAm'+'JiBrZWVwcygnb3duZXJVaWQnKQogICAgICAgICAgICAgICAgICAgICYmIChpc0FkbWluKCkgfHwgKGtlZXBzKCdsaWNlbnNlZCcp'+'ICYmIGtlZXBzKCdsaWNFeHBpcnknKSAmJiBrZWVwcygnc3VzcGVuZGVkVW50aWwnKSkpOwogICAgICBhbGxvdyBkZWxldGU6IGlm'+'IGlzU2lnbmVkSW4oKSAmJiAocmVzb3VyY2UuZGF0YS5nZXQoJ293bmVyVWlkJywnJykgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBp'+'c0FkbWluKCkpOwogICAgfQoKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PQogICAgLy8gIFNFVFRJTkdTCiAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgIC8vIGNvbmZpZy9saWNlbnNlcyBhbmQgY29uZmlnL2xp'+'Y2tleXMgZGVjaWRlIHdobyBtYXkgc2VsbCBhbmQgaG9sZCB1bnJlZGVlbWVkIGxpY2VuY2Uga2V5cy4KICAgIC8vIFRoZSBvbGQg'+'cnVsZSBsZXQgYW55IHNpZ25lZC1pbiBhY2NvdW50IHdyaXRlIHRoZW0gLSB0aGF0IGlzICJncmFudCB5b3Vyc2VsZiBhIGxpY2Vu'+'Y2UiLAogICAgLy8gYW5kIHJlYWQgZXZlcnkgdW51c2VkIGtleS4gVGhleSBhcmUgYW4gYWRtaW4ncy4gVGhlIHR3byByZXF1ZXN0'+'IGxpc3RzIHN0YXkgd3JpdGFibGUsCiAgICAvLyBiZWNhdXNlIGFza2luZyBpcyB3aGF0IGEgdXNlciBkb2VzLgogICAgbWF0Y2gg'+'L2NvbmZpZy9hZG1pbiAgICAgICAgICAgIHsgYWxsb3cgcmVhZCwgd3JpdGU6IGlmIGZhbHNlOyB9CiAgICBtYXRjaCAvY29uZmln'+'L2xpY2Vuc2VzICAgICAgICAgeyBhbGxvdyByZWFkOiBpZiBpc1NpZ25lZEluKCk7IGFsbG93IHdyaXRlOiBpZiBpc0FkbWluKCk7'+'IH0KICAgIG1hdGNoIC9jb25maWcvbGlja2V5cyAgICAgICAgICB7IGFsbG93IHJlYWQsIHdyaXRlOiBpZiBpc0FkbWluKCk7IH0K'+'ICAgIG1hdGNoIC9jb25maWcvbGljcmVxcyAgICAgICAgICB7IGFsbG93IHJlYWQ6IGlmIGlzU2lnbmVkSW4oKTsgYWxsb3cgd3Jp'+'dGU6IGlmIGlzU2lnbmVkSW4oKSAmJiBub3RUb29CaWcoKTsgfQogICAgbWF0Y2ggL2NvbmZpZy9wYWdlcmVxcyAgICAgICAgIHsg'+'YWxsb3cgcmVhZDogaWYgaXNTaWduZWRJbigpOyBhbGxvdyB3cml0ZTogaWYgaXNTaWduZWRJbigpICYmIG5vdFRvb0JpZygpOyB9'+'CiAgICBtYXRjaCAvY29uZmlnL3tkb2N9ICAgICAgICAgICAgeyBhbGxvdyByZWFkOiBpZiBpc1NpZ25lZEluKCk7IGFsbG93IHdy'+'aXRlOiBpZiBpc0FkbWluKCk7IH0KCiAgICAvLyBUSEUgU1dJVENIQk9BUkQuIE9uZSBkb2N1bWVudCBob2xkaW5nIHdoYXQgdGhl'+'IHNpdGUgc2hvd3M6IHdoaWNoIHNlY3Rpb25zIGFyZSBvbiwgd2hpY2gKICAgIC8vIGNhdGVnb3JpZXMgYXBwZWFyLCB0aGUgY29t'+'bWlzc2lvbiBzZXR0aW5ncywgYW5kIHRoZSBpZHMgYW4gYWRtaW4gaGFzIGhpZGRlbiBvciBoZWxkLgogICAgLy8gRXZlcnlib2R5'+'IG11c3QgYmUgYWJsZSB0byBSRUFEIGl0LCBvciBhIHZpc2l0b3IncyBhcHAgY2Fubm90IGtub3cgd2hhdCB0byBzaG93LgogICAg'+'bWF0Y2ggL3NpdGUve2RvY30gewogICAgICBhbGxvdyByZWFkOiAgaWYgdHJ1ZTsKICAgICAgYWxsb3cgd3JpdGU6IGlmIGlzQWRt'+'aW4oKSAmJiBub3RUb29CaWcoKTsKICAgIH0KCiAgICAvLyBBIHJlY29yZCBvZiB3aGF0IGFuIGFkbWluIGRpZCwgc28gYSBjaGFu'+'Z2UgY2FuIGJlIHRyYWNlZCB0byBhbiBhY2NvdW50IGFuZCBhIHRpbWUuCiAgICAvLyBBcHBlbmQtb25seTogbm9ib2R5IG1heSBy'+'ZXdyaXRlIGhpc3RvcnksIG5vdCBldmVuIGFuIGFkbWluLgogICAgbWF0Y2ggL21vZGxvZy97aWR9IHsKICAgICAgYWxsb3cgcmVh'+'ZDogICBpZiBpc0FkbWluKCk7CiAgICAgIGFsbG93IGNyZWF0ZTogaWYgaXNBZG1pbigpICYmIHJlcXVlc3QucmVzb3VyY2UuZGF0'+'YS5ieSA9PSByZXF1ZXN0LmF1dGgudWlkICYmIG5vdFRvb0JpZygpOwogICAgICBhbGxvdyB1cGRhdGUsIGRlbGV0ZTogaWYgZmFs'+'c2U7CiAgICB9CgogICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09CiAgICAvLyAgRU5RVUlSSUVTIEFORCBDTE9TRUQgREVBTFMKICAgIC8vID09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gQW4gZW5xdWlyeSBpcyBwcml2'+'YXRlIGJldHdlZW4gdGhlIHBlcnNvbiBhc2tpbmcgYW5kIHRoZSBsaXN0ZXIsIHdoaWNoIGlzIHRoZSBwb2ludCBvZgogICAgLy8g'+'d2l0aGhvbGRpbmcgYSBudW1iZXIgb24gYSBsaXN0aW5nIGhhbmRsZWQgb24gY29tbWlzc2lvbi4gQSBjbG9zZWQgZGVhbCBpcyBy'+'ZWFkYWJsZSBieQogICAgLy8gdGhlIHBlcnNvbiB3aG8gcmVjb3JkZWQgaXQuIE5laXRoZXIgbWF5IGJlIGVkaXRlZCBieSBhbnlv'+'bmUgZWxzZSwgc28gdGhlIHJlY29yZCBvZiB3aG8KICAgIC8vIGludHJvZHVjZWQgd2hvbSwgYW5kIHdoZW4sIGNhbm5vdCBiZSBy'+'ZXdyaXR0ZW4gYWZ0ZXJ3YXJkcy4KICAgIG1hdGNoIC9sZWFkcy97aWR9IHsKICAgICAgYWxsb3cgY3JlYXRlOiBpZiBpc1NpZ25l'+'ZEluKCkgJiYgcmVxdWVzdC5yZXNvdXJjZS5kYXRhLmZyb20gPT0gcmVxdWVzdC5hdXRoLnVpZCAmJiBub3RUb29CaWcoKTsKICAg'+'ICAgYWxsb3cgcmVhZDogICBpZiBpc1NpZ25lZEluKCkgJiYgKHJlc291cmNlLmRhdGEuZnJvbSA9PSByZXF1ZXN0LmF1dGgudWlk'+'CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8fCByZXNvdXJjZS5kYXRhLnRvICAgPT0gcmVxdWVzdC5hdXRo'+'LnVpZAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfHwgaXNBZG1pbigpKTsKICAgICAgYWxsb3cgdXBkYXRl'+'OiBpZiBpc1NpZ25lZEluKCkgJiYga2VlcHMoJ2Zyb20nKSAmJiBrZWVwcygndG8nKSAmJiBub3RUb29CaWcoKQogICAgICAgICAg'+'ICAgICAgICAgICYmIChyZXNvdXJjZS5kYXRhLnRvID09IHJlcXVlc3QuYXV0aC51aWQgfHwgaXNBZG1pbigpKTsKICAgICAgYWxs'+'b3cgZGVsZXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgKHJlc291cmNlLmRhdGEudG8gPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0Fk'+'bWluKCkpOwogICAgfQogICAgbWF0Y2ggL2RlYWxzL3tpZH0gewogICAgICBhbGxvdyBjcmVhdGU6IGlmIGlzU2lnbmVkSW4oKSAm'+'JiByZXF1ZXN0LnJlc291cmNlLmRhdGEuYnkgPT0gcmVxdWVzdC5hdXRoLnVpZCAmJiBub3RUb29CaWcoKTsKICAgICAgYWxsb3cg'+'cmVhZDogICBpZiBpc1NpZ25lZEluKCkgJiYgKHJlc291cmNlLmRhdGEuYnkgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWlu'+'KCkpOwogICAgICBhbGxvdyB1cGRhdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiBrZWVwcygnYnknKSAmJiBub3RUb29CaWcoKQogICAg'+'ICAgICAgICAgICAgICAgICYmIChyZXNvdXJjZS5kYXRhLmJ5ID09IHJlcXVlc3QuYXV0aC51aWQgfHwgaXNBZG1pbigpKTsKICAg'+'ICAgYWxsb3cgZGVsZXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgKHJlc291cmNlLmRhdGEuYnkgPT0gcmVxdWVzdC5hdXRoLnVpZCB8'+'fCBpc0FkbWluKCkpOwogICAgfQoKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gIE1FU1NBR0VTIEFORCBTVVBQT1JUCiAgICAvLyA9PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgIC8vIEEgY29udmVyc2F0aW9u'+'IGhhcyB0d28gc2lkZXMsIGFVaWQgYW5kIGJVaWQuIFRoZSBvbGQgcnVsZSBsZXQgYW55IHNpZ25lZC1pbiBhY2NvdW50IHJlYWQK'+'ICAgIC8vIEVWRVJZIHByaXZhdGUgbWVzc2FnZSBpbiB0aGUgZGF0YWJhc2UuIE5vdyBvbmx5IHRoZSB0d28gcGVvcGxlIGluIGl0'+'LCBhbmQgdGhlIGFwcCBhc2tzCiAgICAvLyBmb3IgdGhlbSB3aXRoIHdoZXJlKCdhVWlkJywnPT0nLG1lKSBhbmQgd2hlcmUoJ2JV'+'aWQnLCc9PScsbWUpIC0gdHdvIHF1ZXJpZXMsIGJlY2F1c2UgYQogICAgLy8gcnVsZSB0aGF0IHNheXMgIm9yIiBuZWVkcyBhIHF1'+'ZXJ5IHRoYXQgc2F5cyB3aGljaCBzaWRlIHlvdSBhcmUuCiAgICBtYXRjaCAvZG1zL3tpZH0gewogICAgICBhbGxvdyByZWFkOiAg'+'IGlmIGlzU2lnbmVkSW4oKSAmJiAocmVzb3VyY2UuZGF0YS5nZXQoJ2FVaWQnLCcnKSA9PSByZXF1ZXN0LmF1dGgudWlkCiAgICAg'+'ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8fCByZXNvdXJjZS5kYXRhLmdldCgnYlVpZCcsJycpID09IHJlcXVlc3Qu'+'YXV0aC51aWQgfHwgaXNBZG1pbigpKTsKICAgICAgYWxsb3cgY3JlYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgbm90VG9vQmlnKCkK'+'ICAgICAgICAgICAgICAgICAgICAmJiAocmVxdWVzdC5yZXNvdXJjZS5kYXRhLmFVaWQgPT0gcmVxdWVzdC5hdXRoLnVpZAogICAg'+'ICAgICAgICAgICAgICAgICB8fCByZXF1ZXN0LnJlc291cmNlLmRhdGEuYlVpZCA9PSByZXF1ZXN0LmF1dGgudWlkKTsKICAgICAg'+'YWxsb3cgdXBkYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgbm90VG9vQmlnKCkgJiYga2VlcHMoJ2FVaWQnKSAmJiBrZWVwcygnYlVp'+'ZCcpCiAgICAgICAgICAgICAgICAgICAgJiYgKHJlc291cmNlLmRhdGEuZ2V0KCdhVWlkJywnJykgPT0gcmVxdWVzdC5hdXRoLnVp'+'ZAogICAgICAgICAgICAgICAgICAgICB8fCByZXNvdXJjZS5kYXRhLmdldCgnYlVpZCcsJycpID09IHJlcXVlc3QuYXV0aC51aWQp'+'OwogICAgICBhbGxvdyBkZWxldGU6IGlmIGlzQWRtaW4oKTsKICAgIH0KICAgIC8vIEEgc3VwcG9ydCB0aWNrZXQgaXMgYmV0d2Vl'+'biB0aGUgcGVyc29uIHdobyByYWlzZWQgaXQgYW5kIHdob2V2ZXIgYW5zd2VycyBpdC4KICAgIG1hdGNoIC90aWNrZXRzL3tpZH0g'+'ewogICAgICBhbGxvdyByZWFkOiAgIGlmIGlzU2lnbmVkSW4oKSAmJiAocmVzb3VyY2UuZGF0YS5nZXQoJ2J5JywnJykgID09IHJl'+'cXVlc3QuYXV0aC51aWQKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHx8IHJlc291cmNlLmRhdGEuZ2V0KCd1'+'aWQnLCcnKSA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlzQWRtaW4oKSk7CiAgICAgIGFsbG93IGNyZWF0ZTogaWYgaXNTaWduZWRJ'+'bigpICYmIG5vdFRvb0JpZygpOwogICAgICBhbGxvdyB1cGRhdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiBub3RUb29CaWcoKQogICAg'+'ICAgICAgICAgICAgICAgICYmIChyZXNvdXJjZS5kYXRhLmdldCgnYnknLCcnKSA9PSByZXF1ZXN0LmF1dGgudWlkCiAgICAgICAg'+'ICAgICAgICAgICAgIHx8IHJlc291cmNlLmRhdGEuZ2V0KCd1aWQnLCcnKSA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlzQWRtaW4o'+'KSk7CiAgICAgIGFsbG93IGRlbGV0ZTogaWYgaXNBZG1pbigpOwogICAgfQoKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gIE9ORSBQRVJTT04nUyBPV04gVEhJ'+'TkdTICAodm9pY2UgdHJhbnNjcmliZXIsIHN0dWR5IGxpbmssIHNlbGxlciBzZXR0aW5ncykKICAgIC8vID09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgbWF0Y2ggL3Rydm9jYWIv'+'e3VpZH0gICAgICAgeyBhbGxvdyByZWFkLCB3cml0ZTogaWYgaXNPd25lcih1aWQpOyB9CiAgICBtYXRjaCAvdHJjb3JyZWN0aW9u'+'cy97dWlkfSB7IGFsbG93IHJlYWQsIHdyaXRlOiBpZiBpc093bmVyKHVpZCk7IH0KICAgIG1hdGNoIC90cmJyYWluL3t1aWR9ICAg'+'ICAgIHsgYWxsb3cgcmVhZCwgd3JpdGU6IGlmIGlzT3duZXIodWlkKTsgfQogICAgbWF0Y2ggL3JibGluay97dWlkfSAgICAgICAg'+'eyBhbGxvdyByZWFkLCB3cml0ZTogaWYgaXNPd25lcih1aWQpOyB9CiAgICBtYXRjaCAvc2VsbGVyUHJlZnMve3VpZH0gICB7IGFs'+'bG93IHJlYWQsIHdyaXRlOiBpZiBpc093bmVyKHVpZCk7IH0KICAgIG1hdGNoIC9hZ2VudHMve3VpZH0gewogICAgICBhbGxvdyBy'+'ZWFkOiAgaWYgaXNTaWduZWRJbigpOwogICAgICBhbGxvdyB3cml0ZTogaWYgKGlzT3duZXIodWlkKSB8fCBpc0FkbWluKCkpICYm'+'IG5vdFRvb0JpZygpOwogICAgfQogICAgbWF0Y2ggL3Ryc2Vzc2lvbnMve2RvY0lkfSB7CiAgICAgIGFsbG93IHJlYWQ6ICBpZiBp'+'c1NpZ25lZEluKCkgJiYgcmVzb3VyY2UuZGF0YS51aWQgPT0gcmVxdWVzdC5hdXRoLnVpZDsKICAgICAgYWxsb3cgd3JpdGU6IGlm'+'IGlzU2lnbmVkSW4oKSAmJiByZXF1ZXN0LnJlc291cmNlLmRhdGEudWlkID09IHJlcXVlc3QuYXV0aC51aWQgJiYgbm90VG9vQmln'+'KCk7CiAgICB9CiAgICBtYXRjaCAvdHJwYXJ0cy97ZG9jSWR9IHsKICAgICAgYWxsb3cgcmVhZDogIGlmIGlzU2lnbmVkSW4oKSAm'+'JiByZXNvdXJjZS5kYXRhLnVpZCA9PSByZXF1ZXN0LmF1dGgudWlkOwogICAgICBhbGxvdyB3cml0ZTogaWYgaXNTaWduZWRJbigp'+'ICYmIHJlcXVlc3QucmVzb3VyY2UuZGF0YS51aWQgPT0gcmVxdWVzdC5hdXRoLnVpZCAmJiBub3RUb29CaWcoKTsKICAgIH0KCiAg'+'ICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0K'+'ICAgIC8vICBTSEFSRUQgUE9PTFMKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PQogICAgbWF0Y2ggL3Ryc2hhcmVkL3tkb2N9IHsKICAgICAgYWxsb3cgcmVhZDogICBpZiBp'+'c1NpZ25lZEluKCk7CiAgICAgIGFsbG93IGNyZWF0ZTogaWYgaXNTaWduZWRJbigpICYmIG5vdFRvb0JpZygpOwogICAgICBhbGxv'+'dyB1cGRhdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiBub3RUb29CaWcoKTsKICAgICAgYWxsb3cgZGVsZXRlOiBpZiBpc0FkbWluKCk7'+'CiAgICB9CiAgICBtYXRjaCAvc2hhcmVkL3tpZH0gewogICAgICBhbGxvdyByZWFkOiAgIGlmIGlzU2lnbmVkSW4oKTsKICAgICAg'+'YWxsb3cgY3JlYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgcmVxdWVzdC5yZXNvdXJjZS5kYXRhLm93bmVyID09IHJlcXVlc3QuYXV0'+'aC51aWQgJiYgbm90VG9vQmlnKCk7CiAgICAgIGFsbG93IHVwZGF0ZTogaWYgaXNTaWduZWRJbigpICYmIGtlZXBzKCdvd25lcicp'+'ICYmIG5vdFRvb0JpZygpCiAgICAgICAgICAgICAgICAgICAgJiYgKHJlc291cmNlLmRhdGEub3duZXIgPT0gcmVxdWVzdC5hdXRo'+'LnVpZCB8fCBpc0FkbWluKCkpOwogICAgICBhbGxvdyBkZWxldGU6IGlmIGlzU2lnbmVkSW4oKSAmJiAocmVzb3VyY2UuZGF0YS5v'+'d25lciA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlzQWRtaW4oKSk7CiAgICB9CiAgICBtYXRjaCAvdHJhY2tzL3tpZH0gewogICAg'+'ICBhbGxvdyByZWFkOiAgIGlmIGlzU2lnbmVkSW4oKTsKICAgICAgYWxsb3cgY3JlYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgcmVx'+'dWVzdC5yZXNvdXJjZS5kYXRhLm93bmVyID09IHJlcXVlc3QuYXV0aC51aWQgJiYgbm90VG9vQmlnKCk7CiAgICAgIGFsbG93IHVw'+'ZGF0ZTogaWYgaXNTaWduZWRJbigpICYmIGtlZXBzKCdvd25lcicpICYmIG5vdFRvb0JpZygpCiAgICAgICAgICAgICAgICAgICAg'+'JiYgKHJlc291cmNlLmRhdGEub3duZXIgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgICBhbGxvdyBkZWxl'+'dGU6IGlmIGlzU2lnbmVkSW4oKSAmJiAocmVzb3VyY2UuZGF0YS5vd25lciA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlzQWRtaW4o'+'KSk7CiAgICB9CgogICAgLy8gV2hhdCBwZW9wbGUgc2VhcmNoZWQgZm9yIGFuZCBmb3VuZCBub3RoaW5nLCBzbyB0aGUgc2hvcCBj'+'YW4gc3RvY2sgaXQuIE9uZSBzbWFsbCBkb2N1bWVudAogICAgLy8gcGVyIHNlYXJjaCwgd3JpdHRlbiBvbmNlIGFuZCBuZXZlciBj'+'aGFuZ2VkIGJ5IGFueWJvZHkuCiAgICBtYXRjaCAvc2VhcmNoX2ludGVyZXN0L3tpZH0gewogICAgICBhbGxvdyByZWFkOiAgIGlm'+'IGlzU2lnbmVkSW4oKTsKICAgICAgYWxsb3cgY3JlYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgcmVxdWVzdC5yZXNvdXJjZS5kYXRh'+'LnVpZCA9PSByZXF1ZXN0LmF1dGgudWlkCiAgICAgICAgICAgICAgICAgICAgJiYgb2tTdHIocmVxdWVzdC5yZXNvdXJjZS5kYXRh'+'LmdldCgncScsJycpLCAxMjApICYmIG5vdFRvb0JpZygpOwogICAgICBhbGxvdyB1cGRhdGUsIGRlbGV0ZTogaWYgaXNBZG1pbigp'+'OwogICAgfQoKICAgIC8vIFRoZSBhcHAncyBvd24gY29ubmVjdGl2aXR5IHByb2JlLiBPbmUga25vd24gZG9jdW1lbnQsIG5vdCBh'+'IGNvbGxlY3Rpb24gdG8gZmlsbCB1cC4KICAgIG1hdGNoIC9fY29ubl90ZXN0L3Byb2JlIHsgYWxsb3cgcmVhZCwgd3JpdGU6IGlm'+'IGlzU2lnbmVkSW4oKTsgfQoKICAgIC8vIEFueXRoaW5nIG5vdCBuYW1lZCBhYm92ZSBpcyBkZW5pZWQgdG8gZXZlcnlib2R5LiBU'+'aGlzIE1VU1Qgc3RheSBsYXN0LgogICAgbWF0Y2ggL3tkb2N1bWVudD0qKn0geyBhbGxvdyByZWFkLCB3cml0ZTogaWYgZmFsc2U7'+'IH0KICB9Cn0K';
+var RB_RULES_SRC='cnVsZXNfdmVyc2lvbiA9ICcyJzsKc2VydmljZSBjbG91ZC5maXJlc3RvcmUgewogIG1hdGNoIC9kYXRhYmFzZXMve2RhdGFiYXNl'+'fS9kb2N1bWVudHMgewoKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PQogICAgLy8gIFdITyBJUyBXSE8KICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gImFkbWluIiBpcyBhIENVU1RPTSBDTEFJTSBvbiB0'+'aGUgYWNjb3VudCwgc2V0IGZyb20gdGhlIEZpcmViYXNlIEFkbWluIFNESyBvciBhIENsb3VkCiAgICAvLyBGdW5jdGlvbiAtIG5l'+'dmVyIGZyb20gYSBicm93c2VyLiBUaGUgcGFzc3dvcmQgZ2F0ZSBpbnNpZGUgdGhlIFJlZWRiaSBhcHAgaXMgTk9UIHRoaXMuCiAg'+'ICAvLyBUaGF0IGdhdGUgZGVjaWRlcyB3aGF0IG9uZSBwaG9uZSBkaXNwbGF5cyBhbmQgbm90aGluZyBtb3JlOyBhbnlib2R5IGNh'+'biByZWFkIHRoZSBhcHAncwogICAgLy8gc291cmNlIGFuZCBmaW5kIGl0LiBUaGVzZSBydWxlcyBhcmUgdGhlIG9ubHkgdGhpbmcg'+'dGhhdCBhY3R1YWxseSBzdG9wcyBzb21lYm9keQogICAgLy8gcmV3cml0aW5nIHlvdXIgc2l0ZSwgc28gdGhlIGNsYWltIGlzIHdo'+'YXQgdGhleSBhc2sgZm9yLgogICAgZnVuY3Rpb24gaXNBZG1pbigpICAgIHsgcmV0dXJuIHJlcXVlc3QuYXV0aCAhPSBudWxsICYm'+'IHJlcXVlc3QuYXV0aC50b2tlbi5hZG1pbiA9PSB0cnVlOyB9CiAgICBmdW5jdGlvbiBpc1NpZ25lZEluKCkgeyByZXR1cm4gcmVx'+'dWVzdC5hdXRoICE9IG51bGw7IH0KICAgIGZ1bmN0aW9uIGlzT3duZXIodWlkKSB7IHJldHVybiByZXF1ZXN0LmF1dGggIT0gbnVs'+'bCAmJiByZXF1ZXN0LmF1dGgudWlkID09IHVpZDsgfQogICAgLy8gQSBwYWdlIGRvY3VtZW50IGlzIHN0b3JlZCBhdCBpdHMgbmFt'+'ZSBMT1dFUkNBU0VELiBBIHByb2R1Y3QgY2FycmllcyB0aGUgZGlzcGxheSBuYW1lLCBzbwogICAgLy8gdGhpcyBjb21wYXJlZCAi'+'R3JlZW4gR3JvY2VyIiBhZ2FpbnN0IGEgZG9jdW1lbnQgY2FsbGVkICJncmVlbiBncm9jZXIiIGFuZCBuZXZlciBtYXRjaGVkIC0K'+'ICAgIC8vIG1lYW5pbmcgYSBwYWdlIG93bmVyIGNvdWxkIG5vdCBlZGl0IGEgcHJvZHVjdCBsaXN0ZWQgdW5kZXIgdGhlaXIgb3du'+'IHBhZ2UgdW5sZXNzIHRoZXkgYWxzbwogICAgLy8gaGFwcGVuZWQgdG8gYmUgdGhlIHNlbGxlci4gTG93ZXJjYXNpbmcgaXMgdGhl'+'IGZpeC4KICAgIGZ1bmN0aW9uIHBhZ2VEb2MobmFtZSkgeyByZXR1cm4gL2RhdGFiYXNlcy8kKGRhdGFiYXNlKS9kb2N1bWVudHMv'+'cGFnZXMvJChuYW1lLmxvd2VyKCkpOyB9CiAgICBmdW5jdGlvbiBwYWdlSGFzKG5hbWUpICB7IHJldHVybiBuYW1lIGlzIHN0cmlu'+'ZyAmJiBuYW1lICE9ICcnICYmIGV4aXN0cyhwYWdlRG9jKG5hbWUpKTsgfQogICAgZnVuY3Rpb24gb3duc1BhZ2UobmFtZSkgewog'+'ICAgICByZXR1cm4gcGFnZUhhcyhuYW1lKSAmJiBnZXQocGFnZURvYyhuYW1lKSkuZGF0YS5vd25lclVpZCA9PSByZXF1ZXN0LmF1'+'dGgudWlkOwogICAgfQogICAgLy8gQXBwcm92ZWQgdG8gc2VsbC4gT05MWSBhbiBhZG1pbiBjYW4gc2V0IGBsaWNlbnNlZGAsIHNv'+'IHRoaXMgaXMgdGhlIGFkbWluJ3MgZGVjaXNpb24gYW5kCiAgICAvLyBub2JvZHkgZWxzZSdzIC0gYSBzaG9wIGNhbm5vdCBhcHBy'+'b3ZlIGl0c2VsZiwgYW5kIHRoZSBydWxlIGJlbG93IHJlYWRzIGl0IGZyZXNoIGZyb20gdGhlCiAgICAvLyBwYWdlIGRvY3VtZW50'+'IHJhdGhlciB0aGFuIGJlbGlldmluZyBhIGZsYWcgdGhlIGNsaWVudCBzZW50LgogICAgZnVuY3Rpb24gcGFnZUFwcHJvdmVkKG5h'+'bWUpIHsKICAgICAgcmV0dXJuIHBhZ2VIYXMobmFtZSkgJiYgZ2V0KHBhZ2VEb2MobmFtZSkpLmRhdGEuZ2V0KCdsaWNlbnNlZCcs'+'IGZhbHNlKSA9PSB0cnVlOwogICAgfQoKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gIExJTUlUUwogICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgICAvLyBGaXJlc3RvcmUgY2hhcmdlcyB0aGUgT1dO'+'RVIgb2YgdGhlIHByb2plY3QgZm9yIHN0b3JhZ2UgYW5kIGZvciBldmVyeSBieXRlIHJlYWQuIEEgd29ybGQKICAgIC8vIHJlYWRh'+'YmxlIGNvbGxlY3Rpb24gd2l0aCBubyBjZWlsaW5nIGlzIHRoZXJlZm9yZSBzb21lYm9keSBlbHNlJ3MgYmlsbCwgYW5kIGEgbGlz'+'dGluZwogICAgLy8gdGl0bGUgb2YgYSBtaWxsaW9uIGNoYXJhY3RlcnMgYWxzbyBicmVha3MgdGhlIHBhZ2UgYnVpbGRlci4gVGhl'+'c2UgYXJlIGRlbGliZXJhdGVseQogICAgLy8gZ2VuZXJvdXMgLSB0aGV5IHN0b3AgYWJ1c2UsIG5vdCB1c2UuCiAgICBmdW5jdGlv'+'biBva1N0cih2LCBuKSAgeyByZXR1cm4gISh2IGlzIHN0cmluZykgfHwgdi5zaXplKCkgPD0gbjsgfQogICAgZnVuY3Rpb24gb2tM'+'aXN0KHYsIG4pIHsgcmV0dXJuICEodiBpcyBsaXN0KSAgIHx8IHYuc2l6ZSgpIDw9IG47IH0KICAgIGZ1bmN0aW9uIG5vdFRvb0Jp'+'ZygpICB7IHJldHVybiByZXF1ZXN0LnJlc291cmNlLmRhdGEuc2l6ZSgpIDw9IDkwOyB9CgogICAgLy8gQSBsaXN0aW5nLCBhIHBy'+'b2R1Y3Qgb3IgYSBwb3N0IGFzIHNvbWVib2R5IG1heSBhY3R1YWxseSB3cml0ZSBvbmUuCiAgICBmdW5jdGlvbiB0ZXh0T2soKSB7'+'CiAgICAgIGxldCBkID0gcmVxdWVzdC5yZXNvdXJjZS5kYXRhOwogICAgICByZXR1cm4gbm90VG9vQmlnKCkKICAgICAgICAmJiBv'+'a1N0cihkLmdldCgndGl0bGUnLCAnJyksIDMwMCkKICAgICAgICAmJiBva1N0cihkLmdldCgnZGVzYycsICAnJyksIDgwMDApCiAg'+'ICAgICAgJiYgb2tTdHIoZC5nZXQoJ2JvZHknLCAgJycpLCA4MDAwKQogICAgICAgICYmIG9rU3RyKGQuZ2V0KCdwbGFjZScsICcn'+'KSwgMjAwKQogICAgICAgICYmIG9rU3RyKGQuZ2V0KCdhZGRyJywgICcnKSwgMzAwKQogICAgICAgICYmIG9rU3RyKGQuZ2V0KCdu'+'YW1lJywgICcnKSwgMjAwKQogICAgICAgICYmIG9rU3RyKGQuZ2V0KCdwaG9uZScsICcnKSwgNDApCiAgICAgICAgJiYgb2tMaXN0'+'KGQuZ2V0KCdwaG90b3MnLCBbXSksIDIwKQogICAgICAgICYmIG9rTGlzdChkLmdldCgndW5pdHMnLCAgW10pLCAyMDApOwogICAg'+'fQoKICAgIC8vIFRoZSBmaWVsZCB0aGF0IHNheXMgd2hvIG93bnMgYSBkb2N1bWVudCBtdXN0IG5ldmVyIGNoYW5nZSBoYW5kcyBv'+'biBhbiBlZGl0LiBXaXRob3V0IHRoaXMKICAgIC8vIHRoZSBvd25lciBvZiBhIGxpc3RpbmcgY291bGQgaGFuZCBpdCB0byBzb21l'+'Ym9keSBlbHNlLCBvciAtIHdvcnNlLCB3aXRoIGEgbWVyZ2Ugd3JpdGUgLQogICAgLy8gYSBmaWVsZCBjb3VsZCBiZSBxdWlldGx5'+'IGFkZGVkIHRoYXQgYW5vdGhlciBydWxlIGxhdGVyIHRydXN0cy4KICAgIGZ1bmN0aW9uIGtlZXBzKGZpZWxkKSB7CiAgICAgIHJl'+'dHVybiAhKGZpZWxkIGluIHJlcXVlc3QucmVzb3VyY2UuZGF0YSkKICAgICAgICB8fCByZXF1ZXN0LnJlc291cmNlLmRhdGFbZmll'+'bGRdID09IHJlc291cmNlLmRhdGFbZmllbGRdOwogICAgfQoKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gIEFDQ09VTlRTCiAgICAvLyA9PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgIC8vIEEgcHJvZmlsZSBp'+'cyByZWFkYWJsZSBieSBhbnlvbmUgc2lnbmVkIGluIGJlY2F1c2UgdGhlIGFwcCBzaG93cyB3aG8gcG9zdGVkIHdoYXQuIEl0IGlz'+'CiAgICAvLyB3cml0YWJsZSBvbmx5IGJ5IGl0cyBvd25lciAtIGFuZCBgYWRtaW5gIGlzIE5PVCBhIGZpZWxkIGhlcmU7IGl0IGlz'+'IGEgdG9rZW4gY2xhaW0sIHNvCiAgICAvLyB3cml0aW5nIGl0IHRvIHlvdXIgb3duIHByb2ZpbGUgZG9jdW1lbnQgZ3JhbnRzIG5v'+'dGhpbmcuCiAgICBtYXRjaCAvdXNlcnMve3VpZH0gewogICAgICBhbGxvdyByZWFkOiAgaWYgaXNTaWduZWRJbigpOwogICAgICBh'+'bGxvdyB3cml0ZTogaWYgKGlzT3duZXIodWlkKSB8fCBpc0FkbWluKCkpICYmIG5vdFRvb0JpZygpOwogICAgfQoKICAgIC8vID09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8g'+'IFRPUElDUyBBTkQgUE9TVFMgIChwdWJsaWMgcmVhZGluZyAtIGEgam9iIG5vYm9keSBjYW4gc2VlIGlzIG5vdCBhIGpvYiBhZHZl'+'cnQpCiAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT0KICAgIG1hdGNoIC90YWdzL3t0YWdJZH0gewogICAgICBhbGxvdyByZWFkOiAgIGlmIHRydWU7CiAgICAgIGFsbG93IGNy'+'ZWF0ZTogaWYgaXNTaWduZWRJbigpICYmIHRleHRPaygpOwogICAgICAvLyBJdHMgY3JlYXRvciBvciBhbiBhZG1pbiBtYXkgY2hh'+'bmdlIGl0LiBBbnlvbmUgZWxzZSBtYXkgT05MWSB0b3VjaCB0aGUgdGltZXN0YW1wLCB3aGljaAogICAgICAvLyBpcyB3aGF0IHRo'+'ZSBhcHAgZG9lcyB3aGVuIHNvbWVib2R5IHBvc3RzIGluIGEgdG9waWMuIFRoYXQgc3RvcHMgYW55IHNpZ25lZC1pbiBhY2NvdW50'+'CiAgICAgIC8vIHJlbmFtaW5nIG9yIHJlLWRlc2NyaWJpbmcgZXZlcnkgdG9waWMgb24gdGhlIGJvYXJkLCB3aGljaCB0aGUgb2xk'+'IHJ1bGUgYWxsb3dlZC4KICAgICAgYWxsb3cgdXBkYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgdGV4dE9rKCkgJiYgKAogICAgICAg'+'ICAgICAgICAgICAgICAgIHJlc291cmNlLmRhdGEuZ2V0KCdieScsICcnKSA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlzQWRtaW4o'+'KQogICAgICAgICAgICAgICAgICAgICAgIHx8IHJlcXVlc3QucmVzb3VyY2UuZGF0YS5kaWZmKHJlc291cmNlLmRhdGEpLmFmZmVj'+'dGVkS2V5cygpLmhhc09ubHkoWydhdCddKQogICAgICAgICAgICAgICAgICAgICk7CiAgICAgIGFsbG93IGRlbGV0ZTogaWYgaXNB'+'ZG1pbigpOwoKICAgICAgbWF0Y2ggL3Bvc3RzL3twb3N0SWR9IHsKICAgICAgICBhbGxvdyByZWFkOiAgIGlmIHRydWU7CiAgICAg'+'ICAgYWxsb3cgY3JlYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgcmVxdWVzdC5yZXNvdXJjZS5kYXRhLnVpZCA9PSByZXF1ZXN0LmF1'+'dGgudWlkICYmIHRleHRPaygpOwogICAgICAgIGFsbG93IHVwZGF0ZTogaWYgaXNTaWduZWRJbigpICYmIHRleHRPaygpICYmIGtl'+'ZXBzKCd1aWQnKQogICAgICAgICAgICAgICAgICAgICAgJiYgKHJlc291cmNlLmRhdGEudWlkID09IHJlcXVlc3QuYXV0aC51aWQg'+'fHwgaXNBZG1pbigpKTsKICAgICAgICBhbGxvdyBkZWxldGU6IGlmIGlzU2lnbmVkSW4oKSAmJiAocmVzb3VyY2UuZGF0YS51aWQg'+'PT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwoKICAgICAgICBtYXRjaCAvY29tbWVudHMve2NpZH0gewogICAgICAg'+'ICAgLy8gc2lnbi1pbiBvbmx5LCBhcyBpdCB3YXMuIEEgaGFyZGVuaW5nIHBhc3MgaXMgbm90IHRoZSBtb21lbnQgdG8gd2lkZW4g'+'YW55dGhpbmcgLQogICAgICAgICAgLy8gdGhlIHBvc3QgYWJvdmUgaXMgcHVibGljLCB0aGUgY29udmVyc2F0aW9uIHVuZGVyIGl0'+'IHN0YXlzIHdoZXJlIGl0IHdhcy4KICAgICAgICAgIGFsbG93IHJlYWQ6ICAgaWYgaXNTaWduZWRJbigpOwogICAgICAgICAgYWxs'+'b3cgY3JlYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgcmVxdWVzdC5yZXNvdXJjZS5kYXRhLnVpZCA9PSByZXF1ZXN0LmF1dGgudWlk'+'ICYmIHRleHRPaygpOwogICAgICAgICAgYWxsb3cgdXBkYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYga2VlcHMoJ3VpZCcpICYmIHRl'+'eHRPaygpCiAgICAgICAgICAgICAgICAgICAgICAgICYmIChyZXNvdXJjZS5kYXRhLnVpZCA9PSByZXF1ZXN0LmF1dGgudWlkIHx8'+'IGlzQWRtaW4oKSk7CiAgICAgICAgICBhbGxvdyBkZWxldGU6IGlmIGlzU2lnbmVkSW4oKSAmJiAocmVzb3VyY2UuZGF0YS51aWQg'+'PT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgICAgIH0KICAgICAgfQogICAgfQoKICAgIC8vID09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gIFBST1BF'+'UlRZIExJU1RJTkdTICAocHVibGljIHJlYWRpbmcsIGRlbGliZXJhdGVseSkKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gQSByZW50LCBhIHJhdGUsIGEgcGxv'+'dCBmb3Igc2FsZSBpcyBwb3N0ZWQgaW4gb3JkZXIgdG8gYmUgc2Vlbiwgc28gYSB2aXNpdG9yIHdobyBoYXMgbm90CiAgICAvLyBz'+'aWduZWQgdXAgc3RpbGwgc2VlcyBldmVyeSBsaXN0aW5nLCBpdHMgcHJpY2UgYW5kIGl0cyBwbGFjZSBvbiB0aGUgbWFwLiBXcml0'+'aW5nIG5lZWRzIGFuCiAgICAvLyBhY2NvdW50IC0gYGlzU2lnbmVkSW4oKWAgaXMgc2F0aXNmaWVkIGJ5IGFuIEFOT05ZTU9VUyBh'+'Y2NvdW50IHRvbywgd2hpY2ggaXMgaG93IHRoZSBhcHAKICAgIC8vIGxldHMgcGVvcGxlIHBvc3Qgd2l0aG91dCBhIHNpZ24tdXAg'+'Zm9ybTogQXV0aGVudGljYXRpb24gLT4gU2lnbi1pbiBtZXRob2QgLT4gQW5vbnltb3VzLgogICAgbWF0Y2ggL3Byb3BzL3tpZH0g'+'ewogICAgICBhbGxvdyByZWFkOiAgIGlmIHRydWU7CiAgICAgIGFsbG93IGNyZWF0ZTogaWYgaXNTaWduZWRJbigpICYmIHJlcXVl'+'c3QucmVzb3VyY2UuZGF0YS5ieSA9PSByZXF1ZXN0LmF1dGgudWlkICYmIHRleHRPaygpOwogICAgICBhbGxvdyB1cGRhdGU6IGlm'+'IGlzU2lnbmVkSW4oKSAmJiB0ZXh0T2soKSAmJiBrZWVwcygnYnknKQogICAgICAgICAgICAgICAgICAgICYmIChyZXNvdXJjZS5k'+'YXRhLmJ5ID09IHJlcXVlc3QuYXV0aC51aWQgfHwgaXNBZG1pbigpKTsKICAgICAgYWxsb3cgZGVsZXRlOiBpZiBpc1NpZ25lZElu'+'KCkgJiYgKHJlc291cmNlLmRhdGEuYnkgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgfQoKICAgIC8vID09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8g'+'IFRISU5HUyBGT1IgU0FMRSAgLSBzdGlsbCBzaWduLWluIG9ubHksIGRlbGliZXJhdGVseQogICAgLy8gPT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgICAvLyBBIHByb2R1Y3QgZG9j'+'dW1lbnQgY2FycmllcyBgcGhvbmVgIGFuZCBgYWRkcmA6IHRoZSBzZWxsZXIncyBudW1iZXIgYW5kIHN0cmVldCBhZGRyZXNzLAog'+'ICAgLy8gYW5kIGBhZGRyYCBjYW4gYmUgc29tZWJvZHkncyBob21lLiBSdWxlcyBhcHBseSB0byB0aGUgQ09MTEVDVElPTiwgbm90'+'IHRvIHRoZSBmaWVsZHMgYQogICAgLy8gcGFnZSBoYXBwZW5zIHRvIHByaW50LCBzbyBvcGVuaW5nIHRoaXMgcHVibGlzaGVzIGV2'+'ZXJ5IGZpZWxkIG9mIGV2ZXJ5IHByb2R1Y3QgdG8gYW55b25lCiAgICAvLyB3aG8gcXVlcmllcyBGaXJlc3RvcmUuIElmIGFsbCBv'+'ZiB5b3VyIHNlbGxlcnMgYXJlIHNob3BzIHdpdGggYW4gYWRkcmVzcyB0aGV5IHdhbnQKICAgIC8vIHB1Ymxpc2hlZCwgY2hhbmdl'+'IHRoZSBuZXh0IGxpbmUgdG8gYGlmIHRydWU7YCBrbm93aW5nIGV4YWN0bHkgdGhhdC4gVW50aWwgc29tZWJvZHkKICAgIC8vIGRl'+'Y2lkZXMgdGhhdCBkZWxpYmVyYXRlbHksIGl0IHN0YXlzIHNodXQuCiAgICBtYXRjaCAvcHJvZHVjdHMve2lkfSB7CiAgICAgIC8v'+'IGBzaG9wT2tgIGlzIHdyaXR0ZW4gYnkgdGhlIGFwcCBmb3IgZWFzeSByZWFkaW5nLCBidXQgaXQgaXMgTk9UIHRha2VuIG9uIHRy'+'dXN0OiBldmVyeSB3cml0ZQogICAgICAvLyBiZWxvdyByZXF1aXJlcyBpdCB0byBlcXVhbCB3aGF0IHRoZSBwYWdlIGRvY3VtZW50'+'IGFjdHVhbGx5IHNheXMuIFNldHRpbmcgaXQgYnkgaGFuZCBnYWlucwogICAgICAvLyBub3RoaW5nIC0gdGhlIHdyaXRlIGlzIHJl'+'ZnVzZWQuCiAgICAgIC8vIFJlYWRpbmc6IGFueW9uZSBzaWduZWQgaW4gbWF5IHJlYWQgdGhlIHN0b2NrIG9mIGFuIEFQUFJPVkVE'+'IHNob3AuIEEgc2hvcCB0aGUgYWRtaW4gaGFzIG5vdAogICAgICAvLyBhcHByb3ZlZCBpcyByZWFkYWJsZSBieSBpdHMgc2VsbGVy'+'LCB0aGUgcGFnZSdzIG93bmVyLCBhbmQgYW4gYWRtaW4uIE5vYm9keSBlbHNlIC0gc28gYW4KICAgICAgLy8gdW5hcHByb3ZlZCBz'+'aG9wJ3Mgc3RvY2sgaXMgbm90IGJyb3dzYWJsZSBieSB0aGUgd29ybGQgd2hpbGUgaXQgd2FpdHMuCiAgICAgIGFsbG93IHJlYWQ6'+'ICAgaWYgaXNTaWduZWRJbigpICYmICgKICAgICAgICAgICAgICAgICAgICAgICByZXNvdXJjZS5kYXRhLmdldCgnc2hvcE9rJywg'+'ZmFsc2UpID09IHRydWUgfHwKICAgICAgICAgICAgICAgICAgICAgICByZXNvdXJjZS5kYXRhLnNlbGxlclVpZCA9PSByZXF1ZXN0'+'LmF1dGgudWlkIHx8CiAgICAgICAgICAgICAgICAgICAgICAgb3duc1BhZ2UocmVzb3VyY2UuZGF0YS5nZXQoJ3BhZ2VOYW1lJywg'+'JycpKSB8fCBpc0FkbWluKCkKICAgICAgICAgICAgICAgICAgICApOwogICAgICAvLyBQb3N0aW5nIG5lZWRzIGEgc2hvcCB0aGUg'+'YWRtaW4gaGFzIGFwcHJvdmVkLiBOb3QgYW4gYWNjb3VudCwgbm90IGEgcGFnZSB5b3UgbWFkZSB5b3Vyc2VsZi4KICAgICAgYWxs'+'b3cgY3JlYXRlOiBpZiBpc1NpZ25lZEluKCkKICAgICAgICAgICAgICAgICAgICAmJiByZXF1ZXN0LnJlc291cmNlLmRhdGEuc2Vs'+'bGVyVWlkID09IHJlcXVlc3QuYXV0aC51aWQKICAgICAgICAgICAgICAgICAgICAmJiBwYWdlQXBwcm92ZWQocmVxdWVzdC5yZXNv'+'dXJjZS5kYXRhLmdldCgncGFnZU5hbWUnLCAnJykpCiAgICAgICAgICAgICAgICAgICAgJiYgcmVxdWVzdC5yZXNvdXJjZS5kYXRh'+'LmdldCgnc2hvcE9rJywgZmFsc2UpID09IHRydWUKICAgICAgICAgICAgICAgICAgICAmJiB0ZXh0T2soKTsKICAgICAgYWxsb3cg'+'dXBkYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgdGV4dE9rKCkgJiYga2VlcHMoJ3NlbGxlclVpZCcpICYmICgKICAgICAgICAgICAg'+'ICAgICAgICAgICByZXNvdXJjZS5kYXRhLnNlbGxlclVpZCA9PSByZXF1ZXN0LmF1dGgudWlkIHx8CiAgICAgICAgICAgICAgICAg'+'ICAgICAgb3duc1BhZ2UocmVzb3VyY2UuZGF0YS5nZXQoJ3BhZ2VOYW1lJywgJycpKSB8fCBpc0FkbWluKCkKICAgICAgICAgICAg'+'ICAgICAgICApICYmICgKICAgICAgICAgICAgICAgICAgICAgICAvLyB0aGUgZmxhZyBtdXN0IGtlZXAgdGVsbGluZyB0aGUgdHJ1'+'dGgsIHdob2V2ZXIgaXMgd3JpdGluZwogICAgICAgICAgICAgICAgICAgICAgIGlzQWRtaW4oKSB8fAogICAgICAgICAgICAgICAg'+'ICAgICAgIHJlcXVlc3QucmVzb3VyY2UuZGF0YS5nZXQoJ3Nob3BPaycsIGZhbHNlKQogICAgICAgICAgICAgICAgICAgICAgICAg'+'PT0gcGFnZUFwcHJvdmVkKHJlcXVlc3QucmVzb3VyY2UuZGF0YS5nZXQoJ3BhZ2VOYW1lJywgJycpKQogICAgICAgICAgICAgICAg'+'ICAgICk7CiAgICAgIGFsbG93IGRlbGV0ZTogaWYgaXNTaWduZWRJbigpICYmICgKICAgICAgICAgICAgICAgICAgICAgICByZXNv'+'dXJjZS5kYXRhLnNlbGxlclVpZCA9PSByZXF1ZXN0LmF1dGgudWlkIHx8CiAgICAgICAgICAgICAgICAgICAgICAgb3duc1BhZ2Uo'+'cmVzb3VyY2UuZGF0YS5nZXQoJ3BhZ2VOYW1lJywgJycpKSB8fCBpc0FkbWluKCkKICAgICAgICAgICAgICAgICAgICApOwogICAg'+'fQoKICAgIG1hdGNoIC9vcmRlcnMve2lkfSB7CiAgICAgIC8vIEFuIG9yZGVyIGlzIGJldHdlZW4gYSBidXllciBhbmQgYSBzZWxs'+'ZXIuIE5vYm9keSBlbHNlIGhhcyBhbnkgYnVzaW5lc3MgcmVhZGluZyBpdC4KICAgICAgYWxsb3cgcmVhZDogICBpZiBpc1NpZ25l'+'ZEluKCkgJiYgKAogICAgICAgICAgICAgICAgICAgICAgIHJlc291cmNlLmRhdGEuZ2V0KCdidXllclVpZCcsJycpICA9PSByZXF1'+'ZXN0LmF1dGgudWlkIHx8CiAgICAgICAgICAgICAgICAgICAgICAgcmVzb3VyY2UuZGF0YS5nZXQoJ3NlbGxlclVpZCcsJycpID09'+'IHJlcXVlc3QuYXV0aC51aWQgfHwKICAgICAgICAgICAgICAgICAgICAgICByZXNvdXJjZS5kYXRhLmdldCgnYWdlbnRVaWQnLCcn'+'KSAgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fAogICAgICAgICAgICAgICAgICAgICAgIG93bnNQYWdlKHJlc291cmNlLmRhdGEuZ2V0'+'KCdwYWdlTmFtZScsJycpKSB8fCBpc0FkbWluKCkKICAgICAgICAgICAgICAgICAgICApOwogICAgICBhbGxvdyBjcmVhdGU6IGlm'+'IGlzU2lnbmVkSW4oKSAmJiBub3RUb29CaWcoKQogICAgICAgICAgICAgICAgICAgICYmIChyZXF1ZXN0LnJlc291cmNlLmRhdGEu'+'YnV5ZXJVaWQgPT0gcmVxdWVzdC5hdXRoLnVpZAogICAgICAgICAgICAgICAgICAgICB8fCByZXF1ZXN0LnJlc291cmNlLmRhdGEu'+'c2VsbGVyVWlkID09IHJlcXVlc3QuYXV0aC51aWQpOwogICAgICBhbGxvdyB1cGRhdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiBub3RU'+'b29CaWcoKSAmJiBrZWVwcygnYnV5ZXJVaWQnKSAmJiBrZWVwcygnc2VsbGVyVWlkJykgJiYgKAogICAgICAgICAgICAgICAgICAg'+'ICAgIHJlc291cmNlLmRhdGEuZ2V0KCdidXllclVpZCcsJycpICA9PSByZXF1ZXN0LmF1dGgudWlkIHx8CiAgICAgICAgICAgICAg'+'ICAgICAgICAgcmVzb3VyY2UuZGF0YS5nZXQoJ3NlbGxlclVpZCcsJycpID09IHJlcXVlc3QuYXV0aC51aWQgfHwKICAgICAgICAg'+'ICAgICAgICAgICAgICByZXNvdXJjZS5kYXRhLmdldCgnYWdlbnRVaWQnLCcnKSAgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fAogICAg'+'ICAgICAgICAgICAgICAgICAgIG93bnNQYWdlKHJlc291cmNlLmRhdGEuZ2V0KCdwYWdlTmFtZScsJycpKSB8fCBpc0FkbWluKCkK'+'ICAgICAgICAgICAgICAgICAgICApOwogICAgICBhbGxvdyBkZWxldGU6IGlmIGlzQWRtaW4oKTsKICAgIH0KCiAgICAvLyA9PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgIC8vICBK'+'T0IgQVBQTElDQVRJT05TIEFORCBDVnMgIC0gdGhlIG1vc3QgcGVyc29uYWwgdGhpbmdzIGhlcmUKICAgIC8vID09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gQW4gYXBwbGlj'+'YXRpb24gY2FycmllcyBhIG5hbWUsIGFuIGVtYWlsLCBhIHBob25lIG51bWJlciBhbmQgYSBDVi4gVGhlIG9sZCBydWxlIGxldCBB'+'TlkKICAgIC8vIHNpZ25lZC1pbiBhY2NvdW50IHJlYWQgZXZlcnkgb25lIG9mIHRoZW0uIE5vdzogdGhlIGFwcGxpY2FudCwgdGhl'+'IGVtcGxveWVyIGl0IHdhcyBzZW50CiAgICAvLyB0bywgYW5kIGFuIGFkbWluLiBUaGUgYXBwIGFza3MgZm9yIHRoZW0gd2l0aCB3'+'aGVyZSgndWlkJywnPT0nLG1lKSBvcgogICAgLy8gd2hlcmUoJ2VtcGxveWVyVWlkJywnPT0nLG1lKSwgd2hpY2ggaXMgd2hhdCBt'+'YWtlcyB0aG9zZSBxdWVyaWVzIGFsbG93ZWQuCiAgICBtYXRjaCAvYXBwbGljYXRpb25zL3tpZH0gewogICAgICBhbGxvdyByZWFk'+'OiAgIGlmIGlzU2lnbmVkSW4oKSAmJiAoCiAgICAgICAgICAgICAgICAgICAgICAgcmVzb3VyY2UuZGF0YS5nZXQoJ3VpZCcsJycp'+'ICAgICAgICAgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fAogICAgICAgICAgICAgICAgICAgICAgIHJlc291cmNlLmRhdGEuZ2V0KCdl'+'bXBsb3llclVpZCcsJycpID09IHJlcXVlc3QuYXV0aC51aWQgfHwKICAgICAgICAgICAgICAgICAgICAgICBvd25zUGFnZShyZXNv'+'dXJjZS5kYXRhLmdldCgnY29tcGFueUxvd2VyJywnJykpIHx8IGlzQWRtaW4oKQogICAgICAgICAgICAgICAgICAgICk7CiAgICAg'+'IGFsbG93IGNyZWF0ZTogaWYgaXNTaWduZWRJbigpICYmIHJlcXVlc3QucmVzb3VyY2UuZGF0YS51aWQgPT0gcmVxdWVzdC5hdXRo'+'LnVpZCAmJiB0ZXh0T2soKTsKICAgICAgYWxsb3cgdXBkYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYga2VlcHMoJ3VpZCcpICYmIG5v'+'dFRvb0JpZygpICYmICgKICAgICAgICAgICAgICAgICAgICAgICByZXNvdXJjZS5kYXRhLmdldCgndWlkJywnJykgICAgICAgICA9'+'PSByZXF1ZXN0LmF1dGgudWlkIHx8CiAgICAgICAgICAgICAgICAgICAgICAgcmVzb3VyY2UuZGF0YS5nZXQoJ2VtcGxveWVyVWlk'+'JywnJykgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fAogICAgICAgICAgICAgICAgICAgICAgIG93bnNQYWdlKHJlc291cmNlLmRhdGEu'+'Z2V0KCdjb21wYW55TG93ZXInLCcnKSkgfHwgaXNBZG1pbigpCiAgICAgICAgICAgICAgICAgICAgKTsKICAgICAgYWxsb3cgZGVs'+'ZXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgKHJlc291cmNlLmRhdGEuZ2V0KCd1aWQnLCcnKSA9PSByZXF1ZXN0LmF1dGgudWlkIHx8'+'IGlzQWRtaW4oKSk7CiAgICB9CiAgICBtYXRjaCAvY3ZzL3tpZH0gewogICAgICBhbGxvdyByZWFkOiAgaWYgaXNTaWduZWRJbigp'+'ICYmIChyZXNvdXJjZS5kYXRhLnVpZCA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlzQWRtaW4oKSk7CiAgICAgIGFsbG93IHdyaXRl'+'OiBpZiBpc1NpZ25lZEluKCkgJiYgcmVxdWVzdC5yZXNvdXJjZS5kYXRhLnVpZCA9PSByZXF1ZXN0LmF1dGgudWlkICYmIG5vdFRv'+'b0JpZygpOwogICAgfQogICAgbWF0Y2ggL2ludGVydmlld3Mve2lkfSB7CiAgICAgIGFsbG93IHJlYWQ6ICAgaWYgaXNTaWduZWRJ'+'bigpICYmICgKICAgICAgICAgICAgICAgICAgICAgICByZXNvdXJjZS5kYXRhLmdldCgndWlkJywnJykgICAgICAgICA9PSByZXF1'+'ZXN0LmF1dGgudWlkIHx8CiAgICAgICAgICAgICAgICAgICAgICAgcmVzb3VyY2UuZGF0YS5nZXQoJ2VtcGxveWVyVWlkJywnJykg'+'PT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWluKCkKICAgICAgICAgICAgICAgICAgICApOwogICAgICBhbGxvdyBjcmVhdGU6'+'IGlmIGlzU2lnbmVkSW4oKSAmJiBub3RUb29CaWcoKTsKICAgICAgYWxsb3cgdXBkYXRlLCBkZWxldGU6IGlmIGlzU2lnbmVkSW4o'+'KSAmJiAoCiAgICAgICAgICAgICAgICAgICAgICAgcmVzb3VyY2UuZGF0YS5nZXQoJ2VtcGxveWVyVWlkJywnJykgPT0gcmVxdWVz'+'dC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgfQoKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gIFBBR0VTICAoc2hvcHMgYW5kIGNvbXBhbmllcykKICAg'+'IC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQog'+'ICAgLy8gVGhlIG9sZCBydWxlIHdhcyBgYWxsb3cgdXBkYXRlOiBpZiBpc1NpZ25lZEluKClgLiBUaGF0IGxldCBBTlkgYWNjb3Vu'+'dCBvdmVyd3JpdGUgQU5ZCiAgICAvLyBwYWdlIC0gaW5jbHVkaW5nIHNldHRpbmcgb3duZXJVaWQgdG8gdGhlbXNlbHZlcywgb3Ig'+'bGljZW5zZWQgdG8gdHJ1ZS4gQSBzaG9wIGNvdWxkIGJlCiAgICAvLyB0YWtlbiBvdmVyIGJ5IGFueWJvZHkgd2l0aCBhbiBhY2Nv'+'dW50LiBPbmx5IHRoZSBvd25lciwgYSBsaXN0ZWQgbWVtYmVyLCBvciBhbiBhZG1pbi4KICAgIGZ1bmN0aW9uIHBhZ2VNZW1iZXIo'+'bmFtZSkgewogICAgICByZXR1cm4gaXNTaWduZWRJbigpICYmCiAgICAgICAgKHJlc291cmNlLmRhdGEuZ2V0KCdvd25lclVpZCcs'+'JycpID09IHJlcXVlc3QuYXV0aC51aWQKICAgICAgICAgfHwgcmVxdWVzdC5hdXRoLnVpZCBpbiByZXNvdXJjZS5kYXRhLmdldCgn'+'bWVtYmVyVWlkcycsIFtdKSk7CiAgICB9CiAgICBtYXRjaCAvcGFnZXMve25hbWV9IHsKICAgICAgYWxsb3cgcmVhZDogICBpZiBp'+'c1NpZ25lZEluKCk7CiAgICAgIGFsbG93IGNyZWF0ZTogaWYgaXNTaWduZWRJbigpICYmIHJlcXVlc3QucmVzb3VyY2UuZGF0YS5v'+'d25lclVpZCA9PSByZXF1ZXN0LmF1dGgudWlkICYmIHRleHRPaygpOwogICAgICAvLyBgbGljZW5zZWRgLCBgbGljRXhwaXJ5YCBh'+'bmQgYHN1c3BlbmRlZFVudGlsYCBkZWNpZGUgd2hldGhlciBhIHNob3AgYXBwZWFycyBpbiB0aGUKICAgICAgLy8gbWFya2V0cGxh'+'Y2UsIHNvIHRoZXkgYXJlIGFuIGFkbWluJ3MgdG8gc2V0LCBuZXZlciB0aGUgc2hvcCdzIG93bi4KICAgICAgYWxsb3cgdXBkYXRl'+'OiBpZiAocGFnZU1lbWJlcihuYW1lKSB8fCBpc0FkbWluKCkpICYmIHRleHRPaygpICYmIGtlZXBzKCdvd25lclVpZCcpCiAgICAg'+'ICAgICAgICAgICAgICAgJiYgKGlzQWRtaW4oKSB8fCAoa2VlcHMoJ2xpY2Vuc2VkJykgJiYga2VlcHMoJ2xpY0V4cGlyeScpICYm'+'IGtlZXBzKCdzdXNwZW5kZWRVbnRpbCcpKSk7CiAgICAgIGFsbG93IGRlbGV0ZTogaWYgaXNTaWduZWRJbigpICYmIChyZXNvdXJj'+'ZS5kYXRhLmdldCgnb3duZXJVaWQnLCcnKSA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlzQWRtaW4oKSk7CiAgICB9CgogICAgLy8g'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgICAv'+'LyAgU0VUVElOR1MKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PQogICAgLy8gY29uZmlnL2xpY2Vuc2VzIGFuZCBjb25maWcvbGlja2V5cyBkZWNpZGUgd2hvIG1heSBzZWxs'+'IGFuZCBob2xkIHVucmVkZWVtZWQgbGljZW5jZSBrZXlzLgogICAgLy8gVGhlIG9sZCBydWxlIGxldCBhbnkgc2lnbmVkLWluIGFj'+'Y291bnQgd3JpdGUgdGhlbSAtIHRoYXQgaXMgImdyYW50IHlvdXJzZWxmIGEgbGljZW5jZSIsCiAgICAvLyBhbmQgcmVhZCBldmVy'+'eSB1bnVzZWQga2V5LiBUaGV5IGFyZSBhbiBhZG1pbidzLiBUaGUgdHdvIHJlcXVlc3QgbGlzdHMgc3RheSB3cml0YWJsZSwKICAg'+'IC8vIGJlY2F1c2UgYXNraW5nIGlzIHdoYXQgYSB1c2VyIGRvZXMuCiAgICBtYXRjaCAvY29uZmlnL2FkbWluICAgICAgICAgICAg'+'eyBhbGxvdyByZWFkLCB3cml0ZTogaWYgZmFsc2U7IH0KICAgIG1hdGNoIC9jb25maWcvbGljZW5zZXMgICAgICAgICB7IGFsbG93'+'IHJlYWQ6IGlmIGlzU2lnbmVkSW4oKTsgYWxsb3cgd3JpdGU6IGlmIGlzQWRtaW4oKTsgfQogICAgbWF0Y2ggL2NvbmZpZy9saWNr'+'ZXlzICAgICAgICAgIHsgYWxsb3cgcmVhZCwgd3JpdGU6IGlmIGlzQWRtaW4oKTsgfQogICAgbWF0Y2ggL2NvbmZpZy9saWNyZXFz'+'ICAgICAgICAgIHsgYWxsb3cgcmVhZDogaWYgaXNTaWduZWRJbigpOyBhbGxvdyB3cml0ZTogaWYgaXNTaWduZWRJbigpICYmIG5v'+'dFRvb0JpZygpOyB9CiAgICBtYXRjaCAvY29uZmlnL3BhZ2VyZXFzICAgICAgICAgeyBhbGxvdyByZWFkOiBpZiBpc1NpZ25lZElu'+'KCk7IGFsbG93IHdyaXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgbm90VG9vQmlnKCk7IH0KICAgIC8vIEFza2luZyBmb3IgYSBib29z'+'dCBpcyBhIHVzZXIgYWN0aW9uOyBncmFudGluZyBvbmUgaXMgdGhlIGFkbWluJ3MsIGxpa2UgZXZlcnkgb3RoZXIKICAgIC8vIHBy'+'aXZpbGVnZSBoZXJlLiBOb3RoaW5nIGlzIGNoYXJnZWQgLSBSZWVkYmkgdGFrZXMgbm8gcGF5bWVudC4KICAgIG1hdGNoIC9jb25m'+'aWcvYm9vc3RyZXFzICAgICAgICB7IGFsbG93IHJlYWQ6IGlmIGlzU2lnbmVkSW4oKTsgYWxsb3cgd3JpdGU6IGlmIGlzU2lnbmVk'+'SW4oKSAmJiBub3RUb29CaWcoKTsgfQogICAgbWF0Y2ggL2NvbmZpZy97ZG9jfSAgICAgICAgICAgIHsgYWxsb3cgcmVhZDogaWYg'+'aXNTaWduZWRJbigpOyBhbGxvdyB3cml0ZTogaWYgaXNBZG1pbigpOyB9CgogICAgLy8gVEhFIFNXSVRDSEJPQVJELiBPbmUgZG9j'+'dW1lbnQgaG9sZGluZyB3aGF0IHRoZSBzaXRlIHNob3dzOiB3aGljaCBzZWN0aW9ucyBhcmUgb24sIHdoaWNoCiAgICAvLyBjYXRl'+'Z29yaWVzIGFwcGVhciwgdGhlIGNvbW1pc3Npb24gc2V0dGluZ3MsIGFuZCB0aGUgaWRzIGFuIGFkbWluIGhhcyBoaWRkZW4gb3Ig'+'aGVsZC4KICAgIC8vIEV2ZXJ5Ym9keSBtdXN0IGJlIGFibGUgdG8gUkVBRCBpdCwgb3IgYSB2aXNpdG9yJ3MgYXBwIGNhbm5vdCBr'+'bm93IHdoYXQgdG8gc2hvdy4KICAgIG1hdGNoIC9zaXRlL3tkb2N9IHsKICAgICAgYWxsb3cgcmVhZDogIGlmIHRydWU7CiAgICAg'+'IGFsbG93IHdyaXRlOiBpZiBpc0FkbWluKCkgJiYgbm90VG9vQmlnKCk7CiAgICB9CgogICAgLy8gQSByZWNvcmQgb2Ygd2hhdCBh'+'biBhZG1pbiBkaWQsIHNvIGEgY2hhbmdlIGNhbiBiZSB0cmFjZWQgdG8gYW4gYWNjb3VudCBhbmQgYSB0aW1lLgogICAgLy8gQXBw'+'ZW5kLW9ubHk6IG5vYm9keSBtYXkgcmV3cml0ZSBoaXN0b3J5LCBub3QgZXZlbiBhbiBhZG1pbi4KICAgIG1hdGNoIC9tb2Rsb2cv'+'e2lkfSB7CiAgICAgIGFsbG93IHJlYWQ6ICAgaWYgaXNBZG1pbigpOwogICAgICBhbGxvdyBjcmVhdGU6IGlmIGlzQWRtaW4oKSAm'+'JiByZXF1ZXN0LnJlc291cmNlLmRhdGEuYnkgPT0gcmVxdWVzdC5hdXRoLnVpZCAmJiBub3RUb29CaWcoKTsKICAgICAgYWxsb3cg'+'dXBkYXRlLCBkZWxldGU6IGlmIGZhbHNlOwogICAgfQoKICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgLy8gIEVOUVVJUklFUyBBTkQgQ0xPU0VEIERFQUxTCiAgICAv'+'LyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAg'+'IC8vIEFuIGVucXVpcnkgaXMgcHJpdmF0ZSBiZXR3ZWVuIHRoZSBwZXJzb24gYXNraW5nIGFuZCB0aGUgbGlzdGVyLCB3aGljaCBp'+'cyB0aGUgcG9pbnQgb2YKICAgIC8vIHdpdGhob2xkaW5nIGEgbnVtYmVyIG9uIGEgbGlzdGluZyBoYW5kbGVkIG9uIGNvbW1pc3Np'+'b24uIEEgY2xvc2VkIGRlYWwgaXMgcmVhZGFibGUgYnkKICAgIC8vIHRoZSBwZXJzb24gd2hvIHJlY29yZGVkIGl0LiBOZWl0aGVy'+'IG1heSBiZSBlZGl0ZWQgYnkgYW55b25lIGVsc2UsIHNvIHRoZSByZWNvcmQgb2Ygd2hvCiAgICAvLyBpbnRyb2R1Y2VkIHdob20s'+'IGFuZCB3aGVuLCBjYW5ub3QgYmUgcmV3cml0dGVuIGFmdGVyd2FyZHMuCiAgICBtYXRjaCAvbGVhZHMve2lkfSB7CiAgICAgIGFs'+'bG93IGNyZWF0ZTogaWYgaXNTaWduZWRJbigpICYmIHJlcXVlc3QucmVzb3VyY2UuZGF0YS5mcm9tID09IHJlcXVlc3QuYXV0aC51'+'aWQgJiYgbm90VG9vQmlnKCk7CiAgICAgIGFsbG93IHJlYWQ6ICAgaWYgaXNTaWduZWRJbigpICYmIChyZXNvdXJjZS5kYXRhLmZy'+'b20gPT0gcmVxdWVzdC5hdXRoLnVpZAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfHwgcmVzb3VyY2UuZGF0'+'YS50byAgID09IHJlcXVlc3QuYXV0aC51aWQKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHx8IGlzQWRtaW4o'+'KSk7CiAgICAgIGFsbG93IHVwZGF0ZTogaWYgaXNTaWduZWRJbigpICYmIGtlZXBzKCdmcm9tJykgJiYga2VlcHMoJ3RvJykgJiYg'+'bm90VG9vQmlnKCkKICAgICAgICAgICAgICAgICAgICAmJiAocmVzb3VyY2UuZGF0YS50byA9PSByZXF1ZXN0LmF1dGgudWlkIHx8'+'IGlzQWRtaW4oKSk7CiAgICAgIGFsbG93IGRlbGV0ZTogaWYgaXNTaWduZWRJbigpICYmIChyZXNvdXJjZS5kYXRhLnRvID09IHJl'+'cXVlc3QuYXV0aC51aWQgfHwgaXNBZG1pbigpKTsKICAgIH0KICAgIG1hdGNoIC9kZWFscy97aWR9IHsKICAgICAgYWxsb3cgY3Jl'+'YXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgcmVxdWVzdC5yZXNvdXJjZS5kYXRhLmJ5ID09IHJlcXVlc3QuYXV0aC51aWQgJiYgbm90'+'VG9vQmlnKCk7CiAgICAgIGFsbG93IHJlYWQ6ICAgaWYgaXNTaWduZWRJbigpICYmIChyZXNvdXJjZS5kYXRhLmJ5ID09IHJlcXVl'+'c3QuYXV0aC51aWQgfHwgaXNBZG1pbigpKTsKICAgICAgYWxsb3cgdXBkYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYga2VlcHMoJ2J5'+'JykgJiYgbm90VG9vQmlnKCkKICAgICAgICAgICAgICAgICAgICAmJiAocmVzb3VyY2UuZGF0YS5ieSA9PSByZXF1ZXN0LmF1dGgu'+'dWlkIHx8IGlzQWRtaW4oKSk7CiAgICAgIGFsbG93IGRlbGV0ZTogaWYgaXNTaWduZWRJbigpICYmIChyZXNvdXJjZS5kYXRhLmJ5'+'ID09IHJlcXVlc3QuYXV0aC51aWQgfHwgaXNBZG1pbigpKTsKICAgIH0KCiAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgIC8vICBNRVNTQUdFUyBBTkQgU1VQUE9SVAog'+'ICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'CiAgICAvLyBBIGNvbnZlcnNhdGlvbiBoYXMgdHdvIHNpZGVzLCBhVWlkIGFuZCBiVWlkLiBUaGUgb2xkIHJ1bGUgbGV0IGFueSBz'+'aWduZWQtaW4gYWNjb3VudCByZWFkCiAgICAvLyBFVkVSWSBwcml2YXRlIG1lc3NhZ2UgaW4gdGhlIGRhdGFiYXNlLiBOb3cgb25s'+'eSB0aGUgdHdvIHBlb3BsZSBpbiBpdCwgYW5kIHRoZSBhcHAgYXNrcwogICAgLy8gZm9yIHRoZW0gd2l0aCB3aGVyZSgnYVVpZCcs'+'Jz09JyxtZSkgYW5kIHdoZXJlKCdiVWlkJywnPT0nLG1lKSAtIHR3byBxdWVyaWVzLCBiZWNhdXNlIGEKICAgIC8vIHJ1bGUgdGhh'+'dCBzYXlzICJvciIgbmVlZHMgYSBxdWVyeSB0aGF0IHNheXMgd2hpY2ggc2lkZSB5b3UgYXJlLgogICAgbWF0Y2ggL2Rtcy97aWR9'+'IHsKICAgICAgYWxsb3cgcmVhZDogICBpZiBpc1NpZ25lZEluKCkgJiYgKHJlc291cmNlLmRhdGEuZ2V0KCdhVWlkJywnJykgPT0g'+'cmVxdWVzdC5hdXRoLnVpZAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfHwgcmVzb3VyY2UuZGF0YS5nZXQo'+'J2JVaWQnLCcnKSA9PSByZXF1ZXN0LmF1dGgudWlkIHx8IGlzQWRtaW4oKSk7CiAgICAgIGFsbG93IGNyZWF0ZTogaWYgaXNTaWdu'+'ZWRJbigpICYmIG5vdFRvb0JpZygpCiAgICAgICAgICAgICAgICAgICAgJiYgKHJlcXVlc3QucmVzb3VyY2UuZGF0YS5hVWlkID09'+'IHJlcXVlc3QuYXV0aC51aWQKICAgICAgICAgICAgICAgICAgICAgfHwgcmVxdWVzdC5yZXNvdXJjZS5kYXRhLmJVaWQgPT0gcmVx'+'dWVzdC5hdXRoLnVpZCk7CiAgICAgIGFsbG93IHVwZGF0ZTogaWYgaXNTaWduZWRJbigpICYmIG5vdFRvb0JpZygpICYmIGtlZXBz'+'KCdhVWlkJykgJiYga2VlcHMoJ2JVaWQnKQogICAgICAgICAgICAgICAgICAgICYmIChyZXNvdXJjZS5kYXRhLmdldCgnYVVpZCcs'+'JycpID09IHJlcXVlc3QuYXV0aC51aWQKICAgICAgICAgICAgICAgICAgICAgfHwgcmVzb3VyY2UuZGF0YS5nZXQoJ2JVaWQnLCcn'+'KSA9PSByZXF1ZXN0LmF1dGgudWlkKTsKICAgICAgYWxsb3cgZGVsZXRlOiBpZiBpc0FkbWluKCk7CiAgICB9CiAgICAvLyBBIHN1'+'cHBvcnQgdGlja2V0IGlzIGJldHdlZW4gdGhlIHBlcnNvbiB3aG8gcmFpc2VkIGl0IGFuZCB3aG9ldmVyIGFuc3dlcnMgaXQuCiAg'+'ICBtYXRjaCAvdGlja2V0cy97aWR9IHsKICAgICAgYWxsb3cgcmVhZDogICBpZiBpc1NpZ25lZEluKCkgJiYgKHJlc291cmNlLmRh'+'dGEuZ2V0KCdieScsJycpICA9PSByZXF1ZXN0LmF1dGgudWlkCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8'+'fCByZXNvdXJjZS5kYXRhLmdldCgndWlkJywnJykgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgICBhbGxv'+'dyBjcmVhdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiBub3RUb29CaWcoKTsKICAgICAgYWxsb3cgdXBkYXRlOiBpZiBpc1NpZ25lZElu'+'KCkgJiYgbm90VG9vQmlnKCkKICAgICAgICAgICAgICAgICAgICAmJiAocmVzb3VyY2UuZGF0YS5nZXQoJ2J5JywnJykgPT0gcmVx'+'dWVzdC5hdXRoLnVpZAogICAgICAgICAgICAgICAgICAgICB8fCByZXNvdXJjZS5kYXRhLmdldCgndWlkJywnJykgPT0gcmVxdWVz'+'dC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgICBhbGxvdyBkZWxldGU6IGlmIGlzQWRtaW4oKTsKICAgIH0KCiAgICAvLyA9'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgIC8v'+'ICBPTkUgUEVSU09OJ1MgT1dOIFRISU5HUyAgKHZvaWNlIHRyYW5zY3JpYmVyLCBzdHVkeSBsaW5rLCBzZWxsZXIgc2V0dGluZ3Mp'+'CiAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT0KICAgIG1hdGNoIC90cnZvY2FiL3t1aWR9ICAgICAgIHsgYWxsb3cgcmVhZCwgd3JpdGU6IGlmIGlzT3duZXIodWlkKTsgfQog'+'ICAgbWF0Y2ggL3RyY29ycmVjdGlvbnMve3VpZH0geyBhbGxvdyByZWFkLCB3cml0ZTogaWYgaXNPd25lcih1aWQpOyB9CiAgICBt'+'YXRjaCAvdHJicmFpbi97dWlkfSAgICAgICB7IGFsbG93IHJlYWQsIHdyaXRlOiBpZiBpc093bmVyKHVpZCk7IH0KICAgIG1hdGNo'+'IC9yYmxpbmsve3VpZH0gICAgICAgIHsgYWxsb3cgcmVhZCwgd3JpdGU6IGlmIGlzT3duZXIodWlkKTsgfQogICAgbWF0Y2ggL3Nl'+'bGxlclByZWZzL3t1aWR9ICAgeyBhbGxvdyByZWFkLCB3cml0ZTogaWYgaXNPd25lcih1aWQpOyB9CiAgICBtYXRjaCAvYWdlbnRz'+'L3t1aWR9IHsKICAgICAgYWxsb3cgcmVhZDogIGlmIGlzU2lnbmVkSW4oKTsKICAgICAgYWxsb3cgd3JpdGU6IGlmIChpc093bmVy'+'KHVpZCkgfHwgaXNBZG1pbigpKSAmJiBub3RUb29CaWcoKTsKICAgIH0KICAgIG1hdGNoIC90cnNlc3Npb25zL3tkb2NJZH0gewog'+'ICAgICBhbGxvdyByZWFkOiAgaWYgaXNTaWduZWRJbigpICYmIHJlc291cmNlLmRhdGEudWlkID09IHJlcXVlc3QuYXV0aC51aWQ7'+'CiAgICAgIGFsbG93IHdyaXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgcmVxdWVzdC5yZXNvdXJjZS5kYXRhLnVpZCA9PSByZXF1ZXN0'+'LmF1dGgudWlkICYmIG5vdFRvb0JpZygpOwogICAgfQogICAgbWF0Y2ggL3RycGFydHMve2RvY0lkfSB7CiAgICAgIGFsbG93IHJl'+'YWQ6ICBpZiBpc1NpZ25lZEluKCkgJiYgcmVzb3VyY2UuZGF0YS51aWQgPT0gcmVxdWVzdC5hdXRoLnVpZDsKICAgICAgYWxsb3cg'+'d3JpdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiByZXF1ZXN0LnJlc291cmNlLmRhdGEudWlkID09IHJlcXVlc3QuYXV0aC51aWQgJiYg'+'bm90VG9vQmlnKCk7CiAgICB9CgogICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09CiAgICAvLyAgU0hBUkVEIFBPT0xTCiAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09'+'PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgIG1hdGNoIC90cnNoYXJlZC97ZG9jfSB7CiAg'+'ICAgIGFsbG93IHJlYWQ6ICAgaWYgaXNTaWduZWRJbigpOwogICAgICBhbGxvdyBjcmVhdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiBu'+'b3RUb29CaWcoKTsKICAgICAgYWxsb3cgdXBkYXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgbm90VG9vQmlnKCk7CiAgICAgIGFsbG93'+'IGRlbGV0ZTogaWYgaXNBZG1pbigpOwogICAgfQogICAgbWF0Y2ggL3NoYXJlZC97aWR9IHsKICAgICAgYWxsb3cgcmVhZDogICBp'+'ZiBpc1NpZ25lZEluKCk7CiAgICAgIGFsbG93IGNyZWF0ZTogaWYgaXNTaWduZWRJbigpICYmIHJlcXVlc3QucmVzb3VyY2UuZGF0'+'YS5vd25lciA9PSByZXF1ZXN0LmF1dGgudWlkICYmIG5vdFRvb0JpZygpOwogICAgICBhbGxvdyB1cGRhdGU6IGlmIGlzU2lnbmVk'+'SW4oKSAmJiBrZWVwcygnb3duZXInKSAmJiBub3RUb29CaWcoKQogICAgICAgICAgICAgICAgICAgICYmIChyZXNvdXJjZS5kYXRh'+'Lm93bmVyID09IHJlcXVlc3QuYXV0aC51aWQgfHwgaXNBZG1pbigpKTsKICAgICAgYWxsb3cgZGVsZXRlOiBpZiBpc1NpZ25lZElu'+'KCkgJiYgKHJlc291cmNlLmRhdGEub3duZXIgPT0gcmVxdWVzdC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgfQogICAgbWF0'+'Y2ggL3RyYWNrcy97aWR9IHsKICAgICAgYWxsb3cgcmVhZDogICBpZiBpc1NpZ25lZEluKCk7CiAgICAgIGFsbG93IGNyZWF0ZTog'+'aWYgaXNTaWduZWRJbigpICYmIHJlcXVlc3QucmVzb3VyY2UuZGF0YS5vd25lciA9PSByZXF1ZXN0LmF1dGgudWlkICYmIG5vdFRv'+'b0JpZygpOwogICAgICBhbGxvdyB1cGRhdGU6IGlmIGlzU2lnbmVkSW4oKSAmJiBrZWVwcygnb3duZXInKSAmJiBub3RUb29CaWco'+'KQogICAgICAgICAgICAgICAgICAgICYmIChyZXNvdXJjZS5kYXRhLm93bmVyID09IHJlcXVlc3QuYXV0aC51aWQgfHwgaXNBZG1p'+'bigpKTsKICAgICAgYWxsb3cgZGVsZXRlOiBpZiBpc1NpZ25lZEluKCkgJiYgKHJlc291cmNlLmRhdGEub3duZXIgPT0gcmVxdWVz'+'dC5hdXRoLnVpZCB8fCBpc0FkbWluKCkpOwogICAgfQoKICAgIC8vIFdoYXQgcGVvcGxlIHNlYXJjaGVkIGZvciBhbmQgZm91bmQg'+'bm90aGluZywgc28gdGhlIHNob3AgY2FuIHN0b2NrIGl0LiBPbmUgc21hbGwgZG9jdW1lbnQKICAgIC8vIHBlciBzZWFyY2gsIHdy'+'aXR0ZW4gb25jZSBhbmQgbmV2ZXIgY2hhbmdlZCBieSBhbnlib2R5LgogICAgbWF0Y2ggL3NlYXJjaF9pbnRlcmVzdC97aWR9IHsK'+'ICAgICAgYWxsb3cgcmVhZDogICBpZiBpc1NpZ25lZEluKCk7CiAgICAgIGFsbG93IGNyZWF0ZTogaWYgaXNTaWduZWRJbigpICYm'+'IHJlcXVlc3QucmVzb3VyY2UuZGF0YS51aWQgPT0gcmVxdWVzdC5hdXRoLnVpZAogICAgICAgICAgICAgICAgICAgICYmIG9rU3Ry'+'KHJlcXVlc3QucmVzb3VyY2UuZGF0YS5nZXQoJ3EnLCcnKSwgMTIwKSAmJiBub3RUb29CaWcoKTsKICAgICAgYWxsb3cgdXBkYXRl'+'LCBkZWxldGU6IGlmIGlzQWRtaW4oKTsKICAgIH0KCiAgICAvLyBUaGUgYXBwJ3Mgb3duIGNvbm5lY3Rpdml0eSBwcm9iZS4gT25l'+'IGtub3duIGRvY3VtZW50LCBub3QgYSBjb2xsZWN0aW9uIHRvIGZpbGwgdXAuCiAgICBtYXRjaCAvX2Nvbm5fdGVzdC9wcm9iZSB7'+'IGFsbG93IHJlYWQsIHdyaXRlOiBpZiBpc1NpZ25lZEluKCk7IH0KCiAgICAvLyBBbnl0aGluZyBub3QgbmFtZWQgYWJvdmUgaXMg'+'ZGVuaWVkIHRvIGV2ZXJ5Ym9keS4gVGhpcyBNVVNUIHN0YXkgbGFzdC4KICAgIG1hdGNoIC97ZG9jdW1lbnQ9Kip9IHsgYWxsb3cg'+'cmVhZCwgd3JpdGU6IGlmIGZhbHNlOyB9CiAgfQp9Cg==';
 function rbPropRulesText(){
   try{return rbB64ToText(RB_RULES_SRC);}catch(e){return '';}
 }
@@ -19978,7 +20735,7 @@ function openPropertyAdd(kind,pre){
     +'<input id="pf-title" class="pf-in" placeholder="e.g. 3BHK villa near Valanchery"></div>'
     +'<div class="pf-row">'
       +'<div style="flex:0 0 102px"><label class="pf-lab" for="pf-cur">Currency</label>'
-      +'<select id="pf-cur" class="pf-in"><option>AED</option><option selected>INR</option><option>USD</option><option>GBP</option><option>EUR</option></select></div>'
+      +'<select id="pf-cur" class="pf-in">'+rbCurOptions()+'</select></div>'
       +'<div><label class="pf-lab" for="pf-price">Price or rent</label>'
       +'<input id="pf-price" class="pf-in" type="number" inputmode="numeric" placeholder="0"></div>'
     +'</div>'
@@ -20217,7 +20974,7 @@ function rbPropAddSave(kind){
     var p={
       id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
       kind:kind||'sale',title:title,
-      price:Number(g('pf-price'))||0,currency:g('pf-cur')||'INR',
+      price:Number(g('pf-price'))||0,currency:g('pf-cur')||rbHomeCur(),
       beds:g('pf-beds'),baths:g('pf-baths'),area:g('pf-area'),
       place:g('pf-place'),desc:g('pf-desc'),
       ig:rbNormIG(g('pf-ig')),yt:rbNormYT(g('pf-yt')),contact:g('pf-contact'),
@@ -21342,7 +22099,7 @@ function rbNearMe(){
   try{
     var me=LS.get('rb_geo_me',null);
     if(me&&typeof me.lat==='number'&&(Date.now()-(me.at||0))<7*24*3600*1000){
-      out.lat=me.lat;out.lng=me.lng;out.src='you';
+      out.lat=me.lat;out.lng=me.lng;out.src='you';out.acc=me.acc||0;
     }else{
       var g=rbGeoStart();
       out.lat=g.lat;out.lng=g.lng;out.src=g.src;
@@ -21383,16 +22140,27 @@ function rbNearPlaceHit(text,words){
   for(var i=0;i<words.length;i++)if(t.indexOf(words[i])>-1)return true;
   return false;
 }
-function rbNearKmLabel(km){
+/* "from Discovery garden" rather than "away", when that is the truth */
+function rbNearFromSuffix(){
+  var w=__near.fromName||'';
+  return w?(' from '+w):' from where you last looked';
+}
+function rbNearKmLabel(km,bare){
+  /* `bare` leaves off "away", for when the sentence continues "... from Discovery garden" */
   if(typeof km!=='number')return '';
-  if(km<1)return Math.round(km*1000)+' m away';
-  if(km<10)return (Math.round(km*10)/10)+' km away';
-  if(km<1000)return Math.round(km)+' km away';
-  return 'far away';
+  var tail=bare?'':' away';
+  if(km<1)return Math.round(km*1000)+' m'+tail;
+  if(km<10)return (Math.round(km*10)/10)+' km'+tail;
+  if(km<1000)return Math.round(km)+' km'+tail;
+  return bare?'very far':'far away';
 }
 
 /* every open thing Reedbi holds that can be placed, nearest first. Nothing is invented: a job appears
    here only because somebody posted it, and a product only because a seller listed it. */
+/* How far "only this area" reaches for a property, in km. Wide enough to cover a city and the
+   next neighbourhood, narrow enough that another emirate is not "here". A job ignores this
+   entirely - see the jobs branch below. */
+var RB_NEAR_KM=12;
 function rbNearbyItems(opt){
   opt=opt||{};
   var me=opt.me||rbNearMe();
@@ -21406,6 +22174,15 @@ function rbNearbyItems(opt){
       if(typeof p.lat!=='number')return;
       var km=(typeof me.lat==='number')?rbGeoKm(me.lat,me.lng,p.lat,p.lng):null;
       var K=rbPropKind(p.kind);
+      /* v543: "Only <area>" named an area and then showed property from anywhere, because this
+         branch never looked at the toggle - a villa 130 km away sat under a pill saying Discovery
+         garden. A property has real coordinates, so the honest test is a radius, with the area
+         name accepted as well for a listing whose pin is slightly outside it. */
+      if(opt.nearOnly){
+        var byName=rbNearPlaceHit(p.place||'',words);
+        var byKm=(typeof km==='number')&&km<=RB_NEAR_KM;
+        if(!byName&&!byKm)return;
+      }
       out.push({what:'property',id:p.id,title:p.title||'Listing',
         place:p.place||'',
         price:rbUnitsPriceLabel(p)||(p.price?(rbPropPrice(p)+rbPropPeriodSuffix(p)):''),
@@ -21451,14 +22228,20 @@ function rbNearbyItems(opt){
       if(rbCatHidden(x.tag&&x.tag.id))return;             /* v535 */
       var where=String(p.region||'');
       var hit=rbNearPlaceHit(where,words)||(me.cc&&where.toUpperCase().indexOf(me.cc)>-1);
-      if(opt.nearOnly&&!hit)return;
+      /* v543: a job is not looked for the way a flat is. Nobody rents a place in the next emirate
+         but plenty of people would take the work, so a job is NOT held to the person's immediate
+         area - "Only Discovery garden" narrows property and things for sale, and leaves the jobs
+         alone. Jobs showed 0 on a screen with thirty things on it for exactly this reason: a post
+         carries a region, usually no more precise than a country, which almost never matches a
+         neighbourhood name. */
       out.push({what:'job',id:String(p.id),title:p.title||'Job',
         place:where,shop:String(p.co||''),price:'',img:'',
-        sub:[where,p.co||''].filter(Boolean).join(' · '),
-        tagN:'Job',tagC:'#7c3aed',
+        sub:[where,p.co||''].filter(Boolean).join(' \u00b7 '),
+        tagN:'Job',tagC:'#7c3aed',wide:true,
         cat:(function(nm){nm=String(nm||'Jobs');return nm.charAt(0).toUpperCase()+nm.slice(1);})
               ((x.tag&&(x.tag.name||x.tag.id))||'Jobs'),
         catId:String((x.tag&&x.tag.id)||'jobs'),   /* v537 */
+        /* sorted after anything actually measured, but never dropped for being far */
         km:hit?0.9:null,exact:false,here:hit,
         open:"openTag('"+escJS(x.tag.id)+"')",raw:p});
     });
@@ -21477,7 +22260,7 @@ function rbNearbyItems(opt){
 function rbNearbyCount(){try{return rbNearbyItems().length;}catch(e){return 0;}}
 
 /* One tap, everything around you, nearest first - property, things for sale and jobs together. */
-var __near={what:'all',nearOnly:false,cat:'',q:''};   /* v538: category and search */
+var __near={what:'all',nearOnly:false,cat:'',q:'',fromYou:false,fromName:''};   /* v538: category and search */
 function openNearby(what){
   if(what)__near.what=what;
   var ex=document.getElementById('nearby-ovl');if(ex)ex.remove();
@@ -21492,6 +22275,28 @@ function openNearby(what){
 }
 function rbNearbySet(what){__near.what=what;__near.cat='';rbNearbyRender();}
 /* v538: jump to one category */
+/* v541: the button under the heading. Asks the browser, saves the answer, and redraws - so every
+   distance on the screen is then measured from the person rather than from a remembered map centre. */
+function rbNearbyUseMyLocation(){
+  var btn=document.getElementById('rbn-geo'),msg=document.getElementById('rbn-geomsg');
+  var say=function(t,bad){if(msg){msg.textContent=t||'';msg.className='rbn-geomsg'+(bad?' bad':'');}};
+  if(btn){btn.disabled=true;btn.classList.add('busy');
+    var lbl=btn.querySelector('span');if(lbl)lbl.textContent='Finding you\u2026';}
+  say('');
+  rbGeoAskNow(function(me,err){
+    if(me){
+      /* Redrawing rebuilds the button, so there is nothing to put back. No confirmation line
+         either: the heading changes from "Around Discovery garden" to "Around you", and every
+         distance on the screen changes with it. Saying it a third time is noise. */
+      rbNearbyRender();
+      try{if(typeof rbPMapRefresh==='function')rbPMapRefresh();}catch(e){}
+    }else{
+      if(btn){btn.disabled=false;btn.classList.remove('busy');
+        var l2=btn.querySelector('span');if(l2)l2.textContent='Use my exact location';}
+      say(err||'Your position is not available right now.',true);
+    }
+  });
+}
 function rbNearbyCat(id){__near.cat=String(id||'');rbNearbyRender();}
 /* v538: and type to find a thing by name, place, shop or price */
 function rbNearbyFind(q){
@@ -21528,9 +22333,19 @@ function rbNearbyRender(){
   var how=(me.src==='you')?('Around you'+(area?(' in '+esc(area)):''))
         :(me.src==='last')?('Around '+(area?esc(area):'where you last looked'))
         :('Across '+(area?esc(area):'your country'));
-  var sub=(me.src==='you')?'Nearest first, measured from where you are.'
-        :(me.src==='last')?'From the last place you looked at. Turn on location for real distances.'
-        :'Turn on location to see what is closest to you.';
+  var sub=(me.src==='you')
+        ?('Nearest first, measured from where you are'+(me.acc?(', to about '+me.acc+' m'):'')+'.')
+        :(me.src==='last')?('Distances below are measured from '+(area?esc(area):'where you last looked')
+            +', not from you.')
+        :'Nothing is measured yet, because Reedbi does not know where you are.';
+  /* v541: the line above used to end "Turn on location for real distances" with nothing to press.
+     This is the thing to press, and it only appears when it would change something. */
+  /* v541: every row reads these to decide whether it may say "away" */
+  __near.fromYou=(me.src==='you');
+  __near.fromName=(me.src==='last')?(area||''):'';
+  var askBtn=(me.src==='you')?''
+    :('<button class="rbn-geo" id="rbn-geo" onclick="rbNearbyUseMyLocation()">'
+      +rbUiSVG('pin',15)+'<span>Use my exact location</span></button>');
 
   var ACT=[['property','Property'],['product','For sale'],['job','Jobs']];
   var tabs=[['all','Everything']].concat(ACT)
@@ -21594,9 +22409,11 @@ function rbNearbyRender(){
       +'<i style="background:'+c.colour+'"></i>'+esc(c.name)+'<b>'+c.n+'</b></button>';
   }).join('');
 
-  el.innerHTML='<div class="rbn-head"><b>'+how+'</b><span>'+sub+'</span></div>'
+  el.innerHTML='<div class="rbn-head"><b>'+how+'</b><span>'+sub+'</span>'
+      +'<span class="rbn-geomsg" id="rbn-geomsg"></span></div>'
     /* v538: this part holds still at the top of the scroll */
     +'<div class="rbn-stick">'
+    +askBtn
     +'<div class="rbn-find">'+rbUiSVG('search',16)
       +'<input id="rbn-q" type="search" placeholder="Find anything near you" value="'+esc(__near.q||'')+'" '
       +'oninput="rbNearbyFind(this.value)" autocomplete="off">'
@@ -21607,12 +22424,17 @@ function rbNearbyRender(){
        +'<button class="rbn-ix'+(__near.cat?'':' on')+'" onclick="rbNearbyCat(\'\')">All</button>'
        +index+'</div>'):'')
     +'</div>'
-    +(area?('<button class="rbn-only'+(__near.nearOnly?' on':'')+'" onclick="rbNearbyToggleNear()">'
+    +(area?('<button class="rbn-only'+(__near.nearOnly?' on':'')+'" '
+       +'title="Property and things for sale only \u2014 jobs are never narrowed to one area" '
+       +'onclick="rbNearbyToggleNear()">'
        +(__near.nearOnly?'Showing ':'Only ')+esc(area)+'</button>'):'')
     +body
-    +'<div class="rbn-foot">A property carries a map pin, so its distance is measured. '
-    +'Something for sale or a job carries the area it was posted in as words, so those are matched '
-    +'to your area rather than measured — they say <b>in your area</b> instead of a distance.</div>';
+    +'<div class="rbn-foot">A property carries a map pin, so its distance is measured. Something '
+    +'for sale carries the area it was posted in as words, so it is matched to your area rather '
+    +'than measured — it says <b>in your area</b> instead of a distance. '
+    +'<b>Jobs are not narrowed to your area at all</b>: nobody rents a flat in the next emirate, '
+    +'but plenty of people would take the work there, so every job around you is listed with the '
+    +'region it was posted for.</div>';
 }
 /* group rows into categories, each keeping the order they arrived in (nearest first), and put the
    category whose nearest thing is nearest at the top */
@@ -21681,7 +22503,18 @@ try{
 }catch(e){}
 
 function rbNearbyRow(r,sameKind){
-  var dist=(r.exact&&typeof r.km==='number')?rbNearKmLabel(r.km):(r.here?'in your area':'');
+  /* v541: this said "347 m away" whatever the distance was measured FROM. With location off it was
+     measured from the last place the person looked at, so three listings in one building all read
+     "347 m away" and the reader took that to mean 347 m from themselves. If the origin is not the
+     person, the row names what it IS from. */
+  /* v543: a job carries a region, often no finer than a country, so "in your area" would be a
+     claim the data does not support. A job says where it actually is; only something matched to
+     the person's own area says "in your area". */
+  var dist=(r.exact&&typeof r.km==='number')
+    ? (__near.fromYou?rbNearKmLabel(r.km):(rbNearKmLabel(r.km,true)+rbNearFromSuffix()))
+    : (r.wide
+        ? (r.place?('in '+r.place):'anywhere')
+        : (r.here?'in your area':''));
   var where=[r.place,r.shop].filter(Boolean).join(' · ');
   var pic=r.img
     ? '<img class="rbn-pic" src="'+esc(r.img)+'" alt="" loading="lazy" '
@@ -22174,6 +23007,71 @@ var TZ_COUNTRY={
   'Europe/London':'GB','America/New_York':'US','America/Chicago':'US','America/Los_Angeles':'US',
   'America/Toronto':'CA','Australia/Sydney':'AU','Australia/Melbourne':'AU'
 };
+/* The currency a price is in, worked out from the country rather than guessed. The posting form
+   used to arrive with INR already selected, so a flat in Dubai was listed at Rs 4,000 unless the
+   person noticed the box and changed it - and rbPropPrice falls back to AED when the field is
+   missing, so two listings in the same building showed two different currencies. */
+var GEO_CUR={AE:'AED',SA:'SAR',QA:'QAR',KW:'KWD',OM:'OMR',BH:'BHD',
+  IN:'INR',PK:'PKR',BD:'BDT',LK:'LKR',NP:'NPR',
+  US:'USD',GB:'GBP',CA:'CAD',AU:'AUD',NZ:'NZD',
+  PH:'PHP',SG:'SGD',MY:'MYR',ID:'IDR',TH:'THB',VN:'VND',
+  EG:'EGP',NG:'NGN',ZA:'ZAR',KE:'KES',
+  DE:'EUR',FR:'EUR',IT:'EUR',ES:'EUR',NL:'EUR',IE:'EUR',PT:'EUR',
+  TR:'TRY',RU:'RUB',CN:'CNY',JP:'JPY',KR:'KRW',BR:'BRL',MX:'MXN',CH:'CHF',SE:'SEK'};
+/* The currency a listing's PIN implies. rbPropCountryAt is the existing lookup, checked against
+   48 cities. Returns '' when the pin is missing or in open water, so nothing is ever guessed. */
+function rbCurExpected(p){
+  try{
+    if(!p||typeof p.lat!=='number'||typeof p.lng!=='number')return '';
+    var cc=rbPropCountryAt(p.lat,p.lng);
+    return (cc&&GEO_CUR[cc])||'';
+  }catch(e){return '';}
+}
+/* true only when we KNOW the pin's country and the price is in a different country's money */
+function rbCurOdd(p){
+  var want=rbCurExpected(p);
+  if(!want||!p||!p.currency)return false;
+  return String(p.currency).toUpperCase()!==want;
+}
+function rbCurFixList(){
+  try{return rbPMapAll().filter(rbCurOdd);}catch(e){return [];}
+}
+/* change the currency on one listing. The price NUMBER is untouched - 4000 rupees becoming
+   4000 dirhams is a relabelling, not a conversion, and pretending to convert would be worse. */
+function rbCurFixOne(id,to,then){
+  then=then||function(){};
+  try{
+    var all=LS.get('rb_props',[])||[];
+    var p=all.filter(function(x){return x&&x.id===id;})[0];
+    if(!p){then(false,'That listing is no longer here.');return;}
+    p.currency=String(to||'').toUpperCase();
+    LS.set('rb_props',all);
+    try{__prop.store=null;LS.set('rb_props_at',0);}catch(e){}
+    if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED&&!fbIsOff('props')){
+      FB.db.collection('props').doc(String(id)).set({currency:p.currency},{merge:true})
+        .then(function(){then(true,'');},function(err){
+          then(false, fbIsPermErr(err)
+            ? 'Saved on this phone. The server would not take it \u2014 this account does not carry the admin mark, or the listing is not yours.'
+            : 'Saved on this phone. The server would not take it just now.');});
+    }else{then(true,'Saved on this phone. It will go up when the cloud is back.');}
+    try{rbModLog('currency',{id:id,to:p.currency});}catch(e){}
+  }catch(e){then(false,'That could not be changed.');}
+}
+function rbHomeCur(){
+  try{var c=GEO_CUR[rbGeoCountry()];if(c)return c;}catch(e){}
+  return 'AED';
+}
+/* the picker, with the local currency already chosen and named, so nobody has to guess */
+function rbCurOptions(){
+  var home=rbHomeCur();
+  var list=[home];
+  ['AED','INR','USD','GBP','EUR','SAR','PKR','PHP'].forEach(function(c){
+    if(list.indexOf(c)<0)list.push(c);
+  });
+  return list.map(function(c){
+    return '<option value="'+esc(c)+'"'+(c===home?' selected':'')+'>'+esc(c)+'</option>';
+  }).join('');
+}
 function rbGeoCountry(){
   try{
     var saved=LS.get('rb_geo_cc','');
@@ -22229,6 +23127,34 @@ function rbGeoRefine(cb){
       },function(){cb(null);},{enableHighAccuracy:false,timeout:8000,maximumAge:600000});
     }).catch(function(){cb(null);});
   }catch(e){cb(null);}
+}
+/* The person pressed a button, so this one PROMPTS. rbGeoRefine deliberately never does - it only
+   takes a position already granted - which left "Turn on location for real distances" as advice with
+   nothing to press. This is the thing to press. */
+var RB_GEO_ASKING=false;
+function rbGeoAskNow(then){
+  then=then||function(){};
+  if(RB_GEO_ASKING)return;
+  if(!(navigator.geolocation&&navigator.geolocation.getCurrentPosition)){
+    then(null,'This browser cannot read a location.');return;
+  }
+  RB_GEO_ASKING=true;
+  navigator.geolocation.getCurrentPosition(function(pos){
+    RB_GEO_ASKING=false;
+    try{
+      var me={lat:+pos.coords.latitude.toFixed(5),lng:+pos.coords.longitude.toFixed(5),
+              acc:Math.round(pos.coords.accuracy||0),at:Date.now()};
+      LS.set('rb_geo_me',me);
+      LS.set('rb_geo_cc','');            /* a real position outranks a country guessed from the clock */
+      then(me,'');
+    }catch(e){then(null,'Could not save the position.');}
+  },function(err){
+    RB_GEO_ASKING=false;
+    var c=(err&&err.code)||0;
+    then(null, c===1?'Location is blocked for this site. Allow it in the browser\u2019s site settings, then press again.'
+             : c===3?'Finding your position timed out. Try again, or step outside.'
+             : 'Your position is not available right now.');
+  },{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
 }
 /* order listings: nearest first, then by region priority, so the Gulf and India lead for everyone else */
 function rbPropSortForMe(list){
@@ -22350,7 +23276,7 @@ function rbPropAreaBreakdown(kind){
   });
   return Object.keys(byArea).map(function(a){
     var x=byArea[a];
-    return {area:a,n:x.n,km:x.km,avg:x.cnt?Math.round(x.sum/x.cnt):0,cur:(list[0]&&list[0].currency)||'INR'};
+    return {area:a,n:x.n,km:x.km,avg:x.cnt?Math.round(x.sum/x.cnt):0,cur:(list[0]&&list[0].currency)||rbHomeCur()};
   }).sort(function(a,b){return a.km-b.km;});
 }
 function rbPropShowBreakdown(kind){
@@ -24411,8 +25337,15 @@ function admBulkParse(text){
   return rows;
 }
 function admBulkCreate(rows,opts){
-  opts=opts||{};var made=0,skipped=0;var page=null;try{page=myOwnedPage();}catch(e){}
-  var pageName=(page&&pageLicenseValid(page.name))?page.name:'';
+  /* v542: bulk and scan reach the same collection, so they meet the same gate. This used to fall
+     back to pageName:'' when the page was not approved, which created products with no shop
+     behind them - the exact thing the approval is for. */
+  var may=rbCanSellProducts();
+  if(!may.ok){try{rbShopNeeded(may);}catch(e){}
+    try{toast('Your shop needs the admin\u2019s approval before stock can be added','err');}catch(e){}
+    return {made:0,skipped:(rows||[]).length,blocked:true};}
+  opts=opts||{};var made=0,skipped=0;
+  var pageName=may.pages[0].name;
   var prods=getProducts();
   rows.forEach(function(r){
     if(!r.title||r.price<=0){skipped++;return;}
@@ -25737,6 +26670,56 @@ function openRateProduct(pid){
   document.body.appendChild(ov);ov.classList.add('open');
 }
 function setRateStars(n){__rateStars=n;var box=document.getElementById('rate-stars');if(box){[].forEach.call(box.children,function(s){s.style.color=(parseInt(s.getAttribute('data-n'),10)<=n)?'#f5a623':'#cbd5e1';});}}
+/* v544: "Submit Rating" on the delivery screen called submitRating(), which did not exist. The
+   stars could be tapped and the comment typed and the button did nothing. */
+function submitRating(){
+  if(!requireAuth('rate'))return;
+  /* openRateDelivery sets these two - curRateStars starts at 5 and renderStars draws them */
+  var stars=(typeof curRateStars!=='undefined'&&curRateStars)||0;
+  if(!stars){toast('Tap the stars to give a rating','info');return;}
+  var oid=(typeof curRateOrder!=='undefined'&&curRateOrder)||null;
+  if(!oid){toast('Open the order again and press Rate','err');return;}
+  var comment=((document.getElementById('rate-cmt')||{}).value||'').trim();
+  var orders=getOrders();
+  var o=orders.filter(function(x){return x&&x.id===oid;})[0];
+  if(!o){toast('That order is no longer here','err');return;}
+  if(o.buyerUid&&CU&&o.buyerUid!==CU.uid){toast('Only the buyer can rate this delivery','err');return;}
+  o.rating={stars:stars,comment:comment,by:(CU&&CU.uid)||'',at:Date.now()};
+  LS.set('rb_orders',orders);
+  if(FB.ready&&FB.db&&!FB_CLOUD_DISABLED){
+    try{FB.db.collection('orders').doc(String(o.id))
+      .set({rating:o.rating},{merge:true}).catch(function(){});}catch(e){}
+  }
+  closeOvl('rate-ovl');
+  toast('Thank you \u2014 '+stars+' star'+(stars===1?'':'s')+' recorded','ok');
+  try{if(typeof showMyOrders==='function')showMyOrders();}catch(e){}
+}
+
+/* v544: the search box inside a topic. doIS, toggleIS and clearIS were ALL missing, so the box
+   opened by the magnifier took typing and did nothing whatever - while the filtering it needed
+   was already there, reading innerQ at the point the posts are chosen. These three drive that. */
+function rbISRedraw(){
+  var t=tags.filter(function(x){return x.id===activeTagId;})[0];
+  if(!t)return;
+  try{renderSlideRows(t);}catch(e){}
+  try{renderMsgs(t);}catch(e){}
+  try{updateFHd(t);}catch(e){}
+}
+function toggleIS(){
+  showIS=!showIS;
+  var box=document.getElementById('tis');
+  if(box)box.style.display=showIS?'block':'none';
+  var inp=document.getElementById('isrch');
+  if(showIS){ if(inp){try{inp.focus();}catch(e){}} }
+  else{ innerQ=''; if(inp)inp.value=''; rbISRedraw(); }
+}
+function doIS(v){ innerQ=String(v==null?'':v).trim().toLowerCase(); rbISRedraw(); }
+function clearIS(){
+  innerQ='';
+  var inp=document.getElementById('isrch');
+  if(inp){inp.value='';try{inp.focus();}catch(e){}}
+  rbISRedraw();
+}
 function submitProductRating(){
   if(!__rateStars){toast('Tap the stars to give a rating','info');return;}
   if(!hasOrderedProduct(__ratePid)){toast('Only buyers who ordered this can review it','info');return;}
