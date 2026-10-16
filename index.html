@@ -1185,6 +1185,32 @@ body.rb-mapsite #cv-view{display:none!important}
 /* v551: a back control that cannot scroll away, for the full-screen surfaces that are not
    dialogs - the map and the nearby sheet. It sits above them and below dialogs, so a dialog's
    own sticky X is what you reach for there. */
+/* v552: the distance ladder on the map's own listings panel. Its classes carry an rbkm prefix
+   because the obvious short name was already taken by the profile modal's full-screen backdrop
+   (position:fixed, inset:0) - so every "chip" was being laid out as an overlay, 400px wide and
+   half the screen tall. The tests passed through it: they asked whether nine chips existed,
+   which they did. Looking at the screen is what found it.
+   Wide-but-scrollable rather than wrapped onto three lines, because it is read as a scale from
+   near to far. A rung with nothing in it is dimmed and still pressable - v547 learned that one
+   the hard way, when disabling the empty ones locked the whole ladder. */
+.rbkm-row{display:flex;gap:6px;overflow-x:auto;padding:2px 0 9px;margin-bottom:4px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent);
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent)}
+.rbkm-row::-webkit-scrollbar{display:none}
+.rbkm{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:58px;
+  border:1px solid var(--b);background:var(--card);color:var(--tx);border-radius:11px;
+  padding:7px 10px;font-family:var(--fn);cursor:pointer;line-height:1.15}
+.rbkm i{font-style:normal;font-size:10.5px;font-weight:700;color:var(--mt)}
+.rbkm b{font-size:14px;font-weight:800}
+.rbkm.on{background:var(--g);border-color:var(--g);color:#fff}
+.rbkm.on i{color:rgba(255,255,255,.85)}
+.rbkm.zero{opacity:.5}
+.rbkm-x{background:#dc2626;border-color:#dc2626;color:#fff;justify-content:center;
+  font-size:11.5px;font-weight:800;min-width:auto}
+.rbkm-ask{flex:1;border:1px dashed var(--b);background:var(--card);color:var(--mt);
+  border-radius:11px;padding:9px 12px;font:700 12px var(--fn);cursor:pointer;text-align:left}
+.rbkm-note{font-size:10.5px;color:var(--mt);line-height:1.5;padding:0 2px 9px}
 #rb-back{position:fixed;left:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:8600;
   display:none;align-items:center;gap:7px;border:.5px solid rgba(15,23,42,.10);
   background:rgba(255,255,255,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -1823,7 +1849,7 @@ html.no-ti .ti-x{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http:/
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" title="Reedbi Ecommerce — all stores" style="cursor:pointer;display:inline-flex;align-items:center;gap:7px"><svg viewBox="0 0 48 48" width="22" height="22"><defs><linearGradient id="lgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><path fill="url(#lgb)" d="M21.2 2.7a5.6 5.6 0 0 1 5.6 0l14.6 8.4a5.6 5.6 0 0 1 2.8 4.9v16.8a5.6 5.6 0 0 1-2.8 4.9l-14.6 8.4a5.6 5.6 0 0 1-5.6 0L6.6 37.7a5.6 5.6 0 0 1-2.8-4.9V16a5.6 5.6 0 0 1 2.8-4.9z"/><path fill="#fff" d="M24 14.6a1.5 1.5 0 0 1 1 .4l8.6 7.4a1 1 0 0 1-.7 1.8h-1.6v8.4a1.5 1.5 0 0 1-1.5 1.5h-4v-6.2a1.8 1.8 0 0 0-3.6 0v6.2h-4a1.5 1.5 0 0 1-1.5-1.5v-8.4h-1.6a1 1 0 0 1-.7-1.8l8.6-7.4a1.5 1.5 0 0 1 1-.4z"/></svg><span>Reed<span style="color:#6d28d9">bi</span></span> <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v551</span></span>
+      <span class="logo" onclick="openMainStore()" title="Reedbi Ecommerce — all stores" style="cursor:pointer;display:inline-flex;align-items:center;gap:7px"><svg viewBox="0 0 48 48" width="22" height="22"><defs><linearGradient id="lgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><path fill="url(#lgb)" d="M21.2 2.7a5.6 5.6 0 0 1 5.6 0l14.6 8.4a5.6 5.6 0 0 1 2.8 4.9v16.8a5.6 5.6 0 0 1-2.8 4.9l-14.6 8.4a5.6 5.6 0 0 1-5.6 0L6.6 37.7a5.6 5.6 0 0 1-2.8-4.9V16a5.6 5.6 0 0 1 2.8-4.9z"/><path fill="#fff" d="M24 14.6a1.5 1.5 0 0 1 1 .4l8.6 7.4a1 1 0 0 1-.7 1.8h-1.6v8.4a1.5 1.5 0 0 1-1.5 1.5h-4v-6.2a1.8 1.8 0 0 0-3.6 0v6.2h-4a1.5 1.5 0 0 1-1.5-1.5v-8.4h-1.6a1 1 0 0 1-.7-1.8l8.6-7.4a1.5 1.5 0 0 1 1-.4z"/></svg><span>Reed<span style="color:#6d28d9">bi</span></span> <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v552</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -2375,7 +2401,7 @@ html.no-ti .ti-x{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http:/
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <!-- SheetJS (xlsx) — powers Excel bulk product import/export (openBulkExcel). Loads window.XLSX. -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script>var RB_VERSION="v551";
+<script>var RB_VERSION="v552";
 /* ===== v295: installable app (PWA) — manifest, icons, offline worker registration ===== */
 var RB_ICON192='data:image/png;base64,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';
 var RB_ICON512='data:image/png;base64,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';
@@ -8161,7 +8187,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v551 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v552 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -14941,6 +14967,14 @@ function shPlayMusic(u){try{u=decodeURIComponent(u);if(__shAudio&&!__shAudio.pau
 (function(){
   function checkHash(){
     var h=location.hash||'';
+    /* v552: the code printed for a building owner lands here. Scanning it opens the posting
+       form straight away rather than the map, because the errand that code is handed out for
+       is "put your place up", not "have a look round". */
+    if(/^#list$/i.test(h)){
+      try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+      setTimeout(function(){try{if(typeof openPropertyAdd==='function')openPropertyAdd('rent');}catch(e){}},900);
+      return;
+    }
     // v515: a link to one listing, so it can be sent to somebody and opens on it
     if(h.indexOf('#p/')===0){
       var pid=decodeURIComponent(h.slice(3));
@@ -19430,7 +19464,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v551 loaded \u2014 tap here if something is not working (Update)';
+    b.innerHTML='\u2713 Reedbi v552 loaded \u2014 tap here if something is not working (Update)';
     b.onclick=function(){try{rbForceUpdate();}catch(e){try{b.remove();openSystemCheck();}catch(x){}}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -19687,6 +19721,10 @@ function rbSysChecks(){
     {n:'And they were all 0 because nothing had a map pin (v547) — which made the ladder useless even once it could be pressed. A product says “Discovery Gardens” in words; property listings in Discovery Gardens DO carry pins, so the area can be placed from them and the product with it. Two rules keep that honest: the area is only usable when the pins defining it sit close together — four pins inside a kilometre is a place, pins forty kilometres apart is a region and “dubai” is refused — and anything placed this way reads “about 32 m” rather than a flat figure, is counted separately, and the band says how many of its items were placed that way',ok:fn("rbAreaIndex")&&fn("rbAreaPos")&&typeof RB_AREA_SPREAD_KM==='number'&&/placed by the area they name/.test(String(rbBandSentence))&&String(rbNearbyRow).indexOf('about ')>0},
     {n:'One press for “here”, instead of typing coordinates (v547) — the only way into “measure from another point” was to type latitude and longitude, which is a miserable way to say where you are standing. The panel now opens with a button that just asks the browser, and the typing box is underneath it for the times you do mean somewhere else',ok:fn("rbNearbyPickHere")&&/Use my current location/.test(String(rbNearbyPickUI))&&String(rbNearbyPickHere).indexOf('rbGeoAskNow')>0},
     {n:'Reedbi opens as a property site, and everything else waits behind a switch (v548) — every other module is built and tested, but a half-finished one on the front page costs more than it earns: somebody taps Orders, finds nothing, and decides the whole site is broken. Each module now has its own switch, every switch starts off, and Admin → Sections turns them on one at a time. Flick Shop on and the products appear for everybody; flick Jobs on and the vacancies do',ok:(function(){try{return RB_MODULES.length>=10&&RB_SITE_DEFAULT.sections.shop===false&&RB_SITE_DEFAULT.sections.jobs===false&&RB_SITE_DEFAULT.sections.habits===false&&RB_SITE_DEFAULT.sections.property===true&&fn("rbModuleOn")&&fn("rbGateWire");}catch(e){return false;}})()},
+    {n:'Anybody can pass a listing on now, not just whoever posted it (v552) \u2014 the share sheet existed, with WhatsApp, Instagram, Facebook, Telegram, X and email in it, but it was only ever shown once, to the poster, in the moment just after posting. The person who actually fills a room is the colleague somebody sends it to. Every listing card carries a share button now, and what it sends is the listing\u2019s own address \u2014 reedbi.com/property/\u2039listing\u203a.html \u2014 so whoever opens it lands on that listing, and a search engine can read the same link',ok:(function(){try{var c=rbPropCardHTML({id:'zz',kind:'rent',title:'t',by:'not-me',photos:[],units:[]},'map');var L=rbPropLinks({id:'zz',kind:'rent',title:'t',place:'P',price:1});return /rbPropShowLink\('zz','share'\)/.test(c)&&L.share.indexOf('#')<0;}catch(e){return false;}})()},
+    {n:'A QR code for the person standing in front of you (v552) \u2014 a building owner, somebody at the door of a flat. Each listing has one, and there is one for Reedbi itself with two errands behind it: open the site, or go straight to the posting form. Both can be saved as a picture or printed as a card. Worth saying where the picture comes from, because the usual way of doing this is a privacy hole: most sites send the address to somebody else\u2019s server and show the image that comes back, which hands a third party a record of every listing anybody makes a code for. Reedbi draws its own, in the page, from a generator already in this file \u2014 nothing leaves the device and it works with no connection at all',ok:(function(){try{return fn("rbQRBlock")&&fn("rbSiteQR")&&fn("rbQRDownload")&&fn("rbQRPrint")&&rbQRSvgDataURI('x',120).indexOf('data:image/svg+xml')===0&&!/qrserver|chart\.googleapis|quickchart/i.test(String(rbQRSvgDataURI)+String(rbQRBlock));}catch(e){return false;}})()},
+    {n:'The distance ladder is on the map itself (v552) \u2014 400 m, 800 m, 1.2, 1.8, 2.5, 3, 4, 5 and 10 km, as asked. It lived on the Near you page, which stopped being where anybody lands the moment reedbi.com became the map. It is the same RB_BANDS and the same measurement, so the two screens cannot disagree, and the counts are worked out from everything that passes the other filters rather than from what the radius already cut down \u2014 otherwise one press would leave every other rung reading 0. Its classes carry an rbkm prefix because the short name they started with was already the profile modal\u2019s full-screen backdrop, so every rung was being laid out as a 400px overlay \u2014 the tests passed straight through that, because they asked whether nine rungs existed, which they did',ok:(function(){try{return JSON.stringify(RB_BANDS)==='[0.4,0.8,1.2,1.8,2.5,3,4,5,10]'&&fn("rbPMapBandBar")&&fn("rbPMapBandSet")&&fn("rbPMapBandFilter")&&/rbPMapBandFilter/.test(String(rbPMapSet));}catch(e){return false;}})()},
+    {n:'And it refuses to measure from a place that is not you (v552) \u2014 found by this build\u2019s own test rather than on a screen, which is the only reason it is not in the shipped app. rbNearMe never returns nothing: with no fix it falls back to a country or region centre so the rest of the screen has something to sort by. The ladder would have taken that happily and printed \u201c3 within 400 m\u201d measured from the middle of a country \u2014 the same false precision as v541\u2019s \u201c347 m away\u201d about a remembered map centre. It now draws rungs only when the origin really is you or a point you chose by hand, and when it is a chosen point it says so',ok:(function(){try{return /src===.you.\|\|.*src===.pick./.test(String(rbPMapBandBar).replace(/\s+/g,''))&&/Turn on location/.test(String(rbPMapBandBar))&&/src!==.you.&&.*src!==.pick./.test(String(rbPMapBandFilter).replace(/\s+/g,''));}catch(e){return false;}})()},
     {n:'The listing form had no way out on an iPhone (v551) \u2014 reported with a photo of it: the form filling the screen, the header gone, no back and no close anywhere. The cause was not the form. A dialog is capped at 92vh, and on iOS Safari vh is the LARGE viewport \u2014 it ignores the browser\u2019s own chrome \u2014 so the dialog was taller than what could actually be seen, and because it anchors to the bottom of the screen the surplus went off the TOP, taking the header and its close button with it. Every height in the app is now measured in dvh, the viewport you can really see, with the vh line kept first for browsers that do not know dvh',ok:(function(){try{var n=0;Array.prototype.forEach.call(document.querySelectorAll('style'),function(s){n+=(s.textContent.match(/dvh/g)||[]).length;});return n>=4&&/max-height:92vh;max-height:92dvh/.test(document.documentElement.outerHTML.slice(0,400000));}catch(e){return false;}})()},
     {n:'And the close button can no longer be scrolled past (v551) \u2014 the second half of the same report. A dialog scrolls inside itself and the header sits in that same box, so on a long form the X simply left the screen. The header is pinned now, so it is there at the top of the form and at the bottom of it, and the X is given a 40px target rather than a 20px glyph',ok:(function(){try{var d=document.createElement('div');d.className='overlay open';d.innerHTML='<div class="modal"><div class="mhd"><h3>t</h3><button class="modal-x"></button></div><div class="mbd"></div></div>';document.body.appendChild(d);var h=getComputedStyle(d.querySelector('.mhd')).position;var x=getComputedStyle(d.querySelector('.modal-x'));var ok=h==='sticky'&&parseInt(x.minWidth,10)>=40&&parseInt(x.minHeight,10)>=40;d.remove();return ok;}catch(e){return false;}})()},
     {n:'There is one way back that cannot scroll away (v551) \u2014 \u201cback or close button should be viewable\u201d. Fixed to the window rather than to any panel, bottom-left where a dialog\u2019s own X is not, and it names what it will leave. It reads which layer is really on top from how the page is actually stacked, so a panel added later needs nobody to remember to list it, and it closes exactly one layer per press \u2014 pressing it repeatedly walks back out instead of dumping somebody at the start. On the bare map there is nothing to go back to, so it is not drawn at all rather than sitting there doing nothing',ok:(function(){try{return fn("rbTopLayer")&&fn("rbBackGo")&&fn("rbBackPaint")&&fn("rbBackWatch")&&rbTopLayer()===null&&/zIndex/.test(String(rbTopLayer));}catch(e){return false;}})()},
@@ -19713,7 +19751,7 @@ function rbSysChecks(){
     {n:'Measure from a point you choose, not only from where you are (v546) — checking what is near a building you are thinking about does not mean standing in it. Paste its coordinates, or a Google Maps link, or the name of an area that already has a listing, and the WHOLE screen answers about that point: every distance, every rung of the ladder, the metro and the bus. The heading says which point, every row says “11 km from Al Barsha” rather than “away”, and it is cleared by pressing “Use my location instead” — never quietly, or you would be reading a screen about somewhere you had forgotten you chose',ok:fn("rbGeoPickSet")&&fn("rbGeoPickClear")&&fn("rbNearbyPickUI")&&String(rbNearMe).indexOf('rb_geo_pick')>0&&String(rbNearbyRender).indexOf("me.src==='pick'")>0},
     {n:'400 m joins the ladder (v546) — the rungs are 400 m, 800 m, then 1.5, 2, 2.5, 3, 4, 5 and 6 km. It stops at 400 and does not go finer: a phone knows where it is to within tens of metres on a good day, so a 50 m band would be offering a precision the position itself does not have',ok:RB_BANDS[0]===0.4&&RB_BANDS.length===9&&rbBandLabel(0.4)==='400 m'},
     {n:'And a thing standing on the point says so in words (v546) — a listing exactly where you pasted read “0 m from Al Barsha”, which is true and reads like a fault. Anything within about 25 m now reads “right here”, for the same reason the ladder stops at 400 m: three metres is not a distance this knows',ok:rbNearKmLabel(0.003)==='right here'&&rbNearKmLabel(0.003,true)==='right here'&&rbNearKmLabel(0.167)==='167 m away'},
-    {n:'How much is within 800 m, 1.5 km, 2 km… (v545) — a ladder of distances across the top of Near you, each saying how many things are inside it, measured from where you actually are. Tap one and the list shows only those; tap it again to clear. The counts are cumulative — within 800 m means within 800 m, not the ring between two radii — and they are counted from everything, so the numbers do not shrink as you narrow the list. The ladder only appears once your real position is known, because every number on it is a measurement from that point: showing it against the last place you looked at would be a row of confident figures about somewhere you are not',ok:Array.isArray(RB_BANDS)&&[0.8,1.5,2,2.5,3,4,5,6].every(function(k){return RB_BANDS.indexOf(k)>-1;})&&fn("rbBandCounts")&&fn("rbNearbyBand")&&rbBandLabel(0.8)==='800 m'&&rbBandLabel(2.5)==='2.5 km'},
+    {n:'How much is within 400 m, 800 m, 1.2 km… (v545, rungs reset in v552 on request) — a ladder of distances across the top of Near you, each saying how many things are inside it, measured from where you actually are. Tap one and the list shows only those; tap it again to clear. The counts are cumulative — within 800 m means within 800 m, not the ring between two radii — and they are counted from everything, so the numbers do not shrink as you narrow the list. The ladder only appears once your real position is known, because every number on it is a measurement from that point: showing it against the last place you looked at would be a row of confident figures about somewhere you are not',ok:Array.isArray(RB_BANDS)&&RB_BANDS.length>=8&&RB_BANDS[0]===0.4&&RB_BANDS[RB_BANDS.length-1]>=6&&RB_BANDS.every(function(k,i,A){return i===0||k>A[i-1];})&&fn("rbBandCounts")&&fn("rbNearbyBand")&&rbBandLabel(0.8)==='800 m'&&rbBandLabel(2.5)==='2.5 km'},
     {n:'And it says what it could not measure, instead of quietly rounding it in (v545) — a property carries a map pin. A thing for sale carries an area written as words, though a seller who pasted a Google Maps link gave a real point without meaning to, and that is used when it is there. A job carries a region, usually no finer than a country, and there is nothing in it to measure at all. Anything with no point is counted separately and named under the ladder — “2 jobs carry an area written as words, not a map pin, so they are not in these counts” — because a radius cannot be measured from a place name, and putting them in the nearest band would be inventing a distance',ok:fn("rbItemPos")&&fn("rbItemKm")&&rbItemPos({raw:{lat:25.1,lng:55.2}})!==null&&rbItemPos({raw:{map:'https://www.google.com/maps/@25.05,55.11,17z'}})!==null&&rbItemPos({raw:{location:'Discovery Gardens'}})===null&&rbItemKm({raw:{}},{lat:25,lng:55})===null},
     {n:'The metro and the bus, measured from where you stand (v545) — one press and Near you lists the nearest stations and stops with how far each is. The stops come from OpenStreetMap, which is data somebody surveyed; Reedbi has no transit list of its own and is not going to invent one, so a stop nobody has mapped does not appear and it says so. It is a shared free service, so it is asked only when the button is pressed and the answer is kept for the hour. And it is straight-line distance, not walking distance — a stop 400 m away across a motorway is not a 400 m walk, which the panel says rather than letting the number imply otherwise',ok:fn("rbNearbyTransit")&&fn("rbTransitPanel")&&fn("rbPropNearbyTransit")&&/not walking distance/.test(String(rbTransitPanel))&&/OpenStreetMap/.test(String(rbTransitPanel))&&/did not answer/.test(String(rbTransitPanel))},
     {n:'Ten buttons did nothing at all (v544) — the worst thing in the app, and nothing on screen said so. “Publish Listing” called a function that was never written. You could fill in the whole product form, press it, and get no listing, no error, no explanation — and six places open that form. The same was true of “Confirm Order”, the job “Submit”, “Submit Rating”, “Pay and Boost”, the composer’s two typing handlers and all three parts of the search inside a topic. Found by walking every inline handler in the page and checking the function exists; that walk is now a test that fails the build',ok:['submitProduct','placeOrder','submitApply','submitRating','proceedToPay','doIS','toggleIS','clearIS','onBI','onTI','confirmPay'].every(function(f){return typeof window[f]==='function';})},
@@ -19834,7 +19872,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v551';var all=(pass===checks.length);
+  var ver='v552';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -21001,7 +21039,128 @@ function rbBrandSVG(name,size){
   if(name==='googlemaps')name='maps';
   return open+(P[name]||P.link)+'</svg>';
 }
-function rbPropShowLink(id){
+/* ===== v552: QR codes, drawn here ================================================================
+   Worth saying where the picture comes from, because the usual way of doing this is a privacy
+   hole. Most sites build a QR by sending the address to somebody else's server - api.qrserver.com,
+   Google Charts - and showing the image that comes back. That hands a third party every address
+   anybody makes a code for, which for a property listing is a record of what is being advertised
+   and by whom. Reedbi draws its own, in the page, from a generator that already ships inside this
+   file. Nothing leaves the device, it works with no connection at all, and the policy on this app
+   does not permit an outside image host anyway.
+   ============================================================================================== */
+function rbQRSvgDataURI(text,size){
+  try{
+    var svg=makeQRSvg(text,size||560);
+    /* encodeURIComponent, not base64: it keeps the markup readable and cannot be mistaken for an
+       opaque blob by anything inspecting the page. */
+    return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  }catch(e){return '';}
+}
+/* Turn the drawn QR into a PNG the person can save or send. Done on a canvas in the page, so
+   again nothing is uploaded anywhere. */
+function rbQRDownload(text,name){
+  try{
+    var size=720;
+    var img=new Image();
+    img.onload=function(){
+      try{
+        var c=document.createElement('canvas');c.width=size;c.height=size;
+        var g=c.getContext('2d');
+        g.fillStyle='#fff';g.fillRect(0,0,size,size);
+        g.imageSmoothingEnabled=false;
+        g.drawImage(img,0,0,size,size);
+        c.toBlob(function(b){
+          if(!b){toast('Could not make the image.','err');return;}
+          var u=URL.createObjectURL(b);
+          var link=document.createElement('a');
+          link.href=u;link.download=(name||'reedbi-qr')+'.png';
+          document.body.appendChild(link);link.click();
+          setTimeout(function(){try{link.remove();URL.revokeObjectURL(u);}catch(e){}},1500);
+          toast('Saved as a picture.','ok');
+        },'image/png');
+      }catch(e){toast('Could not make the image.','err');}
+    };
+    img.onerror=function(){toast('Could not make the image.','err');};
+    img.src=rbQRSvgDataURI(text,size);
+  }catch(e){toast('Could not make the image.','err');}
+}
+/* A printable card: the code, what it opens, and the address written out for anybody whose
+   camera will not read it. Opened in a new window so the page itself is never replaced. */
+function rbQRPrint(url,title,line){
+  try{
+    var w=window.open('','_blank','noopener,width=620,height=820');
+    if(!w){toast('Your browser blocked the print window.','info');return;}
+    /* Written with the DOM rather than a string of HTML: nothing typed by anybody can become
+       markup in that window, and it keeps working with a strict policy on the new page. */
+    var d=w.document;
+    d.title=String(title||'Reedbi');
+    var st=d.createElement('style');
+    st.textContent='*{box-sizing:border-box}body{margin:0;font:400 14px/1.5 system-ui,-apple-system,'
+      +'"Segoe UI",Roboto,sans-serif;color:#0f172a;display:flex;align-items:center;'
+      +'justify-content:center;min-height:100vh;padding:28px}'
+      +'.card{border:2px solid #0f172a;border-radius:18px;padding:34px 30px;text-align:center;'
+      +'max-width:420px;width:100%}'
+      +'h1{font-size:23px;margin:0 0 6px;letter-spacing:-.4px}'
+      +'p{margin:0 0 20px;color:#475569;font-size:14px}'
+      +'img{width:100%;max-width:300px;height:auto;display:block;margin:0 auto 18px}'
+      +'.u{font:600 12px/1.45 ui-monospace,Menlo,monospace;color:#0f172a;word-break:break-all}'
+      +'.b{margin-top:16px;font-size:11px;color:#94a3b8}'
+      +'@media print{body{padding:0}.card{border-color:#000}}';
+    d.head.appendChild(st);
+    var card=d.createElement('div');card.className='card';
+    var h=d.createElement('h1');h.textContent=String(title||'Reedbi');
+    var p=d.createElement('p');p.textContent=String(line||'');
+    var img=d.createElement('img');img.src=rbQRSvgDataURI(url,600);img.alt='QR code';
+    var u=d.createElement('div');u.className='u';u.textContent=String(url||'');
+    var b=d.createElement('div');b.className='b';b.textContent='Point a phone camera at the code.';
+    card.appendChild(h);card.appendChild(p);card.appendChild(img);card.appendChild(u);card.appendChild(b);
+    d.body.appendChild(card);
+    setTimeout(function(){try{w.print();}catch(e){}},420);
+  }catch(e){toast('Could not open the print window.','err');}
+}
+/* The block that goes inside a share sheet. */
+function rbQRBlock(url,name,title,line){
+  return '<div style="border:.5px solid var(--b);border-radius:12px;padding:13px;margin-top:11px;text-align:center">'
+    +'<div style="font-size:10.5px;font-weight:800;letter-spacing:.05em;color:var(--mt2);margin-bottom:9px">OR LET THEM SCAN IT</div>'
+    +'<img src="'+esc(rbQRSvgDataURI(url,440))+'" alt="QR code" '
+      +'style="width:170px;height:170px;display:block;margin:0 auto 10px;border-radius:9px;border:1px solid var(--b);background:#fff">'
+    +'<div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:center">'
+    +'<button class="btn" style="flex:1;min-width:112px" onclick="rbQRDownload('+JSON.stringify(url).replace(/"/g,'&quot;')+','+JSON.stringify(name).replace(/"/g,'&quot;')+')"><i class="ti ti-download"></i> Save picture</button>'
+    +'<button class="btn" style="flex:1;min-width:112px" onclick="rbQRPrint('+JSON.stringify(url).replace(/"/g,'&quot;')+','+JSON.stringify(title).replace(/"/g,'&quot;')+','+JSON.stringify(line).replace(/"/g,'&quot;')+')"><i class="ti ti-printer"></i> Print a card</button>'
+    +'</div>'
+    +'<div style="font-size:10.5px;color:var(--mt);margin-top:8px;line-height:1.5">Drawn on this device \u2014 the address is not sent to any QR service.</div>'
+    +'</div>';
+}
+/* A code for Reedbi itself, to hand to a building owner. Two of them, because they are two
+   different errands: look at what is nearby, or put your own place up. */
+function rbSiteQR(which){
+  which=which||'open';
+  var base=(function(){try{return rbPropSiteBase();}catch(e){return 'https://www.reedbi.com/';}})();
+  var url=(which==='list')?(base+'#list'):base;
+  var title=(which==='list')?'List your property on Reedbi':'Reedbi \u2014 property near you';
+  var line=(which==='list')
+    ? 'Scan to put your room, flat or building on the map. Free, and it takes a minute.'
+    : 'Scan to see what is for rent and for sale around here.';
+  var ex=document.getElementById('siteqr-ovl');if(ex)ex.remove();
+  var ov=document.createElement('div');ov.className='overlay';ov.id='siteqr-ovl';
+  ov.innerHTML='<div class="modal" style="max-width:440px;max-height:90vh;max-height:90dvh;display:flex;flex-direction:column">'
+    +'<div class="mhd"><h3>QR code</h3><button class="modal-x" onclick="closeOvl(\'siteqr-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mbd" style="overflow-y:auto">'
+    +'<div style="display:flex;gap:6px;margin-bottom:12px">'
+    +[['open','Open Reedbi'],['list','Post a property']].map(function(o){
+        return '<button class="cat-chip'+(which===o[0]?' on':'')+'" style="flex:1" onclick="rbSiteQR(\''+o[0]+'\')">'+esc(o[1])+'</button>';
+      }).join('')
+    +'</div>'
+    +'<div style="font-size:12.5px;color:var(--mt);line-height:1.6;margin-bottom:11px">'+esc(line)+'</div>'
+    +rbQRBlock(url,(which==='list'?'reedbi-post-a-property':'reedbi'),title,line)
+    +'<div style="background:var(--card2);border:.5px solid var(--b);border-radius:11px;padding:11px;margin-top:11px">'
+    +'<div style="font-size:12px;word-break:break-all;margin-bottom:8px">'+esc(url)+'</div>'
+    +'<button class="btn btnok" style="width:100%" onclick="rbPropCopy('+JSON.stringify(url).replace(/"/g,'&quot;')+',\'Link\')"><i class="ti ti-copy"></i> Copy the link</button>'
+    +'</div>'
+    +'</div></div>';
+  document.body.appendChild(ov);requestAnimationFrame(function(){ov.classList.add('open');});
+}
+function rbPropShowLink(id,mode){
   var p=getProps().filter(function(x){return x.id===id;})[0];if(!p)return;
   var L=rbPropLinks(p);
   var shareTxt=(function(){
@@ -21015,7 +21174,7 @@ function rbPropShowLink(id){
   var ex=document.getElementById('proplink-ovl');if(ex)ex.remove();
   var ov=document.createElement('div');ov.className='overlay';ov.id='proplink-ovl';
   ov.innerHTML='<div class="modal" style="max-width:480px;max-height:88vh;max-height:88dvh;display:flex;flex-direction:column">'
-    +'<div class="mhd"><h3>Posted — here is the link</h3><button class="modal-x" onclick="closeOvl(\'proplink-ovl\')"><i class="ti ti-x"></i></button></div>'
+    +'<div class="mhd"><h3>'+(mode==='share'?'Share this listing':'Posted \u2014 here is the link')+'</h3><button class="modal-x" onclick="closeOvl(\'proplink-ovl\')"><i class="ti ti-x"></i></button></div>'
     +'<div class="mbd" style="overflow-y:auto">'
     +'<div style="font-weight:800;font-size:14px;margin-bottom:2px">'+esc(p.title||'')+'</div>'
     +'<div style="font-size:12.5px;color:var(--mt);margin-bottom:12px">'
@@ -21044,6 +21203,9 @@ function rbPropShowLink(id){
       +rbBrandSVG('instagram')+'<span>Instagram</span></button>'
       +'</div>'
       +'<div style="font-size:10.5px;color:var(--mt);margin-top:7px;line-height:1.5">Instagram does not let any website post for you or open a share box, so that one copies the caption and the link \u2014 paste it into a post, a story or your bio.</div>'
+      /* v552: and a code, for the times the person is standing in front of you - a building
+         owner, somebody at the door of the flat - where reading out a link is the slow way. */
+      +rbQRBlock(L.share,'reedbi-'+rbPropPageSlug(p),(p.title||'Reedbi listing'),shareTxt)
       +'</div>'
     +'<div style="font-size:10.5px;font-weight:800;letter-spacing:.05em;color:var(--mt2);margin:12px 0 6px">AND THE SEARCHES IT ANSWERS</div>'
     +L.pages.map(function(x){
@@ -21983,7 +22145,10 @@ function rbPropCardHTML(p,mode){
   else if(p.contact&&rbPropHasRoom(p))
     acts+='<button class="rbpc-a" onclick="rbPropEnquire(\''+escJS(p.id)+'\')"><i class="ti ti-mail"></i> '
       +'Enquire'+'</button>';
-  var more='';
+  /* v552: sharing a listing was only ever offered to the person who posted it, and only in the
+     moment just after posting. Anybody looking at a listing can now pass it on - which is how a
+     room actually gets filled: somebody sends it to a colleague. */
+  var more='<button class="rbpc-a gh" title="Share this listing" onclick="rbPropShowLink(\''+escJS(p.id)+'\',\'share\')">'+rbBrandSVG('share',15)+'</button>';
   if(typeof p.lat==='number')
     more+='<a class="rbpc-a gh" title="Google Maps" href="'+rbPropGMaps(p)+'" target="_blank" rel="noopener">'+rbBrandSVG("google-maps",15)+'</a>'
       +'<a class="rbpc-a gh" title="Directions" href="'+rbPropDirections(p)+'" target="_blank" rel="noopener"><i class="ti ti-navigation"></i></a>';
@@ -22563,6 +22728,7 @@ function rbPMapMenu(){
     ['⌕','Get on Google / AI search','seo'],
     ['☰','My listings','mine'],
     ['◍','Account','account'],
+    ['▦','QR code for owners','qr'],
     ['📷','On Instagram','ig'],
     ['▶','On YouTube','yt']
   ];
@@ -22580,6 +22746,7 @@ function rbPMapMenu(){
     b.onclick=function(){
       var a=b.getAttribute('data-a');m.remove();
       if(a==='closeAllAndHome'){rbPMapClose();}
+      else if(a==='qr'){try{rbSiteQR('list');}catch(e){}}
       else if(a==='account'){try{if(typeof openAccountMenu==='function')openAccountMenu();else if(typeof rbTab==='function')rbTab('account');}catch(e){}}
       else if(a==='exploreAll'){rbPMapNav('home');}
       else if(a==='addOne'){openPropertyAdd('sale');}
@@ -22847,6 +23014,21 @@ function rbPMapAll(where){
     });
   }catch(e){return [];}
 }
+/* The radius the person chose, applied where every property list already goes through. */
+function rbPMapBandFilter(list){
+  try{
+    if(!__pmap.km)return list;
+    var me=rbNearMe();
+    /* same rule as the ladder: no real origin, no radius - rather than filtering against a
+       country centre and showing somebody an answer to a question nobody asked */
+    if(!me||typeof me.lat!=='number'||(me.src!=='you'&&me.src!=='pick'))return list;
+    return list.filter(function(p){
+      var k=rbPMapKm(p,me);
+      if(k===null)return true;           /* unplaced: counted and named, never silently dropped */
+      return k<=__pmap.km;
+    });
+  }catch(e){return list;}
+}
 function rbPMapSet(){
   // v513: a listing that has been handed over leaves everyone's search - nobody should be ringing about a
   // flat that has gone. It stays visible to whoever posted it, under My listings.
@@ -22859,7 +23041,7 @@ function rbPMapSet(){
     var uid='';try{uid=(CU&&CU.uid)||'';}catch(e){}
     ps=ps.filter(function(p){return p.by&&p.by===uid;});
   }
-  return ps;
+  return rbPMapBandFilter(ps);
 }
 /* ---- clustering, written here so there is no extra download to fail ----
    Pins inside the same small square of the map are drawn as one counted circle. The square shrinks as
@@ -23144,7 +23326,10 @@ function rbNearKmLabel(km,bare){
 /* v546: 400 m added at the bottom, as asked. Below that a GPS fix is usually less accurate than
    the band itself - a phone good to 20 m is fine at 400 m and meaningless at 50 m - so the ladder
    stops here rather than offering a precision the position does not have. */
-var RB_BANDS=[0.4,0.8,1.5,2,2.5,3,4,5,6];
+/* v552: the rungs, as asked for: 400 m, 800 m, 1.2, 1.8, 2.5, 3, 4, 5 and 10 km. They are one
+   list, used by the Near you page and by the map's own listings panel, so the two can never
+   disagree about what "within 800 m" means. */
+var RB_BANDS=[0.4,0.8,1.2,1.8,2.5,3,4,5,10];
 function rbBandLabel(km){
   return km<1 ? (Math.round(km*1000)+' m') : ((km%1?km:Math.round(km))+' km');
 }
@@ -24151,6 +24336,65 @@ function rbPropClearAllFilters(){
     toast('Everything cleared \u2014 showing every listing.','ok');
   }catch(e){}
 }
+/* ===== v552: distance on the listings panel ======================================================
+   The ladder existed on the Near you page, which stopped being where anybody lands the moment
+   reedbi.com became the map. Asking "what is within 800 m of me" on the screen you are actually
+   looking at is the whole point of it, so it is here too - the same RB_BANDS, the same
+   measurement, so the two screens can never disagree.
+
+   A listing with no map pin cannot be measured from anything. It is not quietly dropped: the
+   count says how many are unplaced, because a filter that silently hides things is how somebody
+   concludes their listing has vanished.
+   ============================================================================================== */
+function rbPMapKm(p,me){
+  try{
+    if(!me||typeof me.lat!=='number')return null;
+    if(typeof p.lat!=='number')return null;
+    return rbGeoKm(me.lat,me.lng,p.lat,p.lng);
+  }catch(e){return null;}
+}
+function rbPMapBandSet(km){
+  __pmap.km=(__pmap.km===km)?0:km;
+  try{rbPMapDraw();}catch(e){}
+  try{rbPMapList();}catch(e){}
+  try{rbPMapInView();}catch(e){}
+}
+function rbPMapBandBar(all,me){
+  try{
+    /* rbNearMe never returns nothing: with no fix it falls back to a country or region centre so
+       that other parts of the screen have something to sort by. Measuring a 400 m radius from a
+       country centroid and printing it as a count would be a claim the data cannot support - the
+       same mistake as v541, where rows said "347 m away" about a remembered map centre. The
+       ladder is therefore drawn only when the origin really is the person, or a point they chose
+       by hand. Found by this build's own test, not on a screen. */
+    var real=me&&typeof me.lat==='number'&&(me.src==='you'||me.src==='pick');
+    if(!real){
+      return '<div class="rbkm-row"><button class="rbkm-ask" onclick="rbPMapLocateMe()">'
+        +'\u25c9 Turn on location to filter by distance</button></div>';
+    }
+    var unplaced=0,kms=[];
+    all.forEach(function(p){
+      var k=rbPMapKm(p,me);
+      if(k===null)unplaced++;else kms.push(k);
+    });
+    var chips=RB_BANDS.map(function(km){
+      var n=0;for(var i=0;i<kms.length;i++)if(kms[i]<=km)n++;
+      var on=(__pmap.km===km);
+      return '<button class="rbkm'+(on?' on':'')+(n?'':' zero')+'" onclick="rbPMapBandSet('+km+')">'
+        +'<i>'+esc(rbBandLabel(km))+'</i><b>'+n+'</b></button>';
+    }).join('');
+    var clear=__pmap.km?('<button class="rbkm rbkm-x" onclick="rbPMapBandSet('+__pmap.km+')">\u2715 Any distance</button>'):'';
+    var note='';
+    /* and when it is a point chosen by hand, say so - a radius means nothing until you know
+       what it is drawn around */
+    if(me.src==='pick')note+='<div class="rbkm-note">Measured from '
+      +esc(me.pickName||'the point you chose')+', not from where you are.</div>';
+    if(unplaced)note+='<div class="rbkm-note">'+unplaced+' listing'+(unplaced===1?'':'s')
+      +' carr'+(unplaced===1?'ies':'y')+' no map pin, so '+(unplaced===1?'it':'they')
+      +' cannot be measured \u2014 '+(unplaced===1?'it is':'they are')+' still in the list below.</div>';
+    return '<div class="rbkm-row">'+clear+chips+'</div>'+note;
+  }catch(e){return '';}
+}
 function rbPMapList(){
   try{
     var box=document.getElementById('pmap-list'),cnt=document.getElementById('pmap-count');
@@ -24166,6 +24410,16 @@ function rbPMapList(){
       if(!b||b.contains([p.lat,p.lng]))here++;
     });
     var inView=all;
+    /* v552: the ladder is drawn from EVERYTHING that passes the other filters, not from what the
+       radius has already cut down - otherwise pressing 800 m would make every other rung read 0
+       and the ladder would be unusable after one press. */
+    var bandBar='';
+    try{
+      var unfiltered=rbPMapAll().filter(rbPropQuickMatch);
+      if(__pmap.mineOnly){var uid2='';try{uid2=(CU&&CU.uid)||'';}catch(e){}
+        unfiltered=unfiltered.filter(function(p){return p.by&&p.by===uid2;});}
+      bandBar=rbPMapBandBar(unfiltered,rbNearMe());
+    }catch(e){}
     try{var tn=document.getElementById('pmap-tabn');if(tn)tn.textContent=all.length?(all.length+' listing'+(all.length===1?'':'s')):'Listings';}catch(e){}
     // v520: when a filter is on, the line says "2 of 7" rather than "2 listings". The old wording stated
     // a filtered count as though it were the whole truth, which is how the app ended up telling somebody
@@ -24190,7 +24444,7 @@ function rbPMapList(){
     if(!all.length){
       var act=rbPropActiveFilters();
       var raw=0;try{raw=getProps().length;}catch(e){}
-      box.innerHTML=act.length
+      box.innerHTML=bandBar+(act.length
         ? ('<div style="border:1px solid #d97706;background:rgba(217,119,6,.10);border-radius:11px;padding:11px;font-size:12.5px;line-height:1.6">'
             +'<b>Nothing matches, because of what is switched on.</b><br>You are '+act.map(function(a){return esc(a.label);}).join(', and ')+'.'
             +(raw?('<br>There '+(raw===1?'is':'are')+' '+raw+' listing'+(raw===1?'':'s')+' altogether.'):'')
@@ -24198,12 +24452,12 @@ function rbPMapList(){
         : (raw
             // reached when listings exist but none is open - every one has been handed over
             ? '<div style="font-size:12px;color:var(--mt);line-height:1.6;padding:6px 2px">All '+raw+' listing'+(raw===1?' has':'s have')+' been marked handed over, so '+(raw===1?'it is':'they are')+' out of everyone\u2019s search. Open <b>My listings</b> from the menu to reopen '+(raw===1?'it':'one')+'.</div>'
-            : '<div style="font-size:12px;color:var(--mt);line-height:1.6;padding:6px 2px">Nothing posted yet. Tap <b>+ Add</b> to post the first one \u2014 it shows to everyone straight away.</div>');
+            : '<div style="font-size:12px;color:var(--mt);line-height:1.6;padding:6px 2px">Nothing posted yet. Tap <b>+ Add</b> to post the first one \u2014 it shows to everyone straight away.</div>'));
       return;
     }
-    box.innerHTML=inView.length
+    box.innerHTML=bandBar+(inView.length
       ?inView.slice(0,60).map(function(p){return rbPropCardHTML(p,'map');}).join('')
-      :'<div style="font-size:12px;color:var(--mt);line-height:1.6;padding:6px 2px">Nothing here yet. Tap <b>+ Add</b> to list a property, a buyer, a tenant, parking or commercial space \u2014 or use the menu to see what is posted on Instagram and YouTube for this area.</div>';
+      :'<div style="font-size:12px;color:var(--mt);line-height:1.6;padding:6px 2px">Nothing here yet. Tap <b>+ Add</b> to list a property, a buyer, a tenant, parking or commercial space \u2014 or use the menu to see what is posted on Instagram and YouTube for this area.</div>');
   }catch(e){}
 }
 function rbPMapFocus(id){
