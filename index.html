@@ -296,6 +296,59 @@ html,body{height:100%;overflow:hidden;font-family:var(--fn);background:var(--bg)
   font:500 13.5px/1.3 var(--fn)}
 .rbn-find input::placeholder{color:var(--mt2)}
 .rbn-x{background:none;border:none;color:var(--mt2);font-size:14px;cursor:pointer;padding:0 2px;line-height:1}
+/* v546: measuring from a point you set rather than from where you are */
+.rbn-pickbtn{display:inline-flex;align-items:center;gap:7px;border:1px dashed var(--b2,var(--b));
+  background:transparent;color:var(--mt);border-radius:999px;padding:7px 13px;margin:0 0 9px;
+  font:600 12px/1 var(--fn);cursor:pointer}
+.rbn-pickbtn:hover{color:var(--g);border-color:var(--g)}
+.rbn-pickon{display:flex;align-items:center;gap:7px;flex-wrap:wrap;border:1px solid var(--g);
+  background:rgba(37,99,235,.07);border-radius:11px;padding:9px 11px;margin:0 0 9px;
+  font-size:12px;line-height:1.5;color:var(--tx)}
+.rbn-pickon svg{flex:none;color:var(--g)}
+.rbn-pickon span{flex:1;min-width:0}
+.rbn-pick{border:.5px solid var(--b);border-radius:12px;padding:10px 11px;margin:0 0 9px;
+  background:var(--card2)}
+.rbn-pick input{width:100%;padding:10px 12px;border:1px solid var(--b);border-radius:10px;
+  background:var(--card);color:var(--tx);font:500 13px/1.3 var(--fn);margin:0 0 7px}
+.rbn-pickgo{width:100%;padding:9px;border:none;border-radius:10px;background:var(--g);color:#fff;
+  font:700 12.5px/1 var(--fn);cursor:pointer}
+.rbn-pickmsg{font-size:11.5px;line-height:1.55;color:var(--g);margin-top:7px}
+.rbn-pickmsg.bad{color:#b45309}
+.rbn-pickmsg:empty{display:none;margin:0}
+/* v545: metro and bus from where you are */
+.rbn-tr{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--b);
+  background:var(--card);color:var(--g);border-radius:999px;padding:7px 13px;margin:0 0 9px;
+  font:700 12px/1 var(--fn);cursor:pointer}
+.rbn-tr:disabled{opacity:.6;cursor:default}
+.rbn-trp{border:.5px solid var(--b);border-radius:12px;padding:10px 11px;margin:0 0 9px;
+  background:var(--card2)}
+.rbn-trl{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 6px}
+.rbn-trl>b{font-size:11px;font-weight:800;color:var(--mt);min-width:40px;
+  text-transform:uppercase;letter-spacing:.04em}
+.rbn-trs{display:inline-flex;align-items:baseline;gap:5px;font-size:12px;color:var(--tx);
+  background:var(--card);border:.5px solid var(--b);border-radius:8px;padding:3px 8px}
+.rbn-trs i{font-style:normal;font-size:10.5px;color:var(--g);font-weight:700;white-space:nowrap}
+.rbn-trnone{font-size:11.5px;color:var(--mt)}
+.rbn-trnote{font-size:10.5px;line-height:1.55;color:var(--mt);margin-top:7px}
+.rbn-trerr{font-size:11.5px;line-height:1.55;color:#b45309;background:rgba(217,119,6,.07);
+  border-color:rgba(217,119,6,.4)}
+/* v545: the distance ladder */
+.rbn-bdrow{display:flex;gap:6px;overflow-x:auto;padding:0 0 3px;margin:0 0 7px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 26px),transparent);
+  mask-image:linear-gradient(to right,#000 calc(100% - 26px),transparent)}
+.rbn-bdrow::-webkit-scrollbar{display:none}
+.rbn-bd{display:inline-flex;flex-direction:column;align-items:center;gap:1px;flex:none;
+  border:1px solid var(--b);background:var(--card);color:var(--tx);border-radius:11px;
+  padding:6px 11px;cursor:pointer;min-width:58px;font-family:var(--fn)}
+.rbn-bd i{font-style:normal;font-size:10.5px;color:var(--mt);font-weight:700;white-space:nowrap}
+.rbn-bd b{font-size:14px;font-weight:800;line-height:1.1}
+.rbn-bd.on{background:var(--g);border-color:var(--g);color:#fff}
+.rbn-bd.on i{color:rgba(255,255,255,.8)}
+.rbn-bd[disabled]{opacity:.42;cursor:default}
+.rbn-bdsay{font-size:11.5px;line-height:1.55;color:var(--tx);margin:0 0 8px}
+.rbn-bdhint{color:var(--mt)}
+.rbn-bdwarn{color:#b45309}
 .rbn-ixrow{display:flex;gap:6px;overflow-x:auto;padding:0 0 3px;margin:0 0 11px;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
   /* a row that scrolls sideways with no scrollbar needs to look like it does - the last chip
@@ -1716,7 +1769,7 @@ html.no-ti .ti-x{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http:/
 <div class="shell" id="app" style="display:flex">
   <div class="left" id="leftpanel">
     <div class="lhd">
-      <span class="logo" onclick="openMainStore()" title="Reedbi Ecommerce — all stores" style="cursor:pointer;display:inline-flex;align-items:center;gap:7px"><svg viewBox="0 0 48 48" width="22" height="22"><defs><linearGradient id="lgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><path fill="url(#lgb)" d="M21.2 2.7a5.6 5.6 0 0 1 5.6 0l14.6 8.4a5.6 5.6 0 0 1 2.8 4.9v16.8a5.6 5.6 0 0 1-2.8 4.9l-14.6 8.4a5.6 5.6 0 0 1-5.6 0L6.6 37.7a5.6 5.6 0 0 1-2.8-4.9V16a5.6 5.6 0 0 1 2.8-4.9z"/><path fill="#fff" d="M24 14.6a1.5 1.5 0 0 1 1 .4l8.6 7.4a1 1 0 0 1-.7 1.8h-1.6v8.4a1.5 1.5 0 0 1-1.5 1.5h-4v-6.2a1.8 1.8 0 0 0-3.6 0v6.2h-4a1.5 1.5 0 0 1-1.5-1.5v-8.4h-1.6a1 1 0 0 1-.7-1.8l8.6-7.4a1.5 1.5 0 0 1 1-.4z"/></svg><span>Reed<span style="color:#6d28d9">bi</span></span> <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v544</span></span>
+      <span class="logo" onclick="openMainStore()" title="Reedbi Ecommerce — all stores" style="cursor:pointer;display:inline-flex;align-items:center;gap:7px"><svg viewBox="0 0 48 48" width="22" height="22"><defs><linearGradient id="lgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><path fill="url(#lgb)" d="M21.2 2.7a5.6 5.6 0 0 1 5.6 0l14.6 8.4a5.6 5.6 0 0 1 2.8 4.9v16.8a5.6 5.6 0 0 1-2.8 4.9l-14.6 8.4a5.6 5.6 0 0 1-5.6 0L6.6 37.7a5.6 5.6 0 0 1-2.8-4.9V16a5.6 5.6 0 0 1 2.8-4.9z"/><path fill="#fff" d="M24 14.6a1.5 1.5 0 0 1 1 .4l8.6 7.4a1 1 0 0 1-.7 1.8h-1.6v8.4a1.5 1.5 0 0 1-1.5 1.5h-4v-6.2a1.8 1.8 0 0 0-3.6 0v6.2h-4a1.5 1.5 0 0 1-1.5-1.5v-8.4h-1.6a1 1 0 0 1-.7-1.8l8.6-7.4a1.5 1.5 0 0 1 1-.4z"/></svg><span>Reed<span style="color:#6d28d9">bi</span></span> <span style="font-size:9px;color:var(--mt2);font-weight:400" ondblclick="openAdminPanel()" title="">v546</span></span>
       <div style="display:flex;align-items:center;gap:5px">
         <div class="uchip" onclick="showMyProfile()"><div class="uchip-av av0" id="uc-av">ME</div><span class="uchip-nm" id="uc-nm">Guest</span></div>
         <div class="hacts">
@@ -2259,7 +2312,7 @@ html.no-ti .ti-x{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http:/
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <!-- SheetJS (xlsx) — powers Excel bulk product import/export (openBulkExcel). Loads window.XLSX. -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script>var RB_VERSION="v544";
+<script>var RB_VERSION="v546";
 /* ===== v295: installable app (PWA) — manifest, icons, offline worker registration ===== */
 var RB_ICON192='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAALgElEQVR42u2de3BU5RnGn7O3bDabEJLdTQIEkZsEGCpCQRJQYdC20FEGnDpknBgu0jqZgrSlLQjtP0qFKlp6cRC5icW2XKTCWC5OCgEiaIsyKhooIERCNjdy2c1tL6d/hJAQk5jL+bK753t+Z76Z/JE5e873vc953+ec851PQYhZnV6ugkjL8/mJSih/v89//Ln0MgY86ZAX8h2K7gSwikFPesDaPhCDwsAnMgtByI5XMvCJAH4nQAia7nBlRikDn4gXwimnElYC+DUDn4SAFzUQQq938CsGPwkh63opAgODn0QyvY3BHqnnl1NLGPgk7Fh/0tXteDYw+Ile6ElsdksxKxj8JAL4fTcyQZf/8RcMfhJBvNRFERgY/ESPdDVmTV35J1Vh/BN98q0Z4OfT3Ix+EpF0JXY7rZN+xuAnOmDDiSSl2wJYzuAnOuKVDkTQsQdg3U8koF1VPPtAMaOf6I5X85KVbptgQqTKAMt49Sc65g9tssA3PICqsJOIpBlg6YM3ePUnumfj8RSl3QzA6CeycdsE/5RXfyIJrWPdxKs/kZkWAfDBF5G1BMp5qIjRT6SiOeZNLH8ITTAhMnsAPvwisqI8M/06KyAibwZg9BMKgBBpPQDrfyJ3BmAOIPLC26CEHoAQCoAQmmBCaIIJoQkmhB6AEN0LgB6ASG2C6QEISyBCaIIJoQcghCUQITTBhDADEEITTAhNMCH6LIFYBBGpTbDcrH0tBYOHWkL2+6oK+H0q/H4VAT9QVxeEt6apeWqCKCvxo8ztR2mxH9ev+VBa7GfU0gTrB0UBzBYFZktTLWqPM8CZ1PH/13qDuHqpEQWfN+Czs/W4eL4Bfj9HsecZgB4gorDFGJA2zoq0cVbMmd8PDfUq/pNfi1O5Xnx6tg7BIPuIGaA7JUiEH3+UVUHGjBhkzIhBWYkfB3dX49+HPfA1MivQBEuGw2VCdk4CHn0iDjteq8CHp2rZKd8CnwPokASHCcvXuLB8jQvR0RxilkCSMinDhgGpKVj/GzdKePeogwygAFI3nTNosBlr1iUjwWGE9GPdTqMHkABnkgmrXkjCyqVFaKQ5pgeQkUF3WZC1JJEd0VYAKppuBcraZOLh2bEYOdoK2ce8dTOoStMSSdI2yUSQuaA/pB/zVo0TYiQjbawV96RFoeCLenYGb4PKyYMz7fiSAqAJlpX0aXYofAfsVgaQvSMEnH/Wj76C19v5W2lmi4LoaAOsVgVOlwmpgy24e1gUvjvZhn7xRqGnHGM34K5hUbhyqYECYAmkPV25w9TYqKKxMYCqKsDt9uOzT5tKEoMBuHeCDU8tTEDqYHHzFNLGWHGZAqAJDp0E2icYBM5+5MW5j2ux+McOfG9WnJAjHJRqBseeGSDMwr8Fv1/Fpr+UIjbOgPSpds2PMTnFzPCnCQ5zIanA1tfLhbzb73Ca2ME0wYIC99ZDFi0oq/Dj+LEazHxE21IoyqqAY8+X4SDi/NVbm1Z88kmt5gKwRingi5AsgSKCL87XCxApoQkOYxPcmpuVAc2P0eMJUgTgVyHEoPFkG39ARX19EFardgnb6wmCY88MEBEZAAAMBm2j1eMNMAPQBIsz1lr2q8WiwGLRVgDXrjXSBNMERwaJidrfsy8o4NugTRmAdaD2GUDD5wAAMHpMtPYCuFjP5wDMAJHBfeNtmu7P7fbhRrGPHUsPIOZ+uJYeICXZjKkZ2r4LdPhoFev/FgEQEaLSol+NRgXP/MQFo1G7WiUYBI68X83wbxYAuyA8sVgULM1JwsT7YjTd77G8apRX8CtxNMEi6YUJNhoVTJoYg8XZDgwcoO2EGI83iM3bSml+mQFCj9ncNCUy2mqAy2XCkMFRGD4sClMm2xEXK2ZK5NYdpUJeq6AJJnewZ9fwsDumo7lVeO9IJUebJlg+Tn/kwYY/uRHkYLdTAvGrELom/4wHa18uQiCo8uU3ZgB5CARUbNlZht37K9gZnZtgSkBv/O9yPf64yY3zBXXsDGaAztHT+Re7fdi2qxS5edVQeV2jB5CBYBD47zkvDudW4eTpmpY1gzmuzAB6p7jEh/Ubb+Dc51wNkgKQkGSXGRueH4yLl+uxa2858j6oYelDEyyfCxgx1IrfrhiIi5frsfbVIlwt5Dc/uwqXSNIRI4Zasenlu/GDmfFc/qiLjSZYZ1jMClbkpCChvwlv7Sljh9ADyMmiTCf8ARVvv1POzuhcAJwRpleWPOlCYVEDTpypYaR35AHYBfpFUYDnlg3EgGQLO6PDDEAPoDmzsgrg8Qbarc9jYoyIjzNixBArRg2PxvT0OCT2FzctI9pqwOplA5Gz+gqCQY4NM0AIafSpuFnpx5VrDTiSV4WNW4sxb8kFrFpXiK9vNAr73TH3RCNzjoMD0J4AeBtUjK/oagsEgRMf1iDr2UvYf/imsIHOetwBl8PMW59ou1I85N7ECKD7W6M/iJdeL8K23aVCjskaZUBOdhJUbndsLIHCjC1/K8GhY5VC9j19ShzuHRPDTr6jBFJaPuUnYxOSAXp5TC9uKsKFK2K+3bkk0wXZx7x1YwYIQ3w+FWv/fB2BgPYl2rhRNtw/3s5ObjHB9ADh4AHabhe+qsPbB8S8yvD0fBer/2YPwDsBob0L1FnbtrcUldXaf8Vt1NBopE+I5V0gAIbby/nI2kSg0bHV1gexfZ+Yu0LZ85yQfuwVPgcQhlbHt/dIBYrLtP+U+diRNkwcZ2cGoA0Kf0O8c7+YLLBwnpMmmCY4PE1w6+3d3AqU3dTeC4wfHYPvpNkkN8GyPwcQ4AO0PsYGv4q3DgjKAo+7+ByAhD/7jlagskb7LDB5nB1jR9ik7Vea4DA2wK1bXUMQuw6Kmd21YK5LZhNMCUSGBFT841AZarzaf99/2oRYjBxilXL8+SAsYsIf8NQF8PdDYp4OL5onZxbgjDARAhD4ot1f3ytD5mwnbFZt7dv0Sf0wNNWKS1/LtYA2TXCEUe0JYM8R7b2AogAL57pogln+hG8J1Nx2HixFQ6P2E3wfmdIPqSlRNMGUQXhLoLzKh3dytV/4wmBQsHCOUzITzAkxYf8grL22/d0S+Pzai3f2tP5IcVn4IIyEN+4KHw4c1z4LGI0KFjwmjxegB4hAD9Dctv6zRMisscceSoArQY4vSBg4J0iEAPpmKyxpwL/ytf+UitmkIPtRpyRfheCEGDH00fG/sb9EyPq/c2ckIjHexAkxLIHCtwRSAVwuqsf7Zyo1P4coiwFZP3TJcBuURDqb97uFLI30xMMOxNtNuu47ToiJYA/QvH15tRbHP67S/Dyiowx4cpaDX4VgCRS+JVBz27SvWMi5ZH7fCbvNqNvxV8bMP8tFYoi0cIkkIjU0wUT2DMAcQGQWACfEEJZAhNAEEyKfAEAPQOgBCGEJRAhNMCHMAITQBBNCE0wISyBCaIIJ0WcGYA4gMptgegBCD0AIBUAITTAhNMGE0AQTQg9AiL49QOGbk5kDiJQUvjlZMQEAfQCR1wNA3FJBhIR9CcQuIDJz+9o/4KnTrIOINBTtuF9hBiD0AM1/qAoTAJG4BAKA5OwPqAKie4q3T1FogglBO+skJjELEB3jbnX1v8MDtMD4JxJnAABwLcinCojuKNmW/o14b3cNTEY/kYV2TXBpO0ohJJLpKKY7XAWZWYBI6wGacSw8RR2QiKdsa4bSIwEAQCJFQCKY8k6Cv0sCAIAEioBEIBXfEvwdmmBC6AHa0H/RSWYBEjHc3DK1S7Ft0HqHhERK8HcrAzQTz0xAwpjKbl6oe3RV70cRkDCkqgdVSq/KGgqBRGrgayIAAIhbfIIiICGj+o1pvYphQ6gPgJBQxp6mwRvLbED6gBoNL7pCrt52CoEIwCOg2hBavtifzqMQSO8Df/MDwuK0T+r3GAqB9ACvwMDvUwFQDCScgj6kAmiLjYKQmto+Dvi2/B/Kbbniie0JogAAAABJRU5ErkJggg==';
 var RB_ICON512='data:image/png;base64,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';
@@ -7568,7 +7621,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){['cr-ovl','
 /* INIT - bulletproof: UI always boots; no login on startup; one-time login.
    A Firebase-signed-in user is restored via onAuthStateChanged so the
    session survives reloads and app restarts (fixes auto-logout). */
-console.log('%cReedbi build 2026-06-02-v544 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
+console.log('%cReedbi build 2026-06-02-v546 loaded ✓','color:#25d366;font-weight:bold');try{updateCartBadge();}catch(e){}
 try{initFirebase();}catch(e){console.warn('FB init outer',e);FB.ready=false;setDbPill(false);}
 (function(){
   try{
@@ -18760,7 +18813,7 @@ function rbShowVersion(){
     if(document.getElementById('rb-verbanner'))return;
     var b=document.createElement('div');b.id='rb-verbanner';
     b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#7c3aed,#0a66c2);color:#fff;text-align:center;padding:9px 12px;font-size:13px;font-weight:700;font-family:var(--fn);box-shadow:0 3px 12px rgba(0,0,0,.28);transition:opacity .6s';
-    b.innerHTML='\u2713 Reedbi v544 loaded \u2014 tap here if something is not working (Update)';
+    b.innerHTML='\u2713 Reedbi v546 loaded \u2014 tap here if something is not working (Update)';
     b.onclick=function(){try{rbForceUpdate();}catch(e){try{b.remove();openSystemCheck();}catch(x){}}};
     document.body.appendChild(b);
     setTimeout(function(){if(b)b.style.opacity='0';},3500);
@@ -18978,6 +19031,12 @@ function rbSysChecks(){
     {n:'When nothing is showing, it now says what is hiding it (v518.1) - listings are hiding is almost never the listings. It is a filter chip still pressed, a word left in the search box, or My listings still on from a previous look. The app knew which one and never said. The empty list now names every restriction in force, says how many listings exist altogether, and clears the lot in one tap. A Show all button sits beside Add on the map for the same reason, and when listings exist but none has a location it says that instead of looking empty',ok:(typeof rbPropActiveFilters==='function')&&(typeof rbPropClearAllFilters==='function')},
     {n:'The running build is now stated where the problem is being looked at (v518.2) - a phone can be on an older copy than the one just sent, in which case none of the fixes described exist on it and every other answer is beside the point. The version is shown beside Property in the map menu, and the visibility check names it and says what to do if it is older than expected',ok:true},
     {n:'And the admin can see what is waiting, and let it through in one press (v542) — making approval the thing that decides visibility means a shop can go quiet with nobody knowing why. The Pages tab now leads with how many shops are not approved and how many items are sitting behind them, each with an Approve button. Pressing it approves the shop, rewrites the flag on every item already listed under it, and puts the lot in front of buyers at once — tried on twenty-six items: invisible to a buyer, all twenty-six visible to their own seller, and all twenty-six live after one press',ok:fn("rbAcShopsWaiting")&&fn("rbAcApproveShop")&&fn("rbAcWaitingBlock")&&String(rbAcPages).indexOf('rbAcWaitingBlock()')>0&&String(rbAcApproveShop).indexOf('rbShopSyncStock')>0},
+    {n:'Measure from a point you choose, not only from where you are (v546) — checking what is near a building you are thinking about does not mean standing in it. Paste its coordinates, or a Google Maps link, or the name of an area that already has a listing, and the WHOLE screen answers about that point: every distance, every rung of the ladder, the metro and the bus. The heading says which point, every row says “11 km from Al Barsha” rather than “away”, and it is cleared by pressing “Use my location instead” — never quietly, or you would be reading a screen about somewhere you had forgotten you chose',ok:fn("rbGeoPickSet")&&fn("rbGeoPickClear")&&fn("rbNearbyPickUI")&&String(rbNearMe).indexOf('rb_geo_pick')>0&&String(rbNearbyRender).indexOf("me.src==='pick'")>0},
+    {n:'400 m joins the ladder (v546) — the rungs are 400 m, 800 m, then 1.5, 2, 2.5, 3, 4, 5 and 6 km. It stops at 400 and does not go finer: a phone knows where it is to within tens of metres on a good day, so a 50 m band would be offering a precision the position itself does not have',ok:RB_BANDS[0]===0.4&&RB_BANDS.length===9&&rbBandLabel(0.4)==='400 m'},
+    {n:'And a thing standing on the point says so in words (v546) — a listing exactly where you pasted read “0 m from Al Barsha”, which is true and reads like a fault. Anything within about 25 m now reads “right here”, for the same reason the ladder stops at 400 m: three metres is not a distance this knows',ok:rbNearKmLabel(0.003)==='right here'&&rbNearKmLabel(0.003,true)==='right here'&&rbNearKmLabel(0.167)==='167 m away'},
+    {n:'How much is within 800 m, 1.5 km, 2 km… (v545) — a ladder of distances across the top of Near you, each saying how many things are inside it, measured from where you actually are. Tap one and the list shows only those; tap it again to clear. The counts are cumulative — within 800 m means within 800 m, not the ring between two radii — and they are counted from everything, so the numbers do not shrink as you narrow the list. The ladder only appears once your real position is known, because every number on it is a measurement from that point: showing it against the last place you looked at would be a row of confident figures about somewhere you are not',ok:Array.isArray(RB_BANDS)&&[0.8,1.5,2,2.5,3,4,5,6].every(function(k){return RB_BANDS.indexOf(k)>-1;})&&fn("rbBandCounts")&&fn("rbNearbyBand")&&rbBandLabel(0.8)==='800 m'&&rbBandLabel(2.5)==='2.5 km'},
+    {n:'And it says what it could not measure, instead of quietly rounding it in (v545) — a property carries a map pin. A thing for sale carries an area written as words, though a seller who pasted a Google Maps link gave a real point without meaning to, and that is used when it is there. A job carries a region, usually no finer than a country, and there is nothing in it to measure at all. Anything with no point is counted separately and named under the ladder — “2 jobs carry an area written as words, not a map pin, so they are not in these counts” — because a radius cannot be measured from a place name, and putting them in the nearest band would be inventing a distance',ok:fn("rbItemPos")&&fn("rbItemKm")&&rbItemPos({raw:{lat:25.1,lng:55.2}})!==null&&rbItemPos({raw:{map:'https://www.google.com/maps/@25.05,55.11,17z'}})!==null&&rbItemPos({raw:{location:'Discovery Gardens'}})===null&&rbItemKm({raw:{}},{lat:25,lng:55})===null},
+    {n:'The metro and the bus, measured from where you stand (v545) — one press and Near you lists the nearest stations and stops with how far each is. The stops come from OpenStreetMap, which is data somebody surveyed; Reedbi has no transit list of its own and is not going to invent one, so a stop nobody has mapped does not appear and it says so. It is a shared free service, so it is asked only when the button is pressed and the answer is kept for the hour. And it is straight-line distance, not walking distance — a stop 400 m away across a motorway is not a 400 m walk, which the panel says rather than letting the number imply otherwise',ok:fn("rbNearbyTransit")&&fn("rbTransitPanel")&&fn("rbPropNearbyTransit")&&/not walking distance/.test(String(rbTransitPanel))&&/OpenStreetMap/.test(String(rbTransitPanel))&&/did not answer/.test(String(rbTransitPanel))},
     {n:'Ten buttons did nothing at all (v544) — the worst thing in the app, and nothing on screen said so. “Publish Listing” called a function that was never written. You could fill in the whole product form, press it, and get no listing, no error, no explanation — and six places open that form. The same was true of “Confirm Order”, the job “Submit”, “Submit Rating”, “Pay and Boost”, the composer’s two typing handlers and all three parts of the search inside a topic. Found by walking every inline handler in the page and checking the function exists; that walk is now a test that fails the build',ok:['submitProduct','placeOrder','submitApply','submitRating','proceedToPay','doIS','toggleIS','clearIS','onBI','onTI','confirmPay'].every(function(f){return typeof window[f]==='function';})},
     {n:'Nothing you write is thrown away while a shop waits (v544) — the approval gate was the right rule and a miserable experience: fill in a form, press Publish, told you are not allowed. The listing is kept as a draft instead, the screen says plainly that nothing was lost, and the moment an admin approves the shop every draft goes up by itself. Tried end to end: one draft kept, nothing listed, approved, one listing live carrying exactly what was typed',ok:fn("rbDraftSave")&&fn("rbDraftPostAll")&&fn("rbShopDraftNote")&&String(submitProduct).indexOf('rbDraftSave')>0&&String(rbShopSyncStock).indexOf('rbDraftPostAll')>0},
     {n:'And the form now tells you what is wrong, in the order you would fix it (v544) — no name, no price, a price that is not a number, a phone number too short to call. It says one thing at a time and puts the cursor in the field it is talking about, rather than refusing the whole form with nothing pointed at',ok:fn("lpProblems")&&lpProblems({title:'',price:'',desc:'',phone:''}).length>0&&lpProblems({title:'x',price:'abc',desc:'',phone:''})[0][0]==='lp-price'&&lpProblems({title:'x',price:'5',desc:'',phone:''}).length===0},
@@ -19096,7 +19155,7 @@ function rbSysChecks(){
 function openSystemCheck(){
   var ex=document.getElementById('syscheck-ovl');if(ex)ex.remove();
   var checks=rbSysChecks();var pass=checks.filter(function(x){return x.ok;}).length;
-  var ver='v544';var all=(pass===checks.length);
+  var ver='v546';var all=(pass===checks.length);
   var rows=checks.map(function(x){return '<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--b)"><span style="font-size:14px;flex:0 0 auto;color:'+(x.ok?'#16a34a':'#dc2626')+'">'+(x.ok?'✓':'✗')+'</span><span style="font-size:12.5px;line-height:1.45;color:var(--tx)">'+esc(x.n)+'</span></div>';}).join('');
   var ov=document.createElement('div');ov.className='overlay';ov.id='syscheck-ovl';
   ov.innerHTML='<div class="modal" style="max-width:520px"><div class="mhd"><h3>🛡️ System check — Reedbi '+ver+'</h3><button class="modal-x" onclick="closeOvl(\'syscheck-ovl\')"><i class="ti ti-x"></i></button></div>'
@@ -22096,20 +22155,39 @@ function rbPMapInView(){
 function rbNearMe(){
   var out={lat:null,lng:null,src:'',place:'',cc:''};
   try{out.cc=rbGeoCountry();}catch(e){}
+  /* v546: a point set by hand wins over everything, including a live GPS fix. Somebody checking
+     what is near a building they are thinking about is not standing in it, and the whole screen
+     should answer about THAT point - every distance, every band, the metro and the bus. It is
+     cleared deliberately, never silently, or the person would be reading a screen about somewhere
+     they have forgotten they chose. */
+  var picked=null;
   try{
-    var me=LS.get('rb_geo_me',null);
-    if(me&&typeof me.lat==='number'&&(Date.now()-(me.at||0))<7*24*3600*1000){
-      out.lat=me.lat;out.lng=me.lng;out.src='you';out.acc=me.acc||0;
+    var pk=LS.get('rb_geo_pick',null);
+    if(pk&&typeof pk.lat==='number'&&typeof pk.lng==='number')picked=pk;
+  }catch(e){}
+  try{
+    if(picked){
+      out.lat=picked.lat;out.lng=picked.lng;out.src='pick';
+      out.pickName=String(picked.name||'');
     }else{
-      var g=rbGeoStart();
-      out.lat=g.lat;out.lng=g.lng;out.src=g.src;
+      var me=LS.get('rb_geo_me',null);
+      if(me&&typeof me.lat==='number'&&(Date.now()-(me.at||0))<7*24*3600*1000){
+        out.lat=me.lat;out.lng=me.lng;out.src='you';out.acc=me.acc||0;
+      }else{
+        var g=rbGeoStart();
+        out.lat=g.lat;out.lng=g.lng;out.src=g.src;
+      }
     }
   }catch(e){}
   /* what this place is CALLED matters as much as where it is, because a product and a job can only
      be matched by name. The person's own setting comes first; otherwise the nearest listing that has
      both coordinates and a place name says where they are better than a country does. */
   try{
-    if(CU&&CU.location)out.place=String(CU.location);
+    /* a point set by hand carries its own name if one was given; otherwise the nearest listing
+       with a place name still tells us what the area is called, which is how a product or a job -
+       matched by words, never by a point - can be matched to it at all */
+    if(out.src==='pick'&&out.pickName)out.place=out.pickName;
+    if(!out.place&&CU&&CU.location&&out.src!=='pick')out.place=String(CU.location);
     if(!out.place&&typeof out.lat==='number'){
       var best=null,bestKm=1e9;
       rbPMapAll().forEach(function(p){
@@ -22149,6 +22227,10 @@ function rbNearKmLabel(km,bare){
   /* `bare` leaves off "away", for when the sentence continues "... from Discovery garden" */
   if(typeof km!=='number')return '';
   var tail=bare?'':' away';
+  /* v546: under about 25 m, say so in words. A phone's position is good to tens of metres on a
+     good day, so "3 m away" is a precision nothing here has - and a listing sitting exactly on a
+     point somebody pasted read "0 m from Al Barsha", which is true and reads like a fault. */
+  if(km<0.025)return bare?'right here':'right here';
   if(km<1)return Math.round(km*1000)+' m'+tail;
   if(km<10)return (Math.round(km*10)/10)+' km'+tail;
   if(km<1000)return Math.round(km)+' km'+tail;
@@ -22157,6 +22239,75 @@ function rbNearKmLabel(km,bare){
 
 /* every open thing Reedbi holds that can be placed, nearest first. Nothing is invented: a job appears
    here only because somebody posted it, and a product only because a seller listed it. */
+/* ============================================================
+   DISTANCE BANDS  (v545)
+   "within 800 m: 25 for sale, 10 jobs, 80 property" - and the same at 1.5, 2, 2.5, 3, 4, 5 and
+   6 km. Counts are CUMULATIVE: within 800 m means within 800 m, not the ring between two radii.
+
+   Only some things can honestly be counted this way. A property carries a map pin, so it is
+   measured. A product carries an area written as words, but its seller may have pasted a map link,
+   which does contain a point - that is used when it is there. A job carries a region, usually no
+   finer than a country, and there is nothing in it to measure. Anything with no point is counted
+   separately and said out loud rather than quietly dropped into the nearest band or, worse,
+   assigned a distance it does not have.
+   ============================================================ */
+/* v546: 400 m added at the bottom, as asked. Below that a GPS fix is usually less accurate than
+   the band itself - a phone good to 20 m is fine at 400 m and meaningless at 50 m - so the ladder
+   stops here rather than offering a precision the position does not have. */
+var RB_BANDS=[0.4,0.8,1.5,2,2.5,3,4,5,6];
+function rbBandLabel(km){
+  return km<1 ? (Math.round(km*1000)+' m') : ((km%1?km:Math.round(km))+' km');
+}
+/* the best point we actually have for a row, or null - never a guess */
+function rbItemPos(r){
+  try{
+    var raw=r&&r.raw;
+    if(!raw)return null;
+    if(typeof raw.lat==='number'&&typeof raw.lng==='number')return {lat:raw.lat,lng:raw.lng};
+    /* a seller who pasted a Google Maps link gave us a real point without meaning to */
+    var from=[raw.map,raw.mapLink,raw.addr,raw.location];
+    for(var i=0;i<from.length;i++){
+      if(!from[i])continue;
+      var p=rbPropParseLatLng(String(from[i]));
+      if(p&&isFinite(p.lat)&&isFinite(p.lng))return p;
+    }
+  }catch(e){}
+  return null;
+}
+/* how far this row is from the person, in km, or null if it cannot be known */
+function rbItemKm(r,me){
+  if(!me||typeof me.lat!=='number')return null;
+  var p=rbItemPos(r);
+  if(!p)return null;
+  var km=rbGeoKm(me.lat,me.lng,p.lat,p.lng);
+  return isFinite(km)?km:null;
+}
+/* one pass over the rows: for each band, how many of each kind are inside it */
+function rbBandCounts(rows,me){
+  var out=RB_BANDS.map(function(km){
+    return {km:km,label:rbBandLabel(km),property:0,product:0,job:0,total:0};
+  });
+  var unplaced={property:0,product:0,job:0,total:0};
+  (rows||[]).forEach(function(r){
+    var kind=(r.what==='property')?'property':(r.what==='product')?'product':'job';
+    var km=rbItemKm(r,me);
+    if(km==null){unplaced[kind]++;unplaced.total++;return;}
+    for(var i=0;i<out.length;i++){
+      if(km<=out[i].km){out[i][kind]++;out[i].total++;}
+    }
+  });
+  return {bands:out,unplaced:unplaced};
+}
+/* the sentence under a chosen band, in the order the request asked for them */
+function rbBandSentence(b){
+  if(!b)return '';
+  var bits=[];
+  if(b.property)bits.push(b.property+' propert'+(b.property===1?'y':'ies'));
+  if(b.product) bits.push(b.product +' for sale');
+  if(b.job)     bits.push(b.job     +' job'+(b.job===1?'':'s'));
+  if(!bits.length)return 'Nothing within '+b.label+' of you.';
+  return bits.join(' \u00b7 ')+' within '+b.label+' of you.';
+}
 /* How far "only this area" reaches for a property, in km. Wide enough to cover a city and the
    next neighbourhood, narrow enough that another emirate is not "here". A job ignores this
    entirely - see the jobs branch below. */
@@ -22260,7 +22411,7 @@ function rbNearbyItems(opt){
 function rbNearbyCount(){try{return rbNearbyItems().length;}catch(e){return 0;}}
 
 /* One tap, everything around you, nearest first - property, things for sale and jobs together. */
-var __near={what:'all',nearOnly:false,cat:'',q:'',fromYou:false,fromName:''};   /* v538: category and search */
+var __near={what:'all',nearOnly:false,cat:'',q:'',fromYou:false,fromName:'',band:0};   /* v538: category and search */
 function openNearby(what){
   if(what)__near.what=what;
   var ex=document.getElementById('nearby-ovl');if(ex)ex.remove();
@@ -22297,6 +22448,207 @@ function rbNearbyUseMyLocation(){
     }
   });
 }
+/* v545: choose a radius. Pressing the same one again clears it. */
+/* v545: the radius ladder. It only appears once the person's real position is known, because
+   every number on it is a measurement from that point - showing it against a remembered map
+   centre would be a row of confident figures about somewhere the person is not. */
+/* v545: how far the metro and the bus are from where the person is standing. The stops come from
+   OpenStreetMap, which is real data somebody surveyed - Reedbi has no transit list of its own and
+   is not going to invent one. It is a shared free service, so it is asked only when the button is
+   pressed, and the answer is kept for the session.
+
+   One honest limit worth saying out loud: this is distance in a straight line, not walking
+   distance. A stop 400 m away across a motorway is not a 400 m walk. */
+var __rbTransit=null;
+function rbNearbyTransitBtn(){
+  var me=rbNearMe();
+  if(me.src!=='you'&&me.src!=='pick')return '';
+  if(__rbTransit&&__rbTransit.at&&(Date.now()-__rbTransit.at)<3600000&&__rbTransit.key===rbTransitKey(me))
+    return rbTransitPanel(__rbTransit.data);
+  return '<button class="rbn-tr" id="rbn-tr" onclick="rbNearbyTransit()">'
+    +rbUiSVG('pin',14)+'<span>Metro &amp; bus near me</span></button>';
+}
+function rbTransitKey(me){return me.lat.toFixed(3)+','+me.lng.toFixed(3);}
+function rbNearbyTransit(){
+  var me=rbNearMe();
+  if(me.src!=='you'&&me.src!=='pick'){toast('Turn on your location first, or set a point','info');return;}
+  var btn=document.getElementById('rbn-tr');
+  if(btn){btn.disabled=true;var s=btn.querySelector('span');if(s)s.textContent='Looking\u2026';}
+  rbPropNearbyTransit(me.lat,me.lng,function(res){
+    __rbTransit={at:Date.now(),key:rbTransitKey(me),data:res};
+    rbNearbyRender();
+  });
+}
+function rbTransitPanel(res){
+  if(!res)return '';
+  if(res.err){
+    return '<div class="rbn-trp rbn-trerr">The map service did not answer just now \u2014 '
+      +esc(String(res.err))+'. '
+      +'<button class="rbn-link" onclick="rbNearbyTransitAgain()">Try again</button></div>';
+  }
+  var row=function(label,list,icon){
+    if(!list||!list.length)
+      return '<div class="rbn-trl"><b>'+esc(label)+'</b><span class="rbn-trnone">'
+        +'none mapped within about 1.3 km</span></div>';
+    return '<div class="rbn-trl"><b>'+esc(label)+'</b>'
+      + list.slice(0,3).map(function(x){
+          return '<span class="rbn-trs">'+esc(x.name)
+            +'<i>'+esc(rbNearKmLabel(x.km,true))+'</i></span>';
+        }).join('')
+      +'</div>';
+  };
+  return '<div class="rbn-trp">'
+    + row('Metro', res.metro)
+    + row('Bus',   res.bus)
+    +'<div class="rbn-trnote">Straight-line distance from where you are, not walking distance \u2014 '
+    +'a stop across a motorway is further on foot than it looks here. '
+    +'Stops come from OpenStreetMap; one that nobody has mapped will not appear.</div>'
+    +'</div>';
+}
+function rbNearbyTransitAgain(){
+  try{
+    var me=rbNearMe();
+    if(window.__transitCache)delete window.__transitCache[me.lat.toFixed(3)+','+me.lng.toFixed(3)];
+  }catch(e){}
+  __rbTransit=null;
+  rbNearbyRender();
+  rbNearbyTransit();
+}
+function rbBandRow(data){
+  if(!data)return '';
+  var any=data.bands.some(function(b){return b.total>0;});
+  if(!any&&!data.unplaced.total)return '';
+  var chips=data.bands.map(function(b){
+    var on=(__near.band===b.km);
+    return '<button class="rbn-bd'+(on?' on':'')+'"'+(b.total?'':' disabled')
+      +' onclick="rbNearbyBand('+b.km+')">'
+      +'<i>'+esc(b.label)+'</i><b>'+b.total+'</b></button>';
+  }).join('');
+  var chosen=data.bands.filter(function(b){return b.km===__near.band;})[0];
+  var note='';
+  if(chosen){
+    note='<div class="rbn-bdsay">'+esc(rbBandSentence(chosen))+'</div>';
+  }else if(any){
+    /* nothing chosen: say what the ladder is, once, rather than leaving bare numbers */
+    note='<div class="rbn-bdsay rbn-bdhint">How many things are within each distance of you. '
+      +'Tap one to see only those.</div>';
+  }
+  if(data.unplaced.total){
+    var u=data.unplaced;
+    var bits=[];
+    if(u.job)bits.push(u.job+' job'+(u.job===1?'':'s'));
+    if(u.product)bits.push(u.product+' for sale');
+    if(u.property)bits.push(u.property+' propert'+(u.property===1?'y':'ies'));
+    note+='<div class="rbn-bdsay rbn-bdwarn">'+esc(bits.join(' \u00b7 '))
+      +' carr'+(u.total===1?'ies':'y')+' an area written as words, not a map pin, so '
+      +(u.total===1?'it is':'they are')+' not in these counts. A radius cannot be measured '
+      +'from a place name.</div>';
+  }
+  return '<div class="rbn-bdrow">'+chips+'</div>'+note;
+}
+/* ============================================================
+   MEASURE FROM SOMEWHERE ELSE  (v546)
+   Checking what is near a building you are thinking about does not mean standing in it. Paste its
+   coordinates or a Google Maps link and the whole screen answers about that point instead - every
+   distance, every band, the metro and the bus. It is never set quietly and never cleared quietly.
+   ============================================================ */
+function rbGeoPick(){return LS.get('rb_geo_pick',null);}
+/* accepts "25.0475, 55.1196", a Google Maps link, or the name of a place already on the map */
+function rbGeoPickSet(text,then){
+  then=then||function(){};
+  var s=String(text==null?'':text).trim();
+  if(!s){then(false,'Paste coordinates or a Google Maps link.');return;}
+  var p=null;
+  try{p=rbPropParseLatLng(s);}catch(e){}
+  var name='';
+  if(!p){
+    /* not coordinates - try it as the name of somewhere that is already on the map */
+    try{
+      var hit=null;
+      rbPMapAll().forEach(function(x){
+        if(hit||typeof x.lat!=='number'||!x.place)return;
+        if(String(x.place).toLowerCase().indexOf(s.toLowerCase())>-1)hit=x;
+      });
+      if(hit){p={lat:hit.lat,lng:hit.lng};name=String(hit.place);}
+    }catch(e){}
+  }
+  if(!p){
+    then(false,'That is not a point Reedbi can read. Paste it as 25.0475, 55.1196, '
+      +'or paste a Google Maps link, or type the name of an area that already has a listing.');
+    return;
+  }
+  if(!(p.lat>=-90&&p.lat<=90&&p.lng>=-180&&p.lng<=180)){
+    then(false,'Those numbers are not a place on Earth \u2014 check they are latitude then longitude.');
+    return;
+  }
+  if(!name)name=rbGeoPickName(p);
+  try{
+    LS.set('rb_geo_pick',{lat:+p.lat.toFixed(5),lng:+p.lng.toFixed(5),name:name,at:Date.now()});
+  }catch(e){then(false,'That could not be saved on this phone.');return;}
+  then(true,name);
+}
+/* what to call a point nobody named: the nearest listing's area, else the numbers themselves */
+function rbGeoPickName(p){
+  try{
+    var best=null,bestKm=1e9;
+    rbPMapAll().forEach(function(x){
+      if(typeof x.lat!=='number'||!x.place)return;
+      var km=rbGeoKm(p.lat,p.lng,x.lat,x.lng);
+      if(km<bestKm){bestKm=km;best=x;}
+    });
+    if(best&&bestKm<5)return String(best.place);
+  }catch(e){}
+  return p.lat.toFixed(4)+', '+p.lng.toFixed(4);
+}
+function rbGeoPickClear(){
+  try{LS.set('rb_geo_pick',null);}catch(e){}
+  __near.band=0;
+  __rbTransit=null;
+  rbNearbyRender();
+  toast('Back to measuring from where you are','ok');
+}
+/* the panel: open it, paste, done */
+function rbNearbyPickOpen(){
+  var box=document.getElementById('rbn-pick');
+  if(!box)return;
+  box.style.display='block';
+  var inp=document.getElementById('rbn-pickin');
+  if(inp){inp.value='';try{inp.focus();}catch(e){}}
+}
+function rbNearbyPickApply(){
+  var inp=document.getElementById('rbn-pickin');
+  var msg=document.getElementById('rbn-pickmsg');
+  var say=function(t,bad){if(msg){msg.textContent=t||'';msg.className='rbn-pickmsg'+(bad?' bad':'');}};
+  rbGeoPickSet(inp?inp.value:'',function(ok,what){
+    if(!ok){say(what,true);return;}
+    /* a new point means the old metro answer and the old band are about somewhere else */
+    __rbTransit=null;__near.band=0;
+    rbNearbyRender();
+    toast('Now measuring from '+what,'ok');
+  });
+}
+function rbNearbyPickUI(me){
+  var pk=(me.src==='pick');
+  var panel='<div class="rbn-pick" id="rbn-pick" style="display:none">'
+    +'<input id="rbn-pickin" type="text" inputmode="text" autocomplete="off" '
+    +'placeholder="25.0475, 55.1196  or a Maps link" '
+    +'onkeydown="if(event.key===\'Enter\'){event.preventDefault();rbNearbyPickApply();}">'
+    +'<button class="rbn-pickgo" onclick="rbNearbyPickApply()">Measure from here</button>'
+    +'<div class="rbn-pickmsg" id="rbn-pickmsg"></div></div>';
+  if(pk){
+    return '<div class="rbn-pickon">'+rbUiSVG('pin',14)
+      +'<span>Measuring from <b>'+esc(me.pickName||'the point you set')+'</b></span>'
+      +'<button class="rbn-link" onclick="rbGeoPickClear()">Use my location instead</button></div>'
+      +panel;
+  }
+  return '<button class="rbn-pickbtn" onclick="rbNearbyPickOpen()">'
+    +rbUiSVG('search',14)+'<span>Measure from another point</span></button>'+panel;
+}
+function rbNearbyBand(km){
+  km=parseFloat(km)||0;
+  __near.band=(__near.band===km)?0:km;
+  rbNearbyRender();
+}
 function rbNearbyCat(id){__near.cat=String(id||'');rbNearbyRender();}
 /* v538: and type to find a thing by name, place, shop or price */
 function rbNearbyFind(q){
@@ -22320,7 +22672,19 @@ function rbNearbyRender(){
   var all=rbNearbyItems({me:me,where:'home'});
   var rows=rbNearbyItems({me:me,where:'home',what:__near.what,nearOnly:__near.nearOnly})
     .filter(function(r){return rbNearbyMatch(r,__near.q);})
-    .filter(function(r){return !__near.cat||String(r.catId||r.cat)===__near.cat;});
+    .filter(function(r){return !__near.cat||String(r.catId||r.cat)===__near.cat;})
+    /* v545: a chosen radius. Something with no point to measure is NOT silently kept and NOT
+       silently dropped - it is counted separately and said under the band. */
+    .filter(function(r){
+      if(!__near.band)return true;
+      var km=rbItemKm(r,me);
+      return km!=null&&km<=__near.band;
+    });
+  /* bands are counted from EVERYTHING, so the numbers do not shrink as you narrow the list */
+  /* v546: a point set by hand is as real a point as a GPS fix - the ladder and the metro panel
+     answer about whichever one the screen is measuring from. */
+  var measured=(me.src==='you'||me.src==='pick');
+  var bandData=measured?rbBandCounts(all,me):null;
   var n=function(w){return all.filter(function(r){return w==='all'||r.what===w;}).length;};
   var area=me.place?me.place.split(',')[0]:'';
 
@@ -22330,10 +22694,13 @@ function rbNearbyRender(){
      "Vegetables 6 / Fruits 4 / Grocery 2" is a thing to glance at. Nothing is dropped - every
      activity that has something, and inside it every category that has something, in the order
      the nearest of each appears. */
-  var how=(me.src==='you')?('Around you'+(area?(' in '+esc(area)):''))
+  var how=(me.src==='pick')?('Around '+esc(me.pickName||'the point you set'))
+        :(me.src==='you')?('Around you'+(area?(' in '+esc(area)):''))
         :(me.src==='last')?('Around '+(area?esc(area):'where you last looked'))
         :('Across '+(area?esc(area):'your country'));
-  var sub=(me.src==='you')
+  var sub=(me.src==='pick')
+        ?('Measured from the point you set, not from where you are.')
+        :(me.src==='you')
         ?('Nearest first, measured from where you are'+(me.acc?(', to about '+me.acc+' m'):'')+'.')
         :(me.src==='last')?('Distances below are measured from '+(area?esc(area):'where you last looked')
             +', not from you.')
@@ -22342,8 +22709,9 @@ function rbNearbyRender(){
      This is the thing to press, and it only appears when it would change something. */
   /* v541: every row reads these to decide whether it may say "away" */
   __near.fromYou=(me.src==='you');
-  __near.fromName=(me.src==='last')?(area||''):'';
-  var askBtn=(me.src==='you')?''
+  __near.fromName=(me.src==='pick')?(me.pickName||'the point you set')
+                 :(me.src==='last')?(area||''):'';
+  var askBtn=(me.src==='you'||me.src==='pick')?''
     :('<button class="rbn-geo" id="rbn-geo" onclick="rbNearbyUseMyLocation()">'
       +rbUiSVG('pin',15)+'<span>Use my exact location</span></button>');
 
@@ -22414,12 +22782,15 @@ function rbNearbyRender(){
     /* v538: this part holds still at the top of the scroll */
     +'<div class="rbn-stick">'
     +askBtn
+    + rbNearbyPickUI(me)
     +'<div class="rbn-find">'+rbUiSVG('search',16)
       +'<input id="rbn-q" type="search" placeholder="Find anything near you" value="'+esc(__near.q||'')+'" '
       +'oninput="rbNearbyFind(this.value)" autocomplete="off">'
       +(__near.q?'<button class="rbn-x" onclick="rbNearbyFind(\'\')" aria-label="Clear">\u2715</button>':'')
       +'</div>'
     +'<div class="rbn-tabs">'+tabs+'</div>'
+    + rbBandRow(bandData)
+    + rbNearbyTransitBtn()
     +(index?('<div class="rbn-ixrow">'
        +'<button class="rbn-ix'+(__near.cat?'':' on')+'" onclick="rbNearbyCat(\'\')">All</button>'
        +index+'</div>'):'')
@@ -22511,7 +22882,11 @@ function rbNearbyRow(r,sameKind){
      claim the data does not support. A job says where it actually is; only something matched to
      the person's own area says "in your area". */
   var dist=(r.exact&&typeof r.km==='number')
-    ? (__near.fromYou?rbNearKmLabel(r.km):(rbNearKmLabel(r.km,true)+rbNearFromSuffix()))
+    ? (__near.fromYou
+        ? rbNearKmLabel(r.km)
+        /* "right here" already says it - "right here from Al Barsha" would not */
+        : (r.km<0.025 ? rbNearKmLabel(r.km,true)
+                      : (rbNearKmLabel(r.km,true)+rbNearFromSuffix())))
     : (r.wide
         ? (r.place?('in '+r.place):'anywhere')
         : (r.here?'in your area':''));
