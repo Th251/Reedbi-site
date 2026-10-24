@@ -1,0 +1,5 @@
+# Search engines and AI search assistants are welcome to read public listing pages.
+User-agent: *
+Allow: /
+
+Sitemap: https://reedbi.com/sitemap.xml
